@@ -1,0 +1,33 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.34322.80
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "fluxnote-backend", "fluxnote-backend\fluxnote-backend.csproj", "{04ABFD16-A270-467E-86A3-A256EA00F3CB}"
+EndProject
+Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "fluxnote-frontend", "fluxnote-frontend\fluxnote-frontend.esproj", "{63B7A30D-9296-4CA7-A647-FF9A487FE521}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{04ABFD16-A270-467E-86A3-A256EA00F3CB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{04ABFD16-A270-467E-86A3-A256EA00F3CB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{04ABFD16-A270-467E-86A3-A256EA00F3CB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{04ABFD16-A270-467E-86A3-A256EA00F3CB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{63B7A30D-9296-4CA7-A647-FF9A487FE521}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{63B7A30D-9296-4CA7-A647-FF9A487FE521}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{63B7A30D-9296-4CA7-A647-FF9A487FE521}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{63B7A30D-9296-4CA7-A647-FF9A487FE521}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{63B7A30D-9296-4CA7-A647-FF9A487FE521}.Release|Any CPU.Build.0 = Release|Any CPU
+		{63B7A30D-9296-4CA7-A647-FF9A487FE521}.Release|Any CPU.Deploy.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {7745669E-B288-4C59-827E-735E469FD3E5}
+	EndGlobalSection
+EndGlobal

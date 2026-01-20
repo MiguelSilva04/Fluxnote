@@ -1,0 +1,20 @@
+<h1 id="tableLabel">Gym Members</h1>
+
+<p *ngIf="!people"><em>Loading...</em></p>
+
+<table class='table table-striped' aria-labelledby="tableLabel" *ngIf="people">
+  <thead>
+    <tr>
+      <th>Member nr.</th>
+      <th>Name</th>
+      <th>Age</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let person of people">
+      <td>{{ person.personId }}</td>
+      <td>{{ person.name }}</td>
+      <td>{{ person.age }}</td>
+    </tr>
+  </tbody>
+</table>
