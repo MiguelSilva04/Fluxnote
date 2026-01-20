@@ -14,6 +14,13 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
+// Auto-apply migrations on startup
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<FluxnoteServerContext>();
+    db.Database.Migrate();
+}
+
 app.UseDefaultFiles();
 app.UseStaticFiles();
 

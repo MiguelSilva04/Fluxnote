@@ -24,7 +24,7 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
   </ItemGroup>
 
-  <ItemGroup>
+  <ItemGroup Condition="'$(DOTNET_RUNNING_IN_CONTAINER)' != 'true'">
     <ProjectReference Include="..\fluxnote-frontend\fluxnote-frontend.esproj">
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>

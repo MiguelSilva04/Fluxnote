@@ -1,0 +1,19 @@
+# Development Dockerfile for .NET
+FROM mcr.microsoft.com/dotnet/sdk:8.0
+
+WORKDIR /app
+
+# Install EF Core tools
+RUN dotnet tool install --global dotnet-ef
+ENV PATH="$PATH:/root/.dotnet/tools"
+
+# Expose development port
+EXPOSE 5000
+
+# Set environment variables for development
+ENV ASPNETCORE_URLS=http://+:5000
+ENV ASPNETCORE_ENVIRONMENT=Development
+ENV DOTNET_USE_POLLING_FILE_WATCHER=true
+
+# Start with hot reload (dotnet watch)
+ENTRYPOINT ["dotnet", "watch", "run", "--no-launch-profile"]
