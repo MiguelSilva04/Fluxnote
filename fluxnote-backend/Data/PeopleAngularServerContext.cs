@@ -15,5 +15,7 @@ namespace Fluxnote.Backend.Data
         }
 
         public DbSet<Fluxnote.Backend.Models.Person> Person { get; set; } = default!;
+        public DbSet<Fluxnote.Backend.Models.Team> Team { get; set; } = default!;
+        public DbSet<Fluxnote.Backend.Models.TeamMember> TeamMember { get; set; } = default!;
     }
 }
