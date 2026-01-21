@@ -79,7 +79,7 @@
           [class]="getToolbarButtonClass(!formats.align || formats.align === '')"
           title="Align Left"
         >
-          <lucide-icon name="align-left" class="h-4 w-4"></lucide-icon>
+          <lucide-icon name="text-align-start" class="h-4 w-4"></lucide-icon>
         </button>
         <button
           type="button"
@@ -87,7 +87,7 @@
           [class]="getToolbarButtonClass(formats.align === 'center')"
           title="Align Center"
         >
-          <lucide-icon name="align-center" class="h-4 w-4"></lucide-icon>
+          <lucide-icon name="text-align-justify" class="h-4 w-4"></lucide-icon>
         </button>
         <button
           type="button"
@@ -95,7 +95,7 @@
           [class]="getToolbarButtonClass(formats.align === 'right')"
           title="Align Right"
         >
-          <lucide-icon name="align-right" class="h-4 w-4"></lucide-icon>
+          <lucide-icon name="text-align-end" class="h-4 w-4"></lucide-icon>
         </button>
       </div>
 
@@ -132,7 +132,7 @@
         @switch (saveStatus()) {
           @case ('saving') {
             <div class="flex items-center gap-2 text-gray-500">
-              <lucide-icon name="loader-2" class="h-4 w-4 animate-spin"></lucide-icon>
+              <lucide-icon name="loader" class="h-4 w-4 animate-spin"></lucide-icon>
               <span class="text-sm">Saving...</span>
             </div>
           }
