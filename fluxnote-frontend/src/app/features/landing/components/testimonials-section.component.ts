@@ -10,10 +10,10 @@ import { CommonModule } from '@angular/common';
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-16">
           <h2 class="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
-            O que dizem os nossos utilizadores
+            What our users are saying
           </h2>
           <p class="text-xl text-gray-600 max-w-3xl mx-auto">
-            Milhares de profissionais ja confiam no Fluxnote para os seus projetos mais importantes.
+            Thousands of professionals trust Fluxnote for their most important work.
           </p>
         </div>
 
@@ -38,7 +38,7 @@ import { CommonModule } from '@angular/common';
                 "{{ testimonial.quote }}"
               </blockquote>
 
-              <div class="flex text-green-500 mt-4">
+              <div class="flex text-[#155347] mt-4">
                 @for (star of [1,2,3,4,5]; track star) {
                   <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                     <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
@@ -56,20 +56,20 @@ export class TestimonialsSectionComponent {
   testimonials = [
     {
       name: 'Ana Silva',
-      role: 'Gestora de Projetos',
-      quote: 'O Fluxnote revolucionou a forma como a nossa equipe colabora. A IA realmente ajuda a melhorar a qualidade dos nossos documentos.',
+      role: 'Project Manager',
+      quote: 'Fluxnote has transformed the way our team collaborates. The AI truly helps improve the quality of our documents.',
       avatar: 'assets/ana.jpeg'
     },
     {
       name: 'Joao Santos',
-      role: 'Diretor de Marketing',
-      quote: 'Nunca foi tao facil criar conteudo de qualidade. A colaboracao em tempo real e perfeita para as nossas campanhas.',
+      role: 'Marketing Director',
+      quote: 'Creating high-quality content has never been easier. Real-time collaboration is perfect for our campaigns.',
       avatar: 'assets/joao.jpg'
     },
     {
       name: 'Maria Costa',
-      role: 'Consultora',
-      quote: 'A funcionalidade de historico de versoes salvou-me varias vezes. E uma ferramenta indispensavel para qualquer profissional.',
+      role: 'Consultant',
+      quote: 'The version history feature has saved me more than once. It’s an essential tool for any professional.',
       avatar: 'assets/maria.jpg'
     }
   ];

@@ -14,186 +14,185 @@ import { LandingHeaderComponent, LandingFooterComponent } from '../components';
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div class="text-center mb-16">
             <h1 class="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
-              Termos e Condicoes
+              Terms & Conditions
             </h1>
             <p class="text-xl text-gray-600">
-              Ultima atualizacao: 15 de Janeiro de 2025
+              Last updated: January 15, 2025
             </p>
           </div>
 
           <div class="prose prose-lg max-w-none">
-            <div class="bg-green-50 border border-green-200 rounded-2xl p-8 mb-8">
-              <h2 class="text-2xl font-bold text-gray-900 mb-4">Bem-vindo ao Fluxnote</h2>
+            <div class="bg-[#155347]/10 border border-[#155347]/30 rounded-2xl p-8 mb-8">
+              <h2 class="text-2xl font-bold text-gray-900 mb-4">Welcome to Fluxnote</h2>
               <p class="text-gray-700">
-                Estes termos e condicoes regem a utilizacao do servico Fluxnote.
-                Ao utilizar o nosso servico, concorda com estes termos na sua totalidade.
+                These terms and conditions govern your use of the Fluxnote service.
+                By using our service, you agree to these terms in full.
               </p>
             </div>
 
             <div class="space-y-8">
               <section>
-                <h2 class="text-2xl font-bold text-gray-900 mb-4">1. Definicoes</h2>
+                <h2 class="text-2xl font-bold text-gray-900 mb-4">1. Definitions</h2>
                 <div class="bg-gray-50 rounded-xl p-6">
                   <dl class="space-y-4">
                     <div>
-                      <dt class="font-semibold text-gray-900">"Servico"</dt>
-                      <dd class="text-gray-700">Refere-se a plataforma Fluxnote e todas as suas funcionalidades</dd>
+                      <dt class="font-semibold text-gray-900">"Service"</dt>
+                      <dd class="text-gray-700">Refers to the Fluxnote platform and all of its features</dd>
                     </div>
                     <div>
-                      <dt class="font-semibold text-gray-900">"Utilizador"</dt>
-                      <dd class="text-gray-700">Qualquer pessoa que acede ou utiliza o Servico</dd>
+                      <dt class="font-semibold text-gray-900">"User"</dt>
+                      <dd class="text-gray-700">Any person who accesses or uses the Service</dd>
                     </div>
                     <div>
-                      <dt class="font-semibold text-gray-900">"Conteudo"</dt>
-                      <dd class="text-gray-700">Documentos, texto, imagens e outros materiais criados no Servico</dd>
+                      <dt class="font-semibold text-gray-900">"Content"</dt>
+                      <dd class="text-gray-700">Documents, text, images, and other materials created within the Service</dd>
                     </div>
                   </dl>
                 </div>
               </section>
 
               <section>
-                <h2 class="text-2xl font-bold text-gray-900 mb-4">2. Utilizacao do Servico</h2>
+                <h2 class="text-2xl font-bold text-gray-900 mb-4">2. Use of the Service</h2>
                 <div class="space-y-4">
-                  <div class="bg-green-50 rounded-xl p-6">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-3">Utilizacoes Permitidas</h3>
+                  <div class="bg-[#155347]/10 rounded-xl p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-3">Permitted uses</h3>
                     <ul class="list-disc list-inside text-gray-700 space-y-2">
-                      <li>Criar e editar documentos para fins legitimos</li>
-                      <li>Colaborar com outros utilizadores</li>
-                      <li>Utilizar as funcionalidades de IA para melhorar o conteudo</li>
-                      <li>Partilhar documentos com permissoes apropriadas</li>
+                      <li>Create and edit documents for legitimate purposes</li>
+                      <li>Collaborate with other users</li>
+                      <li>Use AI features to improve content</li>
+                      <li>Share documents with appropriate permissions</li>
                     </ul>
                   </div>
 
                   <div class="bg-red-50 rounded-xl p-6">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-3">Utilizacoes Proibidas</h3>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-3">Prohibited uses</h3>
                     <ul class="list-disc list-inside text-gray-700 space-y-2">
-                      <li>Criar conteudo ilegal, difamatorio ou prejudicial</li>
-                      <li>Violar direitos de propriedade intelectual</li>
-                      <li>Tentar aceder a contas de outros utilizadores</li>
-                      <li>Interferir com o funcionamento do Servico</li>
-                      <li>Utilizar o Servico para spam ou atividades maliciosas</li>
+                      <li>Create illegal, defamatory, or harmful content</li>
+                      <li>Violate intellectual property rights</li>
+                      <li>Attempt to access other users’ accounts</li>
+                      <li>Interfere with the operation of the Service</li>
+                      <li>Use the Service for spam or malicious activities</li>
                     </ul>
                   </div>
                 </div>
               </section>
 
               <section>
-                <h2 class="text-2xl font-bold text-gray-900 mb-4">3. Contas de Utilizador</h2>
+                <h2 class="text-2xl font-bold text-gray-900 mb-4">3. User accounts</h2>
                 <div class="bg-gray-50 rounded-xl p-6">
-                  <h3 class="text-lg font-semibold text-gray-900 mb-3">Responsabilidades do Utilizador</h3>
+                  <h3 class="text-lg font-semibold text-gray-900 mb-3">User responsibilities</h3>
                   <ul class="list-disc list-inside text-gray-700 space-y-2">
-                    <li>Manter a confidencialidade das credenciais de acesso</li>
-                    <li>Fornecer informacoes precisas e atualizadas</li>
-                    <li>Notificar-nos imediatamente sobre uso nao autorizado</li>
-                    <li>Ser responsavel por toda a atividade na sua conta</li>
+                    <li>Keep your login credentials confidential</li>
+                    <li>Provide accurate and up-to-date information</li>
+                    <li>Notify us immediately of unauthorized use</li>
+                    <li>Be responsible for all activity on your account</li>
                   </ul>
                 </div>
               </section>
 
               <section>
-                <h2 class="text-2xl font-bold text-gray-900 mb-4">4. Propriedade Intelectual</h2>
+                <h2 class="text-2xl font-bold text-gray-900 mb-4">4. Intellectual property</h2>
                 <div class="grid md:grid-cols-2 gap-6">
                   <div class="bg-blue-50 rounded-xl p-6">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-3">O Seu Conteudo</h3>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-3">Your content</h3>
                     <p class="text-gray-700 mb-3">
-                      Mantem todos os direitos sobre o conteudo que cria no Fluxnote.
+                      You retain all rights to the content you create in Fluxnote.
                     </p>
                     <p class="text-gray-700">
-                      Concede-nos apenas uma licenca limitada para processar e armazenar
-                      o seu conteudo para fornecer o Servico.
+                      You grant us only a limited license to process and store your content
+                      in order to provide the Service.
                     </p>
                   </div>
 
-                  <div class="bg-green-50 rounded-xl p-6">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-3">Nossa Propriedade</h3>
+                  <div class="bg-[#155347]/10 rounded-xl p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-3">Our property</h3>
                     <p class="text-gray-700 mb-3">
-                      O Fluxnote, incluindo software, design e funcionalidades,
-                      e propriedade nossa e dos nossos licenciadores.
+                      Fluxnote, including its software, design, and features,
+                      is owned by us and our licensors.
                     </p>
                     <p class="text-gray-700">
-                      Nao pode copiar, modificar ou distribuir o nosso software.
+                      You may not copy, modify, or distribute our software.
                     </p>
                   </div>
                 </div>
               </section>
 
               <section>
-                <h2 class="text-2xl font-bold text-gray-900 mb-4">5. Planos e Pagamentos</h2>
+                <h2 class="text-2xl font-bold text-gray-900 mb-4">5. Plans and payments</h2>
                 <div class="bg-gray-50 rounded-xl p-6">
-                  <h3 class="text-lg font-semibold text-gray-900 mb-3">Subscricoes</h3>
+                  <h3 class="text-lg font-semibold text-gray-900 mb-3">Subscriptions</h3>
                   <ul class="list-disc list-inside text-gray-700 space-y-2">
-                    <li>Os planos pagos sao cobrados mensalmente ou anualmente</li>
-                    <li>Os precos podem ser alterados com aviso previo de 30 dias</li>
-                    <li>Pode cancelar a subscricao a qualquer momento</li>
-                    <li>Nao oferecemos reembolsos para periodos parciais</li>
+                    <li>Paid plans are billed monthly or annually</li>
+                    <li>Prices may change with 30 days’ notice</li>
+                    <li>You can cancel your subscription at any time</li>
+                    <li>We do not offer refunds for partial periods</li>
                   </ul>
                 </div>
               </section>
 
               <section>
-                <h2 class="text-2xl font-bold text-gray-900 mb-4">6. Limitacao de Responsabilidade</h2>
+                <h2 class="text-2xl font-bold text-gray-900 mb-4">6. Limitation of liability</h2>
                 <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-6">
                   <p class="text-gray-700 mb-4">
-                    O Servico e fornecido "como esta". Nao garantimos que sera sempre
-                    disponivel, seguro ou livre de erros.
+                    The Service is provided "as is". We do not guarantee it will always be
+                    available, secure, or error-free.
                   </p>
                   <p class="text-gray-700">
-                    A nossa responsabilidade e limitada ao valor pago pelo Servico
-                    nos 12 meses anteriores ao incidente.
+                    Our liability is limited to the amount paid for the Service
+                    in the 12 months prior to the incident.
                   </p>
                 </div>
               </section>
 
               <section>
-                <h2 class="text-2xl font-bold text-gray-900 mb-4">7. Terminacao</h2>
+                <h2 class="text-2xl font-bold text-gray-900 mb-4">7. Termination</h2>
                 <div class="bg-gray-50 rounded-xl p-6">
-                  <h3 class="text-lg font-semibold text-gray-900 mb-3">Terminacao por Si</h3>
+                  <h3 class="text-lg font-semibold text-gray-900 mb-3">Termination by you</h3>
                   <p class="text-gray-700 mb-4">
-                    Pode terminar a sua conta a qualquer momento atraves das definicoes
-                    da conta ou contactando-nos.
+                    You may terminate your account at any time through your account settings
+                    or by contacting us.
                   </p>
 
-                  <h3 class="text-lg font-semibold text-gray-900 mb-3">Terminacao por Nos</h3>
+                  <h3 class="text-lg font-semibold text-gray-900 mb-3">Termination by us</h3>
                   <p class="text-gray-700">
-                    Podemos suspender ou terminar a sua conta se violar estes termos
-                    ou por outras razoes legitimas, com aviso previo quando possivel.
+                    We may suspend or terminate your account if you violate these terms
+                    or for other legitimate reasons, with prior notice when possible.
                   </p>
                 </div>
               </section>
 
               <section>
-                <h2 class="text-2xl font-bold text-gray-900 mb-4">8. Alteracoes aos Termos</h2>
-                <div class="bg-green-50 rounded-xl p-6">
+                <h2 class="text-2xl font-bold text-gray-900 mb-4">8. Changes to these terms</h2>
+                <div class="bg-[#155347]/10 rounded-xl p-6">
                   <p class="text-gray-700 mb-4">
-                    Podemos atualizar estes termos ocasionalmente. Notificaremos sobre
-                    alteracoes significativas por email ou atraves do Servico.
+                    We may update these terms from time to time. We will notify you of
+                    significant changes by email or through the Service.
                   </p>
                   <p class="text-gray-700">
-                    A continuacao da utilizacao apos as alteracoes constitui aceitacao
-                    dos novos termos.
+                    Continued use after changes constitutes acceptance of the new terms.
                   </p>
                 </div>
               </section>
 
               <section>
-                <h2 class="text-2xl font-bold text-gray-900 mb-4">9. Lei Aplicavel</h2>
+                <h2 class="text-2xl font-bold text-gray-900 mb-4">9. Governing law</h2>
                 <div class="bg-gray-50 rounded-xl p-6">
                   <p class="text-gray-700">
-                    Estes termos sao regidos pela lei portuguesa. Qualquer disputa
-                    sera resolvida nos tribunais de Lisboa, Portugal.
+                    These terms are governed by Portuguese law. Any dispute
+                    will be resolved in the courts of Lisbon, Portugal.
                   </p>
                 </div>
               </section>
 
               <section>
-                <h2 class="text-2xl font-bold text-gray-900 mb-4">10. Contacto</h2>
+                <h2 class="text-2xl font-bold text-gray-900 mb-4">10. Contact</h2>
                 <div class="bg-gray-50 rounded-xl p-6">
                   <p class="text-gray-700 mb-4">
-                    Para questoes sobre estes termos, contacte-nos:
+                    For questions about these terms, contact us:
                   </p>
                   <div class="space-y-2 text-gray-700">
                     <p><strong>Email:</strong> legal&#64;fluxnote.com</p>
-                    <p><strong>Endereco:</strong> Rua da Inovacao, 123, 1000-001 Lisboa, Portugal</p>
+                    <p><strong>Address:</strong> Innovation Street, 123, 1000-001 Lisbon, Portugal</p>
                   </div>
                 </div>
               </section>

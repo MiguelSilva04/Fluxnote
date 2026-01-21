@@ -14,148 +14,148 @@ import { LandingHeaderComponent, LandingFooterComponent } from '../components';
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div class="text-center mb-16">
             <h1 class="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
-              Politica de Privacidade
+              Privacy Policy
             </h1>
             <p class="text-xl text-gray-600">
-              Ultima atualizacao: 15 de Janeiro de 2025
+              Last updated: January 15, 2025
             </p>
           </div>
 
           <div class="prose prose-lg max-w-none">
-            <div class="bg-green-50 border border-green-200 rounded-2xl p-8 mb-8">
-              <h2 class="text-2xl font-bold text-gray-900 mb-4">Resumo da Nossa Politica</h2>
+            <div class="bg-[#155347]/10 border border-[#155347]/30 rounded-2xl p-8 mb-8">
+              <h2 class="text-2xl font-bold text-gray-900 mb-4">Policy summary</h2>
               <p class="text-gray-700">
-                No Fluxnote, a sua privacidade e fundamental. Recolhemos apenas os dados necessarios
-                para fornecer o nosso servico, nunca vendemos as suas informacoes a terceiros,
-                e damos-lhe controlo total sobre os seus dados.
+                At Fluxnote, your privacy is fundamental. We collect only the data necessary to
+                provide our service, we never sell your information to third parties, and we give you
+                full control over your data.
               </p>
             </div>
 
             <div class="space-y-8">
               <section>
-                <h2 class="text-2xl font-bold text-gray-900 mb-4">1. Informacoes que Recolhemos</h2>
+                <h2 class="text-2xl font-bold text-gray-900 mb-4">1. Information we collect</h2>
                 <div class="bg-gray-50 rounded-xl p-6">
-                  <h3 class="text-lg font-semibold text-gray-900 mb-3">Informacoes de Conta</h3>
+                  <h3 class="text-lg font-semibold text-gray-900 mb-3">Account information</h3>
                   <ul class="list-disc list-inside text-gray-700 space-y-2">
-                    <li>Nome completo e endereco de email</li>
-                    <li>Palavra-passe (encriptada)</li>
-                    <li>Informacoes de perfil opcionais</li>
+                    <li>Full name and email address</li>
+                    <li>Password (encrypted)</li>
+                    <li>Optional profile information</li>
                   </ul>
                 </div>
 
                 <div class="bg-gray-50 rounded-xl p-6 mt-4">
-                  <h3 class="text-lg font-semibold text-gray-900 mb-3">Conteudo e Documentos</h3>
+                  <h3 class="text-lg font-semibold text-gray-900 mb-3">Content and documents</h3>
                   <ul class="list-disc list-inside text-gray-700 space-y-2">
-                    <li>Documentos criados e editados na plataforma</li>
-                    <li>Comentarios e sugestoes</li>
-                    <li>Historico de versoes dos documentos</li>
+                    <li>Documents created and edited on the platform</li>
+                    <li>Comments and suggestions</li>
+                    <li>Document version history</li>
                   </ul>
                 </div>
 
                 <div class="bg-gray-50 rounded-xl p-6 mt-4">
-                  <h3 class="text-lg font-semibold text-gray-900 mb-3">Dados de Utilizacao</h3>
+                  <h3 class="text-lg font-semibold text-gray-900 mb-3">Usage data</h3>
                   <ul class="list-disc list-inside text-gray-700 space-y-2">
-                    <li>Informacoes sobre como utiliza o servico</li>
-                    <li>Dados de performance e diagnostico</li>
-                    <li>Endereco IP e informacoes do dispositivo</li>
+                    <li>Information about how you use the service</li>
+                    <li>Performance and diagnostic data</li>
+                    <li>IP address and device information</li>
                   </ul>
                 </div>
               </section>
 
               <section>
-                <h2 class="text-2xl font-bold text-gray-900 mb-4">2. Como Utilizamos as Suas Informacoes</h2>
+                <h2 class="text-2xl font-bold text-gray-900 mb-4">2. How we use your information</h2>
                 <div class="grid md:grid-cols-2 gap-6">
-                  <div class="bg-green-50 rounded-xl p-6">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-3">Fornecimento do Servico</h3>
+                  <div class="bg-[#155347]/10 rounded-xl p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-3">Providing the service</h3>
                     <ul class="list-disc list-inside text-gray-700 space-y-2">
-                      <li>Criar e manter a sua conta</li>
-                      <li>Processar e armazenar documentos</li>
-                      <li>Facilitar a colaboracao em tempo real</li>
+                      <li>Create and maintain your account</li>
+                      <li>Process and store documents</li>
+                      <li>Enable real-time collaboration</li>
                     </ul>
                   </div>
 
                   <div class="bg-blue-50 rounded-xl p-6">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-3">Melhoramento do Produto</h3>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-3">Improving the product</h3>
                     <ul class="list-disc list-inside text-gray-700 space-y-2">
-                      <li>Analisar padroes de utilizacao</li>
-                      <li>Desenvolver novas funcionalidades</li>
-                      <li>Melhorar a performance da IA</li>
+                      <li>Analyze usage patterns</li>
+                      <li>Develop new features</li>
+                      <li>Improve AI performance</li>
                     </ul>
                   </div>
                 </div>
               </section>
 
               <section>
-                <h2 class="text-2xl font-bold text-gray-900 mb-4">3. Partilha de Informacoes</h2>
+                <h2 class="text-2xl font-bold text-gray-900 mb-4">3. Sharing information</h2>
                 <div class="bg-red-50 border border-red-200 rounded-xl p-6">
-                  <h3 class="text-lg font-semibold text-gray-900 mb-3">Nunca Vendemos os Seus Dados</h3>
+                  <h3 class="text-lg font-semibold text-gray-900 mb-3">We never sell your data</h3>
                   <p class="text-gray-700 mb-4">
-                    O Fluxnote nunca vende, aluga ou comercializa as suas informacoes pessoais a terceiros.
+                    Fluxnote never sells, rents, or trades your personal information to third parties.
                   </p>
                   <p class="text-gray-700">
-                    Apenas partilhamos informacoes em circunstancias muito especificas:
+                    We only share information in very specific circumstances:
                   </p>
                   <ul class="list-disc list-inside text-gray-700 mt-3 space-y-1">
-                    <li>Com o seu consentimento explicito</li>
-                    <li>Para cumprir obrigacoes legais</li>
-                    <li>Com fornecedores de servicos essenciais (sob contrato de confidencialidade)</li>
+                    <li>With your explicit consent</li>
+                    <li>To comply with legal obligations</li>
+                    <li>With essential service providers (under confidentiality agreements)</li>
                   </ul>
                 </div>
               </section>
 
               <section>
-                <h2 class="text-2xl font-bold text-gray-900 mb-4">4. Seguranca dos Dados</h2>
+                <h2 class="text-2xl font-bold text-gray-900 mb-4">4. Data security</h2>
                 <div class="grid md:grid-cols-3 gap-6">
                   <div class="bg-gray-50 rounded-xl p-6 text-center">
                     <div class="text-3xl mb-3">🔒</div>
-                    <h3 class="font-semibold text-gray-900 mb-2">Encriptacao</h3>
-                    <p class="text-gray-700 text-sm">Todos os dados sao encriptados em transito e em repouso</p>
+                    <h3 class="font-semibold text-gray-900 mb-2">Encryption</h3>
+                    <p class="text-gray-700 text-sm">All data is encrypted in transit and at rest</p>
                   </div>
 
                   <div class="bg-gray-50 rounded-xl p-6 text-center">
                     <div class="text-3xl mb-3">🛡️</div>
-                    <h3 class="font-semibold text-gray-900 mb-2">Acesso Controlado</h3>
-                    <p class="text-gray-700 text-sm">Acesso limitado apenas a pessoal autorizado</p>
+                    <h3 class="font-semibold text-gray-900 mb-2">Controlled access</h3>
+                    <p class="text-gray-700 text-sm">Access limited to authorized personnel only</p>
                   </div>
 
                   <div class="bg-gray-50 rounded-xl p-6 text-center">
                     <div class="text-3xl mb-3">🔍</div>
-                    <h3 class="font-semibold text-gray-900 mb-2">Monitorizacao</h3>
-                    <p class="text-gray-700 text-sm">Monitorizacao continua de seguranca</p>
+                    <h3 class="font-semibold text-gray-900 mb-2">Monitoring</h3>
+                    <p class="text-gray-700 text-sm">Continuous security monitoring</p>
                   </div>
                 </div>
               </section>
 
               <section>
-                <h2 class="text-2xl font-bold text-gray-900 mb-4">5. Os Seus Direitos</h2>
-                <div class="bg-green-50 rounded-xl p-6">
+                <h2 class="text-2xl font-bold text-gray-900 mb-4">5. Your rights</h2>
+                <div class="bg-[#155347]/10 rounded-xl p-6">
                   <p class="text-gray-700 mb-4">
-                    De acordo com o GDPR e outras leis de protecao de dados, tem os seguintes direitos:
+                    In accordance with GDPR and other data protection laws, you have the following rights:
                   </p>
                   <div class="grid md:grid-cols-2 gap-4">
                     <ul class="list-disc list-inside text-gray-700 space-y-2">
-                      <li>Acesso aos seus dados pessoais</li>
-                      <li>Correcao de informacoes incorretas</li>
-                      <li>Eliminacao dos seus dados</li>
+                      <li>Access to your personal data</li>
+                      <li>Correction of inaccurate information</li>
+                      <li>Deletion of your data</li>
                     </ul>
                     <ul class="list-disc list-inside text-gray-700 space-y-2">
-                      <li>Portabilidade dos dados</li>
-                      <li>Restricao do processamento</li>
-                      <li>Oposicao ao processamento</li>
+                      <li>Data portability</li>
+                      <li>Restriction of processing</li>
+                      <li>Objection to processing</li>
                     </ul>
                   </div>
                 </div>
               </section>
 
               <section>
-                <h2 class="text-2xl font-bold text-gray-900 mb-4">6. Contacto</h2>
+                <h2 class="text-2xl font-bold text-gray-900 mb-4">6. Contact</h2>
                 <div class="bg-gray-50 rounded-xl p-6">
                   <p class="text-gray-700 mb-4">
-                    Para questoes sobre privacidade ou para exercer os seus direitos, contacte-nos:
+                    For privacy questions or to exercise your rights, contact us:
                   </p>
                   <div class="space-y-2 text-gray-700">
                     <p><strong>Email:</strong> privacy&#64;fluxnote.com</p>
-                    <p><strong>Endereco:</strong> Rua da Inovacao, 123, 1000-001 Lisboa, Portugal</p>
+                    <p><strong>Address:</strong> Innovation Street, 123, 1000-001 Lisbon, Portugal</p>
                   </div>
                 </div>
               </section>

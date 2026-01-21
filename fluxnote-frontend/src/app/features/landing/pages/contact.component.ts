@@ -11,27 +11,27 @@ import { LandingHeaderComponent, LandingFooterComponent } from '../components';
     <div class="min-h-screen bg-white">
       <app-landing-header></app-landing-header>
 
-      <section class="py-20 bg-gradient-to-br from-green-50 to-white">
+      <section class="py-20 bg-gradient-to-br from-[#155347]/10 to-white">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div class="text-center mb-16">
             <h1 class="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
-              Entre em Contacto
+              Contact us
             </h1>
             <p class="text-xl text-gray-600 max-w-3xl mx-auto">
-              Tem alguma questao, sugestao ou precisa de ajuda? Estamos aqui para si.
-              Entre em contacto atraves de qualquer um dos metodos abaixo.
+              Have a question, suggestion, or need help? We’re here for you.
+              Reach out using any of the methods below.
             </p>
           </div>
 
           <div class="grid lg:grid-cols-2 gap-12">
             <!-- Contact Form -->
             <div class="bg-white rounded-2xl shadow-lg p-8">
-              <h2 class="text-2xl font-bold text-gray-900 mb-6">Envie-nos uma Mensagem</h2>
+              <h2 class="text-2xl font-bold text-gray-900 mb-6">Send us a message</h2>
 
               @if (submitStatus() === 'success') {
-                <div class="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
-                  <p class="text-green-800 font-medium">
-                    Mensagem enviada com sucesso! Responderemos em breve.
+                <div class="mb-6 p-4 bg-[#155347]/10 border border-[#155347]/30 rounded-lg">
+                  <p class="text-[#155347] font-medium">
+                    Message sent successfully! We’ll get back to you soon.
                   </p>
                 </div>
               }
@@ -39,7 +39,7 @@ import { LandingHeaderComponent, LandingFooterComponent } from '../components';
               @if (submitStatus() === 'error') {
                 <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
                   <p class="text-red-800">
-                    Ocorreu um erro ao enviar a mensagem. Tente novamente.
+                    There was an error sending your message. Please try again.
                   </p>
                 </div>
               }
@@ -48,14 +48,14 @@ import { LandingHeaderComponent, LandingFooterComponent } from '../components';
                 <div class="grid md:grid-cols-2 gap-6">
                   <div>
                     <label for="name" class="block text-sm font-medium text-gray-700 mb-2">
-                      Nome Completo
+                      Full name
                     </label>
                     <input
                       id="name"
                       type="text"
                       [(ngModel)]="formData.name"
                       name="name"
-                      class="text-black w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                      class="text-black w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#155347]"
                       required
                     />
                   </div>
@@ -69,7 +69,7 @@ import { LandingHeaderComponent, LandingFooterComponent } from '../components';
                       type="email"
                       [(ngModel)]="formData.email"
                       name="email"
-                      class="text-black w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                      class="text-black w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#155347]"
                       required
                     />
                   </div>
@@ -77,35 +77,35 @@ import { LandingHeaderComponent, LandingFooterComponent } from '../components';
 
                 <div>
                   <label for="subject" class="block text-sm font-medium text-gray-700 mb-2">
-                    Assunto
+                    Subject
                   </label>
                   <select
                     id="subject"
                     [(ngModel)]="formData.subject"
                     name="subject"
-                    class="text-black w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                    class="text-black w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#155347]"
                     required
                   >
-                    <option value="">Selecione um assunto</option>
-                    <option value="suporte">Suporte Tecnico</option>
-                    <option value="vendas">Questoes de Vendas</option>
-                    <option value="feedback">Feedback do Produto</option>
-                    <option value="parceria">Oportunidades de Parceria</option>
-                    <option value="outro">Outro</option>
+                    <option value="">Select a subject</option>
+                    <option value="suporte">Technical support</option>
+                    <option value="vendas">Sales questions</option>
+                    <option value="feedback">Product feedback</option>
+                    <option value="parceria">Partnership opportunities</option>
+                    <option value="outro">Other</option>
                   </select>
                 </div>
 
                 <div>
                   <label for="message" class="block text-sm font-medium text-gray-700 mb-2">
-                    Mensagem
+                    Message
                   </label>
                   <textarea
                     id="message"
                     rows="6"
                     [(ngModel)]="formData.message"
                     name="message"
-                    class="text-black w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-                    placeholder="Descreva a sua questao ou mensagem..."
+                    class="text-black w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#155347]"
+                    placeholder="Describe your question or message..."
                     required
                   ></textarea>
                 </div>
@@ -113,15 +113,15 @@ import { LandingHeaderComponent, LandingFooterComponent } from '../components';
                 <button
                   type="submit"
                   [disabled]="isSubmitting()"
-                  class="w-full bg-green-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  class="w-full bg-[#155347] text-white py-3 px-6 rounded-lg font-semibold hover:bg-[#155347] focus:outline-none focus:ring-2 focus:ring-[#155347] focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   @if (isSubmitting()) {
                     <div class="flex items-center justify-center">
                       <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                      Enviando...
+                      Sending...
                     </div>
                   } @else {
-                    Enviar Mensagem
+                    Send message
                   }
                 </button>
               </form>
@@ -130,7 +130,7 @@ import { LandingHeaderComponent, LandingFooterComponent } from '../components';
             <!-- Contact Methods -->
             <div class="space-y-8">
               <div>
-                <h2 class="text-2xl font-bold text-gray-900 mb-6">Outras Formas de Contacto</h2>
+                <h2 class="text-2xl font-bold text-gray-900 mb-6">Other ways to reach us</h2>
                 <div class="space-y-6">
                   @for (method of contactMethods; track method.title) {
                     <div class="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-shadow">
@@ -143,10 +143,10 @@ import { LandingHeaderComponent, LandingFooterComponent } from '../components';
                           <p class="text-gray-600 mb-3">
                             {{ method.description }}
                           </p>
-                          <p class="text-green-600 font-medium mb-3">
+                          <p class="text-[#155347] font-medium mb-3">
                             {{ method.contact }}
                           </p>
-                          <button class="text-green-600 font-semibold hover:text-green-700 transition-colors cursor-pointer">
+                          <button class="text-[#155347] font-semibold hover:text-[#155347] transition-colors cursor-pointer">
                             {{ method.action }} →
                           </button>
                         </div>
@@ -158,28 +158,27 @@ import { LandingHeaderComponent, LandingFooterComponent } from '../components';
 
               <!-- Office Info -->
               <div class="bg-gray-50 rounded-2xl p-6">
-                <h3 class="text-lg font-semibold text-gray-900 mb-4">Escritorio</h3>
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Office</h3>
                 <div class="space-y-2 text-gray-700">
-                  <p><strong>Endereco:</strong></p>
-                  <p>Rua da Inovacao, 123</p>
+                  <p><strong>Address:</strong></p>
+                  <p>Innovation Street, 123</p>
                   <p>1000-001 Lisboa, Portugal</p>
-                  <p class="mt-3"><strong>Horario:</strong></p>
-                  <p>Segunda a Sexta: 9h00 - 18h00</p>
-                  <p>Sabado: 10h00 - 14h00</p>
+                  <p class="mt-3"><strong>Hours:</strong></p>
+                  <p>Monday to Friday: 9:00 AM - 6:00 PM</p>
+                  <p>Saturday: 10:00 AM - 2:00 PM</p>
                 </div>
               </div>
 
               <!-- FAQ Link -->
-              <div class="bg-green-50 rounded-2xl p-6">
+              <div class="bg-[#155347]/10 rounded-2xl p-6">
                 <h3 class="text-lg font-semibold text-gray-900 mb-3">
-                  Antes de nos contactar
+                  Before you contact us
                 </h3>
                 <p class="text-gray-700 mb-4">
-                  Consulte as nossas perguntas frequentes - pode encontrar a resposta
-                  que procura mais rapidamente.
+                  Check our FAQ—you might find your answer faster.
                 </p>
-                <button class="text-green-600 font-semibold hover:text-green-700 transition-colors">
-                  Ver FAQ →
+                <button class="text-[#155347] font-semibold hover:text-[#155347] transition-colors">
+                  View FAQ →
                 </button>
               </div>
             </div>
@@ -206,23 +205,23 @@ export class ContactPageComponent {
     {
       icon: '📧',
       title: 'Email',
-      description: 'Envie-nos um email e responderemos em 24 horas',
+      description: 'Send us an email and we’ll reply within 24 hours',
       contact: 'suporte@fluxnote.com',
-      action: 'Enviar Email'
+      action: 'Send email'
     },
     {
       icon: '💬',
-      title: 'Chat ao Vivo',
-      description: 'Fale connosco em tempo real durante o horario comercial',
-      contact: 'Segunda a Sexta, 9h-18h',
-      action: 'Iniciar Chat'
+      title: 'Live chat',
+      description: 'Chat with us in real time during business hours',
+      contact: 'Mon–Fri, 9 AM–6 PM',
+      action: 'Start chat'
     },
     {
       icon: '📞',
-      title: 'Telefone',
-      description: 'Ligue-nos para suporte imediato',
+      title: 'Phone',
+      description: 'Call us for immediate support',
       contact: '+351 21 123 4567',
-      action: 'Ligar Agora'
+      action: 'Call now'
     }
   ];
 

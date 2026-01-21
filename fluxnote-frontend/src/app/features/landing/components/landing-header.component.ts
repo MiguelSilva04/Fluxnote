@@ -20,31 +20,31 @@ import { Router } from '@angular/router';
                 alt="Fluxnote Icon"
                 class="w-8 h-8 mr-2 rounded"
               />
-              <div class="text-2xl font-bold text-green-600">Fluxnote</div>
+              <div class="text-2xl font-bold text-[#155347]">Fluxnote</div>
             </button>
           </div>
           <nav class="hidden md:flex space-x-8">
             <button
               (click)="scrollTo('funcionalidades')"
-              class="text-gray-700 hover:text-green-600 transition-colors cursor-pointer"
+              class="text-gray-700 hover:text-[#155347] transition-colors cursor-pointer"
             >
-              Funcionalidades
+              Features
             </button>
             <button
               (click)="scrollTo('testemunhos')"
-              class="text-gray-700 hover:text-green-600 transition-colors cursor-pointer"
+              class="text-gray-700 hover:text-[#155347] transition-colors cursor-pointer"
             >
-              Testemunhos
+              Testimonials
             </button>
             <button
               (click)="scrollTo('precos')"
-              class="text-gray-700 hover:text-green-600 transition-colors cursor-pointer"
+              class="text-gray-700 hover:text-[#155347] transition-colors cursor-pointer"
             >
-              Precos
+              Pricing
             </button>
             <button
               (click)="scrollTo('faq')"
-              class="text-gray-700 hover:text-green-600 transition-colors cursor-pointer"
+              class="text-gray-700 hover:text-[#155347] transition-colors cursor-pointer"
             >
               FAQ
             </button>
@@ -52,21 +52,21 @@ import { Router } from '@angular/router';
           <div class="hidden md:flex items-center space-x-4">
             <button
               (click)="goToLogin()"
-              class="text-gray-700 hover:text-green-600 transition-colors cursor-pointer"
+              class="text-gray-700 hover:text-[#155347] transition-colors cursor-pointer"
             >
-              Entrar
+              Sign in
             </button>
             <button
               (click)="goToRegister()"
-              class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors cursor-pointer"
+              class="bg-[#155347] text-white px-4 py-2 rounded-lg hover:bg-[#155347] transition-colors cursor-pointer"
             >
-              Criar Conta
+              Create account
             </button>
           </div>
           <div class="md:hidden">
             <button
               (click)="toggleMenu()"
-              class="text-gray-700 hover:text-green-600 cursor-pointer"
+              class="text-gray-700 hover:text-[#155347] cursor-pointer"
             >
               <svg
                 class="h-6 w-6"
@@ -90,40 +90,40 @@ import { Router } from '@angular/router';
             <div class="flex flex-col space-y-4">
               <button
                 (click)="scrollTo('funcionalidades'); closeMenu()"
-                class="text-gray-700 hover:text-green-600 transition-colors text-left cursor-pointer"
+                class="text-gray-700 hover:text-[#155347] transition-colors text-left cursor-pointer"
               >
-                Funcionalidades
+                Features
               </button>
               <button
                 (click)="scrollTo('testemunhos'); closeMenu()"
-                class="text-gray-700 hover:text-green-600 transition-colors text-left cursor-pointer"
+                class="text-gray-700 hover:text-[#155347] transition-colors text-left cursor-pointer"
               >
-                Testemunhos
+                Testimonials
               </button>
               <button
                 (click)="scrollTo('precos'); closeMenu()"
-                class="text-gray-700 hover:text-green-600 transition-colors text-left cursor-pointer"
+                class="text-gray-700 hover:text-[#155347] transition-colors text-left cursor-pointer"
               >
-                Precos
+                Pricing
               </button>
               <button
                 (click)="scrollTo('faq'); closeMenu()"
-                class="text-gray-700 hover:text-green-600 transition-colors text-left cursor-pointer"
+                  class="text-gray-700 hover:text-[#155347] transition-colors text-left cursor-pointer"
               >
                 FAQ
               </button>
               <div class="flex flex-col space-y-2 pt-4 border-t border-gray-100">
                 <button
                   (click)="goToLogin(); closeMenu()"
-                  class="text-gray-700 hover:text-green-600 transition-colors text-left cursor-pointer"
+                  class="text-gray-700 hover:text-[#155347] transition-colors text-left cursor-pointer"
                 >
-                  Entrar
+                  Sign in
                 </button>
                 <button
                   (click)="goToRegister(); closeMenu()"
-                  class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors cursor-pointer"
+                  class="bg-[#155347] text-white px-4 py-2 rounded-lg hover:bg-[#155347] transition-colors cursor-pointer"
                 >
-                  Criar Conta
+                  Create account
                 </button>
               </div>
             </div>

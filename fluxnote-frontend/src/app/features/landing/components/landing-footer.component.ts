@@ -19,7 +19,7 @@ import { FormsModule } from '@angular/forms';
                   (click)="scrollTo('funcionalidades')"
                   class="text-gray-300 hover:text-white transition-colors text-left cursor-pointer"
                 >
-                  Funcionalidades
+                  Features
                 </button>
               </li>
               <li>
@@ -27,7 +27,7 @@ import { FormsModule } from '@angular/forms';
                   (click)="scrollTo('testemunhos')"
                   class="text-gray-300 hover:text-white transition-colors text-left cursor-pointer"
                 >
-                  Testemunhos
+                  Testimonials
                 </button>
               </li>
               <li>
@@ -35,7 +35,7 @@ import { FormsModule } from '@angular/forms';
                   (click)="scrollTo('precos')"
                   class="text-gray-300 hover:text-white transition-colors text-left cursor-pointer"
                 >
-                  Precos
+                  Pricing
                 </button>
               </li>
               <li>
@@ -50,14 +50,14 @@ import { FormsModule } from '@angular/forms';
           </div>
 
           <div>
-            <h3 class="text-lg font-semibold mb-4">Recursos</h3>
+            <h3 class="text-lg font-semibold mb-4">Resources</h3>
             <ul class="space-y-3">
               <li>
                 <button
                   (click)="navigateTo('/technologies')"
                   class="text-gray-300 hover:text-white transition-colors text-left cursor-pointer"
                 >
-                  Tecnologias Usadas
+                  Technologies
                 </button>
               </li>
               <li>
@@ -72,14 +72,14 @@ import { FormsModule } from '@angular/forms';
           </div>
 
           <div>
-            <h3 class="text-lg font-semibold mb-4">Sobre a Fluxnote</h3>
+            <h3 class="text-lg font-semibold mb-4">About Fluxnote</h3>
             <ul class="space-y-3">
               <li>
                 <button
                   (click)="navigateTo('/privacy')"
                   class="text-gray-300 hover:text-white transition-colors text-left cursor-pointer"
                 >
-                  Politica de Privacidade
+                  Privacy Policy
                 </button>
               </li>
               <li>
@@ -87,7 +87,7 @@ import { FormsModule } from '@angular/forms';
                   (click)="navigateTo('/terms')"
                   class="text-gray-300 hover:text-white transition-colors text-left cursor-pointer"
                 >
-                  Termos e Condicoes
+                  Terms & Conditions
                 </button>
               </li>
               <li>
@@ -95,7 +95,7 @@ import { FormsModule } from '@angular/forms';
                   (click)="navigateTo('/contact')"
                   class="text-gray-300 hover:text-white transition-colors text-left cursor-pointer"
                 >
-                  Contactos
+                  Contact
                 </button>
               </li>
               <li>
@@ -103,7 +103,7 @@ import { FormsModule } from '@angular/forms';
                   (click)="navigateTo('/about')"
                   class="text-gray-300 hover:text-white transition-colors text-left cursor-pointer"
                 >
-                  Sobre nos
+                  About us
                 </button>
               </li>
             </ul>
@@ -112,7 +112,7 @@ import { FormsModule } from '@angular/forms';
           <div>
             <h3 class="text-lg font-semibold mb-4">Newsletter</h3>
             <p class="text-gray-300 mb-4">
-              Receba as ultimas novidades e dicas sobre produtividade.
+              Get the latest updates and productivity tips.
             </p>
 
             <form (submit)="handleNewsletterSubmit($event)" class="mb-6">
@@ -121,15 +121,15 @@ import { FormsModule } from '@angular/forms';
                   type="email"
                   [(ngModel)]="email"
                   name="email"
-                  placeholder="Seu email"
-                  class="flex-1 px-4 py-2 rounded-l-lg bg-gray-800 border border-gray-700 text-white placeholder-gray-400 focus:outline-none focus:border-green-500"
+                  placeholder="Your email"
+                  class="flex-1 px-4 py-2 rounded-l-lg bg-gray-800 border border-gray-700 text-white placeholder-gray-400 focus:outline-none focus:border-[#155347]"
                   required
                 />
                 <button
                   type="submit"
-                  class="bg-green-600 text-white px-6 py-2 rounded-r-lg hover:bg-green-700 transition-colors cursor-pointer"
+                  class="bg-[#155347] text-white px-6 py-2 rounded-r-lg hover:bg-[#155347] transition-colors cursor-pointer"
                 >
-                  Subscrever
+                  Subscribe
                 </button>
               </div>
             </form>
@@ -166,10 +166,10 @@ import { FormsModule } from '@angular/forms';
               alt="Fluxnote Icon"
               class="w-6 h-6 mr-2 rounded"
             />
-            <div class="text-2xl font-bold text-green-600">Fluxnote</div>
+            <div class="text-2xl font-bold text-[#155347]">Fluxnote</div>
           </div>
           <div class="text-gray-400 text-sm">
-            © 2025 Fluxnote. Todos os direitos reservados.
+            © 2026 Fluxnote. All rights reserved.
           </div>
         </div>
       </div>

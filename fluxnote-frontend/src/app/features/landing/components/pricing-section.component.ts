@@ -10,22 +10,22 @@ import { CommonModule } from '@angular/common';
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-16">
           <h2 class="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
-            Precos Simples e Transparentes
+            Simple, transparent pricing
           </h2>
           <p class="text-xl text-gray-600 max-w-3xl mx-auto">
-            Escolha o plano que melhor se adapta as suas necessidades. Pode sempre fazer upgrade.
+            Choose the plan that fits your needs. You can upgrade anytime.
           </p>
         </div>
 
         <div class="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
           @for (plan of plans; track plan.name) {
             <div
-              [class]="'bg-white rounded-2xl p-8 shadow-lg relative flex flex-col ' + (plan.popular ? 'ring-2 ring-green-500 scale-105' : '')"
+              [class]="'bg-white rounded-2xl p-8 shadow-lg relative flex flex-col ' + (plan.popular ? 'ring-2 ring-[#155347] scale-105' : '')"
             >
               @if (plan.popular) {
                 <div class="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                  <span class="bg-green-500 text-white px-4 py-2 rounded-full text-sm font-semibold">
-                    Mais Popular
+                  <span class="bg-[#155347] text-white px-4 py-2 rounded-full text-sm font-semibold">
+                    Most popular
                   </span>
                 </div>
               }
@@ -41,7 +41,7 @@ import { CommonModule } from '@angular/common';
               <ul class="space-y-4 mb-8 flex-grow">
                 @for (feature of plan.features; track feature) {
                   <li class="flex items-center">
-                    <svg class="w-5 h-5 text-green-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-5 h-5 text-[#155347] mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                     </svg>
                     <span class="text-gray-700">{{ feature }}</span>
@@ -50,9 +50,9 @@ import { CommonModule } from '@angular/common';
               </ul>
 
               <button
-                [class]="'w-full py-3 px-6 rounded-xl font-semibold transition-colors cursor-pointer ' + (plan.popular ? 'bg-green-600 text-white hover:bg-green-700' : 'border-2 border-green-600 text-green-600 hover:bg-green-50')"
+                  [class]="'w-full py-3 px-6 rounded-xl font-semibold transition-colors cursor-pointer ' + (plan.popular ? 'bg-[#155347] text-white hover:bg-[#155347]' : 'border-2 border-[#155347] text-[#155347] hover:bg-[#155347] hover:text-white')"
               >
-                Escolher plano
+                Choose plan
               </button>
             </div>
           }
@@ -64,42 +64,42 @@ import { CommonModule } from '@angular/common';
 export class PricingSectionComponent {
   plans = [
     {
-      name: 'Gratuito',
-      price: '0€',
-      period: '/mes',
+      name: 'Free',
+      price: '€0',
+      period: '/mo',
       features: [
-        '3 documentos por mes',
-        'Colaboracao ate 2 pessoas',
-        'Historico basico (7 dias)',
-        'Suporte por email'
+        '3 documents per month',
+        'Collaboration up to 2 people',
+        'Basic history (7 days)',
+        'Email support'
       ],
       popular: false
     },
     {
       name: 'Pro',
-      price: '12€',
-      period: '/mes',
+      price: '€12',
+      period: '/mo',
       features: [
-        'Documentos ilimitados',
-        'Colaboracao ate 10 pessoas',
-        'Historico completo',
-        'IA avancada',
-        'Suporte prioritario',
-        'Integracoes'
+        'Unlimited documents',
+        'Collaboration up to 10 people',
+        'Full history',
+        'Advanced AI',
+        'Priority support',
+        'Integrations'
       ],
       popular: true
     },
     {
-      name: 'Equipa',
-      price: '25€',
-      period: '/mes',
+      name: 'Team',
+      price: '€25',
+      period: '/mo',
       features: [
-        'Tudo do Pro',
-        'Colaboracao ilimitada',
-        'Gestao de equipas',
-        'Analytics avancados',
-        'SSO e seguranca empresarial',
-        'Suporte dedicado'
+        'Everything in Pro',
+        'Unlimited collaboration',
+        'Team management',
+        'Advanced analytics',
+        'SSO & enterprise security',
+        'Dedicated support'
       ],
       popular: false
     }

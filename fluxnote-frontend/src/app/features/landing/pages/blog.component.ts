@@ -10,15 +10,15 @@ import { LandingHeaderComponent, LandingFooterComponent } from '../components';
     <div class="min-h-screen bg-white">
       <app-landing-header></app-landing-header>
 
-      <section class="py-20 bg-gradient-to-br from-green-50 to-white">
+      <section class="py-20 bg-gradient-to-br from-[#155347]/10 to-white">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div class="text-center mb-16">
             <h1 class="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
-              Blog Fluxnote
+              Fluxnote Blog
             </h1>
             <p class="text-xl text-gray-600 max-w-3xl mx-auto">
-              Insights, dicas e novidades sobre colaboracao, inteligencia
-              artificial e produtividade no trabalho moderno.
+              Insights, tips, and updates on collaboration, artificial intelligence,
+              and productivity in modern work.
             </p>
           </div>
 
@@ -27,7 +27,7 @@ import { LandingHeaderComponent, LandingFooterComponent } from '../components';
             @for (category of categories; track category) {
               <button
                 (click)="selectCategory(category)"
-                [class]="'px-6 py-2 rounded-full font-medium transition-colors cursor-pointer ' + (selectedCategory() === category ? 'bg-green-600 text-white' : 'bg-white text-gray-600 hover:bg-green-50 hover:text-green-600 border border-gray-200')"
+                [class]="'px-6 py-2 rounded-full font-medium transition-colors cursor-pointer ' + (selectedCategory() === category ? 'bg-[#155347] text-white' : 'bg-white text-gray-600 hover:bg-[#155347]/10 hover:text-[#155347] border border-gray-200')"
               >
                 {{ category }}
               </button>
@@ -44,7 +44,7 @@ import { LandingHeaderComponent, LandingFooterComponent } from '../components';
                     class="w-full h-48 object-cover"
                   />
                   <div class="absolute top-4 left-4">
-                    <span class="bg-green-600 text-white px-3 py-1 rounded-full text-sm font-medium">
+                    <span class="bg-[#155347] text-white px-3 py-1 rounded-full text-sm font-medium">
                       {{ post.category }}
                     </span>
                   </div>
@@ -54,7 +54,7 @@ import { LandingHeaderComponent, LandingFooterComponent } from '../components';
                   <div class="flex items-center text-sm text-gray-500 mb-3">
                     <span>{{ post.date }}</span>
                     <span class="mx-2">•</span>
-                    <span>{{ post.readTime }} de leitura</span>
+                    <span>{{ post.readTime }} read</span>
                   </div>
 
                   <h2 class="text-xl font-bold text-gray-900 mb-3 line-clamp-2">
@@ -65,8 +65,8 @@ import { LandingHeaderComponent, LandingFooterComponent } from '../components';
                     {{ post.excerpt }}
                   </p>
 
-                  <button class="text-green-600 font-semibold hover:text-green-700 transition-colors cursor-pointer">
-                    Ler mais →
+                  <button class="text-[#155347] font-semibold hover:text-[#155347] transition-colors cursor-pointer">
+                    Read more →
                   </button>
                 </div>
               </article>
@@ -75,20 +75,19 @@ import { LandingHeaderComponent, LandingFooterComponent } from '../components';
 
           <div class="mt-16 bg-gray-50 rounded-2xl p-8 text-center">
             <h2 class="text-2xl font-bold text-gray-900 mb-4">
-              Nao perca nenhum artigo
+              Don’t miss a post
             </h2>
             <p class="text-black mb-6">
-              Subscreva a nossa newsletter e receba os melhores artigos sobre
-              produtividade e colaboracao.
+              Subscribe to our newsletter and get the best articles on productivity and collaboration.
             </p>
             <div class="max-w-md mx-auto flex">
               <input
                 type="email"
-                placeholder="O seu email"
-                class="flex-1 px-4 py-3 border text-black border-gray-300 rounded-l-xl focus:outline-none focus:ring-2 focus:ring-green-500"
+                placeholder="Your email"
+                class="flex-1 px-4 py-3 border text-black border-gray-300 rounded-l-xl focus:outline-none focus:ring-2 focus:ring-[#155347]"
               />
-              <button class="bg-green-600 text-white px-6 py-3 rounded-r-xl font-semibold hover:bg-green-700 transition-colors cursor-pointer">
-                Subscrever
+              <button class="bg-[#155347] text-white px-6 py-3 rounded-r-xl font-semibold hover:bg-[#155347] transition-colors cursor-pointer">
+                Subscribe
               </button>
             </div>
           </div>
@@ -102,69 +101,69 @@ import { LandingHeaderComponent, LandingFooterComponent } from '../components';
 export class BlogPageComponent {
   blogPosts = [
     {
-      title: 'O Futuro da Colaboracao: Como a IA esta a Transformar o Trabalho em Equipa',
-      excerpt: 'Descubra como a inteligencia artificial esta a revolucionar a forma como as equipas colaboram e criam conteudo em conjunto.',
-      date: '15 Janeiro 2025',
+      title: 'The Future of Collaboration: How AI Is Transforming Teamwork',
+      excerpt: 'Discover how artificial intelligence is changing the way teams collaborate and create content together.',
+      date: 'Jan 15, 2025',
       readTime: '5 min',
-      category: 'IA & Colaboracao',
-      image: 'https://via.placeholder.com/400x250/22c55e/ffffff?text=IA+Colaboracao'
+      category: 'AI & Collaboration',
+      image: 'https://via.placeholder.com/400x250/22c55e/ffffff?text=AI+Collaboration'
     },
     {
-      title: '10 Dicas para Maximizar a Produtividade na Criacao de Documentos',
-      excerpt: 'Estrategias praticas para otimizar o seu fluxo de trabalho e criar documentos mais eficazes com menos esforco.',
-      date: '12 Janeiro 2025',
+      title: '10 Tips to Maximize Productivity When Creating Documents',
+      excerpt: 'Practical strategies to optimize your workflow and create more effective documents with less effort.',
+      date: 'Jan 12, 2025',
       readTime: '7 min',
-      category: 'Produtividade',
-      image: 'https://via.placeholder.com/400x250/3b82f6/ffffff?text=Produtividade'
+      category: 'Productivity',
+      image: 'https://via.placeholder.com/400x250/3b82f6/ffffff?text=Productivity'
     },
     {
-      title: 'Seguranca em Primeiro Lugar: Como Protegemos os Seus Documentos',
-      excerpt: 'Uma visao detalhada das medidas de seguranca implementadas no Fluxnote para proteger os seus dados mais importantes.',
-      date: '8 Janeiro 2025',
+      title: 'Security First: How We Protect Your Documents',
+      excerpt: 'A detailed look at the security measures Fluxnote uses to protect your most important data.',
+      date: 'Jan 8, 2025',
       readTime: '6 min',
-      category: 'Seguranca',
-      image: 'https://via.placeholder.com/400x250/ef4444/ffffff?text=Seguranca'
+      category: 'Security',
+      image: 'https://via.placeholder.com/400x250/ef4444/ffffff?text=Security'
     },
     {
-      title: 'Colaboracao Remota: Melhores Praticas para Equipas Distribuidas',
-      excerpt: 'Como manter a produtividade e coesao da equipa quando todos trabalham remotamente.',
-      date: '5 Janeiro 2025',
+      title: 'Remote Collaboration: Best Practices for Distributed Teams',
+      excerpt: 'How to maintain productivity and team cohesion when everyone works remotely.',
+      date: 'Jan 5, 2025',
       readTime: '8 min',
-      category: 'Trabalho Remoto',
-      image: 'https://via.placeholder.com/400x250/8b5cf6/ffffff?text=Trabalho+Remoto'
+      category: 'Remote Work',
+      image: 'https://via.placeholder.com/400x250/8b5cf6/ffffff?text=Remote+Work'
     },
     {
-      title: 'A Evolucao dos Editores de Texto: Do Word ao Fluxnote',
-      excerpt: 'Uma jornada atraves da historia dos editores de texto e como chegamos a era da colaboracao inteligente.',
-      date: '2 Janeiro 2025',
+      title: 'The Evolution of Text Editors: From Word to Fluxnote',
+      excerpt: 'A journey through the history of text editors—and how we arrived at the era of intelligent collaboration.',
+      date: 'Jan 2, 2025',
       readTime: '10 min',
-      category: 'Tecnologia',
-      image: 'https://via.placeholder.com/400x250/f59e0b/ffffff?text=Evolucao+Editores'
+      category: 'Technology',
+      image: 'https://via.placeholder.com/400x250/f59e0b/ffffff?text=Text+Editors'
     },
     {
-      title: 'Como a IA Pode Melhorar a Qualidade dos Seus Textos',
-      excerpt: 'Explore as funcionalidades de IA do Fluxnote que ajudam a criar textos mais claros, concisos e impactantes.',
-      date: '28 Dezembro 2024',
+      title: 'How AI Can Improve the Quality of Your Writing',
+      excerpt: 'Explore Fluxnote’s AI features that help you write clearer, more concise, and more impactful text.',
+      date: 'Dec 28, 2024',
       readTime: '6 min',
-      category: 'IA & Escrita',
-      image: 'https://via.placeholder.com/400x250/10b981/ffffff?text=IA+Escrita'
+      category: 'AI & Writing',
+      image: 'https://via.placeholder.com/400x250/10b981/ffffff?text=AI+Writing'
     }
   ];
 
   categories = [
-    'Todos',
-    'IA & Colaboracao',
-    'Produtividade',
-    'Seguranca',
-    'Trabalho Remoto',
-    'Tecnologia',
-    'IA & Escrita'
+    'All',
+    'AI & Collaboration',
+    'Productivity',
+    'Security',
+    'Remote Work',
+    'Technology',
+    'AI & Writing'
   ];
 
-  selectedCategory = signal('Todos');
+  selectedCategory = signal('All');
 
   filteredPosts = computed(() => {
-    if (this.selectedCategory() === 'Todos') {
+    if (this.selectedCategory() === 'All') {
       return this.blogPosts;
     }
     return this.blogPosts.filter(post => post.category === this.selectedCategory());

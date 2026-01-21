@@ -11,10 +11,10 @@ import { Router } from '@angular/router';
       <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-16">
           <h2 class="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
-            Perguntas Frequentes
+            Frequently asked questions
           </h2>
           <p class="text-xl text-gray-600 max-w-3xl mx-auto">
-            Encontre respostas as perguntas mais comuns sobre o Fluxnote e as suas funcionalidades.
+            Find answers to the most common questions about Fluxnote and its features.
           </p>
         </div>
 
@@ -30,7 +30,7 @@ import { Router } from '@angular/router';
                 </h3>
                 <div class="flex-shrink-0">
                   <svg
-                    [class]="'w-6 h-6 text-green-600 transform transition-transform ' + (openIndex() === i ? 'rotate-180' : '')"
+                    [class]="'w-6 h-6 text-[#155347] transform transition-transform ' + (openIndex() === i ? 'rotate-180' : '')"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -55,13 +55,13 @@ import { Router } from '@angular/router';
 
         <div class="text-center mt-12">
           <p class="text-gray-600 mb-4">
-            Nao encontrou a resposta que procurava?
+            Didn’t find the answer you were looking for?
           </p>
           <button
             (click)="goToContact()"
-            class="bg-green-600 text-white px-8 py-3 rounded-xl font-semibold hover:bg-green-700 transition-colors shadow-lg cursor-pointer"
+            class="bg-[#155347] text-white px-8 py-3 rounded-xl font-semibold hover:bg-[#155347] transition-colors shadow-lg cursor-pointer"
           >
-            Contactar Suporte
+            Contact support
           </button>
         </div>
       </div>
@@ -73,44 +73,44 @@ export class FaqSectionComponent {
 
   faqs = [
     {
-      question: 'Como funciona a inteligencia artificial no Fluxnote?',
-      answer: 'A IA do Fluxnote ajuda na criacao de conteudo, correcao gramatical, sugestoes de melhoria e formatacao automatica. Ela aprende com o seu estilo de escrita e oferece sugestoes personalizadas para tornar os seus documentos mais eficazes.'
+      question: 'How does AI work in Fluxnote?',
+      answer: 'Fluxnote AI helps with content creation, grammar corrections, improvement suggestions, and automatic formatting. It learns from your writing style and offers personalized suggestions to make your documents more effective.'
     },
     {
-      question: 'Quantas pessoas podem colaborar simultaneamente num documento?',
-      answer: 'O numero de colaboradores varia conforme o plano: o plano Gratuito permite ate 2 pessoas, o Pro ate 10 pessoas, e o plano Equipa oferece colaboracao ilimitada. Todas as alteracoes sao sincronizadas em tempo real.'
+      question: 'How many people can collaborate on a document at the same time?',
+      answer: 'The number of collaborators depends on your plan: the Free plan supports up to 2 people, Pro up to 10, and the Team plan offers unlimited collaboration. All changes are synced in real time.'
     },
     {
-      question: 'Os meus dados estao seguros no Fluxnote?',
-      answer: 'Sim, a seguranca e a nossa prioridade. Utilizamos encriptacao de ponta a ponta, armazenamento seguro na cloud, e cumprimos com as regulamentacoes GDPR. Os seus documentos sao privados e apenas acessiveis por si e pelas pessoas que autorizar.'
+      question: 'Is my data safe in Fluxnote?',
+      answer: 'Yes—security is our priority. We use end-to-end encryption, secure cloud storage, and comply with GDPR. Your documents are private and only accessible to you and the people you authorize.'
     },
     {
-      question: 'Posso usar o Fluxnote offline?',
-      answer: 'O Fluxnote funciona principalmente online para garantir a sincronizacao em tempo real. No entanto, oferecemos funcionalidade offline limitada que permite visualizar e editar documentos recentes, com sincronizacao automatica quando voltar a estar online.'
+      question: 'Can I use Fluxnote offline?',
+      answer: 'Fluxnote is primarily online to ensure real-time syncing. However, we offer limited offline functionality that lets you view and edit recent documents, with automatic syncing when you’re back online.'
     },
     {
-      question: 'Como funciona o historico de versoes?',
-      answer: 'Cada alteracao no documento e automaticamente guardada. Pode ver todas as versoes anteriores, comparar mudancas, e restaurar qualquer versao anterior. O plano Gratuito mantem 7 dias de historico, enquanto os planos pagos oferecem historico completo.'
+      question: 'How does version history work?',
+      answer: 'Every change is automatically saved. You can review previous versions, compare changes, and restore any earlier version. The Free plan keeps 7 days of history, while paid plans offer full history.'
     },
     {
-      question: 'Posso importar documentos de outras plataformas?',
-      answer: 'Sim, o Fluxnote suporta importacao de documentos do Microsoft Word, Google Docs, PDF e outros formatos populares. A formatacao e preservada e pode comecar a colaborar imediatamente apos a importacao.'
+      question: 'Can I import documents from other platforms?',
+      answer: 'Yes. Fluxnote supports imports from Microsoft Word, Google Docs, PDF, and other popular formats. Formatting is preserved and you can start collaborating right after import.'
     },
     {
-      question: 'Como posso cancelar a minha subscricao?',
-      answer: 'Pode cancelar a sua subscricao a qualquer momento nas definicoes da conta. O acesso as funcionalidades premium mantem-se ate ao final do periodo pago, e pode sempre voltar a subscrever quando desejar.'
+      question: 'How do I cancel my subscription?',
+      answer: 'You can cancel anytime from your account settings. You’ll keep access to premium features until the end of your billing period, and you can subscribe again whenever you like.'
     },
     {
-      question: 'Existe uma versao movel do Fluxnote?',
-      answer: 'Sim, o Fluxnote e totalmente responsivo e funciona perfeitamente em dispositivos moveis atraves do navegador. Tambem temos aplicacoes nativas para iOS e Android em desenvolvimento, que estarao disponiveis em breve.'
+      question: 'Is there a mobile version of Fluxnote?',
+      answer: 'Yes. Fluxnote is fully responsive and works great on mobile devices in your browser. Native iOS and Android apps are also in development and will be available soon.'
     },
     {
-      question: 'Que tipos de documentos posso criar?',
-      answer: 'O Fluxnote e versatil e permite criar relatorios, propostas, artigos, apresentacoes, manuais, contratos, e qualquer tipo de documento de texto. A IA adapta-se ao tipo de conteudo que esta a criar.'
+      question: 'What types of documents can I create?',
+      answer: 'Fluxnote is versatile—you can create reports, proposals, articles, presentations, manuals, contracts, and any kind of text document. The AI adapts to the type of content you’re creating.'
     },
     {
-      question: 'Como funciona o suporte tecnico?',
-      answer: 'Oferecemos suporte por email para todos os utilizadores, suporte prioritario para utilizadores Pro, e suporte dedicado para equipas. Tambem temos uma base de conhecimento completa e tutoriais em video disponiveis.'
+      question: 'How does support work?',
+      answer: 'We offer email support for all users, priority support for Pro users, and dedicated support for teams. We also provide a full knowledge base and video tutorials.'
     }
   ];
 
