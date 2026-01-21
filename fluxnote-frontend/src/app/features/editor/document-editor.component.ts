@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -6,11 +6,19 @@ import { LucideAngularModule } from 'lucide-angular';
 import { ButtonComponent, BadgeComponent } from '../../shared/components/ui';
 import { DocumentService } from '../../core/services';
 import { Collaborator, Version, Comment, AISuggestion } from '../../core/models';
+import { TextEditorComponent } from './components/text-editor.component';
 
 @Component({
   selector: 'app-document-editor',
   standalone: true,
-  imports: [CommonModule, FormsModule, LucideAngularModule, ButtonComponent, BadgeComponent],
+  imports: [
+    CommonModule,
+    FormsModule,
+    LucideAngularModule,
+    ButtonComponent,
+    BadgeComponent,
+    TextEditorComponent,
+  ],
   template: `
     <div class="min-h-screen bg-gray-50 flex flex-col relative">
       <!-- Collaborative Cursors -->
@@ -38,9 +46,28 @@ import { Collaborator, Version, Comment, AISuggestion } from '../../core/models'
           <button (click)="navigateBack()" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
             <lucide-icon name="arrow-left" class="h-5 w-5 text-gray-600"></lucide-icon>
           </button>
-          <div>
-            <h1 class="text-lg font-bold text-gray-900">Market Analysis 2024</h1>
-            <p class="text-xs text-gray-500">Last edited 2 hours ago</p>
+          <div class="flex-1">
+            <!-- Editable Title -->
+            @if (isEditingTitle()) {
+              <input
+                #titleInput
+                type="text"
+                [(ngModel)]="documentTitle"
+                (blur)="saveTitle()"
+                (keydown.enter)="saveTitle()"
+                (keydown.escape)="cancelTitleEdit()"
+                class="text-lg font-bold text-gray-900 bg-transparent border-b-2 border-[#155347] focus:outline-none w-full max-w-md"
+              />
+            } @else {
+              <h1
+                (click)="startEditingTitle()"
+                class="text-lg font-bold text-gray-900 cursor-pointer hover:text-[#155347] transition-colors"
+                title="Click to edit title"
+              >
+                {{ documentTitle }}
+              </h1>
+            }
+            <p class="text-xs text-gray-500">{{ lastEditedText() }}</p>
           </div>
         </div>
         <div class="flex items-center gap-2">
@@ -82,31 +109,15 @@ import { Collaborator, Version, Comment, AISuggestion } from '../../core/models'
 
       <div class="flex flex-1 overflow-hidden">
         <!-- Main Editor -->
-        <main class="flex-1 overflow-y-auto p-8">
-          <div class="max-w-4xl mx-auto bg-white shadow-sm border border-gray-200 rounded-xl p-12">
-            <h2 class="text-3xl font-bold text-gray-900 mb-6">
-              Market Analysis 2024: The Impact of Technological Innovation
-            </h2>
-            <div class="space-y-4 text-gray-800 leading-relaxed">
-              <p>
-                The year 2024 marks a period of unprecedented transformation in the global scenario,
-                primarily driven by the rapid evolution and adoption of new technologies. Artificial
-                intelligence (AI) continues to be a central engine behind this change, redefining
-                sectors from manufacturing to services.
-              </p>
-              <p>
-                Beyond AI, quantum computing and biotechnology are also emerging as fields with the
-                potential to revolutionize the technological landscape in the next decade. Although
-                still in early stages of commercialization, investment in research and development
-                in these areas is robust.
-              </p>
-              <p>
-                Environmental sustainability and corporate social responsibility (CSR) also play a
-                crucial role in business decisions and investment in 2024. Consumers and investors
-                are increasingly aware of companies' impact on the planet and society.
-              </p>
-            </div>
-          </div>
+        <main class="flex-1 flex flex-col overflow-hidden">
+          <app-rich-text-editor
+            #editor
+            [initialContent]="initialContent"
+            placeholder="Start writing your document..."
+            [autoSaveDelay]="2000"
+            (contentChange)="onContentChange($event)"
+            (save)="onSave($event)"
+          />
         </main>
 
         <!-- AI Assistant Panel -->
@@ -425,16 +436,18 @@ import { Collaborator, Version, Comment, AISuggestion } from '../../core/models'
         </div>
       }
     </div>
-  `
+  `,
 })
 export class DocumentEditorComponent {
+  @ViewChild('editor') editor!: TextEditorComponent;
+
   private router = inject(Router);
   private documentService = inject(DocumentService);
 
   showVersionHistory = signal(false);
   showComments = signal(false);
   showShareModal = signal(false);
-  showAIPanel = signal(true);
+  showAIPanel = signal(false);
   isRestoreModalOpen = signal(false);
   versionToRestore = signal<number | null>(null);
   newComment = '';
@@ -442,33 +455,96 @@ export class DocumentEditorComponent {
   aiGenerating = signal(false);
   restoreConfirmed = false;
 
+  // Document state
+  documentTitle = 'Market Analysis 2024';
+  originalTitle = 'Market Analysis 2024';
+  isEditingTitle = signal(false);
+  lastEdited = signal(new Date());
+
+  initialContent = `
+    <h1>Market Analysis 2024: The Impact of Technological Innovation</h1>
+    <p>The year 2024 marks a period of unprecedented transformation in the global scenario, primarily driven by the rapid evolution and adoption of new technologies. Artificial intelligence (AI) continues to be a central engine behind this change, redefining sectors from manufacturing to services.</p>
+    <p>Beyond AI, quantum computing and biotechnology are also emerging as fields with the potential to revolutionize the technological landscape in the next decade. Although still in early stages of commercialization, investment in research and development in these areas is robust.</p>
+    <p>Environmental sustainability and corporate social responsibility (CSR) also play a crucial role in business decisions and investment in 2024. Consumers and investors are increasingly aware of companies' impact on the planet and society.</p>
+    <h2>Key Trends</h2>
+    <ul>
+      <li>Artificial Intelligence adoption across industries</li>
+      <li>Quantum computing research breakthroughs</li>
+      <li>Sustainable technology investments</li>
+      <li>Remote work infrastructure improvements</li>
+    </ul>
+    <blockquote>The future belongs to those who prepare for it today. - Malcolm X</blockquote>
+  `;
+
   collaborators: Collaborator[] = [
     { name: 'Sarah Kim', initials: 'SK', color: '#3B82F6' },
-    { name: 'John Doe', initials: 'JD', color: '#8B5CF6' }
+    { name: 'John Doe', initials: 'JD', color: '#8B5CF6' },
   ];
 
   versions: Version[] = this.documentService.getVersions();
   comments: Comment[] = this.documentService.getComments();
   aiSuggestions: AISuggestion[] = this.documentService.getAISuggestions();
 
+  lastEditedText = signal('Last edited just now');
+
+  startEditingTitle(): void {
+    this.originalTitle = this.documentTitle;
+    this.isEditingTitle.set(true);
+    setTimeout(() => {
+      const input = document.querySelector('input[type="text"]') as HTMLInputElement;
+      if (input) {
+        input.focus();
+        input.select();
+      }
+    }, 0);
+  }
+
+  saveTitle(): void {
+    if (this.documentTitle.trim() === '') {
+      this.documentTitle = this.originalTitle;
+    }
+    this.isEditingTitle.set(false);
+    this.updateLastEdited();
+  }
+
+  cancelTitleEdit(): void {
+    this.documentTitle = this.originalTitle;
+    this.isEditingTitle.set(false);
+  }
+
+  private updateLastEdited(): void {
+    this.lastEdited.set(new Date());
+    this.lastEditedText.set('Last edited just now');
+  }
+
+  onContentChange(content: string): void {
+    this.updateLastEdited();
+  }
+
+  onSave(content: string): void {
+    console.log('Saving document content:', content.substring(0, 100) + '...');
+    // Here you would call the API to save the document
+    // For now, it just logs to console
+  }
+
   navigateBack(): void {
     this.router.navigate(['/dashboard']);
   }
 
   toggleAIPanel(): void {
-    this.showAIPanel.update(v => !v);
+    this.showAIPanel.update((v) => !v);
     this.showVersionHistory.set(false);
     this.showComments.set(false);
   }
 
   toggleVersionHistory(): void {
-    this.showVersionHistory.update(v => !v);
+    this.showVersionHistory.update((v) => !v);
     this.showComments.set(false);
     this.showAIPanel.set(false);
   }
 
   toggleComments(): void {
-    this.showComments.update(v => !v);
+    this.showComments.update((v) => !v);
     this.showVersionHistory.set(false);
     this.showAIPanel.set(false);
   }
@@ -476,7 +552,7 @@ export class DocumentEditorComponent {
   handleVersionSelect(versionId: number): void {
     const current = this.selectedVersions();
     if (current.includes(versionId)) {
-      this.selectedVersions.set(current.filter(id => id !== versionId));
+      this.selectedVersions.set(current.filter((id) => id !== versionId));
     } else if (current.length < 2) {
       this.selectedVersions.set([...current, versionId]);
     }
