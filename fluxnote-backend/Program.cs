@@ -14,12 +14,16 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Auto-apply migrations on startup
+// Inserts Seed & Auto-apply migrations on startup
 using (var scope = app.Services.CreateScope())
 {
-    var db = scope.ServiceProvider.GetRequiredService<FluxnoteServerContext>();
+    var services = scope.ServiceProvider;
+    var db = services.GetRequiredService<FluxnoteServerContext>();
     db.Database.Migrate();
+    SeedData.Initialize(services);   
 }
+
+
 
 app.UseDefaultFiles();
 app.UseStaticFiles();
