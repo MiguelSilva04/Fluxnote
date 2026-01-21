@@ -1,0 +1,161 @@
+<div class="flex flex-col h-full">
+    <!-- Toolbar -->
+    <div class="bg-white border-b border-gray-200 px-4 py-2 flex items-center gap-1 flex-wrap">
+      <!-- Text formatting -->
+      <div class="flex items-center gap-1 pr-3 border-r border-gray-200">
+        <button
+          type="button"
+          (click)="format('bold')"
+          [class]="getToolbarButtonClass(formats.bold)"
+          title="Bold (Ctrl+B)"
+        >
+          <lucide-icon name="bold" class="h-4 w-4"></lucide-icon>
+        </button>
+        <button
+          type="button"
+          (click)="format('italic')"
+          [class]="getToolbarButtonClass(formats.italic)"
+          title="Italic (Ctrl+I)"
+        >
+          <lucide-icon name="italic" class="h-4 w-4"></lucide-icon>
+        </button>
+        <button
+          type="button"
+          (click)="format('underline')"
+          [class]="getToolbarButtonClass(formats.underline)"
+          title="Underline (Ctrl+U)"
+        >
+          <lucide-icon name="underline" class="h-4 w-4"></lucide-icon>
+        </button>
+        <button
+          type="button"
+          (click)="format('strike')"
+          [class]="getToolbarButtonClass(formats.strike)"
+          title="Strikethrough"
+        >
+          <lucide-icon name="strikethrough" class="h-4 w-4"></lucide-icon>
+        </button>
+      </div>
+
+      <!-- Headers -->
+      <div class="flex items-center gap-1 px-3 border-r border-gray-200">
+        <select
+          (change)="formatHeader($event)"
+          class="h-8 px-2 text-sm border border-gray-200 rounded hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#155347]"
+          #headerSelect
+        >
+          <option value="">Normal</option>
+          <option value="1">Heading 1</option>
+          <option value="2">Heading 2</option>
+          <option value="3">Heading 3</option>
+        </select>
+      </div>
+
+      <!-- Lists -->
+      <div class="flex items-center gap-1 px-3 border-r border-gray-200">
+        <button
+          type="button"
+          (click)="formatList('ordered')"
+          [class]="getToolbarButtonClass(formats.listOrdered)"
+          title="Numbered List"
+        >
+          <lucide-icon name="list-ordered" class="h-4 w-4"></lucide-icon>
+        </button>
+        <button
+          type="button"
+          (click)="formatList('bullet')"
+          [class]="getToolbarButtonClass(formats.listBullet)"
+          title="Bullet List"
+        >
+          <lucide-icon name="list" class="h-4 w-4"></lucide-icon>
+        </button>
+      </div>
+
+      <!-- Alignment -->
+      <div class="flex items-center gap-1 px-3 border-r border-gray-200">
+        <button
+          type="button"
+          (click)="formatAlign('')"
+          [class]="getToolbarButtonClass(!formats.align || formats.align === '')"
+          title="Align Left"
+        >
+          <lucide-icon name="align-left" class="h-4 w-4"></lucide-icon>
+        </button>
+        <button
+          type="button"
+          (click)="formatAlign('center')"
+          [class]="getToolbarButtonClass(formats.align === 'center')"
+          title="Align Center"
+        >
+          <lucide-icon name="align-center" class="h-4 w-4"></lucide-icon>
+        </button>
+        <button
+          type="button"
+          (click)="formatAlign('right')"
+          [class]="getToolbarButtonClass(formats.align === 'right')"
+          title="Align Right"
+        >
+          <lucide-icon name="align-right" class="h-4 w-4"></lucide-icon>
+        </button>
+      </div>
+
+      <!-- Other -->
+      <div class="flex items-center gap-1 px-3">
+        <button
+          type="button"
+          (click)="formatLink()"
+          [class]="getToolbarButtonClass(formats.link)"
+          title="Insert Link"
+        >
+          <lucide-icon name="link" class="h-4 w-4"></lucide-icon>
+        </button>
+        <button
+          type="button"
+          (click)="formatBlockquote()"
+          [class]="getToolbarButtonClass(formats.blockquote)"
+          title="Blockquote"
+        >
+          <lucide-icon name="quote" class="h-4 w-4"></lucide-icon>
+        </button>
+        <button
+          type="button"
+          (click)="formatCode()"
+          [class]="getToolbarButtonClass(formats.codeBlock)"
+          title="Code Block"
+        >
+          <lucide-icon name="code" class="h-4 w-4"></lucide-icon>
+        </button>
+      </div>
+
+      <!-- Save status -->
+      <div class="ml-auto flex items-center gap-2">
+        @switch (saveStatus()) {
+          @case ('saving') {
+            <div class="flex items-center gap-2 text-gray-500">
+              <lucide-icon name="loader-2" class="h-4 w-4 animate-spin"></lucide-icon>
+              <span class="text-sm">Saving...</span>
+            </div>
+          }
+          @case ('saved') {
+            <div class="flex items-center gap-2 text-green-600">
+              <lucide-icon name="check" class="h-4 w-4"></lucide-icon>
+              <span class="text-sm">Saved</span>
+            </div>
+          }
+          @case ('error') {
+            <div class="flex items-center gap-2 text-red-600">
+              <lucide-icon name="alert-circle" class="h-4 w-4"></lucide-icon>
+              <span class="text-sm">Error saving</span>
+            </div>
+          }
+        }
+      </div>
+    </div>
+
+    <!-- Editor container -->
+    <div class="flex-1 overflow-y-auto bg-gray-50 p-8">
+      <div class="max-w-4xl mx-auto bg-white shadow-sm border border-gray-200 rounded-xl min-h-[600px]">
+        <div #editorContainer class="quill-editor-container"></div>
+      </div>
+    </div>
+  </div>
