@@ -4,7 +4,7 @@ export interface Team {
   id: number;
   name: string;
   members: number;
-  role: 'Owner' | 'Team Admin' | 'Member' | 'Viewer';
+  role: 'Owner' | 'Team Admin' | 'Member';
   avatar: string;
   lastActivity: string;
   documents: TeamDocument[];
@@ -21,7 +21,7 @@ export interface TeamMember {
   id: number;
   name: string;
   email: string;
-  role: 'Owner' | 'Team Admin' | 'Member' | 'Viewer';
+  role: 'Owner' | 'Team Admin' | 'Member';
   avatar: string;
   joinedAt: string;
 }
