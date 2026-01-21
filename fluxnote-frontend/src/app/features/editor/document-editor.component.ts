@@ -1,12 +1,18 @@
 import { Component, inject, signal, ViewChild } from '@angular/core';
+// TODO: BACKEND INTEGRATION - Descomentar quando implementar ngOnInit
+// import { OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
 import { ButtonComponent, BadgeComponent } from '../../shared/components/ui';
 import { DocumentService } from '../../core/services';
 import { Collaborator, Version, Comment, AISuggestion } from '../../core/models';
 import { TextEditorComponent } from './components/text-editor.component';
+
+// TODO: BACKEND INTEGRATION - Adicionar import do HttpClient quando necessário
+// import { HttpClient } from '@angular/common/http';
+// import { Observable, catchError, of } from 'rxjs';
 
 @Component({
   selector: 'app-document-editor',
@@ -438,11 +444,17 @@ import { TextEditorComponent } from './components/text-editor.component';
     </div>
   `,
 })
+// TODO: BACKEND INTEGRATION - Adicionar implements OnInit quando implementar ngOnInit
 export class DocumentEditorComponent {
   @ViewChild('editor') editor!: TextEditorComponent;
 
   private router = inject(Router);
+  // TODO: BACKEND INTEGRATION - Descomentar quando backend estiver pronto
+  // private route = inject(ActivatedRoute);
   private documentService = inject(DocumentService);
+  
+  // TODO: BACKEND INTEGRATION - Adicionar campo para armazenar ID do documento
+  // documentId: number | null = null;
 
   showVersionHistory = signal(false);
   showComments = signal(false);
@@ -456,11 +468,17 @@ export class DocumentEditorComponent {
   restoreConfirmed = false;
 
   // Document state
+  // TODO: BACKEND INTEGRATION - Remover valores hardcoded e carregar do backend
+  // Estes valores devem vir de:
+  // - GET /api/v1/documents/{id} -> para documentTitle
+  // - GET /api/v1/documents/{id}/content -> para initialContent
   documentTitle = 'Market Analysis 2024';
   originalTitle = 'Market Analysis 2024';
   isEditingTitle = signal(false);
   lastEdited = signal(new Date());
 
+  // TODO: BACKEND INTEGRATION - Este conteúdo deve ser carregado do backend
+  // Chamar documentService.loadDocumentContent(id) em ngOnInit
   initialContent = `
     <h1>Market Analysis 2024: The Impact of Technological Innovation</h1>
     <p>The year 2024 marks a period of unprecedented transformation in the global scenario, primarily driven by the rapid evolution and adoption of new technologies. Artificial intelligence (AI) continues to be a central engine behind this change, redefining sectors from manufacturing to services.</p>
@@ -487,6 +505,46 @@ export class DocumentEditorComponent {
 
   lastEditedText = signal('Last edited just now');
 
+  // TODO: BACKEND INTEGRATION - Implementar ngOnInit para carregar documento do backend
+  // ngOnInit(): void {
+  //   const documentId = this.route.snapshot.paramMap.get('id');
+  //   if (documentId) {
+  //     this.documentId = +documentId;
+  //     this.loadDocument(this.documentId);
+  //   } else {
+  //     // Redirecionar para dashboard se não houver ID
+  //     this.router.navigate(['/dashboard']);
+  //   }
+  // }
+  //
+  // private loadDocument(id: number): void {
+  //   this.documentService.loadDocument(id).subscribe({
+  //     next: (doc) => {
+  //       this.documentTitle = doc.title;
+  //       this.originalTitle = doc.title;
+  //       this.lastEditedText.set(this.formatLastEdited(doc.updatedAt));
+  //     },
+  //     error: (err) => {
+  //       console.error('Error loading document:', err);
+  //       // Redirecionar para dashboard em caso de erro
+  //       this.router.navigate(['/dashboard']);
+  //     }
+  //   });
+  //
+  //   this.documentService.loadDocumentContent(id).subscribe({
+  //     next: (content) => {
+  //       this.initialContent = content;
+  //       // Se o editor já estiver inicializado, atualizar conteúdo
+  //       if (this.editor) {
+  //         this.editor.setContent(content);
+  //       }
+  //     },
+  //     error: (err) => {
+  //       console.error('Error loading document content:', err);
+  //     }
+  //   });
+  // }
+
   startEditingTitle(): void {
     this.originalTitle = this.documentTitle;
     this.isEditingTitle.set(true);
@@ -505,6 +563,22 @@ export class DocumentEditorComponent {
     }
     this.isEditingTitle.set(false);
     this.updateLastEdited();
+    
+    // TODO: BACKEND INTEGRATION - Guardar título no backend
+    // if (this.documentId) {
+    //   this.documentService.updateDocumentMetadata(this.documentId, {
+    //     title: this.documentTitle
+    //   }).subscribe({
+    //     next: () => {
+    //       console.log('Title saved successfully');
+    //     },
+    //     error: (err) => {
+    //       console.error('Error saving title:', err);
+    //       // Reverter título em caso de erro
+    //       this.documentTitle = this.originalTitle;
+    //     }
+    //   });
+    // }
   }
 
   cancelTitleEdit(): void {
@@ -522,9 +596,29 @@ export class DocumentEditorComponent {
   }
 
   onSave(content: string): void {
+    // TODO: BACKEND INTEGRATION - Implementar guardar conteúdo no backend
+    // Endpoint: PUT /api/v1/documents/{id}/content
+    // 
+    // if (this.documentId) {
+    //   this.documentService.saveDocumentContent(this.documentId, content).subscribe({
+    //     next: () => {
+    //       console.log('Document saved successfully');
+    //       this.editor.setSaveStatus('saved');
+    //       this.updateLastEdited();
+    //     },
+    //     error: (err) => {
+    //       console.error('Error saving document:', err);
+    //       this.editor.setSaveStatus('error');
+    //       // Opcional: Mostrar notificação de erro ao utilizador
+    //     }
+    //   });
+    // } else {
+    //   console.warn('Cannot save: Document ID is missing');
+    //   this.editor.setSaveStatus('error');
+    // }
+    
+    // TEMPORÁRIO: Apenas para desenvolvimento sem backend
     console.log('Saving document content:', content.substring(0, 100) + '...');
-    // Here you would call the API to save the document
-    // For now, it just logs to console
   }
 
   navigateBack(): void {

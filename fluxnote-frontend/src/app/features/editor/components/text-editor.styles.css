@@ -74,3 +74,15 @@
   :host ::ng-deep .ql-editor li {
     margin-bottom: 0.25rem;
   }
+
+  :host ::ng-deep .ql-editor img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 0.5rem;
+    margin: 1rem 0;
+    cursor: pointer;
+  }
+
+  :host ::ng-deep .ql-editor img:hover {
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  }

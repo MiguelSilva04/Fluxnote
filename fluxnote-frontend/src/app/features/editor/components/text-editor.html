@@ -111,6 +111,14 @@
         </button>
         <button
           type="button"
+          (click)="insertImage()"
+          [class]="getToolbarButtonClass(false)"
+          title="Insert Image"
+        >
+          <lucide-icon name="image" class="h-4 w-4"></lucide-icon>
+        </button>
+        <button
+          type="button"
           (click)="formatBlockquote()"
           [class]="getToolbarButtonClass(formats.blockquote)"
           title="Blockquote"
@@ -151,6 +159,15 @@
         }
       </div>
     </div>
+
+    <!-- Hidden file input for image upload -->
+    <input
+      type="file"
+      #imageInput
+      (change)="onImageSelected($event)"
+      accept="image/*"
+      class="hidden"
+    />
 
     <!-- Editor container -->
     <div class="flex-1 overflow-y-auto bg-gray-50 p-8">

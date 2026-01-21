@@ -55,6 +55,7 @@ const DEFAULT_FORMATS: EditorFormats = {
 export class TextEditorComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('editorContainer') editorContainer!: ElementRef<HTMLDivElement>;
   @ViewChild('headerSelect') headerSelect!: ElementRef<HTMLSelectElement>;
+  @ViewChild('imageInput') imageInput!: ElementRef<HTMLInputElement>;
 
   initialContent = input<string>('');
   placeholder = input<string>('Start writing...');
@@ -116,6 +117,40 @@ export class TextEditorComponent implements OnInit, AfterViewInit, OnDestroy {
     this.quill.root.addEventListener('keyup', () => {
       this.updateActiveFormats();
     });
+
+    // Intercept drag & drop to validate image size (capture phase to run before Quill)
+    this.quill.root.addEventListener(
+      'drop',
+      (e: DragEvent) => {
+        const files = e.dataTransfer?.files;
+        if (files && files.length > 0) {
+          const file = files[0];
+          if (file.type.startsWith('image/')) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            this.handleDroppedImage(file);
+          }
+        }
+      },
+      true
+    );
+  }
+
+  private handleDroppedImage(file: File): void {
+    const maxSizeInMB = 2;
+    const maxSizeInBytes = maxSizeInMB * 1024 * 1024;
+
+    if (file.size > maxSizeInBytes) {
+      alert(`Image size must be less than ${maxSizeInMB}MB. Dropped image is ${(file.size / 1024 / 1024).toFixed(2)}MB.`);
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const base64 = e.target?.result as string;
+      this.insertImageAtCursor(base64);
+    };
+    reader.readAsDataURL(file);
   }
 
   private updateActiveFormats(): void {
@@ -203,6 +238,44 @@ export class TextEditorComponent implements OnInit, AfterViewInit, OnDestroy {
     const currentFormat = this.quill.getFormat();
     this.quill.format('code-block', !currentFormat['code-block']);
     this.updateActiveFormats();
+  }
+
+  insertImage(): void {
+    this.imageInput.nativeElement.click();
+  }
+
+  onImageSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    const maxSizeInMB = 2;
+    const maxSizeInBytes = maxSizeInMB * 1024 * 1024;
+
+    if (file) {
+      if (!file.type.startsWith('image/')) {
+        alert('Please select a valid image file.');
+        return;
+      }
+
+      if (file.size > maxSizeInBytes) {
+        alert(`Image size must be less than ${maxSizeInMB}MB. Selected image is ${(file.size / 1024 / 1024).toFixed(2)}MB.`);
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const base64 = e.target?.result as string;
+        this.insertImageAtCursor(base64);
+      };
+      reader.readAsDataURL(file);
+    }
+
+    input.value = '';
+  }
+
+  private insertImageAtCursor(imageUrl: string): void {
+    const range = this.quill.getSelection(true);
+    this.quill.insertEmbed(range.index, 'image', imageUrl);
+    this.quill.setSelection(range.index + 1);
   }
 
   getToolbarButtonClass(isActive: boolean | string | undefined): string {

@@ -54,8 +54,10 @@ export const routes: Routes = [
     path: 'dashboard',
     loadComponent: () => import('./features/dashboard/pages/dashboard.component').then(m => m.DashboardComponent)
   },
+  // TODO: BACKEND INTEGRATION - Alterar rota para aceitar ID do documento
+  // Mudar de 'editor' para 'documents/:id' quando backend estiver pronto
   {
-    path: 'editor',
+    path: 'editor', // Mudar para: path: 'documents/:id'
     loadComponent: () => import('./features/editor/document-editor.component').then(m => m.DocumentEditorComponent)
   },
   {
