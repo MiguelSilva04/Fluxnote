@@ -72,7 +72,7 @@ import { DocumentService, TeamService } from '../../../core/services';
                   <lucide-icon name="file-text" class="h-6 w-6 text-[#155347]"></lucide-icon>
                 </div>
                 <button class="p-1 hover:bg-gray-100 rounded" (click)="$event.stopPropagation()">
-                  <lucide-icon name="more-vertical" class="h-5 w-5 text-gray-400"></lucide-icon>
+                  <lucide-icon name="ellipsis-vertical" class="h-5 w-5 text-gray-400"></lucide-icon>
                 </button>
               </div>
               <h3 class="text-lg font-bold text-gray-900 mb-2">{{ doc.title }}</h3>

@@ -11,7 +11,7 @@ import { AuthService } from '../../core/services';
   template: `
     <aside class="w-64 bg-white border-r border-gray-200 fixed left-0 top-0 h-screen flex flex-col">
       <a routerLink="/dashboard" class="p-6 border-b border-gray-100 flex items-center justify-center">
-        <img src="assets/textIcon.png" alt="Fluxnote" class="h-10 w-auto" />
+        <img src="assets/textIcon.png" alt="Fluxnote" class="h-auto w-auto" />
       </a>
 
       <nav class="flex-1 px-4 py-6 space-y-1">
@@ -27,6 +27,7 @@ import { AuthService } from '../../core/services';
         <a
           routerLink="/teams"
           routerLinkActive="bg-[#e8f0ee] text-[#155347]"
+
           class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors text-gray-600 hover:bg-gray-50 hover:text-gray-900"
         >
           <lucide-icon name="users" class="h-5 w-5"></lucide-icon>
@@ -56,7 +57,7 @@ import { AuthService } from '../../core/services';
           routerLinkActive="bg-[#e8f0ee] text-[#155347]"
           class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors"
         >
-          <lucide-icon name="help-circle" class="h-5 w-5"></lucide-icon>
+          <lucide-icon name="badge-question-mark" class="h-5 w-5"></lucide-icon>
           Help & Support
         </a>
         <button

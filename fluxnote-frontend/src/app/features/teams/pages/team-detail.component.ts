@@ -74,7 +74,7 @@ import { ButtonComponent, CardComponent, CardContentComponent, BadgeComponent } 
                       <div class="flex items-center gap-4">
                         <app-badge [variant]="member.role === 'Owner' ? 'default' : 'outline'">{{ member.role }}</app-badge>
                         <button class="p-1 hover:bg-gray-100 rounded">
-                          <lucide-icon name="more-vertical" class="h-4 w-4 text-gray-400"></lucide-icon>
+                          <lucide-icon name="ellipsis-vertical" class="h-4 w-4 text-gray-400"></lucide-icon>
                         </button>
                       </div>
                     </div>
