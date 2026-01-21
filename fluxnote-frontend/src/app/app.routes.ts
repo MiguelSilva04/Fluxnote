@@ -1,7 +1,7 @@
 import { Routes } from '@angular/router';
 
 export const routes: Routes = [
-  // Landing page routes
+  // Landing page routes  dashboard
   {
     path: '',
     loadComponent: () => import('./features/landing/pages/landing.component').then(m => m.LandingComponent)
