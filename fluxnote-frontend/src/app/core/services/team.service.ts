@@ -41,7 +41,7 @@ export class TeamService {
       id: 4,
       name: 'Suporte Delta',
       members: 8,
-      role: 'Viewer',
+      role: 'Member',
       avatar: 'SD',
       lastActivity: '3 days ago',
       documents: []
