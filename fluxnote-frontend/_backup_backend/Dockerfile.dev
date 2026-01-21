@@ -1,0 +1,16 @@
+# Development Dockerfile for Angular
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+
+# Install dependencies
+RUN npm install
+
+# Expose Angular dev server port
+EXPOSE 4200
+
+# Start development server directly (bypass prestart which requires dotnet)
+CMD ["npx", "ng", "serve", "--host", "0.0.0.0", "--poll", "2000", "--proxy-config", "src/proxy.conf.docker.js"]
