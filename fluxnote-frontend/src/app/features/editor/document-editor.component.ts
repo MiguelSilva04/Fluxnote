@@ -75,7 +75,7 @@ import { Collaborator, Version, Comment, AISuggestion } from '../../core/models'
             Share
           </app-button>
           <button class="p-2 hover:bg-gray-100 rounded-lg">
-            <lucide-icon name="more-vertical" class="h-5 w-5 text-gray-600"></lucide-icon>
+            <lucide-icon name="ellipsis-vertical" class="h-5 w-5 text-gray-600"></lucide-icon>
           </button>
         </div>
       </header>

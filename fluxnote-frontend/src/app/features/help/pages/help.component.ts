@@ -23,7 +23,7 @@ import { ButtonComponent, CardComponent, CardContentComponent } from '../../../s
         <!-- Header -->
         <div class="text-center mb-12">
           <div class="inline-flex items-center justify-center w-16 h-16 bg-[#155347] rounded-full mb-4">
-            <lucide-icon name="help-circle" class="h-8 w-8 text-white"></lucide-icon>
+            <lucide-icon name="badge-question-mark" class="h-8 w-8 text-white"></lucide-icon>
           </div>
           <h1 class="text-4xl font-bold text-gray-900 mb-4">How can we help you?</h1>
           <p class="text-lg text-gray-600 mb-8">Search our knowledge base or browse categories below</p>
