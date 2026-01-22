@@ -38,7 +38,7 @@ namespace Fluxnote.Backend.Models
         PendingEmailConfirmation = 0,
         Active = 1,
         Suspended = 2,
-        Deleted = 3
+        Blocked = 3
     }
 
     public static class AccountStatusExtensions
@@ -50,7 +50,7 @@ namespace Fluxnote.Backend.Models
                 AccountStatus.PendingEmailConfirmation => "Pending Email Confirmation",
                 AccountStatus.Active => "Active",
                 AccountStatus.Suspended => "Suspended",
-                AccountStatus.Deleted => "Deleted",
+                AccountStatus.Blocked => "Blocked",
                 _ => "Unknown"
             };
         }
