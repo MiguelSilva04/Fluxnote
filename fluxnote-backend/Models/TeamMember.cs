@@ -4,9 +4,9 @@
 {
         public int Id { get; set; }
 
-        public string Role { get; set; }
+        public TeamRole Role { get; set; }
 
-        public int PersonId { get; set; }
+        public int UserId { get; set; }
 
         public int TeamId { get; set; }
 

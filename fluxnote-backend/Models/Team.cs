@@ -14,8 +14,10 @@
 
         public bool IsActive { get; set; }
 
-        public DateTime? DeletionScheduledAt { get; set; }
+        public DateTime? DeletionScheduled { get; set; }
 
         public int MemberCount { get; set; }
+
+        public List<TeamMember> TeamMembers { get; set; }
     }
 }
