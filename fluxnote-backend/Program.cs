@@ -21,6 +21,12 @@ builder.Services.Configure<EmailOptions>(builder.Configuration.GetSection("Email
 else
     builder.Services.AddScoped<IEmailSender, SmtpEmailSender>();*/
 
+if (builder.Environment.IsDevelopment())
+{
+    builder.Services.AddSingleton<IDevEmailStore, DevEmailStore>();
+    builder.Services.AddScoped<IEmailSender, ConsoleEmailSender>();
+}
+
 builder.Services.AddScoped<IEmailSender, ConsoleEmailSender>();
 
 builder.Services.AddIdentity<User, IdentityRole>(options =>

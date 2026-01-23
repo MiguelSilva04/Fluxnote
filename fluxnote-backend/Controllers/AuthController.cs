@@ -151,4 +151,16 @@ public class AuthController : ControllerBase
                 status = "Active"
             });
     }
+
+    [HttpGet("dev/last-confirmation-link")]
+    public IActionResult DevLastConfirmationLink([FromQuery] string email, [FromServices] IDevEmailStore store)
+    {
+        if (!HttpContext.RequestServices.GetRequiredService<IWebHostEnvironment>().IsDevelopment())
+            return NotFound();
+
+        var link = store.Get(email);
+        if (link is null) return NotFound(new { message = "No link found for this email." });
+
+        return Ok(new { confirmationLink = link });
+    }
 }
