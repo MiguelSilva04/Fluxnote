@@ -38,36 +38,36 @@ namespace Fluxnote.Backend.Controllers
             return team;
         }
 
-        //// PUT: api/Teams/5
-        //// To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        //[HttpPut("{id}")]
-        //public async Task<IActionResult> PutTeam(int id, Team team)
-        //{
-        //    if (id != team.Id)
-        //    {
-        //        return BadRequest();
-        //    }
+        // PUT: api/Teams/5
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutTeam(int id, Team team)
+        {
+            if (id != team.Id)
+            {
+                return BadRequest();
+            }
 
-        //    _context.Entry(team).State = EntityState.Modified;
+            _context.Entry(team).State = EntityState.Modified;
 
-        //    try
-        //    {
-        //        await _context.SaveChangesAsync();
-        //    }
-        //    catch (DbUpdateConcurrencyException)
-        //    {
-        //        if (!TeamExists(id))
-        //        {
-        //            return NotFound();
-        //        }
-        //        else
-        //        {
-        //            throw;
-        //        }
-        //    }
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!TeamExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
 
-        //    return NoContent();
-        //}
+            return NoContent();
+        }
 
         // POST: api/Teams
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
@@ -80,21 +80,21 @@ namespace Fluxnote.Backend.Controllers
             return CreatedAtAction("GetTeam", new { id = team.Id }, team);
         }
 
-        //// DELETE: api/Teams/5
-        //[HttpDelete("{id}")]
-        //public async Task<IActionResult> DeleteTeam(int id)
-        //{
-        //    var team = await _context.Team.FindAsync(id);
-        //    if (team == null)
-        //    {
-        //        return NotFound();
-        //    }
+        // DELETE: api/Teams/5
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteTeam(int id)
+        {
+            var team = await _context.Team.FindAsync(id);
+            if (team == null)
+            {
+                return NotFound();
+            }
 
-        //    _context.Team.Remove(team);
-        //    await _context.SaveChangesAsync();
+            _context.Team.Remove(team);
+            await _context.SaveChangesAsync();
 
-        //    return NoContent();
-        //}
+            return NoContent();
+        }
 
         private bool TeamExists(int id)
         {

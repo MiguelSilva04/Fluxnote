@@ -14,12 +14,12 @@ namespace Fluxnote.Backend.Data
             if (context.Team.Any())
                 return;
             
-            context.Person.AddRange(
-                new Person { Name = "Alex Morgan", Email = "alex.morgan@fluxnote.com" },
-                new Person { Name = "Sarah Kim", Email = "sarah.kim@fluxnote.com" },
-                new Person { Name = "John Doe", Email = "john.doe@fluxnote.com" },
-                new Person { Name = "Maria Santos", Email = "maria.santos@fluxnote.com" }
-            );
+            //context.Person.AddRange(
+            //    new Person { Name = "Alex Morgan", Email = "alex.morgan@fluxnote.com" },
+            //    new Person { Name = "Sarah Kim", Email = "sarah.kim@fluxnote.com" },
+            //    new Person { Name = "John Doe", Email = "john.doe@fluxnote.com" },
+            //    new Person { Name = "Maria Santos", Email = "maria.santos@fluxnote.com" }
+            //);
             //context.Team.AddRange(
             //    new Team { Name = "Keyboard", Price = 29.99m, Stock = 10, Category = "Peripherals" },
             //    new Team { Name = "Mouse", Price = 19.99m, Stock = 25, Category = "Peripherals" },
@@ -82,10 +82,10 @@ namespace Fluxnote.Backend.Data
             );
 
             context.TeamMember.AddRange(
-                new TeamMember { TeamId = 1, PersonId = 1, Role = "Owner" },
-                new TeamMember { TeamId = 1, PersonId = 2, Role = "Team Admin" },
-                new TeamMember { TeamId = 1, PersonId = 3, Role = "Editor" },
-                new TeamMember { TeamId = 1, PersonId = 4, Role = "Viewer" }
+                new TeamMember { TeamId = 1, UserId = 1, Role = TeamRole.Owner },
+                new TeamMember { TeamId = 1, UserId = 2, Role = TeamRole.TeamAdmin },
+                new TeamMember { TeamId = 1, UserId = 3, Role = TeamRole.Member },
+                new TeamMember { TeamId = 1, UserId = 4, Role = TeamRole.Member }
             );
 
             context.SaveChanges();
