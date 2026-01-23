@@ -1,4 +1,4 @@
-﻿namespace Fluxnote.Backend.Models
+namespace Fluxnote.Backend.Models
 {
     public class Team
 {

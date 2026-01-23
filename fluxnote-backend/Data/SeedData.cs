@@ -1,4 +1,4 @@
-﻿using Fluxnote.Backend.Models;
+using Fluxnote.Backend.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Fluxnote.Backend.Data
