@@ -4,6 +4,10 @@ using Fluxnote.Backend.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
+using Fluxnote.Backend.Data;
+using Fluxnote.Backend.Dtos.Auth;
+using Fluxnote.Backend.Services.Auth;
+using Microsoft.EntityFrameworkCore;
 using System.Text;
 
 namespace Fluxnote.Backend.Controllers;
@@ -13,13 +17,29 @@ namespace Fluxnote.Backend.Controllers;
 public class AuthController : ControllerBase
 {
     private readonly UserManager<User> _userManager;
+    private readonly SignInManager<User> _signInManager;
+    private readonly FluxnoteServerContext _db;
+    private readonly TokenService _tokenService;
+    private readonly IWebHostEnvironment _env;
     private readonly IEmailSender _emailSender;
     private readonly IConfiguration _configuration;
-    public AuthController(UserManager<User> userManager, IEmailSender emailSender, IConfiguration configuration)
+    public AuthController(
+        UserManager<User> userManager,
+        SignInManager<User> signInManager,
+        IEmailSender emailSender,
+        IConfiguration configuration,
+        FluxnoteServerContext db,
+        TokenService tokenService,
+        IWebHostEnvironment env
+    )
     {
         _userManager = userManager;
+        _signInManager = signInManager;
         _emailSender = emailSender;
         _configuration = configuration;
+        _db = db;
+        _tokenService = tokenService;
+        _env = env;
     }
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterRequest request)
@@ -93,16 +113,17 @@ public class AuthController : ControllerBase
         if (user == null)
         {
             return Conflict(
-                new 
-                { 
-                    message = "Invalid user ID." 
+                new
+                {
+                    message = "Invalid user ID."
                 });
         }
         if (user.EmailConfirmed)
         {
             return Ok(
-                new { 
-                    message = "Email already confirmed. You can proceed to login." 
+                new
+                {
+                    message = "Email already confirmed. You can proceed to login."
                 });
         }
         string tokenDecoded;
@@ -127,7 +148,7 @@ public class AuthController : ControllerBase
                 new
                 {
                     message = "Email confirmation failed.",
-                  errors = result.Errors.Select(e => e.Description)
+                    errors = result.Errors.Select(e => e.Description)
                 });
         }
         // atualiza o estado da conta
@@ -163,4 +184,66 @@ public class AuthController : ControllerBase
 
         return Ok(new { confirmationLink = link });
     }
+
+    [HttpPost("login")]
+    public async Task<IActionResult> Login([FromBody] LoginRequest request)
+    {
+        var user = await _userManager.FindByEmailAsync(request.Email);
+        if (user is null)
+            return Unauthorized(new { message = "Invalid Credentials" });
+
+        // Bloqueio por falta de confirmação / estado inválido
+        if (!user.EmailConfirmed || user.AccountStatus != AccountStatus.Active)
+            return Unauthorized(new { message = "Account not valid or unauthorized" });
+
+        var signIn = await _signInManager.CheckPasswordSignInAsync(
+            user,
+            request.Password,
+            lockoutOnFailure: true
+        );
+
+        if (!signIn.Succeeded)
+            return Unauthorized(new { message = "Invalid Credentials" });
+
+        var accessToken = _tokenService.CreateAccessToken(user);
+
+        var refreshPlain = TokenService.GenerateRefreshTokenPlain();
+        var refreshHash = TokenService.HashRefreshToken(refreshPlain);
+
+        var days = request.RememberMe ? 30 : 7;
+        var expiresAt = DateTime.UtcNow.AddDays(days);
+
+        _db.RefreshTokens.Add(new RefreshToken
+        {
+            TokenHash = refreshHash,
+            UserId = user.Id,
+            ExpiresAt = expiresAt,
+            CreatedAt = DateTime.UtcNow,
+            CreatedByIp = HttpContext.Connection.RemoteIpAddress?.ToString()
+        });
+
+        await _db.SaveChangesAsync();
+
+        SetRefreshCookie(refreshPlain, expiresAt);
+
+        return Ok(new
+        {
+            accessToken,
+            expiresInSeconds = 15 * 60
+        });
+    }
+
+    private void SetRefreshCookie(string refreshTokenPlain, DateTime expiresAt)
+    {
+        var cookieName = _configuration["Auth:RefreshCookieName"] ?? "fluxnote_rt";
+
+        Response.Cookies.Append(cookieName, refreshTokenPlain, new CookieOptions
+        {
+            HttpOnly = true,
+            Secure = !_env.IsDevelopment(), // dev http -> false; prod https -> true
+            SameSite = SameSiteMode.Lax,
+            Expires = expiresAt
+        });
+    }
+
 }

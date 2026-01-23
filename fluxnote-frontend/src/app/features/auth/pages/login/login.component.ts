@@ -134,11 +134,11 @@ export class LoginComponent {
 
   showPassword = signal(false);
   isLoading = signal(false);
-  formData = { email: '', password: '' };
+  formData = { email: '', password: '', rememberMe: true };
 
   async handleSubmit(): Promise<void> {
     this.isLoading.set(true);
-    const success = await this.authService.login(this.formData.email, this.formData.password);
+    const success = await this.authService.login(this.formData.email, this.formData.password, this.formData.rememberMe);
     this.isLoading.set(false);
     if (success) {
       this.router.navigate(['/dashboard']);

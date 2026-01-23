@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { AuthGuard } from './core/services/auth.guard';
 
 export const routes: Routes = [
   // Landing page routes  dashboard
@@ -83,9 +84,11 @@ export const routes: Routes = [
   // Main app routes
   {
     path: 'dashboard',
+    canActivate: [AuthGuard],
     loadComponent: () =>
       import('./features/dashboard/pages/dashboard.component').then((m) => m.DashboardComponent),
   },
+  
   {
     path: 'editor',
     loadComponent: () =>

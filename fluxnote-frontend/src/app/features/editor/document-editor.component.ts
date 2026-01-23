@@ -144,7 +144,7 @@ import { Collaborator, Version, Comment, AISuggestion } from '../../core/models'
               @if (aiGenerating()) {
                 <div class="p-4 bg-blue-50 border border-blue-200 rounded-lg mb-6">
                   <div class="flex items-center gap-3">
-                    <lucide-icon name="loader-2" class="h-5 w-5 text-blue-600 animate-spin"></lucide-icon>
+                    <lucide-icon name="loader-circle" class="h-5 w-5 text-blue-600 animate-spin"></lucide-icon>
                     <p class="text-sm text-blue-900">Generating suggestion...</p>
                   </div>
                 </div>

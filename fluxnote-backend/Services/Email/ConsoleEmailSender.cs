@@ -17,7 +17,7 @@ public class ConsoleEmailSender : IEmailSender
         _store.Save(toEmail, confirmationLink);
         Console.WriteLine($"[DEV EMAIL] To: {toEmail}");
         Console.WriteLine($"[DEV EMAIL] Link: {confirmationLink}");
-        //_logger.LogInformation("Simulated sending email to {ToEmail} with confirmation link: {ConfirmationLink}", toEmail, confirmationLink);
+        _logger.LogInformation("Simulated sending email to {ToEmail} with confirmation link: {ConfirmationLink}", toEmail, confirmationLink);
         return Task.CompletedTask;
     }
 }

@@ -25,7 +25,7 @@ namespace Fluxnote.Backend.Data
                 entity.HasIndex(x => x.TokenHash).IsUnique();
 
                 entity.HasOne(x => x.User)
-                      .WithMany() // por agora sem navegação no User (podes adicionar mais tarde)
+                      .WithMany() // por agora sem navegação no User
                       .HasForeignKey(x => x.UserId)
                       .OnDelete(DeleteBehavior.Cascade);
 

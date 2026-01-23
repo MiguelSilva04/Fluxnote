@@ -6,10 +6,17 @@ import { User } from '../models';
 
 type ApiResponse = { message: string; status?: string; errors?: string[]}
 
+export interface LoginResponse {
+  accessToken: string;
+  expiresInSeconds: number;
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
+  private readonly tokenKey = 'fluxnote_access_token';
+  
   private readonly _currentUser = signal<User | null>(null);
   private readonly _isLoading = signal(false);
 
@@ -27,27 +34,23 @@ export class AuthService {
     }
   }
 
-  async login(email: string, password: string): Promise<boolean> {
+  async login(email: string, password: string, rememberMe: boolean): Promise<boolean> {
     this._isLoading.set(true);
-
-    // Simulate API call
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        const user: User = {
-          id: '1',
-          name: 'Alex Morgan',
-          email: email,
-          initials: 'AM',
-          color: '#3B82F6',
-          role: 'Team Owner'
-        };
-
-        this._currentUser.set(user);
-        localStorage.setItem('fluxnote_user', JSON.stringify(user));
-        this._isLoading.set(false);
-        resolve(true);
-      }, 1500);
-    });
+    try {
+      const res = await firstValueFrom(
+        this.http.post<LoginResponse>(
+          `${this.baseUrl}/login`,
+          { email, password, rememberMe },
+          { withCredentials: true }
+        )
+      );
+      localStorage.setItem(this.tokenKey, res.accessToken);
+      return true;
+    } catch (error) {
+      return false;
+    } finally {
+      this._isLoading.set(false);
+    }
   }
 
   async register(fullName: string, email: string, password: string): Promise<ApiResponse> {
@@ -84,9 +87,18 @@ export class AuthService {
     });
   }
 
-  logout(): void {
+  logout() {
     this._currentUser.set(null);
     localStorage.removeItem('fluxnote_user');
+    localStorage.removeItem(this.tokenKey);
     this.router.navigate(['/login']);
+  }
+
+  getAccessToken(): string | null {
+    return localStorage.getItem(this.tokenKey);
+  }
+
+  isLoggedIn(): boolean {
+    return !!this.getAccessToken();
   }
 }
