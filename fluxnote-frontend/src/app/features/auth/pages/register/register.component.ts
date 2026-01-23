@@ -44,7 +44,8 @@ import {
             <app-input
               label="Full Name"
               placeholder="John Doe"
-              [(ngModel)]="formData.fullName"
+              [ngModel]="fullName()"
+              (ngModelChange)="fullName.set($event)"
               name="fullName"
               [hasLeftIcon]="true"
               [required]="true"
@@ -56,7 +57,8 @@ import {
               label="Email"
               type="email"
               placeholder="your.email&#64;example.com"
-              [(ngModel)]="formData.email"
+              [ngModel]="email()"
+              (ngModelChange)="email.set($event)"
               name="email"
               [hasLeftIcon]="true"
               [required]="true"
@@ -70,7 +72,8 @@ import {
                   label="Password"
                   [type]="showPassword() ? 'text' : 'password'"
                   placeholder="••••••••"
-                  [(ngModel)]="formData.password"
+                  [ngModel]="password()"
+                  (ngModelChange)="password.set($event)"
                   name="password"
                   [hasLeftIcon]="true"
                   [required]="true"
@@ -137,14 +140,15 @@ import {
                 label="Confirm Password"
                 type="password"
                 placeholder="••••••••"
-                [(ngModel)]="formData.confirmPassword"
+                [ngModel]="confirmPassword()"
+                (ngModelChange)="confirmPassword.set($event)"
                 name="confirmPassword"
                 [required]="true"
                 [customClass]="
-                  !validations().match && formData.confirmPassword ? 'border-red-300' : ''
+                  !validations().match && confirmPassword() ? 'border-red-300' : ''
                 "
               ></app-input>
-              @if (formData.confirmPassword && !validations().match) {
+              @if (confirmPassword() && !validations().match) {
                 <p class="text-xs text-red-500 pl-1">Passwords do not match</p>
               }
             </div>
@@ -222,15 +226,35 @@ export class RegisterComponent {
 
   showPassword = signal(false);
   isLoading = signal(false);
-  formData = { fullName: '', email: '', password: '', confirmPassword: '' };
+  
+  // Campos reativos usando signals
+  fullName = signal('');
+  email = signal('');
+  password = signal('');
+  confirmPassword = signal('');
 
-  validations = computed(() => ({
-    length: this.formData.password.length >= 8,
-    number: /\d/.test(this.formData.password),
-    special: /[!@#$%^&*(),.?":{}|<>]/.test(this.formData.password),
-    match:
-      this.formData.password === this.formData.confirmPassword && this.formData.password !== '',
-  }));
+  // Objeto formData para compatibilidade com ngModel
+  get formData() {
+    return {
+      fullName: this.fullName(),
+      email: this.email(),
+      password: this.password(),
+      confirmPassword: this.confirmPassword(),
+    };
+  }
+
+  validations = computed(() => {
+    const pwd = this.password();
+    const confirmPwd = this.confirmPassword();
+    console.log(pwd, confirmPwd);
+    
+    return {
+      length: pwd.length >= 8,
+      number: /\d/.test(pwd),
+      special: /[!@#$%^&*(),.?":{}|<>]/.test(pwd),
+      match: pwd === confirmPwd && pwd !== '',
+    };
+  });
 
   isFormValid = computed(() => {
     const v = this.validations();
@@ -243,12 +267,12 @@ export class RegisterComponent {
     this.isLoading.set(true);
     try {
       await this.authService.register(
-        this.formData.fullName,
-        this.formData.email,
-        this.formData.password,
+        this.fullName(),
+        this.email(),
+        this.password(),
       );
 
-      this.router.navigate(['/pending-email'], { queryParams: { email: this.formData.email } });
+      this.router.navigate(['/pending-email'], { queryParams: { email: this.email() } });
     } catch (err: any) {
       console.error(err);
     } finally {
