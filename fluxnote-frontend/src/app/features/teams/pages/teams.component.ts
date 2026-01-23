@@ -6,7 +6,7 @@ import { LucideAngularModule } from 'lucide-angular';
 import { DashboardLayoutComponent } from '../../../layout/dashboard-layout/dashboard-layout.component';
 import { ButtonComponent, CardComponent, BadgeComponent, ModalComponent, InputComponent } from '../../../shared/components/ui';
 import { TeamService } from '../../../core/services';
-
+import { HttpClient } from '@angular/common/http';
 @Component({
   selector: 'app-teams',
   standalone: true,
@@ -25,6 +25,7 @@ import { TeamService } from '../../../core/services';
 })
 export class TeamsComponent {
   private router = inject(Router);
+  private http = inject(HttpClient);
   teamService = inject(TeamService);
 
   teams = this.teamService.teams;
@@ -44,7 +45,7 @@ export class TeamsComponent {
 
   createTeam(): void {
     if (this.newTeamName) {
-      this.teamService.createTeam(this.newTeamName, this.newTeamDescription);
+      this.teamService.createTeam(this.newTeamName, this.http , this.router);
       this.isCreateModalOpen.set(false);
       this.newTeamName = '';
       this.newTeamDescription = '';

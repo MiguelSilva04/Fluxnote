@@ -1,5 +1,14 @@
 import { Injectable, signal } from '@angular/core';
 import { Team } from '../models';
+import { HttpClient } from '@angular/common/http';
+import { Router } from '@angular/router';
+
+interface TeamToPost {
+  
+  name: string;
+  
+}
+
 
 @Injectable({
   providedIn: 'root'
@@ -58,22 +67,35 @@ export class TeamService {
   readonly teams = this._teams.asReadonly();
   readonly myTeams = this._myTeams.asReadonly();
 
+  //saving = false;
+  //errorMessage = '';
+
   getTeamById(id: number): Team | undefined {
     return this._teams().find(team => team.id === id);
   }
 
-  createTeam(name: string, description: string): Team {
-    const newTeam: Team = {
-      id: Date.now(),
-      name,
-      members: 1,
-      role: 'Owner',
-      avatar: name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2),
-      lastActivity: 'Just now',
-      documents: []
+  createTeam(teamName: string,  http: HttpClient,  router: Router): void {
+    const newTeam: TeamToPost = {
+      name:teamName
+      //ownerId : 1,
+
     };
-    this._teams.update(teams => [...teams, newTeam]);
-    return newTeam;
+    //this.errorMessage = '';
+    //this.saving = true;
+
+    http.post('/api/teams', newTeam)
+      .subscribe({
+        next: () => {
+          router.navigate(['/teams']);
+        },
+        error: err => {
+          console.error(err);
+          //this.errorMessage = 'Ocorreu um erro ao criar a equipa.';
+          //this.saving = false;
+        }
+      });
+    //this._teams.update(teams => [...teams, newTeam]);
+    //return newTeam;
   }
 
   updateTeam(id: number, updates: Partial<Team>): void {
