@@ -31,7 +31,6 @@ namespace Fluxnote.Backend.Data
                 new Team
                 {
                     Name = "Projeto Alfa",
-                    MemberCount = 7,
                     CreatedAt = DateTime.Now.AddMonths(-3),
                     //Documents = new List<Document>
                     //{
@@ -61,38 +60,33 @@ namespace Fluxnote.Backend.Data
                 new Team
                 {
                     Name = "Desenvolvimento Beta",
-                    MemberCount = 12,
                     CreatedAt = DateTime.Now.AddMonths(-2),
                     //Documents = new List<Document>()
                 },
                 new Team
                 {
                     Name = "Marketing Gamma",
-                    MemberCount = 5,
                     CreatedAt = DateTime.Now.AddMonths(-1),
                     //Documents = new List<Document>()
                 },
                 new Team
                 {
                     Name = "Suporte Delta",
-                    MemberCount = 8,
                     CreatedAt = DateTime.Now.AddHours(-3),
                     //Documents = new List<Document>()
                 }
             );
 
             context.TeamMember.AddRange(
-                new TeamMember { TeamId = 1, UserId = 1, Role = TeamRole.Owner },
-                new TeamMember { TeamId = 1, UserId = 2, Role = TeamRole.TeamAdmin },
-                new TeamMember { TeamId = 1, UserId = 3, Role = TeamRole.Member },
-                new TeamMember { TeamId = 1, UserId = 4, Role = TeamRole.Member }
+                new TeamMember { TeamId = 1, Name = "Maestro", Role = TeamRole.Owner },
+                new TeamMember { TeamId = 1, Name = "Zé Admin", Role = TeamRole.TeamAdmin },
+                new TeamMember { TeamId = 1, Name = "Martim Membro", Role = TeamRole.Member },
+                new TeamMember { TeamId = 1, Name = "Marcelo Membro", Role = TeamRole.Member }
             );
 
             context.SaveChanges();
 
 
-
-            context.SaveChanges();
         }
     }
 }
