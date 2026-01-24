@@ -72,7 +72,7 @@ import { ToastService } from '../../../../shared/services/toast.service';
 
             <div class="flex items-center justify-between text-sm">
               <label class="flex items-center gap-2 cursor-pointer">
-                <input type="checkbox" class="rounded border-gray-300 text-[#155347] focus:ring-[#155347]" />
+                <input name="rememberMe" [(ngModel)]="formData.rememberMe" type="checkbox" class="rounded border-gray-300 text-[#155347] focus:ring-[#155347]" />
                 <span class="text-gray-600">Remember me</span>
               </label>
               <a routerLink="/forgot-password" class="text-[#155347] hover:underline font-medium">
@@ -136,9 +136,10 @@ export class LoginComponent {
 
   showPassword = signal(false);
   isLoading = this.authService.isLoading;
-  formData = { email: '', password: '', rememberMe: true };
+  formData = { email: '', password: '', rememberMe: false };
 
   async handleSubmit(): Promise<void> {
+    console.log(`30 dias selecionados: ${this.formData.rememberMe}`)
     const result = await this.authService.login(
       this.formData.email,
       this.formData.password,

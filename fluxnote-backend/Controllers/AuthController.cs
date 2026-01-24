@@ -179,9 +179,10 @@ public class AuthController : ControllerBase
         var sessionId = Guid.NewGuid().ToString();
         var sessionStartedAt = now;
         var lastUsedAt = now;
-        var idleDays = 7;
+        //var idleDays = 7;
         var absoluteDays = request.RememberMe ? 30 : 7;
-        var expiresAt = Min(now.AddDays(idleDays), sessionStartedAt.AddDays(absoluteDays));
+        //var expiresAt = Min(now.AddDays(idleDays), sessionStartedAt.AddDays(absoluteDays));
+        var expiresAt = sessionStartedAt.AddDays(absoluteDays);
 
         _db.RefreshTokens.Add(new RefreshToken
         {
