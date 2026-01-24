@@ -332,7 +332,7 @@ export class AuthService {
       return {
         success: false,
         message: errorBody.message || 'Login failed. Please try again.',
-        errors: errorBody.errors || [errorBody.message || 'Unknown error occurred.']
+        errors: errorBody.errors || [errorBody.message || 'Internal error.']
       };
     } finally {
       this._isLoading.set(false);
@@ -391,10 +391,28 @@ export class AuthService {
       return {
         message: errorBody.message || 'Failed to create account. Please try again.',
         status: 'error',
-        errors: errorBody.errors || [errorBody.message || 'Unknown error occurred.']
+        errors: errorBody.errors || [errorBody.message || 'Internal error.']
       };
     } finally {
       this._isLoading.set(false);
+    }
+  }
+
+  async getDevLastConfirmationLink(email: string): Promise<string | null> {
+    try {
+      const params = new HttpParams().set('email', email);
+      const res = await firstValueFrom(
+        this.http.get<{ confirmationLink: string }>(
+          `${this.baseUrl}/dev/last-confirmation-link`, 
+          { params }
+        )
+      );
+      return res.confirmationLink;
+    } catch (error: any) {
+      if (error.status === 404) {
+        return null; // ou lançar erro
+      }
+      throw error;
     }
   }
 

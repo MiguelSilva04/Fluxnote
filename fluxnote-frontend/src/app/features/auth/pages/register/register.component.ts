@@ -31,7 +31,8 @@ import { ToastService } from '../../../../shared/services/toast.service';
         <div
           class="inline-flex items-center justify-center p-3 bg-[#155347] rounded-xl mb-4 shadow-lg shadow-[#155347]/20"
         >
-          <lucide-icon name="file-text" class="h-8 w-8 text-white"></lucide-icon>
+          
+          <img src="assets/white_icon.png" alt="FluxNote" class="h-10 w-10" />
         </div>
         <h1 class="text-3xl font-bold text-gray-900">FluxNote</h1>
         <p class="text-gray-500 mt-2">Create your account to get started</p>
