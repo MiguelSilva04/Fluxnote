@@ -139,7 +139,6 @@ export class LoginComponent {
   formData = { email: '', password: '', rememberMe: false };
 
   async handleSubmit(): Promise<void> {
-    console.log(`30 dias selecionados: ${this.formData.rememberMe}`)
     const result = await this.authService.login(
       this.formData.email,
       this.formData.password,

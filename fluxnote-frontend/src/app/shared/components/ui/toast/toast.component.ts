@@ -96,7 +96,7 @@ export class ToastComponent {
 
   getIconName(type: ToastType): string {
     const icons = {
-      success: 'check-circle-2',
+      success: 'badge-check',
       error: 'alert-circle',
       info: 'info',
       warning: 'alert-triangle'

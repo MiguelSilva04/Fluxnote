@@ -53,7 +53,7 @@ import { LucideAngularModule } from 'lucide-angular';
       }
       @if (!error && success) {
         <p class="mt-1.5 text-sm text-green-600 flex items-center gap-1">
-          <lucide-icon name="check-circle-2" class="h-4 w-4"></lucide-icon>
+          <lucide-icon name="badge-check" class="h-4 w-4"></lucide-icon>
           Saved
         </p>
       }
