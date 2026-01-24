@@ -110,6 +110,102 @@ public class AuthController : ControllerBase
         });
     }
 
+    // -------------------------
+    // LOGIN
+    // Sliding + absolute cap:
+    // - refresh token expira em min(now+7d, sessionStart+30d)
+    // - sessionStart é "agora" no login, e é herdado em todas as rotações
+    // -------------------------
+    [HttpPost("login")]
+    public async Task<IActionResult> Login([FromBody] LoginRequest request)
+    {
+        var user = await _userManager.FindByEmailAsync(request.Email);
+        if (user is null)
+        {
+            return Conflict(new
+            {
+                message = "Invalid Credentials",
+                errors = new[] { "Invalid email or password." }
+            });
+        }
+
+        // Account validity checks
+        var accountErrors = new List<string>();
+        if (!user.EmailConfirmed)
+            accountErrors.Add("Email not confirmed.");
+        if (user.AccountStatus != AccountStatus.Active)
+            accountErrors.Add($"Account status: {user.AccountStatus}.");
+
+        if (accountErrors.Count > 0)
+        {
+            return Conflict(new
+            {
+                message = "Account not valid or Conflict",
+                errors = accountErrors
+            });
+        }
+
+        var signIn = await _signInManager.CheckPasswordSignInAsync(
+            user,
+            request.Password,
+            lockoutOnFailure: true
+        );
+
+        if (!signIn.Succeeded)
+        {
+            var signInErrors = new List<string>();
+            if (signIn.IsLockedOut)
+                signInErrors.Add("Too many failed attempts. Account is locked.");
+            if (signIn.IsNotAllowed)
+                signInErrors.Add("Sign-in is not allowed for this account.");
+            if (signIn.RequiresTwoFactor)
+                signInErrors.Add("Two-factor authentication required.");
+            if (signInErrors.Count == 0)
+                signInErrors.Add("Invalid credentials.");
+
+            return Conflict(new
+            {
+                message = "Invalid Credentials",
+                errors = signInErrors
+            });
+        }
+
+        var accessToken = _tokenService.CreateAccessToken(user);
+
+        var refreshPlain = TokenService.GenerateRefreshTokenPlain();
+        var refreshHash = TokenService.HashRefreshToken(refreshPlain);
+
+        var now = DateTime.UtcNow;
+        var sessionId = Guid.NewGuid().ToString();
+        var sessionStartedAt = now;
+        var lastUsedAt = now;
+        var idleDays = 7;
+        var absoluteDays = request.RememberMe ? 30 : 7;
+        var expiresAt = Min(now.AddDays(idleDays), sessionStartedAt.AddDays(absoluteDays));
+
+        _db.RefreshTokens.Add(new RefreshToken
+        {
+            TokenHash = refreshHash,
+            UserId = user.Id,
+            SessionId = sessionId,
+            SessionStartedAt = sessionStartedAt,
+            LastUsedAt = lastUsedAt,
+            ExpiresAt = expiresAt,
+            CreatedAt = now,
+            CreatedByIp = HttpContext.Connection.RemoteIpAddress?.ToString()
+        });
+
+        await _db.SaveChangesAsync();
+
+        SetRefreshCookie(refreshPlain, expiresAt);
+
+        return Ok(new
+        {
+            accessToken,
+            expiresInSeconds = 15 * 60
+        });
+    }
+
     [HttpGet("confirm-email")]
     public async Task<IActionResult> ConfirmEmail([FromQuery] string userId, [FromQuery] string token)
     {
@@ -189,74 +285,13 @@ public class AuthController : ControllerBase
         return Ok(new { confirmationLink = link });
     }
 
-    // -------------------------
-    // LOGIN
-    // Sliding + absolute cap:
-    // - refresh token expira em min(now+7d, sessionStart+30d)
-    // - sessionStart é "agora" no login, e é herdado em todas as rotações
-    // -------------------------
-    [HttpPost("login")]
-    public async Task<IActionResult> Login([FromBody] LoginRequest request)
-    {
-        var user = await _userManager.FindByEmailAsync(request.Email);
-        if (user is null)
-            return Unauthorized(new { message = "Invalid Credentials" });
-
-        // Bloqueio por falta de confirmação / estado inválido
-        if (!user.EmailConfirmed || user.AccountStatus != AccountStatus.Active)
-            return Unauthorized(new { message = "Account not valid or unauthorized" });
-
-        var signIn = await _signInManager.CheckPasswordSignInAsync(
-            user,
-            request.Password,
-            lockoutOnFailure: true
-        );
-
-        if (!signIn.Succeeded)
-            return Unauthorized(new { message = "Invalid Credentials" });
-
-        var accessToken = _tokenService.CreateAccessToken(user);
-
-        var refreshPlain = TokenService.GenerateRefreshTokenPlain();
-        var refreshHash = TokenService.HashRefreshToken(refreshPlain);
-
-        var now = DateTime.UtcNow;
-        var sessionId = Guid.NewGuid().ToString();
-        var sessionStartedAt = now;
-        var lastUsedAt = now;
-        var idleDays = 7;
-        var absoluteDays = request.RememberMe ? 30 : 7;
-        var expiresAt = Min(now.AddDays(idleDays), sessionStartedAt.AddDays(absoluteDays));
-
-        _db.RefreshTokens.Add(new RefreshToken
-        {
-            TokenHash = refreshHash,
-            UserId = user.Id,
-            SessionId = sessionId,
-            SessionStartedAt = sessionStartedAt,
-            LastUsedAt = lastUsedAt,
-            ExpiresAt = expiresAt,
-            CreatedAt = now,
-            CreatedByIp = HttpContext.Connection.RemoteIpAddress?.ToString()
-        });
-
-        await _db.SaveChangesAsync();
-
-        SetRefreshCookie(refreshPlain, expiresAt);
-
-        return Ok(new
-        {
-            accessToken,
-            expiresInSeconds = 15 * 60
-        });
-    }
 
     [HttpPost("refresh")]
     public async Task<IActionResult> Refresh()
     {
         var cookieName = _configuration["Auth:RefreshCookieName"] ?? "fluxnote_rt";
         if (!Request.Cookies.TryGetValue(cookieName, out var refreshPlain) || string.IsNullOrWhiteSpace(refreshPlain))
-            return Unauthorized(new { message = "Missing refresh token." });
+            return Conflict(new { message = "Missing refresh token." });
 
         var now = DateTime.UtcNow;
         var refreshHash = TokenService.HashRefreshToken(refreshPlain);
@@ -270,7 +305,7 @@ public class AuthController : ControllerBase
             .FirstOrDefaultAsync(rt => rt.TokenHash == refreshHash);
 
         if (stored is null)
-            return Unauthorized(new { message = "Invalid refresh token." });
+            return Conflict(new { message = "Invalid refresh token." });
 
         // Reuse detection: token revogado reapareceu
         if (stored.RevokedAt is not null)
@@ -278,7 +313,7 @@ public class AuthController : ControllerBase
             // Reacção: revogar a sessão toda (por SessionId)
             await RevokeSessionAsync(stored.UserId, stored.SessionId, now);
             ClearRefreshCookie();
-            return Unauthorized(new { message = "Refresh token reuse detected. Session revoked." });
+            return Conflict(new { message = "Refresh token reuse detected. Session revoked." });
         }
 
         // Expiração por tempo total (ExpiresAt)
@@ -287,7 +322,7 @@ public class AuthController : ControllerBase
             stored.RevokedAt = now;
             await _db.SaveChangesAsync();
             ClearRefreshCookie();
-            return Unauthorized(new { message = "Refresh token expired." });
+            return Conflict(new { message = "Refresh token expired." });
         }
 
         // Absolute cap (30 dias desde início da sessão)
@@ -297,7 +332,7 @@ public class AuthController : ControllerBase
             stored.RevokedAt = now;
             await _db.SaveChangesAsync();
             ClearRefreshCookie();
-            return Unauthorized(new { message = "Session expired (absolute cap)." });
+            return Conflict(new { message = "Session expired (absolute cap)." });
         }
 
         // Idle timeout (7 dias desde última utilização)
@@ -306,7 +341,7 @@ public class AuthController : ControllerBase
             stored.RevokedAt = now;
             await _db.SaveChangesAsync();
             ClearRefreshCookie();
-            return Unauthorized(new { message = "Session expired (idle timeout)." });
+            return Conflict(new { message = "Session expired (idle timeout)." });
         }
 
         // User
@@ -316,7 +351,7 @@ public class AuthController : ControllerBase
             stored.RevokedAt = now;
             await _db.SaveChangesAsync();
             ClearRefreshCookie();
-            return Unauthorized(new { message = "User inactive." });
+            return Conflict(new { message = "User inactive." });
         }
 
         // Rotação (novo refresh + revogar antigo)
@@ -419,7 +454,8 @@ public class AuthController : ControllerBase
         {
             HttpOnly = true,
             Secure = !_env.IsDevelopment(),
-            SameSite = SameSiteMode.Lax
+            SameSite = SameSiteMode.Lax,
+            Path = "/"
         });
     }
 
@@ -432,7 +468,8 @@ public class AuthController : ControllerBase
             HttpOnly = true,
             Secure = !_env.IsDevelopment(), // dev http -> false; prod https -> true
             SameSite = SameSiteMode.Lax,
-            Expires = expiresAt
+            Expires = expiresAt,
+            Path = "/"
         });
     }
 
