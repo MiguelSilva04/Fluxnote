@@ -23,6 +23,10 @@ public class AuthController : ControllerBase
     private readonly IWebHostEnvironment _env;
     private readonly IEmailSender _emailSender;
     private readonly IConfiguration _configuration;
+
+    private const int AccessTokenMinutesDefault = 15;
+    private const int RefreshSlidingDaysDefault = 7;
+    private const int RefreshAbsoluteDaysDefault = 30;
     public AuthController(
         UserManager<User> userManager,
         SignInManager<User> signInManager,
@@ -185,6 +189,12 @@ public class AuthController : ControllerBase
         return Ok(new { confirmationLink = link });
     }
 
+    // -------------------------
+    // LOGIN
+    // Sliding + absolute cap:
+    // - refresh token expira em min(now+7d, sessionStart+30d)
+    // - sessionStart é "agora" no login, e é herdado em todas as rotações
+    // -------------------------
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginRequest request)
     {
@@ -210,15 +220,23 @@ public class AuthController : ControllerBase
         var refreshPlain = TokenService.GenerateRefreshTokenPlain();
         var refreshHash = TokenService.HashRefreshToken(refreshPlain);
 
-        var days = request.RememberMe ? 30 : 7;
-        var expiresAt = DateTime.UtcNow.AddDays(days);
+        var now = DateTime.UtcNow;
+        var sessionId = Guid.NewGuid().ToString();
+        var sessionStartedAt = now;
+        var lastUsedAt = now;
+        var idleDays = 7;
+        var absoluteDays = request.RememberMe ? 30 : 7;
+        var expiresAt = Min(now.AddDays(idleDays), sessionStartedAt.AddDays(absoluteDays));
 
         _db.RefreshTokens.Add(new RefreshToken
         {
             TokenHash = refreshHash,
             UserId = user.Id,
+            SessionId = sessionId,
+            SessionStartedAt = sessionStartedAt,
+            LastUsedAt = lastUsedAt,
             ExpiresAt = expiresAt,
-            CreatedAt = DateTime.UtcNow,
+            CreatedAt = now,
             CreatedByIp = HttpContext.Connection.RemoteIpAddress?.ToString()
         });
 
@@ -230,6 +248,138 @@ public class AuthController : ControllerBase
         {
             accessToken,
             expiresInSeconds = 15 * 60
+        });
+    }
+
+    [HttpPost("refresh")]
+    public async Task<IActionResult> Refresh()
+    {
+        var cookieName = _configuration["Auth:RefreshCookieName"] ?? "fluxnote_rt";
+        if (!Request.Cookies.TryGetValue(cookieName, out var refreshPlain) || string.IsNullOrWhiteSpace(refreshPlain))
+            return Unauthorized(new { message = "Missing refresh token." });
+
+        var now = DateTime.UtcNow;
+        var refreshHash = TokenService.HashRefreshToken(refreshPlain);
+
+        var idleDays = int.Parse(_configuration["Auth:RefreshIdleDays"] ?? "7");
+        var absoluteDays = int.Parse(_configuration["Auth:RefreshAbsoluteDays"] ?? "30");
+
+        // Carregar token
+        var stored = await _db.RefreshTokens
+            .AsTracking()
+            .FirstOrDefaultAsync(rt => rt.TokenHash == refreshHash);
+
+        if (stored is null)
+            return Unauthorized(new { message = "Invalid refresh token." });
+
+        // Reuse detection: token revogado reapareceu
+        if (stored.RevokedAt is not null)
+        {
+            // Reacção: revogar a sessão toda (por SessionId)
+            await RevokeSessionAsync(stored.UserId, stored.SessionId, now);
+            ClearRefreshCookie();
+            return Unauthorized(new { message = "Refresh token reuse detected. Session revoked." });
+        }
+
+        // Expiração por tempo total (ExpiresAt)
+        if (stored.ExpiresAt <= now)
+        {
+            stored.RevokedAt = now;
+            await _db.SaveChangesAsync();
+            ClearRefreshCookie();
+            return Unauthorized(new { message = "Refresh token expired." });
+        }
+
+        // Absolute cap (30 dias desde início da sessão)
+        var absoluteExpiresAt = stored.SessionStartedAt.AddDays(absoluteDays);
+        if (now >= absoluteExpiresAt)
+        {
+            stored.RevokedAt = now;
+            await _db.SaveChangesAsync();
+            ClearRefreshCookie();
+            return Unauthorized(new { message = "Session expired (absolute cap)." });
+        }
+
+        // Idle timeout (7 dias desde última utilização)
+        if (now - stored.LastUsedAt > TimeSpan.FromDays(idleDays))
+        {
+            stored.RevokedAt = now;
+            await _db.SaveChangesAsync();
+            ClearRefreshCookie();
+            return Unauthorized(new { message = "Session expired (idle timeout)." });
+        }
+
+        // User
+        var user = await _userManager.FindByIdAsync(stored.UserId);
+        if (user is null || !user.EmailConfirmed || user.AccountStatus != AccountStatus.Active)
+        {
+            stored.RevokedAt = now;
+            await _db.SaveChangesAsync();
+            ClearRefreshCookie();
+            return Unauthorized(new { message = "User inactive." });
+        }
+
+        // Rotação (novo refresh + revogar antigo)
+        var newRefreshPlain = TokenService.GenerateRefreshTokenPlain();
+        var newRefreshHash = TokenService.HashRefreshToken(newRefreshPlain);
+
+        stored.RevokedAt = now;
+        stored.ReplacedByTokenHash = newRefreshHash;
+
+        var newExpiresAt = Min(now.AddDays(idleDays), absoluteExpiresAt);
+
+        _db.RefreshTokens.Add(new RefreshToken
+        {
+            TokenHash = newRefreshHash,
+            UserId = stored.UserId,
+            SessionId = stored.SessionId,
+            SessionStartedAt = stored.SessionStartedAt,
+            LastUsedAt = now,
+            ExpiresAt = newExpiresAt,
+            CreatedAt = now,
+            CreatedByIp = HttpContext.Connection.RemoteIpAddress?.ToString()
+        });
+
+        // actualiza também o LastUsedAt do token actual (opcional, mas útil para auditoria)
+        // stored.LastUsedAt = now; // normalmente não, porque foi revogado; mantém histórico.
+
+        await _db.SaveChangesAsync();
+
+        SetRefreshCookie(newRefreshPlain, newExpiresAt);
+
+        var accessToken = _tokenService.CreateAccessToken(user);
+        var accessMinutes = int.Parse(_configuration["Jwt:AccessTokenMinutes"] ?? "15");
+
+        return Ok(new
+        {
+            accessToken,
+            expiresInSeconds = accessMinutes * 60
+        });
+    }
+
+    private static DateTime Min(DateTime a, DateTime b) => a <= b ? a : b;
+
+    private async Task RevokeSessionAsync(string userId, string sessionId, DateTime now)
+    {
+        // revoga quaisquer refresh tokens activos desta sessão
+        var tokens = await _db.RefreshTokens
+            .Where(rt => rt.UserId == userId && rt.SessionId == sessionId && rt.RevokedAt == null && rt.ExpiresAt > now)
+            .ToListAsync();
+
+        foreach (var t in tokens)
+            t.RevokedAt = now;
+
+        await _db.SaveChangesAsync();
+    }
+
+    private void ClearRefreshCookie()
+    {
+        var cookieName = _configuration["Auth:RefreshCookieName"] ?? "fluxnote_rt";
+        Response.Cookies.Delete(cookieName, new CookieOptions
+        {
+            HttpOnly = true,
+            Secure = !_env.IsDevelopment(),
+            SameSite = SameSiteMode.Lax
         });
     }
 

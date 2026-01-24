@@ -1,5 +1,6 @@
 import { ApplicationRef, Component, afterNextRender, inject } from '@angular/core';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
+import { AuthService } from './core/services/auth.service';
 
 @Component({
   selector: 'app-root',
@@ -10,11 +11,11 @@ import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 export class App {
   private appRef = inject(ApplicationRef);
   private router = inject(Router);
+  private auth = inject(AuthService);
   title = 'FluxNote';
 
   constructor() {
     afterNextRender(() => {
-      // Force a full change detection pass after the initial render.
       queueMicrotask(() => this.appRef.tick());
     });
 

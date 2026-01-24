@@ -1,10 +1,11 @@
 import { Routes } from '@angular/router';
-import { AuthGuard } from './core/services/auth.guard';
+import { authGuard, guestGuard } from './core/services/auth.guard';
 
 export const routes: Routes = [
   // Landing page routes  dashboard
   {
     path: '',
+    canActivate: [guestGuard],
     loadComponent: () =>
       import('./features/landing/pages/landing.component').then((m) => m.LandingComponent),
   },
@@ -84,7 +85,7 @@ export const routes: Routes = [
   // Main app routes
   {
     path: 'dashboard',
-    canActivate: [AuthGuard],
+    canActivate: [authGuard],
     loadComponent: () =>
       import('./features/dashboard/pages/dashboard.component').then((m) => m.DashboardComponent),
   },

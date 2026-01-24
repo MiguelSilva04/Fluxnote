@@ -4,36 +4,286 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { User } from '../models';
 
-type ApiResponse = { message: string; status?: string; errors?: string[]}
+/**
+ * interface que representa a resposta do servidor após uma tentativa de registo.
+ * contém informações sobre o sucesso ou falha da operação, incluindo possíveis erros de validação.
+ */
+export interface RegisterResponse {
+  /** mensagem descritiva sobre o resultado da operação de registo */
+  message: string;
+  /** status opcional da operação (ex: 'success', 'error') */
+  status?: string;
+  /** lista opcional de erros de validação ou processamento */
+  errors?: string[]
+}
 
+/**
+ * interface que representa a resposta do servidor após uma tentativa de autenticação bem-sucedida.
+ * contém o token de acesso e informação sobre a sua duração de validade.
+ */
 export interface LoginResponse {
+  /** token de acesso JWT que será utilizado para autenticar requisições subsequentes */
   accessToken: string;
+  /** duração de validade do token em segundos */
   expiresInSeconds: number;
 }
 
+/**
+ * interface que representa a resposta do servidor ao solicitar um novo token de acesso.
+ * utilizada no processo de refresh token para obter um novo access token sem reautenticação.
+ */
+export interface TokenResponse {
+  /** novo token de acesso JWT obtido através do refresh token */
+  accessToken: string;
+  /** duração de validade do novo token em segundos */
+  expiresInSeconds: number;
+}
+
+/**
+ * tipo que representa os possíveis estados de autenticação do utilizador na aplicação.
+ * 'unknown' indica que o estado ainda não foi determinado (inicialização),
+ * 'authenticated' indica que o utilizador está autenticado,
+ * 'unauthenticated' indica que o utilizador não está autenticado.
+ */
+type AuthStatus = 'unknown' | 'authenticated' | 'unauthenticated';
+
+/**
+ * serviço responsável pela gestão de autenticação e autorização na aplicação.
+ * implementa o padrão de segurança "cookie refresh + access token em memória", onde o refresh token
+ * é armazenado em cookie HttpOnly (gerido pelo backend) e o access token permanece apenas em memória
+ * através de signals reativos do Angular.
+ * 
+ * este serviço centraliza todas as operações relacionadas com autenticação, incluindo login, registo,
+ * confirmação de email, recuperação de palavra-passe, e gestão de tokens e mais tudo o que 
+ * esteja relacionado com autenticação. Utiliza signals para manter o estado de autenticação reativo e computado, 
+ * permitindo que componentes reajam automaticamente a mudanças no estado de autenticação.
+ * 
+ * @example
+ * ```typescript
+ * // injeção do serviço
+ * constructor(private auth: AuthService) {}
+ * 
+ * // verificar se está autenticado na auth.guard.ts
+ * if (this.auth.isAuthenticated()) {
+ *   // utilizador autenticado
+ * }
+ * 
+ * // realizar login
+ * const success = await this.auth.login(email, password, rememberMe);
+ * ```
+ */
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private readonly tokenKey = 'fluxnote_access_token';
+  /**
+   * signal privado que armazena o token de acesso JWT em memória.
+   * este token não é persistido em localStorage por questões de segurança, sendo perdido
+   * quando a aplicação é recarregada. a recuperação é feita através do refresh token
+   * armazenado em cookie HttpOnly.
+   */
+  private readonly _accessToken = signal<string | null>(null);
   
+  /**
+   * signal privado que mantém o estado atual de autenticação do utilizador.
+   * pode assumir os valores 'unknown' (ainda não determinado), 'authenticated' (autenticado),
+   * ou 'unauthenticated' (não autenticado).
+   */
+  private readonly _status = signal<AuthStatus>('unknown');
+  
+  /**
+   * propriedade pública readonly que expõe o estado de autenticação de forma reativa.
+   * componentes podem observar este signal para reagir a mudanças no estado de autenticação.
+   */
+  readonly status = this._status.asReadonly();
+
+  /**
+   * signal privado que armazena os dados do utilizador atualmente autenticado.
+   * estes dados são persistidos em localStorage para permitir recuperação após refresh,
+   * mas a autenticação em si depende do token em memória.
+   */
   private readonly _currentUser = signal<User | null>(null);
+  
+  /**
+   * signal privado que indica se alguma operação de autenticação está em curso.
+   * útil para mostrar indicadores de carregamento durante operações assíncronas.
+   */
   private readonly _isLoading = signal(false);
 
+  /**
+   * propriedade pública readonly que expõe os dados do utilizador atual de forma reativa.
+   * retorna null se não houver utilizador autenticado.
+   */
   readonly currentUser = this._currentUser.asReadonly();
+  
+  /**
+   * propriedade pública readonly que expõe o estado de carregamento de forma reativa.
+   * útil para desabilitar botões ou mostrar spinners durante operações de autenticação.
+   */
   readonly isLoading = this._isLoading.asReadonly();
-  readonly isAuthenticated = computed(() => this._currentUser() !== null);
+  
+  /**
+   * computed signal que determina se o utilizador está atualmente autenticado.
+   * verifica a existência e validade do token de acesso em memória.
+   * retorna true se o token existir e não estiver expirado, false caso contrário.
+   */
+  readonly isAuthenticated = computed(() => {
+    const token = this._accessToken();
+    return !!token && !this.isJwtExpired(token);
+  });
 
+  /**
+   * url base para todas as requisições de autenticação ao backend.
+   * todas as operações de autenticação são direcionadas para endpoints sob este caminho.
+   */
   private readonly baseUrl = '/api/auth';
 
+  /**
+   * construtor do serviço de autenticação.
+   * inicializa o serviço e recupera dados do utilizador persistidos em localStorage,
+   * se existirem. o estado de autenticação propriamente dito será determinado através
+   * da chamada ao método initAuth() no arranque da aplicação.
+   * 
+   * @param router - instância do router do Angular para navegação programática
+   * @param http - cliente HTTP do Angular para realizar requisições ao backend
+   */
   constructor(private router: Router, private http: HttpClient) {
-    // Check for stored user on init
     const storedUser = localStorage.getItem('fluxnote_user');
     if (storedUser) {
       this._currentUser.set(JSON.parse(storedUser));
     }
   }
 
+  /**
+   * método privado que verifica se um token JWT está expirado.
+   * decodifica o payload do token (sem validação de assinatura) e verifica
+   * se a data de expiração (exp) já foi ultrapassada.
+   * 
+   * @param token - token JWT a ser verificado
+   * @returns true se o token estiver expirado ou se ocorrer erro na decodificação, false caso contrário
+   */
+  private isJwtExpired(token: string): boolean {
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      const expMs = payload.exp * 1000;
+      return Date.now() > expMs;
+    }catch (error) {
+      return true;
+    }
+  }
+
+  /**
+   * inicializa o processo de autenticação no arranque da aplicação.
+   * este método deve ser chamado uma vez durante a inicialização da aplicação (geralmente
+   * no componente raiz) para determinar o estado de autenticação do utilizador.
+   * 
+   * o método sempre tenta obter um novo access token através do endpoint /refresh,
+   * utilizando o refresh token armazenado em cookie HttpOnly. se o refresh token for válido,
+   * o access token obtido é armazenado em memória e o estado é definido como 'authenticated'.
+   * caso contrário, o estado é definido como 'unauthenticated' e os dados locais são limpos.
+   * 
+   * este comportamento garante que mesmo após um refresh da página (F5), onde o access token
+   * em memória é perdido, a sessão pode ser recuperada se o refresh token ainda for válido.
+   * 
+   * @returns Promise que resolve quando a inicialização estiver completa
+   * 
+   * @example
+   * ```typescript
+   * // no app.component.ts ou main.ts
+   * constructor(private auth: AuthService) {
+   *   this.auth.initAuth();
+   * }
+   * ```
+   */
+  async initAuth(): Promise<void> {
+    try {
+      // chama sempre /refresh (não verifica localStorage)
+      // O refresh token está em cookie HttpOnly, então o backend envia automaticamente
+      const res = await firstValueFrom(
+        this.http.post<TokenResponse>(`${this.baseUrl}/refresh`, {}, { withCredentials: true })
+      );
+      
+      // Guarda o access token APENAS em memória (signal) para evitar fácil acesso não desejado
+      this._accessToken.set(res.accessToken);
+      this._status.set('authenticated');
+    } catch {
+      // Refresh token inválido/expirado ou não existe
+      this._accessToken.set(null);
+      this._currentUser.set(null);
+      localStorage.removeItem('fluxnote_user');
+      this._status.set('unauthenticated');
+    }
+  }
+
+  /**
+   * atualiza o token de acesso utilizando o refresh token armazenado em cookie HttpOnly.
+   * este método é utilizado quando o access token atual expira ou quando uma requisição
+   * retorna um erro 401 (não autorizado), permitindo obter um novo access token sem
+   * exigir que o utilizador faça login novamente.
+   * 
+   * o método realiza uma requisição POST para o endpoint /refresh, que utiliza automaticamente
+   * o refresh token do cookie HttpOnly. se bem-sucedido, atualiza o access token em memória
+   * e define o estado como 'authenticated'. em caso de falha (refresh token inválido ou expirado),
+   * executa logout automático e retorna false.
+   * 
+   * @returns Promise que resolve com true se o refresh foi bem-sucedido, false caso contrário
+   * 
+   * @example
+   * ```typescript
+   * // em um interceptor HTTP ao receber 401
+   * if (error.status === 401) {
+   *   const refreshed = await this.auth.refresh();
+   *   if (refreshed) {
+   *     // repetir requisição original
+   *   }
+   * }
+   * ```
+   */
+  async refresh(): Promise<boolean>{ 
+    try{
+      const res = await firstValueFrom(
+        this.http.post<TokenResponse>(`${this.baseUrl}/refresh`, {}, { withCredentials: true })
+      );
+      
+      // atualiza access token em memória
+      this._accessToken.set(res.accessToken);
+      this._status.set('authenticated');
+      return true;
+    } catch {
+      this.logout();
+      return false;
+    }
+  }
+
+  /**
+   * autentica um utilizador na aplicação utilizando credenciais de email e palavra-passe.
+   * realiza uma requisição POST para o endpoint /login com as credenciais fornecidas.
+   * 
+   * em caso de sucesso, o método recebe um access token que é armazenado em memória através
+   * do signal _accessToken. o refresh token é automaticamente armazenado em cookie HttpOnly
+   * pelo backend, não sendo acessível via JavaScript por questões de segurança.
+   * 
+   * o parâmetro rememberMe controla a duração do refresh token: se true, o token persiste
+   * por um período mais longo, permitindo que a sessão seja mantida mesmo após fechar o browser.
+   * 
+   * durante a operação, o signal isLoading é definido como true, permitindo que componentes
+   * reajam e mostrem indicadores de carregamento.
+   * 
+   * @param email - endereço de email do utilizador
+   * @param password - palavra-passe do utilizador
+   * @param rememberMe - indica se a sessão deve ser mantida por um período prolongado
+   * @returns Promise que resolve com true se o login foi bem-sucedido, false caso contrário
+   * 
+   * @example
+   * ```typescript
+   * const success = await this.auth.login('user@example.com', 'password123', true);
+   * if (success) {
+   *   this.router.navigate(['/dashboard']);
+   * } else {
+   *   // mostrar erro de autenticação
+   * }
+   * ```
+   */
   async login(email: string, password: string, rememberMe: boolean): Promise<boolean> {
     this._isLoading.set(true);
     try {
@@ -44,38 +294,122 @@ export class AuthService {
           { withCredentials: true }
         )
       );
-      localStorage.setItem(this.tokenKey, res.accessToken);
+      
+      // access token fica APENAS em memória (não localStorage)
+      // refresh token fica em cookie HttpOnly (gerido pelo backend)
+      this._accessToken.set(res.accessToken);
+      this._status.set('authenticated');
       return true;
     } catch (error) {
+      console.log(error);
       return false;
     } finally {
       this._isLoading.set(false);
     }
   }
 
-  async register(fullName: string, email: string, password: string): Promise<ApiResponse> {
+  /**
+   * regista um novo utilizador na aplicação.
+   * realiza uma requisição POST para o endpoint /register com os dados fornecidos.
+   * 
+   * este método não autentica automaticamente o utilizador após o registo. normalmente,
+   * após um registo bem-sucedido, o utilizador recebe um email de confirmação e deve
+   * confirmar a conta antes de poder fazer login.
+   * 
+   * a resposta contém informações sobre o resultado da operação, incluindo possíveis
+   * erros de validação (ex: email já existente, palavra-passe fraca, etc.).
+   * 
+   * durante a operação, o signal isLoading é definido como true para indicar que
+   * uma operação assíncrona está em curso.
+   * 
+   * @param fullName - nome completo do utilizador
+   * @param email - endereço de email do utilizador (deve ser único)
+   * @param password - palavra-passe do utilizador (deve cumprir requisitos de segurança)
+   * @returns Promise que resolve com a resposta do servidor contendo mensagem e possíveis erros
+   * 
+   * @example
+   * ```typescript
+   * const response = await this.auth.register('João Silva', 'joao@example.com', 'senha123');
+   * if (response.status === 'success') {
+   *   // redirecionar para página de confirmação de email
+   * } else {
+   *   // mostrar erros de validação
+   *   console.log(response.errors);
+   * }
+   * ```
+   */
+  async register(fullName: string, email: string, password: string): Promise<RegisterResponse> {
     this._isLoading.set(true);
     try {
       return await firstValueFrom(
-        this.http.post<ApiResponse>(`${this.baseUrl}/register`, { fullName, email, password })
+        this.http.post<RegisterResponse>(`${this.baseUrl}/register`, { fullName, email, password })
       );
     } finally {
       this._isLoading.set(false);
     }
   }
 
-  async confirmEmail(userId: string, token: string): Promise<ApiResponse> {
+  /**
+   * confirma o endereço de email de um utilizador utilizando o token de confirmação.
+   * este método é chamado quando o utilizador clica no link de confirmação recebido por email
+   * após o registo. o link contém o userId e um token de confirmação único.
+   * 
+   * realiza uma requisição GET para o endpoint /confirm-email com os parâmetros userId e token
+   * como query parameters. a resposta indica se a confirmação foi bem-sucedida ou se ocorreram
+   * erros (ex: token inválido ou expirado).
+   * 
+   * após confirmação bem-sucedida, o utilizador pode fazer login normalmente. em caso de falha,
+   * pode ser necessário solicitar um novo email de confirmação.
+   * 
+   * @param userId - identificador único do utilizador a confirmar
+   * @param token - token de confirmação único enviado por email
+   * @returns Promise que resolve com a resposta do servidor contendo mensagem e status da operação
+   * 
+   * @example
+   * ```typescript
+   * // ao receber parâmetros da URL (ex: /confirm-email?userId=123&token=abc)
+   * const response = await this.auth.confirmEmail(userId, token);
+   * if (response.status === 'success') {
+   *   // redirecionar para página de login
+   * }
+   * ```
+   */
+  async confirmEmail(userId: string, token: string): Promise<RegisterResponse> {
     this._isLoading.set(true);
     try {
       const params = new HttpParams().set('userId', userId).set('token', token);
       return await firstValueFrom(
-        this.http.get<ApiResponse>(`${this.baseUrl}/confirm-email`, { params })
+        this.http.get<RegisterResponse>(`${this.baseUrl}/confirm-email`, { params })
       );
     } finally {
       this._isLoading.set(false);
     }
   }
 
+  /**
+   * inicia o processo de recuperação de palavra-passe para um utilizador.
+   * este método é chamado quando o utilizador esquece a sua palavra-passe e solicita
+   * um link de redefinição por email.
+   * 
+   * atualmente, este método implementa uma simulação com delay de 1.5 segundos.
+   * em produção, deve realizar uma requisição ao backend que envia um email com
+   * instruções e um token de redefinição de palavra-passe.
+   * 
+   * por questões de segurança, o método sempre retorna true, mesmo que o email
+   * não exista na base de dados, para evitar que atacantes descubram quais emails
+   * estão registados no sistema.
+   * 
+   * @param email - endereço de email do utilizador que deseja recuperar a palavra-passe
+   * @returns Promise que resolve com true (sempre, por questões de segurança)
+   * 
+   * @example
+   * ```typescript
+   * const sent = await this.auth.forgotPassword('user@example.com');
+   * if (sent) {
+   *   // mostrar mensagem: "verifique o seu email"
+   * }
+   * ```
+   */
   async forgotPassword(email: string): Promise<boolean> {
     this._isLoading.set(true);
 
@@ -87,17 +421,81 @@ export class AuthService {
     });
   }
 
+  /**
+   * termina a sessão do utilizador atual e limpa todos os dados de autenticação.
+   * este método remove o access token da memória, limpa os dados do utilizador armazenados
+   * localmente, e define o estado de autenticação como 'unauthenticated'.
+   * 
+   * o refresh token armazenado em cookie HttpOnly deve ser invalidado através de uma
+   * chamada ao endpoint /logout no backend, se esse endpoint existir. caso contrário,
+   * o cookie expirará naturalmente ou será limpo pelo browser.
+   * 
+   * após o logout, o utilizador é redirecionado para a página de login. este método
+   * não realiza requisições assíncronas ao backend, sendo uma operação síncrona que
+   * apenas limpa o estado local.
+   * 
+   * @example
+   * ```typescript
+   * // em um componente ou serviço
+   * this.auth.logout();
+   * // utilizador será redirecionado para /login automaticamente
+   * ```
+   */
   logout() {
+    this._accessToken.set(null);
     this._currentUser.set(null);
     localStorage.removeItem('fluxnote_user');
-    localStorage.removeItem(this.tokenKey);
+    this._status.set('unauthenticated');
     this.router.navigate(['/login']);
   }
 
+  /**
+   * obtém o token de acesso atual armazenado em memória.
+   * este método retorna o access token JWT que está atualmente armazenado no signal
+   * _accessToken, após verificar se o token existe e não está expirado.
+   * 
+   * o token é utilizado pelo AuthInterceptor para adicionar o header Authorization
+   * em requisições HTTP que requerem autenticação. se o token não existir ou estiver
+   * expirado, retorna null, indicando que uma nova autenticação ou refresh é necessária.
+   * 
+   * @returns o token de acesso JWT se válido, ou null se não existir ou estiver expirado
+   * 
+   * @example
+   * ```typescript
+   * const token = this.auth.getAccessToken();
+   * if (token) {
+   *   // token válido disponível
+   * } else {
+   *   // necessário fazer login ou refresh
+   * }
+   * ```
+   */
   getAccessToken(): string | null {
-    return localStorage.getItem(this.tokenKey);
+    const token = this._accessToken();
+    if (!token || this.isJwtExpired(token)) {
+      return null;
+    }
+    return token;
   }
 
+  /**
+   * verifica se existe um token de acesso válido atualmente em memória.
+   * este método é uma conveniência que verifica se getAccessToken() retorna um valor
+   * não-nulo, indicando que o utilizador possui uma sessão ativa com um token válido.
+   * 
+   * diferentemente de isAuthenticated (que é um computed signal reativo), este método
+   * retorna um valor booleano simples baseado no estado atual. é útil para verificações
+   * pontuais sem necessidade de reatividade.
+   * 
+   * @returns true se existe um token válido, false caso contrário
+   * 
+   * @example
+   * ```typescript
+   * if (this.auth.isLoggedIn()) {
+   *   // utilizador tem sessão ativa
+   * }
+   * ```
+   */
   isLoggedIn(): boolean {
     return !!this.getAccessToken();
   }
