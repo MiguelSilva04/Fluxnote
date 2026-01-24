@@ -357,13 +357,52 @@ public class AuthController : ControllerBase
         });
     }
 
-    private static DateTime Min(DateTime a, DateTime b) => a <= b ? a : b;
+    [HttpPost("logout")]
+    public Task<IActionResult> Logout() => LogoutCore(revokeAll: false);
+
+    [HttpPost("logout-all")]
+    public Task<IActionResult> LogoutAll() => LogoutCore(revokeAll: true);
+
+    private async Task<IActionResult> LogoutCore(bool revokeAll)
+    {
+        var cookieName = _configuration["Auth:RefreshCookieName"] ?? "fluxnote_rt";
+
+        if (!Request.Cookies.TryGetValue(cookieName, out var refreshPlain) || string.IsNullOrWhiteSpace(refreshPlain))
+        {
+            ClearRefreshCookie();
+            return Ok(new { message = "Logged out." });
+        }
+
+        var refreshHash = TokenService.HashRefreshToken(refreshPlain);
+        var now = DateTime.UtcNow;
+
+        var stored = await _db.RefreshTokens
+            .FirstOrDefaultAsync(rt => rt.TokenHash == refreshHash);
+
+        if (stored is not null && stored.RevokedAt is null)
+        {
+            if (revokeAll)
+            {
+                await RevokeSessionAsync(stored.UserId, stored.SessionId, now);
+            }
+            else
+            {
+                stored.RevokedAt = now;
+                await _db.SaveChangesAsync();
+            }
+        }
+
+        ClearRefreshCookie();
+
+        return Ok(new { message = "Logged out successfully." });
+    }
+
 
     private async Task RevokeSessionAsync(string userId, string sessionId, DateTime now)
     {
         // revoga quaisquer refresh tokens activos desta sessão
         var tokens = await _db.RefreshTokens
-            .Where(rt => rt.UserId == userId && rt.SessionId == sessionId && rt.RevokedAt == null && rt.ExpiresAt > now)
+            .Where(rt => rt.UserId == userId && rt.RevokedAt == null && rt.ExpiresAt > now)
             .ToListAsync();
 
         foreach (var t in tokens)
@@ -371,6 +410,7 @@ public class AuthController : ControllerBase
 
         await _db.SaveChangesAsync();
     }
+    private static DateTime Min(DateTime a, DateTime b) => a <= b ? a : b;
 
     private void ClearRefreshCookie()
     {

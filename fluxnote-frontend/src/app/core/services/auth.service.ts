@@ -205,6 +205,7 @@ export class AuthService {
       
       // Guarda o access token APENAS em memória (signal) para evitar fácil acesso não desejado
       this._accessToken.set(res.accessToken);
+      this.setAuthenticatedState(res.accessToken);
       this._status.set('authenticated');
     } catch {
       // Refresh token inválido/expirado ou não existe
@@ -247,6 +248,7 @@ export class AuthService {
       
       // atualiza access token em memória
       this._accessToken.set(res.accessToken);
+      this.setAuthenticatedState(res.accessToken);
       this._status.set('authenticated');
       return true;
     } catch {
@@ -298,6 +300,7 @@ export class AuthService {
       // access token fica APENAS em memória (não localStorage)
       // refresh token fica em cookie HttpOnly (gerido pelo backend)
       this._accessToken.set(res.accessToken);
+      this.setAuthenticatedState(res.accessToken);
       this._status.set('authenticated');
       return true;
     } catch (error) {
@@ -387,6 +390,60 @@ export class AuthService {
   }
 
   /**
+   * método privado para extrair o user do JWT
+   */
+  private extractUserFromToken(token: string): User | null {
+    try{
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      const name = payload.name || '';
+      return {
+        id: payload.sub,
+        email: payload.email,
+        name: name,
+        initials: this.getInitials(name),
+        color: this.generateColorFromName(name)
+      };
+    } catch(err) {
+      console.log(`Erro a extrair o user do JWT: ${err}`);
+      return null;
+    }
+  }
+
+  /**
+   * Helper para gerar as iniciais do user
+   */
+  private getInitials(name: string): string {
+    return name
+      .split(' ')
+      .map(word => word[0])
+      .splice(0, 2)
+      .join('')
+      .toLocaleUpperCase();
+  }
+
+  /**
+   * Helper para gerar cor consistente baseada no nome do user
+   */
+  private generateColorFromName(name: string): string {
+    const colors = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899'];
+    let hash = 0;
+    for(let i = 0; i < name.length; i++){
+      hash = name.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    return colors[Math.abs(hash) % colors.length];
+  }
+
+  /**
+   * Helper para guardar o user após obter o JWT
+   */
+  private setAuthenticatedState(accessToken: string): void{
+    this._accessToken.set(accessToken);
+    const user = this.extractUserFromToken(accessToken);
+    this._currentUser.set(user);
+    this._status.set("authenticated");
+  }
+
+  /**
    * inicia o processo de recuperação de palavra-passe para um utilizador.
    * este método é chamado quando o utilizador esquece a sua palavra-passe e solicita
    * um link de redefinição por email.
@@ -441,7 +498,14 @@ export class AuthService {
    * // utilizador será redirecionado para /login automaticamente
    * ```
    */
-  logout() {
+  async logout() : Promise<void> {
+    try{
+      await firstValueFrom(
+        this.http.post(`${this.baseUrl}/logout-all`, {}, {withCredentials: true})
+      );
+    }catch (err){
+      console.log("Logout error: ", err);
+    }
     this._accessToken.set(null);
     this._currentUser.set(null);
     localStorage.removeItem('fluxnote_user');

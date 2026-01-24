@@ -50,11 +50,13 @@ export const routes: Routes = [
   // Auth routes
   {
     path: 'register',
+    canActivate: [guestGuard],
     loadComponent: () =>
       import('./features/auth/pages/register/register.component').then((m) => m.RegisterComponent),
   },
   {
     path: 'pending-email',
+    canActivate: [guestGuard],
     loadComponent: () =>
       import('./features/auth/pages/pending-email/pending-email.component').then(
         (m) => m.PendingEmailComponent,
@@ -62,6 +64,7 @@ export const routes: Routes = [
   },
   {
     path: 'confirm-email',
+    canActivate: [guestGuard],
     loadComponent: () =>
       import('./features/auth/pages/confirm-email/confirm-email.component').then(
         (m) => m.ConfirmEmailComponent,
@@ -69,6 +72,7 @@ export const routes: Routes = [
   },
   {
     path: 'login',
+    canActivate: [guestGuard],
     loadComponent: () =>
       import('./features/auth/pages/login/login.component').then(
         (m) => m.LoginComponent
@@ -76,6 +80,7 @@ export const routes: Routes = [
   },
   {
     path: 'forgot-password',
+    canActivate: [guestGuard],
     loadComponent: () =>
       import('./features/auth/pages/forgot-password/forgot-password.component').then(
         (m) => m.ForgotPasswordComponent,
@@ -92,21 +97,25 @@ export const routes: Routes = [
   
   {
     path: 'editor',
+    canActivate: [authGuard],
     loadComponent: () =>
       import('./features/editor/document-editor.component').then((m) => m.DocumentEditorComponent),
   },
   {
     path: 'teams',
+    canActivate: [authGuard],
     loadComponent: () =>
       import('./features/teams/pages/teams.component').then((m) => m.TeamsComponent),
   },
   {
     path: 'team-detail',
+    canActivate: [authGuard],
     loadComponent: () =>
       import('./features/teams/pages/team-detail.component').then((m) => m.TeamDetailComponent),
   },
   {
     path: 'subscriptions',
+    canActivate: [authGuard],
     loadComponent: () =>
       import('./features/subscriptions/pages/subscriptions.component').then(
         (m) => m.SubscriptionsComponent,
@@ -114,6 +123,7 @@ export const routes: Routes = [
   },
   {
     path: 'settings',
+    canActivate: [authGuard],
     loadComponent: () =>
       import('./features/settings/pages/settings.component').then((m) => m.SettingsComponent),
   },
