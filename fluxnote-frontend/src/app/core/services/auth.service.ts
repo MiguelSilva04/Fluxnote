@@ -29,6 +29,19 @@ export interface LoginResponse {
 }
 
 /**
+ * interface que representa o resultado de uma operação de login.
+ * contém informação sobre o sucesso da operação e mensagens de erro, se aplicável.
+ */
+export interface LoginResult {
+  /** indica se o login foi bem-sucedido */
+  success: boolean;
+  /** mensagem de erro principal, se houver */
+  message?: string;
+  /** lista de erros detalhados, se houver */
+  errors?: string[];
+}
+
+/**
  * interface que representa a resposta do servidor ao solicitar um novo token de acesso.
  * utilizada no processo de refresh token para obter um novo access token sem reautenticação.
  */
@@ -274,19 +287,19 @@ export class AuthService {
    * @param email - endereço de email do utilizador
    * @param password - palavra-passe do utilizador
    * @param rememberMe - indica se a sessão deve ser mantida por um período prolongado
-   * @returns Promise que resolve com true se o login foi bem-sucedido, false caso contrário
+   * @returns Promise que resolve com LoginResult contendo informação sobre sucesso e erros
    * 
    * @example
    * ```typescript
-   * const success = await this.auth.login('user@example.com', 'password123', true);
-   * if (success) {
+   * const result = await this.auth.login('user@example.com', 'password123', true);
+   * if (result.success) {
    *   this.router.navigate(['/dashboard']);
    * } else {
-   *   // mostrar erro de autenticação
+   *   // mostrar erro: result.error
    * }
    * ```
    */
-  async login(email: string, password: string, rememberMe: boolean): Promise<boolean> {
+  async login(email: string, password: string, rememberMe: boolean): Promise<LoginResult> {
     this._isLoading.set(true);
     try {
       const res = await firstValueFrom(
@@ -302,10 +315,25 @@ export class AuthService {
       this._accessToken.set(res.accessToken);
       this.setAuthenticatedState(res.accessToken);
       this._status.set('authenticated');
-      return true;
-    } catch (error) {
-      console.log(error);
-      return false;
+      return { success: true };
+    } catch (error: any) {
+      // extrai mensagens de erro diretamente do corpo da resposta HTTP
+      if (error.status === 0) {
+        // servidor não está acessível (offline, CORS, etc.)
+        return {
+          success: false,
+          message: 'Server error. Check your internet connection or try again later.',
+          errors: ['Unable to connect to the server.']
+        };
+      }
+
+      // o backend retorna { message, errors } no corpo da resposta
+      const errorBody = error.error || {};
+      return {
+        success: false,
+        message: errorBody.message || 'Login failed. Please try again.',
+        errors: errorBody.errors || [errorBody.message || 'Unknown error occurred.']
+      };
     } finally {
       this._isLoading.set(false);
     }
@@ -347,6 +375,24 @@ export class AuthService {
       return await firstValueFrom(
         this.http.post<RegisterResponse>(`${this.baseUrl}/register`, { fullName, email, password })
       );
+    } catch (error: any) {
+      // extrai mensagens de erro diretamente do corpo da resposta HTTP
+      if (error.status === 0) {
+        // servidor não está acessível (offline, CORS, etc.)
+        return {
+          message: 'Server error. Check your internet connection or try again later.',
+          status: 'error',
+          errors: ['Unable to connect to the server.']
+        };
+      }
+
+      // o backend retorna { message, errors } no corpo da resposta
+      const errorBody = error.error || {};
+      return {
+        message: errorBody.message || 'Failed to create account. Please try again.',
+        status: 'error',
+        errors: errorBody.errors || [errorBody.message || 'Unknown error occurred.']
+      };
     } finally {
       this._isLoading.set(false);
     }

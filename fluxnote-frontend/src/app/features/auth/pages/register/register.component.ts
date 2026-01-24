@@ -10,6 +10,7 @@ import {
   CardComponent,
   CardContentComponent,
 } from '../../../../shared/components/ui';
+import { ToastService } from '../../../../shared/services/toast.service';
 
 @Component({
   selector: 'app-register',
@@ -223,9 +224,10 @@ import {
 export class RegisterComponent {
   private authService = inject(AuthService);
   private router = inject(Router);
+  private toastService = inject(ToastService);
 
   showPassword = signal(false);
-  isLoading = signal(false);
+  isLoading = this.authService.isLoading;
   
   // Campos reativos usando signals
   fullName = signal('');
@@ -262,21 +264,30 @@ export class RegisterComponent {
   });
 
   async handleSubmit(): Promise<void> {
-    if (!this.isFormValid()) return;
+    if (!this.isFormValid()) {
+      this.toastService.warning('Please fill out all fields correctly.');
+      return;
+    }
 
-    this.isLoading.set(true);
-    try {
-      await this.authService.register(
-        this.fullName(),
-        this.email(),
-        this.password(),
-      );
+    const result = await this.authService.register(
+      this.fullName(),
+      this.email(),
+      this.password(),
+    );
 
+    // verifica se houve erros na resposta
+    if (result.errors && result.errors.length > 0) {
+      // mostra todos os erros do backend
+      result.errors.forEach(error => {
+        this.toastService.error(error);
+      });
+    } else if (result.status === 'error') {
+      // erro genérico (sem lista de erros)
+      this.toastService.error(result.message || 'Failed to create account. Please try again.');
+    } else {
+      // sucesso
+      this.toastService.success(result.message || 'Account created successfully! Please check your email to confirm.');
       this.router.navigate(['/pending-email'], { queryParams: { email: this.email() } });
-    } catch (err: any) {
-      console.error(err);
-    } finally {
-      this.isLoading.set(false);
     }
   }
 }

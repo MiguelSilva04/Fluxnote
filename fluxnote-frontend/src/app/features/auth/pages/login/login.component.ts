@@ -5,6 +5,7 @@ import { Router, RouterLink } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
 import { AuthService } from '../../../../core/services';
 import { ButtonComponent, InputComponent, CardComponent, CardContentComponent } from '../../../../shared/components/ui';
+import { ToastService } from '../../../../shared/services/toast.service';
 
 @Component({
   selector: 'app-login',
@@ -131,17 +132,33 @@ import { ButtonComponent, InputComponent, CardComponent, CardContentComponent } 
 export class LoginComponent {
   private authService = inject(AuthService);
   private router = inject(Router);
+  private toastService = inject(ToastService);
 
   showPassword = signal(false);
-  isLoading = signal(false);
+  isLoading = this.authService.isLoading;
   formData = { email: '', password: '', rememberMe: true };
 
   async handleSubmit(): Promise<void> {
-    this.isLoading.set(true);
-    const success = await this.authService.login(this.formData.email, this.formData.password, this.formData.rememberMe);
-    this.isLoading.set(false);
-    if (success) {
+    const result = await this.authService.login(
+      this.formData.email, 
+      this.formData.password, 
+      this.formData.rememberMe
+    );
+    
+    if (result.success) {
+      this.toastService.success('Login successful!');
       this.router.navigate(['/dashboard']);
+    } else {
+      // mostra erros do backend usando o toast service
+      if (result.errors && result.errors.length > 0) {
+        // mostra todos os erros
+        result.errors.forEach(error => {
+          this.toastService.error(error);
+        });
+      } else {
+        // mostra mensagem principal se não houver erros detalhados
+        this.toastService.error(result.message || 'Login failed. Please try again.');
+      }
     }
   }
 }
