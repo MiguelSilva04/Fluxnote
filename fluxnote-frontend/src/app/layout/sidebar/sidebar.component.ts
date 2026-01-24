@@ -74,14 +74,14 @@ import { ModalComponent, ButtonComponent } from '../../shared/components/ui';
     <!-- Modal de confirmação de logout -->
     <app-modal
       [isOpen]="showLogoutModal()"
-      title="Confirmar Logout"
+      title="Confirm logout"
       maxWidth="sm"
       [hasFooter]="true"
       (onClose)="showLogoutModal.set(false)"
     >
       <div class="space-y-4">
         <p class="text-gray-600">
-          Tem a certeza que deseja terminar a sessão? Será necessário fazer login novamente para aceder à sua conta.
+          Are you sure that want to logout of your session?
         </p>
       </div>
 
@@ -91,13 +91,13 @@ import { ModalComponent, ButtonComponent } from '../../shared/components/ui';
           (onClick)="showLogoutModal.set(false)"
           customClass="flex-1"
         >
-          Cancelar
+          Cancel
         </app-button>
         <app-button
           (onClick)="confirmLogout()"
           customClass="flex-1 bg-red-600 hover:bg-red-700 text-white"
         >
-          Sim, fazer logout
+          Logout
         </app-button>
       </div>
     </app-modal>
