@@ -10,6 +10,11 @@ export interface Team {
   documents: TeamDocument[];
 }
 
+export interface TeamToPost {
+  name: string;
+}
+
+
 export interface TeamDocument {
   id: number;
   name: string;
@@ -24,4 +29,12 @@ export interface TeamMember {
   role: 'Owner' | 'Team Admin' | 'Member';
   avatar: string;
   joinedAt: string;
+}
+
+export interface TeamMemberToPost {
+  name: string;
+  email: string;
+  role: number;
+  teamId :number;
+  //joinedAt: string;
 }

@@ -14,6 +14,6 @@ namespace Fluxnote.Backend.Dtos
         public bool IsActive { get; set; }
         public DateTime? DeletionScheduled { get; set; }
 
-        public List<TeamMemberDto> Members { get; set; } = new();
+        public List<TeamMember> Members { get; set; } = new();
     }
 }

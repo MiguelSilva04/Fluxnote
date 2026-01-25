@@ -4,7 +4,9 @@ namespace Fluxnote.Backend.Models
 {
         public int Id { get; set; }
 
-        public string Name { get; set; }
+        public required string Name { get; set; }
+
+        //public required TeamMember Owner { get; set; }
 
         public int OwnerId { get; set; }
 

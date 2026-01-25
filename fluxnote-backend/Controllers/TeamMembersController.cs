@@ -1,13 +1,13 @@
+using Fluxnote.Backend.Data;
+using Fluxnote.Backend.Dtos;
+using Fluxnote.Backend.Models;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Fluxnote.Backend.Data;
-using Fluxnote.Backend.Models;
-using Fluxnote.Backend.Dtos;
 
 namespace Fluxnote.Backend.Controllers
 {
@@ -24,35 +24,16 @@ namespace Fluxnote.Backend.Controllers
 
         // GET: api/TeamMembers
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<TeamMemberDto>>> GetTeamMember()
+        public async Task<ActionResult<IEnumerable<TeamMember>>> GetTeamMember()
         {
-            return await _context.TeamMember
-                .Select(m => new TeamMemberDto
-                {
-                    Id = m.Id,
-                    Name = m.Name,
-                    Role = m.Role,
-                    JoinedAt = m.JoinedAt,
-                    TeamId = m.Team.Id
-
-                }).ToListAsync();
-            }
+           return await _context.TeamMember.ToListAsync();
+        }
 
         // GET: api/TeamMembers/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<TeamMemberDto>> GetTeamMember(int id)
+        public async Task<ActionResult<TeamMember>> GetTeamMember(int id)
         {
-            var teamMember = await _context.TeamMember
-        .Where(m => m.Id == id)
-        .Select(m => new TeamMemberDto
-        {
-            Id = m.Id,
-            Name = m.Name,
-            Role = m.Role,
-            JoinedAt = m.JoinedAt,
-            TeamId = m.Team.Id
-        })
-        .FirstOrDefaultAsync();
+            var teamMember = await _context.TeamMember.FindAsync(id);
 
             if (teamMember == null)
             {
@@ -93,16 +74,16 @@ namespace Fluxnote.Backend.Controllers
         //    return NoContent();
         //}
 
-        //// POST: api/TeamMembers
-        //// To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        //[HttpPost]
-        //public async Task<ActionResult<TeamMember>> PostTeamMember(TeamMember teamMember)
-        //{
-        //    _context.TeamMember.Add(teamMember);
-        //    await _context.SaveChangesAsync();
+        // POST: api/TeamMembers
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPost]
+        public async Task<ActionResult<TeamMember>> PostTeamMember(TeamMember teamMember)
+        {
+            _context.TeamMember.Add(teamMember);
+            await _context.SaveChangesAsync();
 
-        //    return CreatedAtAction("GetTeamMember", new { id = teamMember.Id }, teamMember);
-        //}
+            return CreatedAtAction("GetTeamMember", new { id = teamMember.Id }, teamMember);
+        }
 
         //// DELETE: api/TeamMembers/5
         //[HttpDelete("{id}")]

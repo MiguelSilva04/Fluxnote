@@ -1,13 +1,8 @@
 import { Injectable, signal } from '@angular/core';
-import { Team } from '../models';
+import { Team, TeamMember, TeamMemberToPost, TeamToPost } from '../models';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 
-interface TeamToPost {
-  
-  name: string;
-  
-}
 
 
 @Injectable({
@@ -70,38 +65,82 @@ export class TeamService {
   //saving = false;
   //errorMessage = '';
 
-  getTeamById(id: number): Team | undefined {
-    return this._teams().find(team => team.id === id);
+  getTeamById(id: number, http: HttpClient): Team | void {
+    http.get<Team>(`/api/teams/${id}`)
+      .subscribe({
+        next: (team) => {
+          // Update local state or handle response
+          return team;
+          console.log(team);
+        },
+        error: (err) => {
+          console.error(err);
+        }
+      });
   }
 
   createTeam(teamName: string,  http: HttpClient,  router: Router): void {
-    const newTeam: TeamToPost = {
+    //Criar as variáveis para o team e o owner
+    var newTeam: TeamToPost = {
       name:teamName
-      //ownerId : 1,
-
     };
-    //this.errorMessage = '';
-    //this.saving = true;
 
-    http.post('/api/teams', newTeam)
+    var owner: TeamMemberToPost = {
+      name: 'John Doe',
+      email: 'john.doe@example.com',
+      role: 2,
+      teamId: 0
+    };
+
+    
+    // 1. Postar a Team
+    http.post<{ id: number }>('/api/teams', newTeam)
       .subscribe({
-        next: () => {
-          router.navigate(['/teams']);
+        next: (teamResponse) => {
+          const teamId = teamResponse.id;
+          owner.teamId = teamId;
+          console.log('teamId:', teamId);
+
+          // 2. Postar o Owner com teamId
+          http.post<{ id: number }>('/api/teamMembers', owner).subscribe({
+            next: (ownerResponse) => {
+              const ownerId = ownerResponse.id;
+              console.log('ownerId:', ownerId);
+              // 3. Atualizar Team com ownerId ( o request tem de ter o id, name e ownerId)
+              
+              http.put(`/api/teams/${teamId}`, {id: teamId, Name: teamName, OwnerId: ownerId}).subscribe({
+                next: () => {
+                  router.navigate(['/teams']);
+                  console.log('Atualizado team com ownerId:', ownerId);
+                },
+                error: (err) => {
+                  console.error('Erro ao atualizar team com ownerId:', err);
+                }
+              });
+            },
+            error: (err) => {
+              console.error('Erro ao criar owner:', err);
+            }
+          });
         },
-        error: err => {
-          console.error(err);
-          //this.errorMessage = 'Ocorreu um erro ao criar a equipa.';
-          //this.saving = false;
+        error: (err) => {
+          console.error('Erro ao criar team:', err);
         }
       });
-    //this._teams.update(teams => [...teams, newTeam]);
-    //return newTeam;
   }
 
-  updateTeam(id: number, updates: Partial<Team>): void {
-    this._teams.update(teams =>
-      teams.map(team => team.id === id ? { ...team, ...updates } : team)
-    );
+  updateTeam(id: number, updates: Partial<Team>, http: HttpClient): void {
+    http.put<Team>(`/api/teams/${id}`, updates)
+      .subscribe({
+        next: (team) => {
+          this._teams.update(teams =>
+            teams.map(t => t.id === id ? { ...t, ...team } : t)
+          );
+        },
+        error: (err) => {
+          console.error(err);
+        }
+      });
   }
 
   deleteTeam(id: number): void {

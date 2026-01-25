@@ -8,7 +8,7 @@ namespace Fluxnote.Backend.Dtos
 
         public TeamRole Role { get; set; }
 
-        public string Name { get; set; }
+        public required string Name { get; set; }
 
         public DateTime JoinedAt { get; set; }
         public int TeamId { get; set; }

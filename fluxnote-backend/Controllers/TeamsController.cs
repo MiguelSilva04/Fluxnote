@@ -33,13 +33,13 @@ namespace Fluxnote.Backend.Controllers
                     UpdatedAt = t.UpdatedAt,
                     IsActive = t.IsActive,
                     DeletionScheduled = t.DeletionScheduled,
-                    Members = t.Members.Select(m => new TeamMemberDto
+                    Members = t.Members.Select(m => new TeamMember
                     {
                         Id = m.Id,
                         Name = m.Name,
                         Role = m.Role,
                         JoinedAt = m.JoinedAt,
-                        TeamId = m.Team.Id
+                        TeamId = t.Id
                     }).ToList()
                 })
                 .ToListAsync();
@@ -61,13 +61,13 @@ namespace Fluxnote.Backend.Controllers
                 UpdatedAt = t.UpdatedAt,
                 IsActive = t.IsActive,
                 DeletionScheduled = t.DeletionScheduled,
-                Members = t.Members.Select(m => new TeamMemberDto
+                Members = t.Members.Select(m => new TeamMember
                 {
                     Id = m.Id,
                     Name = m.Name,
                     Role = m.Role,
                     JoinedAt = m.JoinedAt,
-                    TeamId = m.Team.Id
+                    TeamId = t.Id
                 }).ToList()
             })
             .FirstOrDefaultAsync();
@@ -116,6 +116,8 @@ namespace Fluxnote.Backend.Controllers
         [HttpPost]
         public async Task<ActionResult<Team>> PostTeam(Team team)
         {
+            //_context.TeamMember.Add(team.Owner);
+
             _context.Team.Add(team);
             await _context.SaveChangesAsync();
 
