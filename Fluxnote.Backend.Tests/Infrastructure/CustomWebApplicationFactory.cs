@@ -1,14 +1,15 @@
-﻿using System.Data.Common;
-using Fluxnote.Backend.Data;
-using Fluxnote.Backend.Services.Email;
-using Fluxnote.Backend.Tests.Fakes;
+﻿using System;
+using System.Data.Common;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Fluxnote.Backend.Data;
+using Fluxnote.Backend.Tests.Fakes;
 using System.Collections.Generic;
+using Fluxnote.Backend.Services.Email;
 
 namespace Fluxnote.Backend.Tests.Infrastructure;
 
@@ -16,67 +17,88 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
 {
     private DbConnection? _connection;
 
+    // Static constructor runs when the type is first used — sets env vars before host creation
+    static CustomWebApplicationFactory()
+    {
+        // Ensure Program.Main can find the Jwt key (double-underscore name for nested config)
+        Environment.SetEnvironmentVariable("Jwt__Key", "test-secret-key-please-change-for-ci");
+
+        // Optionally set other env vars your Program expects
+        Environment.SetEnvironmentVariable("Jwt__Issuer", "fluxnote-tests");
+        Environment.SetEnvironmentVariable("Jwt__Audience", "fluxnote-tests");
+    }
+
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
-        builder.UseEnvironment("Testing");
+        // Ensure test environment
+        builder.UseEnvironment("Test");
 
-        // Garantir que a configuração de testes contenha valores para Jwt:Key etc.
-        builder.ConfigureAppConfiguration((context, config) =>
+        // Inject minimal required configuration values for tests
+        builder.ConfigureAppConfiguration((context, configBuilder) =>
         {
-            var dict = new Dictionary<string, string?>
+            var testSettings = new Dictionary<string, string?>
             {
-                ["Jwt:Key"] = "integration-tests-secret-key",
-                ["Jwt:Issuer"] = "fluxnote-tests",
-                ["Jwt:Audience"] = "fluxnote-tests"
+                // In-memory config still useful (keeps settings available regardless of env)
+                { "Jwt:Key", "test-secret-key-please-change-for-ci" },
+                { "Jwt:Issuer", "fluxnote-tests" },
+                { "Jwt:Audience", "fluxnote-tests" }
             };
-            config.AddInMemoryCollection(dict);
+
+            configBuilder.AddInMemoryCollection(testSettings);
         });
 
         builder.ConfigureServices(services =>
         {
-            // remover o DbContext registado pela app (SQL Server) para se por o SQLite
-            var dbContextDescriptor = services.SingleOrDefault(
-                d => d.ServiceType == typeof(DbContextOptions<FluxnoteServerContext>)
-            );
-            if (dbContextDescriptor != null)
-                services.Remove(dbContextDescriptor);
+            // Replace real email sender with test fake
+            services.AddSingleton<TestEmailSender>();
+            services.AddSingleton<IEmailSender>(sp => sp.GetRequiredService<TestEmailSender>());
 
-            // criar uma conexão SQLite in-memory e mantê-la aberta durante os testes
-            _connection = new SqliteConnection("DataSource=:memory:");
-            _connection.Open();
+            // Remove existing DbContext registration(s)
+            var descriptor = services.SingleOrDefault(d => d.ServiceType == typeof(DbContextOptions<FluxnoteServerContext>));
+            if (descriptor != null) services.Remove(descriptor);
 
-            // registar o DbContext com SQLite
+            var contextDescriptor = services.SingleOrDefault(d => d.ServiceType == typeof(FluxnoteServerContext));
+            if (contextDescriptor != null) services.Remove(contextDescriptor);
+
+            // Create and open a shared in-memory SQLite connection for EF Core
+            _connection ??= new SqliteConnection("DataSource=:memory:");
+            if (_connection is SqliteConnection sqlite)
+            {
+                sqlite.Open();
+            }
+
+            // Register the test DbContext using the open connection
             services.AddDbContext<FluxnoteServerContext>(options =>
             {
                 options.UseSqlite(_connection);
             });
 
-            // substituir o IEmailSender por um fake (captura links)
-            var emailSenderDescriptor = services.SingleOrDefault(d => d.ServiceType == typeof(IEmailSender));
-            if (emailSenderDescriptor != null)
-                services.Remove(emailSenderDescriptor);
-
-            services.AddSingleton<TestEmailSender>();
-            services.AddSingleton<IEmailSender>(sp => sp.GetRequiredService<TestEmailSender>());
-
-            // criar a BD/tabelas (aplica migrations)
-            var sp2 = services.BuildServiceProvider();
-            using var scope = sp2.CreateScope();
+            // Build the provider and ensure DB is created
+            var sp = services.BuildServiceProvider();
+            using var scope = sp.CreateScope();
             var db = scope.ServiceProvider.GetRequiredService<FluxnoteServerContext>();
-
-            // IMPORTANTE: em SQLite in-memory temos de garantir que a BD é criada
             db.Database.EnsureCreated();
-            // alternativamente, se preferimos usar migrations:
-            // db.Database.Migrate();
         });
     }
 
     protected override void Dispose(bool disposing)
     {
         base.Dispose(disposing);
+
         if (disposing)
         {
-            _connection?.Dispose();
+            if (_connection != null)
+            {
+                try
+                {
+                    _connection.Close();
+                    _connection.Dispose();
+                }
+                finally
+                {
+                    _connection = null;
+                }
+            }
         }
     }
 }

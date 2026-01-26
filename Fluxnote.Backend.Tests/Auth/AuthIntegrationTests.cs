@@ -58,7 +58,7 @@ public class AuthIntegrationTests : IClassFixture<CustomWebApplicationFactory>
     }
 
     [Fact]
-    public async Task Register_DuplicateEmail_Returns_BadRequest()
+    public async Task Register_DuplicateEmail_Returns_Conflict()
     {
         // Arrange
         var request = new RegisterRequest
@@ -157,7 +157,7 @@ public class AuthIntegrationTests : IClassFixture<CustomWebApplicationFactory>
     }
 
     [Fact]
-    public async Task Login_InvalidPassword_Returns_Conflict()
+    public async Task Login_InvalidPassword_Returns_Unauthorized()
     {
         // Arrange
         var email = "login-wrongpass@test.com";
@@ -174,11 +174,11 @@ public class AuthIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         var resp = await _client.PostAsJsonAsync("/api/auth/login", loginRequest);
 
         // Assert
-        Assert.Equal(HttpStatusCode.Conflict, resp.StatusCode);
+        Assert.Equal(HttpStatusCode.Unauthorized, resp.StatusCode);
     }
 
     [Fact]
-    public async Task Login_UnconfirmedEmail_Returns_Conflict()
+    public async Task Login_UnconfirmedEmail_Returns_Forbidden()
     {
         // Arrange: register but don't confirm
         var request = new RegisterRequest
@@ -200,7 +200,7 @@ public class AuthIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         var resp = await _client.PostAsJsonAsync("/api/auth/login", loginRequest);
 
         // Assert
-        Assert.Equal(HttpStatusCode.Conflict, resp.StatusCode);
+        Assert.Equal(HttpStatusCode.Forbidden, resp.StatusCode);
     }
 
     [Fact]
@@ -218,7 +218,7 @@ public class AuthIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         var resp = await _client.PostAsJsonAsync("/api/auth/login", loginRequest);
 
         // Assert
-        Assert.Equal(HttpStatusCode.Conflict, resp.StatusCode);
+        Assert.Equal(HttpStatusCode.Unauthorized, resp.StatusCode);
     }
 
     // ==================== REFRESH TESTS ====================
@@ -253,17 +253,17 @@ public class AuthIntegrationTests : IClassFixture<CustomWebApplicationFactory>
     }
 
     [Fact]
-    public async Task Refresh_MissingCookie_Returns_Conflict()
+    public async Task Refresh_MissingCookie_Returns_Unauthorized()
     {
         // Act - no cookie
         var resp = await _client.PostAsync("/api/auth/refresh", null);
 
         // Assert
-        Assert.Equal(HttpStatusCode.Conflict, resp.StatusCode);
+        Assert.Equal(HttpStatusCode.Unauthorized, resp.StatusCode);
     }
 
     [Fact]
-    public async Task Refresh_InvalidToken_Returns_Conflict()
+    public async Task Refresh_InvalidToken_Returns_Unauthorized()
     {
         // Arrange: client with fake cookie
         var clientWithFakeCookie = CreateClientWithCookie("fluxnote_rt=invalidtoken123");
@@ -272,7 +272,7 @@ public class AuthIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         var resp = await clientWithFakeCookie.PostAsync("/api/auth/refresh", null);
 
         // Assert
-        Assert.Equal(HttpStatusCode.Conflict, resp.StatusCode);
+        Assert.Equal(HttpStatusCode.Unauthorized, resp.StatusCode);
     }
 
     [Fact]
@@ -293,13 +293,13 @@ public class AuthIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         var resp2 = await client1.PostAsync("/api/auth/refresh", null);
 
         // Assert: reuse detection
-        Assert.Equal(HttpStatusCode.Conflict, resp2.StatusCode);
+        Assert.Equal(HttpStatusCode.Unauthorized, resp2.StatusCode);
     }
 
     // ==================== LOGOUT TESTS ====================
 
     [Fact]
-    public async Task LogoutValidSessionClearsCookieAndRevokesToken()
+    public async Task Logout_ValidSession_Clears_Cookie_And_RevokesToken()
     {
         // Arrange
         var email = "logout-valid@test.com";
@@ -320,7 +320,7 @@ public class AuthIntegrationTests : IClassFixture<CustomWebApplicationFactory>
 
         // Try to refresh with old cookie - should fail
         var refreshResp = await clientWithCookie.PostAsync("/api/auth/refresh", null);
-        Assert.Equal(HttpStatusCode.Conflict, refreshResp.StatusCode);
+        Assert.Equal(HttpStatusCode.Unauthorized, refreshResp.StatusCode);
     }
 
     [Fact]
@@ -354,8 +354,8 @@ public class AuthIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         var refresh1 = await client1.PostAsync("/api/auth/refresh", null);
         var refresh2 = await client2.PostAsync("/api/auth/refresh", null);
 
-        Assert.Equal(HttpStatusCode.Conflict, refresh1.StatusCode);
-        Assert.Equal(HttpStatusCode.Conflict, refresh2.StatusCode);
+        Assert.Equal(HttpStatusCode.Unauthorized, refresh1.StatusCode);
+        Assert.Equal(HttpStatusCode.Unauthorized, refresh2.StatusCode);
     }
 
     [Fact]
@@ -378,7 +378,7 @@ public class AuthIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         // Simula tentativa de reuse com cookie antigo (novo client)
         var attackerClient = CreateClientWithCookie(refreshCookie!);
         var refreshResp = await attackerClient.PostAsync("/api/auth/refresh", null);
-        Assert.Equal(HttpStatusCode.Conflict, refreshResp.StatusCode);
+        Assert.Equal(HttpStatusCode.Unauthorized, refreshResp.StatusCode);
     }
 
 
