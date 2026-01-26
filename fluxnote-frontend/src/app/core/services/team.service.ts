@@ -1,5 +1,5 @@
 import { Injectable, signal } from '@angular/core';
-import { Team, TeamMember, TeamMemberToPost, TeamToPost } from '../models';
+import { Team, TeamGet, TeamMember, TeamMemberToPost, TeamToPost } from '../models';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 
@@ -9,7 +9,7 @@ import { Router } from '@angular/router';
   providedIn: 'root'
 })
 export class TeamService {
-  private readonly _teams = signal<Team[]>([
+  private readonly _teams = signal<TeamGet[]>([/* 
     {
       id: 1,
       name: 'Projeto Alfa',
@@ -50,7 +50,7 @@ export class TeamService {
       lastActivity: '3 days ago',
       documents: []
     }
-  ]);
+   */]);
 
   private readonly _myTeams = signal<{ id: number; name: string; role: string; badge: string }[]>([
     { id: 1, name: 'Minha Equipa de Projeto', role: 'Proprietário', badge: 'bg-[#155347]' },
@@ -64,6 +64,20 @@ export class TeamService {
 
   //saving = false;
   //errorMessage = '';
+
+  getTeams(http:HttpClient): void {
+    http.get<TeamGet[]>(`/api/teams/`)
+      .subscribe({
+        next: (teams) => {
+          // Update local state or handle response
+          this._teams.set(teams) ;
+          console.log(teams);
+        },
+        error: (err) => {
+          console.error(err);
+        }
+      });
+  }
 
   getTeamById(id: number, http: HttpClient): Team | void {
     http.get<Team>(`/api/teams/${id}`)
@@ -97,14 +111,14 @@ export class TeamService {
     http.post<{ id: number }>('/api/teams', newTeam)
       .subscribe({
         next: (teamResponse) => {
-          const teamId = teamResponse.id;
+          var teamId = teamResponse.id;
           owner.teamId = teamId;
           console.log('teamId:', teamId);
 
           // 2. Postar o Owner com teamId
           http.post<{ id: number }>('/api/teamMembers', owner).subscribe({
             next: (ownerResponse) => {
-              const ownerId = ownerResponse.id;
+              var ownerId = ownerResponse.id;
               console.log('ownerId:', ownerId);
               // 3. Atualizar Team com ownerId ( o request tem de ter o id, name e ownerId)
               
@@ -129,7 +143,7 @@ export class TeamService {
       });
   }
 
-  updateTeam(id: number, updates: Partial<Team>, http: HttpClient): void {
+  /* updateTeam(id: number, updates: Partial<Team>, http: HttpClient): void {
     http.put<Team>(`/api/teams/${id}`, updates)
       .subscribe({
         next: (team) => {
@@ -141,7 +155,7 @@ export class TeamService {
           console.error(err);
         }
       });
-  }
+  } */
 
   deleteTeam(id: number): void {
     this._teams.update(teams => teams.filter(team => team.id !== id));

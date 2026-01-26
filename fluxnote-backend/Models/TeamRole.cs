@@ -1,9 +1,13 @@
-﻿namespace Fluxnote.Backend.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+public enum TeamRole
 {
-    public enum TeamRole 
-{
-        Member=0,
-        TeamAdmin=1,
-        Owner= 2
-    }
+    [Display(Name = "Member")]
+    Member = 0,
+
+    [Display(Name = "Team Admin")]
+    TeamAdmin = 1,
+
+    [Display(Name = "Owner")]
+    Owner = 2
 }

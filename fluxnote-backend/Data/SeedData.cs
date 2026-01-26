@@ -32,6 +32,7 @@ namespace Fluxnote.Backend.Data
                 {
                     Name = "Projeto Alfa",
                     CreatedAt = DateTime.Now.AddMonths(-3),
+                    OwnerId=1,
                     //Documents = new List<Document>
                     //{
                     //    new Document

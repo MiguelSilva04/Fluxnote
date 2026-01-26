@@ -1,10 +1,13 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace Fluxnote.Backend.Models
 {
     public class TeamMember
-{
+    {
         public int Id { get; set; }
 
-        public string Name { get; set; }
+        [Required]
+        public string Name { get; set; } = string.Empty;
 
         public TeamRole Role { get; set; }
 

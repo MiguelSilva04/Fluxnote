@@ -17,7 +17,7 @@ import { HttpClient } from '@angular/common/http';
     DashboardLayoutComponent,
     ButtonComponent,
     CardComponent,
-    BadgeComponent,
+    //BadgeComponent,
     ModalComponent,
     InputComponent
   ],
@@ -35,6 +35,10 @@ export class TeamsComponent {
   newTeamName = '';
   newTeamDescription = '';
 
+  ngOnInit(): void {
+    this.teamService.getTeams(this.http);
+  }
+
   toggleTeam(teamId: number): void {
     this.expandedTeam.update(current => current === teamId ? null : teamId);
   }
@@ -51,4 +55,6 @@ export class TeamsComponent {
       this.newTeamDescription = '';
     }
   }
+
+  
 }

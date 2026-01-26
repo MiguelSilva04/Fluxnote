@@ -20,56 +20,19 @@ namespace Fluxnote.Backend.Controllers
 
         // GET: api/Teams
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<TeamDto>>> GetTeams()
+        public async Task<ActionResult<IEnumerable<Team>>> GetTeams()
         {
-           return await _context.Team
-                .Include(t => t.Members) // Ensure Owner is included
-                .Select(t => new TeamDto
-                {
-                    Id = t.Id,
-                    Name = t.Name,
-                    OwnerId = t.OwnerId,
-                    CreatedAt = t.CreatedAt,
-                    UpdatedAt = t.UpdatedAt,
-                    IsActive = t.IsActive,
-                    DeletionScheduled = t.DeletionScheduled,
-                    Members = t.Members.Select(m => new TeamMember
-                    {
-                        Id = m.Id,
-                        Name = m.Name,
-                        Role = m.Role,
-                        JoinedAt = m.JoinedAt,
-                        TeamId = t.Id
-                    }).ToList()
-                })
-                .ToListAsync();
+           //Inclui os members
+            return await _context.Team.Include(t => t.Members).ToListAsync();
         }
 
         // GET: api/Teams/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<TeamDto>> GetTeam(int id)
+        public async Task<ActionResult<Team>> GetTeam(int id)
         {
+            //Inclui os members
             var team = await _context.Team
-            .Include(t => t.Members) // inclui membros da equipa
-            .Where(t => t.Id == id)
-            .Select(t => new TeamDto
-            {
-                Id = t.Id,
-                Name = t.Name,
-                OwnerId = t.OwnerId,
-                CreatedAt = t.CreatedAt,
-                UpdatedAt = t.UpdatedAt,
-                IsActive = t.IsActive,
-                DeletionScheduled = t.DeletionScheduled,
-                Members = t.Members.Select(m => new TeamMember
-                {
-                    Id = m.Id,
-                    Name = m.Name,
-                    Role = m.Role,
-                    JoinedAt = m.JoinedAt,
-                    TeamId = t.Id
-                }).ToList()
-            })
+            .Include(t => t.Members)
             .FirstOrDefaultAsync();
 
             if (team == null)

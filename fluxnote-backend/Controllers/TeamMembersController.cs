@@ -43,36 +43,36 @@ namespace Fluxnote.Backend.Controllers
             return teamMember;
         }
 
-        //// PUT: api/TeamMembers/5
-        //// To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        //[HttpPut("{id}")]
-        //public async Task<IActionResult> PutTeamMember(int id, TeamMember teamMember)
-        //{
-        //    if (id != teamMember.Id)
-        //    {
-        //        return BadRequest();
-        //    }
+        // PUT: api/TeamMembers/5
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutTeamMember(int id, TeamMember teamMember)
+        {
+            if (id != teamMember.Id)
+            {
+                return BadRequest();
+            }
 
-        //    _context.Entry(teamMember).State = EntityState.Modified;
+            _context.Entry(teamMember).State = EntityState.Modified;
 
-        //    try
-        //    {
-        //        await _context.SaveChangesAsync();
-        //    }
-        //    catch (DbUpdateConcurrencyException)
-        //    {
-        //        if (!TeamMemberExists(id))
-        //        {
-        //            return NotFound();
-        //        }
-        //        else
-        //        {
-        //            throw;
-        //        }
-        //    }
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!TeamMemberExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
 
-        //    return NoContent();
-        //}
+            return NoContent();
+        }
 
         // POST: api/TeamMembers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
@@ -85,21 +85,21 @@ namespace Fluxnote.Backend.Controllers
             return CreatedAtAction("GetTeamMember", new { id = teamMember.Id }, teamMember);
         }
 
-        //// DELETE: api/TeamMembers/5
-        //[HttpDelete("{id}")]
-        //public async Task<IActionResult> DeleteTeamMember(int id)
-        //{
-        //    var teamMember = await _context.TeamMember.FindAsync(id);
-        //    if (teamMember == null)
-        //    {
-        //        return NotFound();
-        //    }
+        // DELETE: api/TeamMembers/5
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteTeamMember(int id)
+        {
+            var teamMember = await _context.TeamMember.FindAsync(id);
+            if (teamMember == null)
+            {
+                return NotFound();
+            }
 
-        //    _context.TeamMember.Remove(teamMember);
-        //    await _context.SaveChangesAsync();
+            _context.TeamMember.Remove(teamMember);
+            await _context.SaveChangesAsync();
 
-        //    return NoContent();
-        //}
+            return NoContent();
+        }
 
         private bool TeamMemberExists(int id)
         {
