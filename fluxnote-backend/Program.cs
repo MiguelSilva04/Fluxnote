@@ -1,4 +1,5 @@
-﻿using FluentValidation;
+﻿using AspNetCoreRateLimit;
+using FluentValidation;
 using FluentValidation.AspNetCore;
 using Fluxnote.Backend.Data;
 using Fluxnote.Backend.Models;
@@ -9,6 +10,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
@@ -17,9 +19,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<FluxnoteServerContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("FluxnoteServerContext") ?? throw new InvalidOperationException("Connection string 'FluxnoteServerContext' not found.")));
 
-var jwtKey = builder.Configuration["Jwt:Key"]!;
-var jwtIssuer = builder.Configuration["Jwt:Issuer"]!;
-var jwtAudience = builder.Configuration["Jwt:Audience"]!;
+var jwtKey = builder.Configuration["Jwt:Key"];
+var jwtIssuer = builder.Configuration["Jwt:Issuer"];
+var jwtAudience = builder.Configuration["Jwt:Audience"];
 
 if (string.IsNullOrWhiteSpace(jwtKey))
     throw new InvalidOperationException("Jwt:Key missing (Jwt__Key).");
@@ -47,6 +49,13 @@ builder.Services
             ClockSkew = TimeSpan.FromSeconds(30)
         };
     });
+
+// Configuração de rate limiting
+builder.Services.AddMemoryCache();
+builder.Services.Configure<IpRateLimitOptions>(builder.Configuration.GetSection("IpRateLimiting"));
+builder.Services.Configure<IpRateLimitPolicies>(builder.Configuration.GetSection("IpRateLimitPolicies"));
+builder.Services.AddInMemoryRateLimiting();
+builder.Services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
 
 builder.Services.Configure<EmailOptions>(builder.Configuration.GetSection("EmailOptions"));
 
@@ -91,8 +100,9 @@ builder.Services.AddCors(options =>
             "http://localhost:4200",
             "http://127.0.0.1:4200"
             )
-               .AllowAnyHeader()
-               .AllowAnyMethod()
+               .WithHeaders("Content-Type", "Authorization", "X-Requested-With")
+               .WithMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+               .WithExposedHeaders("Retry-After", "X-Rate-Limit-Limit", "X-Rate-Limit-Remaining", "X-Rate-Limit-Reset")
                .AllowCredentials();
     });
 });
@@ -101,6 +111,23 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+
+var iprl = builder.Configuration.GetSection("IpRateLimiting");
+var pol = builder.Configuration.GetSection("IpRateLimitPolicies");
+
+Console.WriteLine($"IpRateLimiting exists: {iprl.Exists()}");
+Console.WriteLine($"IpRateLimitPolicies exists: {pol.Exists()}");
+
+Console.WriteLine("IpRateLimiting JSON: " + iprl.GetChildren().Count());
+Console.WriteLine("IpRateLimitPolicies JSON: " + pol.GetChildren().Count());
+
+Console.WriteLine("Policies dump:");
+foreach (var c in pol.GetChildren())
+{
+    Console.WriteLine($"  {c.Path} = {c.Value}");
+    foreach (var cc in c.GetChildren())
+        Console.WriteLine($"    {cc.Path} = {cc.Value}");
+}
 
 
 // Auto-apply migrations on startup (avoid in tests)
@@ -125,10 +152,19 @@ if (!app.Environment.IsProduction())
     app.UseDeveloperExceptionPage();
 }
 
+app.UseRouting();
+
 app.UseCors("spa");
 
-app.UseAuthentication();
+app.Use(async (ctx, next) =>
+{
+    Console.WriteLine($"REQ {ctx.Request.Method} {ctx.Request.Path}");
+    await next();
+});
 
+app.UseIpRateLimiting();
+
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

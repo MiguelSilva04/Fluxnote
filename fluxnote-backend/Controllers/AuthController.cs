@@ -45,22 +45,23 @@ public class AuthController : ControllerBase
         _tokenService = tokenService;
         _env = env;
     }
+    // -------------------------
+    // REGISTER
+    // - 409 se email já existe
+    // - 400 se validação/Identity falhar
+    // -------------------------
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterRequest request)
     {
-        // o userManager é tipo o serviço que gere os users no identity
-        // é a partir dele que criamos users, procuramos, etc
-        // fazemos verificações pra ver se o email ja ta registado
         var existing = await _userManager.FindByEmailAsync(request.Email);
         if (existing != null)
         {
-            return Conflict(
-                new
-                {
-                    message = "Email is already registered."
-                });
+            return Conflict(new
+            {
+                message = "Email is already registered."
+            });
         }
-        // criar a instancia do user
+
         var user = new User
         {
             UserName = request.Email,
@@ -74,35 +75,26 @@ public class AuthController : ControllerBase
             UpdatedAt = DateTime.UtcNow
         };
 
-        // criar o user na bd com a password o identity gera o passwordHash e guarda
         var createResult = await _userManager.CreateAsync(user, request.Password);
         if (!createResult.Succeeded)
         {
-            // devolver erros do Identity de forma legível
-            return Conflict(
-                new
-                {
-                    message = "User creation failed.",
-                    errors = createResult.Errors.Select(e => e.Description)
-                });
+            return BadRequest(new
+            {
+                message = "User creation failed.",
+                errors = createResult.Errors.Select(e => e.Description)
+            });
         }
 
-        // gerar token de confirmação de email
         var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+        var tokenEncoded = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
 
-        // codificar o token para URL
-        var tokenBytes = Encoding.UTF8.GetBytes(token);
-        var tokenEncoded = WebEncoders.Base64UrlEncode(tokenBytes);
+        // em produção deve apontar para o frontend; em dev mantém fallback
+        var frontendBaseUrl = _configuration["Frontend:BaseUrl"] ?? "http://localhost:4200";
+        var confirmationLink =
+            $"{frontendBaseUrl}/confirm-email?userId={Uri.EscapeDataString(user.Id)}&token={Uri.EscapeDataString(tokenEncoded)}";
 
-        // criar link de confirmação (por agora vai para o backend)
-        // em produção isto devia apontar para o frontend
-        var frontendBaseUrl = _configuration["Frontend:BaseUrl"];
-        var confirmationLink = $"{frontendBaseUrl ?? "http://localhost:4200"}/confirm-email?userId={user.Id}&token={tokenEncoded}";
+        await _emailSender.SendEmailConfirmationAsync(user.Email!, confirmationLink);
 
-        // enviar email de confirmação (simulado)
-        await _emailSender.SendEmailConfirmationAsync(user.Email, confirmationLink);
-
-        // devolver resposta de sucesso
         return Ok(new
         {
             message = "User registered successfully. Please check your email to confirm your account.",
@@ -110,11 +102,17 @@ public class AuthController : ControllerBase
         });
     }
 
+
     // -------------------------
     // LOGIN
-    // Sliding + absolute cap:
-    // - refresh token expira em min(now+7d, sessionStart+30d)
-    // - sessionStart é "agora" no login, e é herdado em todas as rotações
+    // Status codes:
+    // - 401: credenciais inválidas
+    // - 403: conta não confirmada / não activa
+    // - 423: locked out (opcional mas explícito)
+    // Sem leaks desnecessários (mensagem genérica em 401)
+    // Sliding+cap:
+    // - idleDays (sempre) vem de config Auth:RefreshIdleDays (default 7)
+    // - absoluteDays depende de rememberMe (7 vs 30) e é guardado por sessão
     // -------------------------
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginRequest request)
@@ -122,25 +120,24 @@ public class AuthController : ControllerBase
         var user = await _userManager.FindByEmailAsync(request.Email);
         if (user is null)
         {
-            return Conflict(new
+            // Não distinguir user inexistente de password errada
+            return Unauthorized(new
             {
-                message = "Invalid Credentials",
+                message = "Invalid credentials.",
                 errors = new[] { "Invalid email or password." }
             });
         }
 
-        // Account validity checks
+        // Conta inválida -> 403
         var accountErrors = new List<string>();
-        if (!user.EmailConfirmed)
-            accountErrors.Add("Email not confirmed.");
-        if (user.AccountStatus != AccountStatus.Active)
-            accountErrors.Add($"Account status: {user.AccountStatus}.");
+        if (!user.EmailConfirmed) accountErrors.Add("Email not confirmed.");
+        if (user.AccountStatus != AccountStatus.Active) accountErrors.Add($"Account status: {user.AccountStatus}.");
 
         if (accountErrors.Count > 0)
         {
-            return Conflict(new
+            return StatusCode(StatusCodes.Status403Forbidden, new
             {
-                message = "Account not valid or Conflict",
+                message = "Account not allowed.",
                 errors = accountErrors
             });
         }
@@ -153,36 +150,40 @@ public class AuthController : ControllerBase
 
         if (!signIn.Succeeded)
         {
-            var signInErrors = new List<string>();
             if (signIn.IsLockedOut)
-                signInErrors.Add("Too many failed attempts. Account is locked.");
-            if (signIn.IsNotAllowed)
-                signInErrors.Add("Sign-in is not allowed for this account.");
-            if (signIn.RequiresTwoFactor)
-                signInErrors.Add("Two-factor authentication required.");
-            if (signInErrors.Count == 0)
-                signInErrors.Add("Invalid credentials.");
-
-            return Conflict(new
             {
-                message = "Invalid Credentials",
-                errors = signInErrors
+                // Opcional: 423 é mais expressivo do que 403/401
+                return StatusCode(StatusCodes.Status423Locked, new
+                {
+                    message = "Account locked.",
+                    errors = new[] { "Too many failed attempts. Please try again later." }
+                });
+            }
+
+            // Não dar sinais (401 genérico)
+            return Unauthorized(new
+            {
+                message = "Invalid credentials.",
+                errors = new[] { "Invalid email or password." }
             });
         }
 
         var accessToken = _tokenService.CreateAccessToken(user);
 
-        var refreshPlain = TokenService.GenerateRefreshTokenPlain();
-        var refreshHash = TokenService.HashRefreshToken(refreshPlain);
-
+        // Refresh token session policy
         var now = DateTime.UtcNow;
+        var idleDays = int.Parse(_configuration["Auth:RefreshIdleDays"] ?? "7"); // sliding window
+        var absoluteDays = request.RememberMe
+            ? int.Parse(_configuration["Auth:RefreshAbsoluteDaysRememberMe"] ?? "30")
+            : int.Parse(_configuration["Auth:RefreshAbsoluteDays"] ?? "7"); // sem rememberMe
+
         var sessionId = Guid.NewGuid().ToString();
         var sessionStartedAt = now;
-        var lastUsedAt = now;
-        //var idleDays = 7;
-        var absoluteDays = request.RememberMe ? 30 : 7;
-        //var expiresAt = Min(now.AddDays(idleDays), sessionStartedAt.AddDays(absoluteDays));
-        var expiresAt = sessionStartedAt.AddDays(absoluteDays);
+        var absoluteExpiresAt = sessionStartedAt.AddDays(absoluteDays);
+        var expiresAt = Min(now.AddDays(idleDays), absoluteExpiresAt);
+
+        var refreshPlain = TokenService.GenerateRefreshTokenPlain();
+        var refreshHash = TokenService.HashRefreshToken(refreshPlain);
 
         _db.RefreshTokens.Add(new RefreshToken
         {
@@ -190,8 +191,11 @@ public class AuthController : ControllerBase
             UserId = user.Id,
             SessionId = sessionId,
             SessionStartedAt = sessionStartedAt,
-            LastUsedAt = lastUsedAt,
+            LastUsedAt = now,
             ExpiresAt = expiresAt,
+            // Persistir a política por sessão (recomendado para consistência)
+            AbsoluteDays = absoluteDays,
+            IdleDays = idleDays,
             CreatedAt = now,
             CreatedByIp = HttpContext.Connection.RemoteIpAddress?.ToString()
         });
@@ -200,10 +204,133 @@ public class AuthController : ControllerBase
 
         SetRefreshCookie(refreshPlain, expiresAt);
 
+        var accessMinutes = int.Parse(_configuration["Jwt:AccessTokenMinutes"] ?? "15");
         return Ok(new
         {
             accessToken,
-            expiresInSeconds = 15 * 60
+            expiresInSeconds = accessMinutes * 60
+        });
+    }
+
+    // -------------------------
+    // REFRESH
+    // Status codes:
+    // - 401: sem cookie / inválido / expirado / revogado / idle / cap / user inválido
+    // Reuse detection:
+    // - token revogado reapareceu -> revogar sessão toda e 401
+    // Sliding+cap:
+    // - newExpiresAt = min(now+idleDays, sessionStart+absoluteDays)
+    // - idleDays e absoluteDays vêm do token guardado (por sessão) para respeitar rememberMe
+    // -------------------------
+    [HttpPost("refresh")]
+    public async Task<IActionResult> Refresh()
+    {
+        Console.WriteLine("REFRESH ACTION HIT");
+        var cookieName = _configuration["Auth:RefreshCookieName"] ?? "fluxnote_rt";
+        if (!Request.Cookies.TryGetValue(cookieName, out var refreshPlain) || string.IsNullOrWhiteSpace(refreshPlain))
+        {
+            ClearRefreshCookie();
+            return Unauthorized(new { message = "Not authenticated." });
+        }
+
+        var now = DateTime.UtcNow;
+        var refreshHash = TokenService.HashRefreshToken(refreshPlain);
+
+        var stored = await _db.RefreshTokens
+            .AsTracking()
+            .FirstOrDefaultAsync(rt => rt.TokenHash == refreshHash);
+
+        if (stored is null)
+        {
+            ClearRefreshCookie();
+            return Unauthorized(new { message = "Not authenticated." });
+        }
+
+        // Reuse detection: token revogado reapareceu
+        if (stored.RevokedAt is not null)
+        {
+            await RevokeSessionAsync(stored.UserId, stored.SessionId, now);
+            ClearRefreshCookie();
+            return Unauthorized(new { message = "Not authenticated." });
+        }
+
+        // Expiração total do token actual
+        if (stored.ExpiresAt <= now)
+        {
+            stored.RevokedAt = now;
+            await _db.SaveChangesAsync();
+            ClearRefreshCookie();
+            return Unauthorized(new { message = "Not authenticated." });
+        }
+
+        // Política por sessão (respeita rememberMe)
+        var idleDays = stored.IdleDays ?? int.Parse(_configuration["Auth:RefreshIdleDays"] ?? "7");
+        var absoluteDays = stored.AbsoluteDays ?? int.Parse(_configuration["Auth:RefreshAbsoluteDaysRememberMe"] ?? "30");
+
+        var absoluteExpiresAt = stored.SessionStartedAt.AddDays(absoluteDays);
+
+        // Absolute cap
+        if (now >= absoluteExpiresAt)
+        {
+            stored.RevokedAt = now;
+            await _db.SaveChangesAsync();
+            ClearRefreshCookie();
+            return Unauthorized(new { message = "Not authenticated." });
+        }
+
+        // Idle timeout
+        if (now - stored.LastUsedAt > TimeSpan.FromDays(idleDays))
+        {
+            stored.RevokedAt = now;
+            await _db.SaveChangesAsync();
+            ClearRefreshCookie();
+            return Unauthorized(new { message = "Not authenticated." });
+        }
+
+        // User checks
+        var user = await _userManager.FindByIdAsync(stored.UserId);
+        if (user is null || !user.EmailConfirmed || user.AccountStatus != AccountStatus.Active)
+        {
+            stored.RevokedAt = now;
+            await _db.SaveChangesAsync();
+            ClearRefreshCookie();
+            return Unauthorized(new { message = "Not authenticated." });
+        }
+
+        // Rotação
+        var newRefreshPlain = TokenService.GenerateRefreshTokenPlain();
+        var newRefreshHash = TokenService.HashRefreshToken(newRefreshPlain);
+
+        stored.RevokedAt = now;
+        stored.ReplacedByTokenHash = newRefreshHash;
+
+        var newExpiresAt = Min(now.AddDays(idleDays), absoluteExpiresAt);
+
+        _db.RefreshTokens.Add(new RefreshToken
+        {
+            TokenHash = newRefreshHash,
+            UserId = stored.UserId,
+            SessionId = stored.SessionId,
+            SessionStartedAt = stored.SessionStartedAt,
+            LastUsedAt = now,
+            ExpiresAt = newExpiresAt,
+            AbsoluteDays = absoluteDays,
+            IdleDays = idleDays,
+            CreatedAt = now,
+            CreatedByIp = HttpContext.Connection.RemoteIpAddress?.ToString()
+        });
+
+        await _db.SaveChangesAsync();
+
+        SetRefreshCookie(newRefreshPlain, newExpiresAt);
+
+        var accessToken = _tokenService.CreateAccessToken(user);
+        var accessMinutes = int.Parse(_configuration["Jwt:AccessTokenMinutes"] ?? "15");
+
+        return Ok(new
+        {
+            accessToken,
+            expiresInSeconds = accessMinutes * 60
         });
     }
 
@@ -284,113 +411,6 @@ public class AuthController : ControllerBase
         if (link is null) return NotFound(new { message = "No link found for this email." });
 
         return Ok(new { confirmationLink = link });
-    }
-
-
-    [HttpPost("refresh")]
-    public async Task<IActionResult> Refresh()
-    {
-        var cookieName = _configuration["Auth:RefreshCookieName"] ?? "fluxnote_rt";
-        if (!Request.Cookies.TryGetValue(cookieName, out var refreshPlain) || string.IsNullOrWhiteSpace(refreshPlain))
-            return Conflict(new { message = "Missing refresh token." });
-
-        var now = DateTime.UtcNow;
-        var refreshHash = TokenService.HashRefreshToken(refreshPlain);
-
-        var idleDays = int.Parse(_configuration["Auth:RefreshIdleDays"] ?? "7");
-        var absoluteDays = int.Parse(_configuration["Auth:RefreshAbsoluteDays"] ?? "30");
-
-        // Carregar token
-        var stored = await _db.RefreshTokens
-            .AsTracking()
-            .FirstOrDefaultAsync(rt => rt.TokenHash == refreshHash);
-
-        if (stored is null)
-            return Conflict(new { message = "Invalid refresh token." });
-
-        // Reuse detection: token revogado reapareceu
-        if (stored.RevokedAt is not null)
-        {
-            // Reacção: revogar a sessão toda (por SessionId)
-            await RevokeSessionAsync(stored.UserId, stored.SessionId, now);
-            ClearRefreshCookie();
-            return Conflict(new { message = "Refresh token reuse detected. Session revoked." });
-        }
-
-        // Expiração por tempo total (ExpiresAt)
-        if (stored.ExpiresAt <= now)
-        {
-            stored.RevokedAt = now;
-            await _db.SaveChangesAsync();
-            ClearRefreshCookie();
-            return Conflict(new { message = "Refresh token expired." });
-        }
-
-        // Absolute cap (30 dias desde início da sessão)
-        var absoluteExpiresAt = stored.SessionStartedAt.AddDays(absoluteDays);
-        if (now >= absoluteExpiresAt)
-        {
-            stored.RevokedAt = now;
-            await _db.SaveChangesAsync();
-            ClearRefreshCookie();
-            return Conflict(new { message = "Session expired (absolute cap)." });
-        }
-
-        // Idle timeout (7 dias desde última utilização)
-        if (now - stored.LastUsedAt > TimeSpan.FromDays(idleDays))
-        {
-            stored.RevokedAt = now;
-            await _db.SaveChangesAsync();
-            ClearRefreshCookie();
-            return Conflict(new { message = "Session expired (idle timeout)." });
-        }
-
-        // User
-        var user = await _userManager.FindByIdAsync(stored.UserId);
-        if (user is null || !user.EmailConfirmed || user.AccountStatus != AccountStatus.Active)
-        {
-            stored.RevokedAt = now;
-            await _db.SaveChangesAsync();
-            ClearRefreshCookie();
-            return Conflict(new { message = "User inactive." });
-        }
-
-        // Rotação (novo refresh + revogar antigo)
-        var newRefreshPlain = TokenService.GenerateRefreshTokenPlain();
-        var newRefreshHash = TokenService.HashRefreshToken(newRefreshPlain);
-
-        stored.RevokedAt = now;
-        stored.ReplacedByTokenHash = newRefreshHash;
-
-        var newExpiresAt = Min(now.AddDays(idleDays), absoluteExpiresAt);
-
-        _db.RefreshTokens.Add(new RefreshToken
-        {
-            TokenHash = newRefreshHash,
-            UserId = stored.UserId,
-            SessionId = stored.SessionId,
-            SessionStartedAt = stored.SessionStartedAt,
-            LastUsedAt = now,
-            ExpiresAt = newExpiresAt,
-            CreatedAt = now,
-            CreatedByIp = HttpContext.Connection.RemoteIpAddress?.ToString()
-        });
-
-        // actualiza também o LastUsedAt do token actual (opcional, mas útil para auditoria)
-        // stored.LastUsedAt = now; // normalmente não, porque foi revogado; mantém histórico.
-
-        await _db.SaveChangesAsync();
-
-        SetRefreshCookie(newRefreshPlain, newExpiresAt);
-
-        var accessToken = _tokenService.CreateAccessToken(user);
-        var accessMinutes = int.Parse(_configuration["Jwt:AccessTokenMinutes"] ?? "15");
-
-        return Ok(new
-        {
-            accessToken,
-            expiresInSeconds = accessMinutes * 60
-        });
     }
 
     [HttpPost("logout")]
@@ -474,4 +494,6 @@ public class AuthController : ControllerBase
         });
     }
 
+    [HttpPost("ping")]
+    public IActionResult Ping() => Ok("pong");
 }

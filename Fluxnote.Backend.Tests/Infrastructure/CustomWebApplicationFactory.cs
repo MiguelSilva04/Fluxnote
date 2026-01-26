@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Configuration;
+using System.Collections.Generic;
 
 namespace Fluxnote.Backend.Tests.Infrastructure;
 
@@ -17,6 +19,19 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.UseEnvironment("Testing");
+
+        // Garantir que a configuração de testes contenha valores para Jwt:Key etc.
+        builder.ConfigureAppConfiguration((context, config) =>
+        {
+            var dict = new Dictionary<string, string?>
+            {
+                ["Jwt:Key"] = "integration-tests-secret-key",
+                ["Jwt:Issuer"] = "fluxnote-tests",
+                ["Jwt:Audience"] = "fluxnote-tests"
+            };
+            config.AddInMemoryCollection(dict);
+        });
+
         builder.ConfigureServices(services =>
         {
             // remover o DbContext registado pela app (SQL Server) para se por o SQLite

@@ -47,7 +47,7 @@ import { LucideAngularModule } from 'lucide-angular';
       </div>
       @if (error) {
         <p class="mt-1.5 text-sm text-red-600 flex items-center gap-1">
-          <lucide-icon name="alert-circle" class="h-4 w-4"></lucide-icon>
+          <lucide-icon name="badge-alert" class="h-4 w-4"></lucide-icon>
           {{ error }}
         </p>
       }

@@ -96,14 +96,14 @@ export class AuthService {
    * armazenado em cookie HttpOnly.
    */
   private readonly _accessToken = signal<string | null>(null);
-  
+
   /**
    * signal privado que mantém o estado atual de autenticação do utilizador.
    * pode assumir os valores 'unknown' (ainda não determinado), 'authenticated' (autenticado),
    * ou 'unauthenticated' (não autenticado).
    */
   private readonly _status = signal<AuthStatus>('unknown');
-  
+
   /**
    * propriedade pública readonly que expõe o estado de autenticação de forma reativa.
    * componentes podem observar este signal para reagir a mudanças no estado de autenticação.
@@ -112,11 +112,11 @@ export class AuthService {
 
   /**
    * signal privado que armazena os dados do utilizador atualmente autenticado.
-   * estes dados são persistidos em localStorage para permitir recuperação após refresh,
-   * mas a autenticação em si depende do token em memória.
+   * estes dados são mantidos apenas em memória e extraídos do JWT após refresh.
+   * não são persistidos em localStorage por questões de segurança.
    */
   private readonly _currentUser = signal<User | null>(null);
-  
+
   /**
    * signal privado que indica se alguma operação de autenticação está em curso.
    * útil para mostrar indicadores de carregamento durante operações assíncronas.
@@ -124,17 +124,25 @@ export class AuthService {
   private readonly _isLoading = signal(false);
 
   /**
+   * promise privada que armazena uma operação de refresh em curso.
+   * utilizada para implementar "single-flight" - se já existe um refresh a decorrer,
+   * reutiliza-se a mesma promise em vez de disparar múltiplas chamadas paralelas.
+   * isto evita rotação excessiva de tokens e pressão desnecessária na BD.
+   */
+  private _refreshPromise: Promise<boolean> | null = null;
+
+  /**
    * propriedade pública readonly que expõe os dados do utilizador atual de forma reativa.
    * retorna null se não houver utilizador autenticado.
    */
   readonly currentUser = this._currentUser.asReadonly();
-  
+
   /**
    * propriedade pública readonly que expõe o estado de carregamento de forma reativa.
    * útil para desabilitar botões ou mostrar spinners durante operações de autenticação.
    */
   readonly isLoading = this._isLoading.asReadonly();
-  
+
   /**
    * computed signal que determina se o utilizador está atualmente autenticado.
    * verifica a existência e validade do token de acesso em memória.
@@ -153,19 +161,14 @@ export class AuthService {
 
   /**
    * construtor do serviço de autenticação.
-   * inicializa o serviço e recupera dados do utilizador persistidos em localStorage,
-   * se existirem. o estado de autenticação propriamente dito será determinado através
-   * da chamada ao método initAuth() no arranque da aplicação.
-   * 
+   * inicializa o serviço com estado limpo. o estado de autenticação será determinado
+   * através da chamada ao método initAuth() no arranque da aplicação, que tenta
+   * recuperar a sessão usando o refresh token em cookie HttpOnly.
+   *
    * @param router - instância do router do Angular para navegação programática
    * @param http - cliente HTTP do Angular para realizar requisições ao backend
    */
-  constructor(private router: Router, private http: HttpClient) {
-    const storedUser = localStorage.getItem('fluxnote_user');
-    if (storedUser) {
-      this._currentUser.set(JSON.parse(storedUser));
-    }
-  }
+  constructor(private router: Router, private http: HttpClient) { }
 
   /**
    * método privado que verifica se um token JWT está expirado.
@@ -180,7 +183,7 @@ export class AuthService {
       const payload = JSON.parse(atob(token.split('.')[1]));
       const expMs = payload.exp * 1000;
       return Date.now() > expMs;
-    }catch (error) {
+    } catch (error) {
       return true;
     }
   }
@@ -215,7 +218,7 @@ export class AuthService {
       const res = await firstValueFrom(
         this.http.post<TokenResponse>(`${this.baseUrl}/refresh`, {}, { withCredentials: true })
       );
-      
+
       // Guarda o access token APENAS em memória (signal) para evitar fácil acesso não desejado
       this._accessToken.set(res.accessToken);
       this.setAuthenticatedState(res.accessToken);
@@ -224,7 +227,6 @@ export class AuthService {
       // Refresh token inválido/expirado ou não existe
       this._accessToken.set(null);
       this._currentUser.set(null);
-      localStorage.removeItem('fluxnote_user');
       this._status.set('unauthenticated');
     }
   }
@@ -234,14 +236,18 @@ export class AuthService {
    * este método é utilizado quando o access token atual expira ou quando uma requisição
    * retorna um erro 401 (não autorizado), permitindo obter um novo access token sem
    * exigir que o utilizador faça login novamente.
-   * 
+   *
    * o método realiza uma requisição POST para o endpoint /refresh, que utiliza automaticamente
    * o refresh token do cookie HttpOnly. se bem-sucedido, atualiza o access token em memória
    * e define o estado como 'authenticated'. em caso de falha (refresh token inválido ou expirado),
    * executa logout automático e retorna false.
-   * 
+   *
+   * implementa o padrão "single-flight": se já existe uma chamada refresh() em curso,
+   * reutiliza a mesma Promise em vez de disparar múltiplas requisições paralelas.
+   * isto evita rotação excessiva de tokens e pressão desnecessária na BD.
+   *
    * @returns Promise que resolve com true se o refresh foi bem-sucedido, false caso contrário
-   * 
+   *
    * @example
    * ```typescript
    * // em um interceptor HTTP ao receber 401
@@ -253,18 +259,42 @@ export class AuthService {
    * }
    * ```
    */
-  async refresh(): Promise<boolean>{ 
-    try{
+  async refresh(): Promise<boolean> {
+    // Single-flight: se já há um refresh em curso, reutiliza a mesma Promise
+    if (this._refreshPromise) {
+      return this._refreshPromise;
+    }
+
+    this._refreshPromise = this.doRefresh();
+
+    try {
+      return await this._refreshPromise;
+    } finally {
+      this._refreshPromise = null;
+    }
+  }
+
+  /**
+   * método privado que executa a lógica real do refresh.
+   * separado do método público para permitir o padrão single-flight.
+   */
+  private async doRefresh(): Promise<boolean> {
+    try {
       const res = await firstValueFrom(
         this.http.post<TokenResponse>(`${this.baseUrl}/refresh`, {}, { withCredentials: true })
       );
-      
+
       // atualiza access token em memória
       this._accessToken.set(res.accessToken);
       this.setAuthenticatedState(res.accessToken);
       this._status.set('authenticated');
       return true;
-    } catch {
+    } catch (error: any) {
+      // Rate limit - não fazer logout, apenas falhar silenciosamente
+      if (error.status === 429) {
+        console.warn('Refresh rate limit exceeded');
+        return false;
+      }
       this.logout();
       return false;
     }
@@ -309,7 +339,7 @@ export class AuthService {
           { withCredentials: true }
         )
       );
-      
+
       // access token fica APENAS em memória (não localStorage)
       // refresh token fica em cookie HttpOnly (gerido pelo backend)
       this._accessToken.set(res.accessToken);
@@ -324,6 +354,18 @@ export class AuthService {
           success: false,
           message: 'Server error. Check your internet connection or try again later.',
           errors: ['Unable to connect to the server.']
+        };
+      }
+
+      // Rate limit exceeded ()
+      if (error.status === 429) {
+        const retryAfter = error.headers?.get('Retry-After');
+        const seconds = retryAfter ? parseInt(retryAfter, 10) : 900; // default 15min
+        const minutes = Math.ceil(seconds / 60);
+        return {
+          success: false,
+          message: `Too many login attempts. Please try again in ${minutes} minute${minutes > 1 ? 's' : ''}.`,
+          errors: [`Rate limit exceeded. Retry after ${minutes} minute${minutes > 1 ? 's' : ''}.`]
         };
       }
 
@@ -386,6 +428,18 @@ export class AuthService {
         };
       }
 
+      // Rate limit exceeded (429)
+      if (error.status === 429) {
+        const retryAfter = error.headers?.get('Retry-After');
+        const seconds = retryAfter ? parseInt(retryAfter, 10) : 3600; // default 1 hora
+        const minutes = Math.ceil(seconds / 60);
+        return {
+          message: `Too many registration attempts. Please try again in ${minutes} minute${minutes > 1 ? 's' : ''}.`,
+          status: 'error',
+          errors: [`Rate limit exceeded. Retry after ${minutes} minute${minutes > 1 ? 's' : ''}.`]
+        };
+      }
+
       // o backend retorna { message, errors } no corpo da resposta
       const errorBody = error.error || {};
       return {
@@ -403,7 +457,7 @@ export class AuthService {
       const params = new HttpParams().set('email', email);
       const res = await firstValueFrom(
         this.http.get<{ confirmationLink: string }>(
-          `${this.baseUrl}/dev/last-confirmation-link`, 
+          `${this.baseUrl}/dev/last-confirmation-link`,
           { params }
         )
       );
@@ -457,7 +511,7 @@ export class AuthService {
    * método privado para extrair o user do JWT
    */
   private extractUserFromToken(token: string): User | null {
-    try{
+    try {
       const payload = JSON.parse(atob(token.split('.')[1]));
       const name = payload.name || '';
       return {
@@ -467,7 +521,7 @@ export class AuthService {
         initials: this.getInitials(name),
         color: this.generateColorFromName(name)
       };
-    } catch(err) {
+    } catch (err) {
       console.log(`Erro a extrair o user do JWT: ${err}`);
       return null;
     }
@@ -491,7 +545,7 @@ export class AuthService {
   private generateColorFromName(name: string): string {
     const colors = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899'];
     let hash = 0;
-    for(let i = 0; i < name.length; i++){
+    for (let i = 0; i < name.length; i++) {
       hash = name.charCodeAt(i) + ((hash << 5) - hash);
     }
     return colors[Math.abs(hash) % colors.length];
@@ -500,7 +554,7 @@ export class AuthService {
   /**
    * Helper para guardar o user após obter o JWT
    */
-  private setAuthenticatedState(accessToken: string): void{
+  private setAuthenticatedState(accessToken: string): void {
     this._accessToken.set(accessToken);
     const user = this.extractUserFromToken(accessToken);
     this._currentUser.set(user);
@@ -562,17 +616,16 @@ export class AuthService {
    * // utilizador será redirecionado para /login automaticamente
    * ```
    */
-  async logout() : Promise<void> {
-    try{
+  async logout(): Promise<void> {
+    try {
       await firstValueFrom(
-        this.http.post(`${this.baseUrl}/logout-all`, {}, {withCredentials: true})
+        this.http.post(`${this.baseUrl}/logout-all`, {}, { withCredentials: true })
       );
-    }catch (err){
+    } catch (err) {
       console.log("Logout error: ", err);
     }
     this._accessToken.set(null);
     this._currentUser.set(null);
-    localStorage.removeItem('fluxnote_user');
     this._status.set('unauthenticated');
     this.router.navigate(['/login']);
   }

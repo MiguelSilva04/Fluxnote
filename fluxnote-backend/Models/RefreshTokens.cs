@@ -25,6 +25,10 @@ public class RefreshToken
     public DateTime? RevokedAt { get; set; }
     public string? ReplacedByTokenHash { get; set; }
 
+    public int? AbsoluteDays { get; set; } // número de dias para expiração absoluta (máx 30)
+    public int? IdleDays { get; set; } // número de dias para expiração por inatividade (máx 7)
+
+
     public bool isExpired => DateTime.UtcNow >= ExpiresAt;
     public bool isRevoked => RevokedAt != null;
     public bool isActive => RevokedAt == null && !isExpired;
