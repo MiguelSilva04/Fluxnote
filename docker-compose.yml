@@ -26,8 +26,11 @@ services:
       dockerfile: Dockerfile.dev
     container_name: fluxnote-backend
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_ENVIRONMENT=Development	
       - ConnectionStrings__FluxnoteServerContext=Server=db;Database=FluxnoteDb;User Id=sa;Password=FluxNote@2024!;TrustServerCertificate=True;
+      - Jwt__Key=${JWT_KEY}
+    env_file:
+      - .env
     ports:
       - "5000:5000"
     volumes:

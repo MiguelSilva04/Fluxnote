@@ -7,22 +7,52 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "fluxnote-backend", "fluxnot
 EndProject
 Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "fluxnote-frontend", "fluxnote-frontend\fluxnote-frontend.esproj", "{63B7A30D-9296-4CA7-A647-FF9A487FE521}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fluxnote.Backend.Tests", "Fluxnote.Backend.Tests\Fluxnote.Backend.Tests.csproj", "{FC2772E5-7633-493B-8710-999B9AB1DD8D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
 		Release|Any CPU = Release|Any CPU
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{04ABFD16-A270-467E-86A3-A256EA00F3CB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{04ABFD16-A270-467E-86A3-A256EA00F3CB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{04ABFD16-A270-467E-86A3-A256EA00F3CB}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{04ABFD16-A270-467E-86A3-A256EA00F3CB}.Debug|x64.Build.0 = Debug|Any CPU
+		{04ABFD16-A270-467E-86A3-A256EA00F3CB}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{04ABFD16-A270-467E-86A3-A256EA00F3CB}.Debug|x86.Build.0 = Debug|Any CPU
 		{04ABFD16-A270-467E-86A3-A256EA00F3CB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{04ABFD16-A270-467E-86A3-A256EA00F3CB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{04ABFD16-A270-467E-86A3-A256EA00F3CB}.Release|x64.ActiveCfg = Release|Any CPU
+		{04ABFD16-A270-467E-86A3-A256EA00F3CB}.Release|x64.Build.0 = Release|Any CPU
+		{04ABFD16-A270-467E-86A3-A256EA00F3CB}.Release|x86.ActiveCfg = Release|Any CPU
+		{04ABFD16-A270-467E-86A3-A256EA00F3CB}.Release|x86.Build.0 = Release|Any CPU
 		{63B7A30D-9296-4CA7-A647-FF9A487FE521}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{63B7A30D-9296-4CA7-A647-FF9A487FE521}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{63B7A30D-9296-4CA7-A647-FF9A487FE521}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{63B7A30D-9296-4CA7-A647-FF9A487FE521}.Debug|x64.ActiveCfg = Debug|x64
+		{63B7A30D-9296-4CA7-A647-FF9A487FE521}.Debug|x86.ActiveCfg = Debug|x86
 		{63B7A30D-9296-4CA7-A647-FF9A487FE521}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{63B7A30D-9296-4CA7-A647-FF9A487FE521}.Release|Any CPU.Build.0 = Release|Any CPU
 		{63B7A30D-9296-4CA7-A647-FF9A487FE521}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{63B7A30D-9296-4CA7-A647-FF9A487FE521}.Release|x64.ActiveCfg = Release|x64
+		{63B7A30D-9296-4CA7-A647-FF9A487FE521}.Release|x86.ActiveCfg = Release|x86
+		{FC2772E5-7633-493B-8710-999B9AB1DD8D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FC2772E5-7633-493B-8710-999B9AB1DD8D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FC2772E5-7633-493B-8710-999B9AB1DD8D}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{FC2772E5-7633-493B-8710-999B9AB1DD8D}.Debug|x64.Build.0 = Debug|Any CPU
+		{FC2772E5-7633-493B-8710-999B9AB1DD8D}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{FC2772E5-7633-493B-8710-999B9AB1DD8D}.Debug|x86.Build.0 = Debug|Any CPU
+		{FC2772E5-7633-493B-8710-999B9AB1DD8D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FC2772E5-7633-493B-8710-999B9AB1DD8D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FC2772E5-7633-493B-8710-999B9AB1DD8D}.Release|x64.ActiveCfg = Release|Any CPU
+		{FC2772E5-7633-493B-8710-999B9AB1DD8D}.Release|x64.Build.0 = Release|Any CPU
+		{FC2772E5-7633-493B-8710-999B9AB1DD8D}.Release|x86.ActiveCfg = Release|Any CPU
+		{FC2772E5-7633-493B-8710-999B9AB1DD8D}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
