@@ -23,3 +23,19 @@ export const guestGuard: CanActivateFn = () => {
 
   return router.createUrlTree(['/dashboard']);
 };
+
+/**
+ * Guard que protege a rota pending-email de acessos manuais via URL.
+ * Só permite acesso se a navegação veio com o state { fromRegistration: true }.
+ */
+export const pendingEmailGuard: CanActivateFn = () => {
+  const router = inject(Router);
+  const navigation = router.getCurrentNavigation();
+  const state = navigation?.extras?.state as { fromRegistration?: boolean } | undefined;
+
+  if (state?.fromRegistration) {
+    return true;
+  }
+
+  return router.createUrlTree(['/register']);
+};

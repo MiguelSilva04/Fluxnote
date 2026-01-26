@@ -171,10 +171,29 @@ export class AuthService {
   constructor(private router: Router, private http: HttpClient) { }
 
   /**
+   * formata um tempo em segundos para uma string legível com minutos e segundos.
+   *
+   * @param totalSeconds - tempo total em segundos
+   * @returns string formatada (ex: "14 minutes and 55 seconds", "2 minutes", "45 seconds")
+   */
+  private formatRetryTime(totalSeconds: number): string {
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+
+    if (minutes === 0) {
+      return `${seconds} second${seconds !== 1 ? 's' : ''}`;
+    }
+    if (seconds === 0) {
+      return `${minutes} minute${minutes !== 1 ? 's' : ''}`;
+    }
+    return `${minutes} minute${minutes !== 1 ? 's' : ''} and ${seconds} second${seconds !== 1 ? 's' : ''}`;
+  }
+
+  /**
    * método privado que verifica se um token JWT está expirado.
    * decodifica o payload do token (sem validação de assinatura) e verifica
    * se a data de expiração (exp) já foi ultrapassada.
-   * 
+   *
    * @param token - token JWT a ser verificado
    * @returns true se o token estiver expirado ou se ocorrer erro na decodificação, false caso contrário
    */
@@ -357,15 +376,15 @@ export class AuthService {
         };
       }
 
-      // Rate limit exceeded ()
+      // Rate limit exceeded (429)
       if (error.status === 429) {
         const retryAfter = error.headers?.get('Retry-After');
-        const seconds = retryAfter ? parseInt(retryAfter, 10) : 900; // default 15min
-        const minutes = Math.ceil(seconds / 60);
+        const totalSeconds = retryAfter ? parseInt(retryAfter, 10) : 900; // default 15min
+        const timeMessage = this.formatRetryTime(totalSeconds);
         return {
           success: false,
-          message: `Too many login attempts. Please try again in ${minutes} minute${minutes > 1 ? 's' : ''}.`,
-          errors: [`Rate limit exceeded. Retry after ${minutes} minute${minutes > 1 ? 's' : ''}.`]
+          message: `Too many login attempts. Please try again in ${timeMessage}.`,
+          errors: [`Rate limit exceeded. Retry after ${timeMessage}.`]
         };
       }
 
@@ -431,12 +450,12 @@ export class AuthService {
       // Rate limit exceeded (429)
       if (error.status === 429) {
         const retryAfter = error.headers?.get('Retry-After');
-        const seconds = retryAfter ? parseInt(retryAfter, 10) : 3600; // default 1 hora
-        const minutes = Math.ceil(seconds / 60);
+        const totalSeconds = retryAfter ? parseInt(retryAfter, 10) : 3600; // default 1 hora
+        const timeMessage = this.formatRetryTime(totalSeconds);
         return {
-          message: `Too many registration attempts. Please try again in ${minutes} minute${minutes > 1 ? 's' : ''}.`,
+          message: `Too many registration attempts. Please try again in ${timeMessage}.`,
           status: 'error',
-          errors: [`Rate limit exceeded. Retry after ${minutes} minute${minutes > 1 ? 's' : ''}.`]
+          errors: [`Rate limit exceeded. Retry after ${timeMessage}.`]
         };
       }
 

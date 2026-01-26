@@ -288,7 +288,10 @@ export class RegisterComponent {
     } else {
       // sucesso
       this.toastService.success(result.message || 'Account created successfully! Please check your email to confirm.');
-      this.router.navigate(['/pending-email'], { queryParams: { email: this.email() } });
+      this.router.navigate(['/pending-email'], {
+        queryParams: { email: this.email() },
+        state: { fromRegistration: true }
+      });
     }
   }
 }

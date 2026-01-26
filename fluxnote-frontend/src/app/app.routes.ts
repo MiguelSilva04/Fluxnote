@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { authGuard, guestGuard } from './core/services/auth.guard';
+import { authGuard, guestGuard, pendingEmailGuard } from './core/services/auth.guard';
 
 export const routes: Routes = [
   // Landing page routes  dashboard
@@ -56,7 +56,7 @@ export const routes: Routes = [
   },
   {
     path: 'pending-email',
-    canActivate: [guestGuard],
+    canActivate: [guestGuard, pendingEmailGuard],
     loadComponent: () =>
       import('./features/auth/pages/pending-email/pending-email.component').then(
         (m) => m.PendingEmailComponent,
