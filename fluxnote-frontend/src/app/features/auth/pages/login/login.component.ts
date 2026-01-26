@@ -5,6 +5,7 @@ import { Router, RouterLink } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
 import { AuthService } from '../../../../core/services';
 import { ButtonComponent, InputComponent, CardComponent, CardContentComponent } from '../../../../shared/components/ui';
+import { ToastService } from '../../../../shared/services/toast.service';
 
 @Component({
   selector: 'app-login',
@@ -23,7 +24,7 @@ import { ButtonComponent, InputComponent, CardComponent, CardContentComponent } 
     <div class="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
       <div class="mb-8 text-center">
         <div class="inline-flex items-center justify-center p-3 bg-[#155347] rounded-xl mb-4 shadow-lg shadow-[#155347]/20">
-          <lucide-icon name="file-text" class="h-8 w-8 text-white"></lucide-icon>
+        <img src="assets/white_icon.png" alt="FluxNote" class="h-10 w-10" />
         </div>
         <h1 class="text-3xl font-bold text-gray-900">FluxNote</h1>
         <p class="text-gray-500 mt-2">Access your collaborative documents</p>
@@ -71,7 +72,7 @@ import { ButtonComponent, InputComponent, CardComponent, CardContentComponent } 
 
             <div class="flex items-center justify-between text-sm">
               <label class="flex items-center gap-2 cursor-pointer">
-                <input type="checkbox" class="rounded border-gray-300 text-[#155347] focus:ring-[#155347]" />
+                <input name="rememberMe" [(ngModel)]="formData.rememberMe" type="checkbox" class="rounded border-gray-300 text-[#155347] focus:ring-[#155347]" />
                 <span class="text-gray-600">Remember me</span>
               </label>
               <a routerLink="/forgot-password" class="text-[#155347] hover:underline font-medium">
@@ -131,17 +132,33 @@ import { ButtonComponent, InputComponent, CardComponent, CardContentComponent } 
 export class LoginComponent {
   private authService = inject(AuthService);
   private router = inject(Router);
+  private toastService = inject(ToastService);
 
   showPassword = signal(false);
-  isLoading = signal(false);
-  formData = { email: '', password: '' };
+  isLoading = this.authService.isLoading;
+  formData = { email: '', password: '', rememberMe: false };
 
   async handleSubmit(): Promise<void> {
-    this.isLoading.set(true);
-    const success = await this.authService.login(this.formData.email, this.formData.password);
-    this.isLoading.set(false);
-    if (success) {
+    const result = await this.authService.login(
+      this.formData.email,
+      this.formData.password,
+      this.formData.rememberMe
+    );
+
+    if (result.success) {
+      this.toastService.success('Login successful!');
       this.router.navigate(['/dashboard']);
+    } else {
+      // mostra erros do backend usando o toast service
+      if (result.errors && result.errors.length > 0) {
+        // mostra todos os erros
+        result.errors.forEach(error => {
+          this.toastService.error(error);
+        });
+      } else {
+        // mostra mensagem principal se não houver erros detalhados
+        this.toastService.error(result.message || 'Login failed. Please try again.');
+      }
     }
   }
 }
