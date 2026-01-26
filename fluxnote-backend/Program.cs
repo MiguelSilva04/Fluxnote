@@ -71,8 +71,11 @@ if (builder.Environment.IsDevelopment())
     builder.Services.AddSingleton<IDevEmailStore, DevEmailStore>();
     builder.Services.AddScoped<IEmailSender, ConsoleEmailSender>();
 }
+else
+{
+    builder.Services.AddScoped<IEmailSender, ConsoleEmailSender>();
+}
 
-builder.Services.AddScoped<IEmailSender, ConsoleEmailSender>();
 
 
 builder.Services.AddScoped<TokenService>();
@@ -113,24 +116,6 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-var iprl = builder.Configuration.GetSection("IpRateLimiting");
-var pol = builder.Configuration.GetSection("IpRateLimitPolicies");
-
-Console.WriteLine($"IpRateLimiting exists: {iprl.Exists()}");
-Console.WriteLine($"IpRateLimitPolicies exists: {pol.Exists()}");
-
-Console.WriteLine("IpRateLimiting JSON: " + iprl.GetChildren().Count());
-Console.WriteLine("IpRateLimitPolicies JSON: " + pol.GetChildren().Count());
-
-Console.WriteLine("Policies dump:");
-foreach (var c in pol.GetChildren())
-{
-    Console.WriteLine($"  {c.Path} = {c.Value}");
-    foreach (var cc in c.GetChildren())
-        Console.WriteLine($"    {cc.Path} = {cc.Value}");
-}
-
-
 // Auto-apply migrations on startup (avoid in tests)
 if (!app.Environment.IsEnvironment("Testing"))
 {
@@ -155,7 +140,6 @@ if (!app.Environment.IsEnvironment("Testing"))
     }
 }
 
-
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -172,12 +156,6 @@ if (!app.Environment.IsProduction())
 app.UseRouting();
 
 app.UseCors("spa");
-
-app.Use(async (ctx, next) =>
-{
-    Console.WriteLine($"REQ {ctx.Request.Method} {ctx.Request.Path}");
-    await next();
-});
 
 app.UseIpRateLimiting();
 
