@@ -261,7 +261,7 @@ public class AuthController : ControllerBase
         if (user is null)
             return Unauthorized(new { message = "User not found." });
 
-        // Atualiza apenas os campos fornecidos (não nulos)
+        // atualiza apenas os campos passados no request
         if (request.FullName is not null)
             user.FullName = request.FullName;
 
@@ -317,7 +317,7 @@ public class AuthController : ControllerBase
         if (user is null)
             return Unauthorized(new { message = "User not found." });
 
-        // Verifica se o utilizador usa autenticação local
+        // verifica se o utilizador usa autenticação local
         if (user.AuthProvider != AuthProvider.Local)
         {
             return BadRequest(new
@@ -327,7 +327,7 @@ public class AuthController : ControllerBase
             });
         }
 
-        // Valida a password atual
+        // valida a password atual
         var passwordValid = await _userManager.CheckPasswordAsync(user, request.CurrentPassword);
         if (!passwordValid)
         {
@@ -338,7 +338,7 @@ public class AuthController : ControllerBase
             });
         }
 
-        // Altera a password usando o Identity (aplica todas as validações configuradas)
+        // altera a password usando o Identity (aplica todas as validações configuradas)
         var result = await _userManager.ChangePasswordAsync(user, request.CurrentPassword, request.NewPassword);
         if (!result.Succeeded)
         {
