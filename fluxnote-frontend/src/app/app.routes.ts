@@ -151,6 +151,13 @@ export const routes: Routes = [
         (m) => m.VersionHistoryComponent,
       ),
   },
+  {
+    path: 'work-in-progress',
+    loadComponent: () => 
+      import('./shared/components/ui/wip/work-in-progress.component').then(
+        (m) => m.WorkInProgressComponent,
+      ),
+  },
 
   // Backend API test route
   {

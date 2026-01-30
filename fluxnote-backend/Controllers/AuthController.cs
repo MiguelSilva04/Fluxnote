@@ -1,14 +1,18 @@
 ﻿using Fluxnote.Backend.Contracts.Auth;
-using Fluxnote.Backend.Services.Email;
+using Fluxnote.Backend.Data;
+using Fluxnote.Backend.Dtos.Auth;
 using Fluxnote.Backend.Models;
+using Fluxnote.Backend.Services.Auth;
+using Fluxnote.Backend.Services.Email;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
-using Fluxnote.Backend.Data;
-using Fluxnote.Backend.Dtos.Auth;
-using Fluxnote.Backend.Services.Auth;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Fluxnote.Backend.Controllers;
 
@@ -212,6 +216,35 @@ public class AuthController : ControllerBase
         });
     }
 
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [HttpGet("users/me")]
+    public async Task<IActionResult> Me()
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (userId is null)
+            return Unauthorized("Invalid claims for obtaining user id.");
+
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user is null)
+        {
+            return Unauthorized(new
+            {
+                message = "User not found."
+            });
+        }
+        var profile = new UserProfile
+        {
+            Id = user.Id,
+            Email = user.Email!,
+            FullName = user.FullName!,
+            UserName = user.UserName!,
+            ProfilePictureUrl = user.ProfilePictureUrl!,
+            Location = user.Location!,
+            PhoneNumber = user.PhoneNumber!
+        };
+        return Ok(profile);
+    }
+
     // -------------------------
     // REFRESH
     // Status codes:
@@ -225,7 +258,6 @@ public class AuthController : ControllerBase
     [HttpPost("refresh")]
     public async Task<IActionResult> Refresh()
     {
-        Console.WriteLine("REFRESH ACTION HIT");
         var cookieName = _configuration["Auth:RefreshCookieName"] ?? "fluxnote_rt";
         if (!Request.Cookies.TryGetValue(cookieName, out var refreshPlain) || string.IsNullOrWhiteSpace(refreshPlain))
         {

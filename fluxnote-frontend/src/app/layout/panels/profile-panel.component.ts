@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LucideAngularModule } from 'lucide-angular';
-import { PanelStateService } from '../../core/services';
+import { AuthService, PanelStateService } from '../../core/services';
 import { ButtonComponent, BadgeComponent } from '../../shared/components/ui';
 
 @Component({
@@ -26,29 +26,23 @@ import { ButtonComponent, BadgeComponent } from '../../shared/components/ui';
           <!-- Profile Picture & Basic Info -->
           <div class="text-center">
             <div class="relative inline-block mb-4">
-              <div class="h-24 w-24 rounded-full bg-gradient-to-br from-blue-900 to-purple-900 flex items-center justify-center text-white text-2xl font-bold mx-auto">
-                AM
-              </div>
+            <div class="h-24 w-24 rounded-full flex items-center justify-center text-white text-2xl font-bold mx-auto"
+                [style.background]="user()?.color">
+              {{ user()?.initials }}
+            </div>
               <div class="absolute bottom-1 right-1 h-5 w-5 rounded-full bg-green-500 border-4 border-white"></div>
             </div>
-            <h3 class="text-xl font-bold text-gray-900 mb-1">Alex Morgan</h3>
-            <p class="text-sm text-gray-600">alex.morgan&#64;fluxnote.com</p>
+            <h3 class="text-xl font-bold text-gray-900 mb-1">{{ user()?.fullName }}</h3>
+            <p class="text-sm text-gray-600">{{ user()?.email }}</p>
           </div>
 
           <!-- Quick Info -->
           <div class="space-y-3">
             <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-              <lucide-icon name="user" class="h-5 w-5 text-gray-500"></lucide-icon>
+              <lucide-icon name="badge-euro" class="h-5 w-5 text-gray-500"></lucide-icon>
               <div>
-                <p class="text-xs text-gray-500">Role</p>
-                <p class="text-sm font-medium text-gray-900">Team Owner</p>
-              </div>
-            </div>
-            <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-              <lucide-icon name="mail" class="h-5 w-5 text-gray-500"></lucide-icon>
-              <div>
-                <p class="text-xs text-gray-500">Email</p>
-                <p class="text-sm font-medium text-gray-900">alex.morgan&#64;fluxnote.com</p>
+                <p class="text-xs text-gray-500">Plan</p>
+                <p class="text-sm font-medium text-gray-900">Professional</p>
               </div>
             </div>
           </div>
@@ -94,6 +88,7 @@ import { ButtonComponent, BadgeComponent } from '../../shared/components/ui';
 })
 export class ProfilePanelComponent {
   panelState = inject(PanelStateService);
+  user = inject(AuthService).currentUser;
 
   userTeams = [
     { name: 'Marketing Team', role: 'Editor' },

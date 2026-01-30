@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LucideAngularModule } from 'lucide-angular';
-import { PanelStateService } from '../../core/services';
+import { AuthService, PanelStateService } from '../../core/services';
 
 @Component({
   selector: 'app-header',
@@ -35,9 +35,10 @@ import { PanelStateService } from '../../core/services';
         </button>
         <button
           (click)="panelState.openProfilePanel()"
-          class="h-9 w-9 rounded-full bg-gradient-to-br from-blue-900 to-purple-900 text-white flex items-center justify-center text-sm font-medium hover:opacity-90 transition-opacity"
+          class="h-9 w-9 rounded-full text-white flex items-center justify-center text-sm font-medium hover:opacity-90 transition-opacity"
+          [style.background]="user()?.color"
         >
-          AM
+          {{ user()?.initials }}
         </button>
       </div>
     </header>
@@ -45,4 +46,5 @@ import { PanelStateService } from '../../core/services';
 })
 export class HeaderComponent {
   panelState = inject(PanelStateService);
+  user = inject(AuthService).currentUser;
 }

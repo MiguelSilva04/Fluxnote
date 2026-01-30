@@ -5,6 +5,7 @@ namespace Fluxnote.Backend.Models
     public class User : IdentityUser
     {
         public string? FullName { get; set; }
+        public string? Location { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
         public string? ProfilePictureUrl { get; set; }

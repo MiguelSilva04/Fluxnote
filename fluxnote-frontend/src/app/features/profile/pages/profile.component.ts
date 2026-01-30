@@ -1,8 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LucideAngularModule } from 'lucide-angular';
 import { DashboardLayoutComponent } from '../../../layout/dashboard-layout/dashboard-layout.component';
 import { ButtonComponent, CardComponent, CardContentComponent, BadgeComponent } from '../../../shared/components/ui';
+import { AuthService } from '../../../core/services';
 
 @Component({
   selector: 'app-profile',
@@ -27,15 +28,16 @@ import { ButtonComponent, CardComponent, CardContentComponent, BadgeComponent } 
             <app-card>
               <app-card-content customClass="p-6 text-center">
                 <div class="relative inline-block mb-4">
-                  <div class="h-24 w-24 rounded-full bg-gradient-to-br from-blue-900 to-purple-900 flex items-center justify-center text-white text-2xl font-bold mx-auto">
-                    AM
+                <div class="h-24 w-24 rounded-full flex items-center justify-center text-white text-2xl font-bold mx-auto"
+                  [style.background]="user()?.color">
+                    {{user()?.initials || ''}}
                   </div>
                   <button class="absolute bottom-0 right-0 h-8 w-8 rounded-full bg-[#155347] text-white flex items-center justify-center hover:bg-[#0d3d31] transition-colors">
                     <lucide-icon name="camera" class="h-4 w-4"></lucide-icon>
                   </button>
                 </div>
-                <h2 class="text-xl font-bold text-gray-900 mb-1">Alex Morgan</h2>
-                <p class="text-sm text-gray-600 mb-4">alex.morgan&#64;fluxnote.com</p>
+                <h2 class="text-xl font-bold text-gray-900 mb-1">{{user()?.fullName || ''}}</h2>
+                <p class="text-sm text-gray-600 mb-4">{{user()?.email || ''}}</p>
                 <app-badge variant="default">Pro Plan</app-badge>
               </app-card-content>
             </app-card>
@@ -51,7 +53,7 @@ import { ButtonComponent, CardComponent, CardContentComponent, BadgeComponent } 
                     <label class="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
                     <input
                       type="text"
-                      value="Alex Morgan"
+                      [value]="user()?.fullName || ''"
                       class="w-full h-10 px-4 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#155347] text-sm"
                     />
                   </div>
@@ -59,7 +61,7 @@ import { ButtonComponent, CardComponent, CardContentComponent, BadgeComponent } 
                     <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
                     <input
                       type="email"
-                      value="alex.morgan@fluxnote.com"
+                      [value]="user()?.email || ''"
                       class="w-full h-10 px-4 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#155347] text-sm"
                     />
                   </div>
@@ -67,6 +69,7 @@ import { ButtonComponent, CardComponent, CardContentComponent, BadgeComponent } 
                     <label class="block text-sm font-medium text-gray-700 mb-2">Phone</label>
                     <input
                       type="tel"
+                      [value]="user()?.phoneNumber || ''"
                       placeholder="+1 (555) 000-0000"
                       class="w-full h-10 px-4 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#155347] text-sm"
                     />
@@ -75,6 +78,7 @@ import { ButtonComponent, CardComponent, CardContentComponent, BadgeComponent } 
                     <label class="block text-sm font-medium text-gray-700 mb-2">Location</label>
                     <input
                       type="text"
+                      [value]="user()?.location || ''"
                       placeholder="City, Country"
                       class="w-full h-10 px-4 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#155347] text-sm"
                     />
@@ -143,4 +147,6 @@ import { ButtonComponent, CardComponent, CardContentComponent, BadgeComponent } 
     </app-dashboard-layout>
   `
 })
-export class ProfileComponent {}
+export class ProfileComponent {
+  user = inject(AuthService).currentUser;
+}

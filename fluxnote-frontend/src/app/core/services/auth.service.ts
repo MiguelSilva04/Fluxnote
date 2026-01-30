@@ -52,6 +52,16 @@ export interface TokenResponse {
   expiresInSeconds: number;
 }
 
+export interface UserProfile {
+  id: string;
+  email: string;
+  fullName: string;
+  userName: string;
+  profilePictureUrl: string;
+  location: string;
+  phoneNumber: string;
+}
+
 /**
  * tipo que representa os possíveis estados de autenticação do utilizador na aplicação.
  * 'unknown' indica que o estado ainda não foi determinado (inicialização),
@@ -242,6 +252,23 @@ export class AuthService {
       this._accessToken.set(res.accessToken);
       this.setAuthenticatedState(res.accessToken);
       this._status.set('authenticated');
+      const resUser = await firstValueFrom(
+        this.http.get<UserProfile>(`${this.baseUrl}/users/me`, {
+          headers: { Authorization: `Bearer ${this._accessToken()}` }
+        })
+      );
+      const user: User = {
+        id: resUser.id,
+        email: resUser.email,
+        fullName: resUser.fullName,
+        userName: resUser.userName,
+        profilePictureUrl: resUser.profilePictureUrl,
+        location: resUser.location,
+        phoneNumber: resUser.phoneNumber,
+        initials: this.getInitials(resUser.fullName),  
+        color: this.generateColorFromName(resUser.id)    
+      };
+      this._currentUser.set(user);
     } catch {
       // Refresh token inválido/expirado ou não existe
       this._accessToken.set(null);
@@ -536,7 +563,6 @@ export class AuthService {
       return {
         id: payload.sub,
         email: payload.email,
-        name: name,
         initials: this.getInitials(name),
         color: this.generateColorFromName(name)
       };

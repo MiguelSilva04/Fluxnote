@@ -50,6 +50,14 @@ import { ModalComponent, ButtonComponent } from '../../shared/components/ui';
           <lucide-icon name="settings" class="h-5 w-5"></lucide-icon>
           Settings
         </a>
+        <a
+          routerLink="/profile"
+          routerLinkActive="bg-[#e8f0ee] text-[#155347]"
+          class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+        >
+          <lucide-icon name="user" class="h-5 w-5"></lucide-icon>
+          Profile
+        </a>
       </nav>
 
       <div class="p-4 border-t border-gray-200 space-y-1">
