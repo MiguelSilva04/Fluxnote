@@ -33,7 +33,7 @@ import { ButtonComponent, WorkInProgressComponent } from '../../shared/component
               (click)="showWipModal.set(true)"
               class="w-full h-10 px-4 rounded-lg border border-gray-300 text-sm bg-white flex items-center justify-between cursor-pointer hover:bg-gray-50"
             >
-              <span class="text-gray-900">Português (Portugal)</span>
+              <span class="text-gray-900">English (US)</span>
               <lucide-icon name="chevron-down" class="h-4 w-4 text-gray-500"></lucide-icon>
             </div>
           </div>

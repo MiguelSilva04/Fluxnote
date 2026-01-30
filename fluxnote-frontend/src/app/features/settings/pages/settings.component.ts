@@ -34,7 +34,7 @@ import { ButtonComponent, CardComponent, CardContentComponent, WorkInProgressCom
                 (click)="showWipModal.set(true)"
                 class="w-full max-w-xs h-10 px-4 rounded-lg border border-gray-300 text-sm bg-white flex items-center justify-between cursor-pointer hover:bg-gray-50"
               >
-                <span class="text-gray-900">Português (Portugal)</span>
+                <span class="text-gray-900">English (US)</span>
                 <lucide-icon name="chevron-down" class="h-4 w-4 text-gray-500"></lucide-icon>
               </div>
             </app-card-content>
@@ -89,27 +89,6 @@ import { ButtonComponent, CardComponent, CardContentComponent, WorkInProgressCom
                   </div>
                 }
               </div>
-            </app-card-content>
-          </app-card>
-
-          <!-- Privacy & Security -->
-          <app-card>
-            <app-card-content customClass="p-6">
-              <div class="flex items-center gap-3 mb-4">
-                <lucide-icon name="shield" class="h-5 w-5 text-gray-600"></lucide-icon>
-                <h2 class="text-lg font-bold text-gray-900">Privacy & Security</h2>
-              </div>
-              <p class="text-sm text-gray-600 mb-4">Manage your account security settings</p>
-              <button
-                (click)="showWipModal.set(true)"
-                class="flex items-center gap-3 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors w-full text-left"
-              >
-                <lucide-icon name="key" class="h-5 w-5 text-gray-500"></lucide-icon>
-                <div>
-                  <p class="text-sm font-medium text-gray-900">Change Password</p>
-                  <p class="text-xs text-gray-500">Update your account password</p>
-                </div>
-              </button>
             </app-card-content>
           </app-card>
 

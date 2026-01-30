@@ -2,12 +2,12 @@ import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LucideAngularModule } from 'lucide-angular';
 import { AuthService, PanelStateService } from '../../core/services';
-import { ButtonComponent, BadgeComponent, WorkInProgressComponent } from '../../shared/components/ui';
+import { ButtonComponent, BadgeComponent } from '../../shared/components/ui';
 
 @Component({
   selector: 'app-profile-panel',
   standalone: true,
-  imports: [CommonModule, LucideAngularModule, ButtonComponent, BadgeComponent, WorkInProgressComponent],
+  imports: [CommonModule, LucideAngularModule, ButtonComponent, BadgeComponent],
   template: `
     @if (panelState.isProfilePanelOpen()) {
       <!-- Backdrop -->
@@ -95,7 +95,27 @@ import { ButtonComponent, BadgeComponent, WorkInProgressComponent } from '../../
         </div>
       </aside>
 
-      <app-work-in-progress [show]="showWipModal()" (close)="showWipModal.set(false)" />
+      <!-- WIP Modal -->
+      @if (showWipModal()) {
+        <div class="fixed inset-0 bg-black/50 flex items-center justify-center z-[60]" (click)="showWipModal.set(false)">
+          <div class="bg-white rounded-xl shadow-xl max-w-sm w-full mx-4 p-6" (click)="$event.stopPropagation()">
+            <div class="text-center mb-4">
+              <div class="h-16 w-16 rounded-full bg-amber-100 flex items-center justify-center mx-auto mb-4">
+                <lucide-icon name="construction" class="h-8 w-8 text-amber-600"></lucide-icon>
+              </div>
+              <h3 class="text-lg font-bold text-gray-900 mb-2">Work in Progress</h3>
+              <p class="text-sm text-gray-600">This feature is currently under development and will be available soon.</p>
+            </div>
+
+            <app-button
+              customClass="w-full bg-[#155347] hover:bg-[#0d3d31]"
+              (onClick)="showWipModal.set(false)"
+            >
+              Got it
+            </app-button>
+          </div>
+        </div>
+      }
     }
   `
 })

@@ -177,6 +177,22 @@ import { AuthService } from '../../../core/services';
                 </div>
               </app-card-content>
             </app-card>
+
+            <app-card>
+              <app-card-content customClass="p-6">
+                <h3 class="text-lg font-bold text-gray-900 mb-4">Security</h3>
+                <button
+                  (click)="showPasswordModal.set(true)"
+                  class="w-full flex items-center gap-3 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-left"
+                >
+                  <lucide-icon name="key" class="h-5 w-5 text-gray-500"></lucide-icon>
+                  <div>
+                    <p class="text-sm font-medium text-gray-900">Change Password</p>
+                    <p class="text-xs text-gray-500">Update your password to keep your account secure</p>
+                  </div>
+                </button>
+              </app-card-content>
+            </app-card>
           </div>
         </div>
       </div>
