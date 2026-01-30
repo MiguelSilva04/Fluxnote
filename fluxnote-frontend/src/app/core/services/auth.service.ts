@@ -62,6 +62,25 @@ export interface UserProfile {
   phoneNumber: string;
 }
 
+export interface UpdateProfileRequest {
+  fullName?: string;
+  profilePictureUrl?: string;
+  location?: string;
+  phoneNumber?: string;
+}
+
+export interface ChangePasswordRequest {
+  currentPassword: string;
+  newPassword: string;
+  confirmPassword: string;
+}
+
+export interface ApiResult {
+  success: boolean;
+  message?: string;
+  errors?: string[];
+}
+
 /**
  * tipo que representa os possíveis estados de autenticação do utilizador na aplicação.
  * 'unknown' indica que o estado ainda não foi determinado (inicialização),
@@ -639,6 +658,120 @@ export class AuthService {
         resolve(true);
       }, 1500);
     });
+  }
+
+  /**
+   * atualiza o perfil do utilizador autenticado.
+   * permite alterar nome, avatar, localização e telefone.
+   *
+   * @param request - dados a atualizar (apenas campos não nulos são alterados)
+   * @returns Promise com o resultado da operação
+   */
+  async updateProfile(request: UpdateProfileRequest): Promise<ApiResult> {
+    this._isLoading.set(true);
+    try {
+      const token = this.getAccessToken();
+      if (!token) {
+        return { success: false, message: 'Not authenticated.', errors: ['Please log in again.'] };
+      }
+
+      const res = await firstValueFrom(
+        this.http.put<UserProfile>(`${this.baseUrl}/users/me`, request, {
+          headers: { Authorization: `Bearer ${token}` }
+        })
+      );
+
+      // Atualiza o utilizador atual com os novos dados
+      const updatedUser: User = {
+        id: res.id,
+        email: res.email,
+        fullName: res.fullName,
+        userName: res.userName,
+        profilePictureUrl: res.profilePictureUrl,
+        location: res.location,
+        phoneNumber: res.phoneNumber,
+        initials: this.getInitials(res.fullName),
+        color: this.generateColorFromName(res.id)
+      };
+      this._currentUser.set(updatedUser);
+
+      return { success: true, message: 'Profile updated successfully.' };
+    } catch (error: any) {
+      if (error.status === 0) {
+        return {
+          success: false,
+          message: 'Server error. Check your internet connection.',
+          errors: ['Unable to connect to the server.']
+        };
+      }
+
+      if (error.status === 401) {
+        return {
+          success: false,
+          message: 'Session expired.',
+          errors: ['Please log in again.']
+        };
+      }
+
+      const errorBody = error.error || {};
+      return {
+        success: false,
+        message: errorBody.message || 'Failed to update profile.',
+        errors: errorBody.errors || [errorBody.message || 'Internal error.']
+      };
+    } finally {
+      this._isLoading.set(false);
+    }
+  }
+
+  /**
+   * altera a password do utilizador autenticado.
+   * requer a password atual para confirmação de segurança.
+   *
+   * @param request - contém password atual, nova password e confirmação
+   * @returns Promise com o resultado da operação
+   */
+  async changePassword(request: ChangePasswordRequest): Promise<ApiResult> {
+    this._isLoading.set(true);
+    try {
+      const token = this.getAccessToken();
+      if (!token) {
+        return { success: false, message: 'Not authenticated.', errors: ['Please log in again.'] };
+      }
+
+      await firstValueFrom(
+        this.http.put<{ message: string }>(`${this.baseUrl}/users/me/password`, request, {
+          headers: { Authorization: `Bearer ${token}` }
+        })
+      );
+
+      return { success: true, message: 'Password changed successfully.' };
+    } catch (error: any) {
+      if (error.status === 0) {
+        return {
+          success: false,
+          message: 'Server error. Check your internet connection.',
+          errors: ['Unable to connect to the server.']
+        };
+      }
+
+      if (error.status === 401) {
+        return {
+          success: false,
+          message: 'Session expired.',
+          errors: ['Please log in again.']
+        };
+      }
+
+      const errorBody = error.error || {};
+      return {
+        success: false,
+        message: errorBody.message || 'Failed to change password.',
+        errors: errorBody.errors || [errorBody.message || 'Internal error.']
+      };
+    } finally {
+      this._isLoading.set(false);
+    }
   }
 
   /**

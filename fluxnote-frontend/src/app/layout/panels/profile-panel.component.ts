@@ -1,13 +1,13 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LucideAngularModule } from 'lucide-angular';
 import { AuthService, PanelStateService } from '../../core/services';
-import { ButtonComponent, BadgeComponent } from '../../shared/components/ui';
+import { ButtonComponent, BadgeComponent, WorkInProgressComponent } from '../../shared/components/ui';
 
 @Component({
   selector: 'app-profile-panel',
   standalone: true,
-  imports: [CommonModule, LucideAngularModule, ButtonComponent, BadgeComponent],
+  imports: [CommonModule, LucideAngularModule, ButtonComponent, BadgeComponent, WorkInProgressComponent],
   template: `
     @if (panelState.isProfilePanelOpen()) {
       <!-- Backdrop -->
@@ -26,10 +26,18 @@ import { ButtonComponent, BadgeComponent } from '../../shared/components/ui';
           <!-- Profile Picture & Basic Info -->
           <div class="text-center">
             <div class="relative inline-block mb-4">
-            <div class="h-24 w-24 rounded-full flex items-center justify-center text-white text-2xl font-bold mx-auto"
-                [style.background]="user()?.color">
-              {{ user()?.initials }}
-            </div>
+              @if (user()?.profilePictureUrl) {
+                <img
+                  [src]="user()?.profilePictureUrl"
+                  alt="Profile"
+                  class="h-24 w-24 rounded-full object-cover mx-auto"
+                />
+              } @else {
+                <div class="h-24 w-24 rounded-full flex items-center justify-center text-white text-2xl font-bold mx-auto"
+                    [style.background]="user()?.color">
+                  {{ user()?.initials }}
+                </div>
+              }
               <div class="absolute bottom-1 right-1 h-5 w-5 rounded-full bg-green-500 border-4 border-white"></div>
             </div>
             <h3 class="text-xl font-bold text-gray-900 mb-1">{{ user()?.fullName }}</h3>
@@ -70,7 +78,10 @@ import { ButtonComponent, BadgeComponent } from '../../shared/components/ui';
 
           <!-- Account Actions -->
           <div class="space-y-2">
-            <button class="w-full flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-left">
+            <button
+              (click)="showWipModal.set(true)"
+              class="w-full flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-left"
+            >
               <lucide-icon name="settings" class="h-5 w-5 text-gray-500"></lucide-icon>
               <span class="text-sm font-medium text-gray-900">Account Settings</span>
             </button>
@@ -83,12 +94,15 @@ import { ButtonComponent, BadgeComponent } from '../../shared/components/ui';
           </app-button>
         </div>
       </aside>
+
+      <app-work-in-progress [show]="showWipModal()" (close)="showWipModal.set(false)" />
     }
   `
 })
 export class ProfilePanelComponent {
   panelState = inject(PanelStateService);
   user = inject(AuthService).currentUser;
+  showWipModal = signal(false);
 
   userTeams = [
     { name: 'Marketing Team', role: 'Editor' },

@@ -246,6 +246,116 @@ public class AuthController : ControllerBase
     }
 
     // -------------------------
+    // UPDATE PROFILE
+    // - Atualiza nome, avatar, localização, telefone
+    // -------------------------
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [HttpPut("users/me")]
+    public async Task<IActionResult> UpdateProfile([FromBody] UpdateProfileRequest request)
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (userId is null)
+            return Unauthorized(new { message = "Invalid claims for obtaining user id." });
+
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user is null)
+            return Unauthorized(new { message = "User not found." });
+
+        // Atualiza apenas os campos fornecidos (não nulos)
+        if (request.FullName is not null)
+            user.FullName = request.FullName;
+
+        if (request.ProfilePictureUrl is not null)
+            user.ProfilePictureUrl = request.ProfilePictureUrl;
+
+        if (request.Location is not null)
+            user.Location = request.Location;
+
+        if (request.PhoneNumber is not null)
+            user.PhoneNumber = request.PhoneNumber;
+
+        user.UpdatedAt = DateTime.UtcNow;
+
+        var result = await _userManager.UpdateAsync(user);
+        if (!result.Succeeded)
+        {
+            return BadRequest(new
+            {
+                message = "Failed to update profile.",
+                errors = result.Errors.Select(e => e.Description)
+            });
+        }
+
+        var profile = new UserProfile
+        {
+            Id = user.Id,
+            Email = user.Email!,
+            FullName = user.FullName!,
+            UserName = user.UserName!,
+            ProfilePictureUrl = user.ProfilePictureUrl!,
+            Location = user.Location!,
+            PhoneNumber = user.PhoneNumber!
+        };
+
+        return Ok(profile);
+    }
+
+    // -------------------------
+    // CHANGE PASSWORD
+    // - Requer password atual para segurança
+    // - Aplica requisitos do Identity
+    // -------------------------
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [HttpPut("users/me/password")]
+    public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest request)
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (userId is null)
+            return Unauthorized(new { message = "Invalid claims for obtaining user id." });
+
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user is null)
+            return Unauthorized(new { message = "User not found." });
+
+        // Verifica se o utilizador usa autenticação local
+        if (user.AuthProvider != AuthProvider.Local)
+        {
+            return BadRequest(new
+            {
+                message = "Cannot change password.",
+                errors = new[] { "Password change is only available for accounts using email/password authentication." }
+            });
+        }
+
+        // Valida a password atual
+        var passwordValid = await _userManager.CheckPasswordAsync(user, request.CurrentPassword);
+        if (!passwordValid)
+        {
+            return BadRequest(new
+            {
+                message = "Invalid current password.",
+                errors = new[] { "The current password is incorrect." }
+            });
+        }
+
+        // Altera a password usando o Identity (aplica todas as validações configuradas)
+        var result = await _userManager.ChangePasswordAsync(user, request.CurrentPassword, request.NewPassword);
+        if (!result.Succeeded)
+        {
+            return BadRequest(new
+            {
+                message = "Failed to change password.",
+                errors = result.Errors.Select(e => e.Description)
+            });
+        }
+
+        user.UpdatedAt = DateTime.UtcNow;
+        await _userManager.UpdateAsync(user);
+
+        return Ok(new { message = "Password changed successfully." });
+    }
+
+    // -------------------------
     // REFRESH
     // Status codes:
     // - 401: sem cookie / inválido / expirado / revogado / idle / cap / user inválido

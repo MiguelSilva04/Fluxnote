@@ -146,18 +146,18 @@ Este sprint foca-se em estabelecer a base funcional da aplicação FluxNote, imp
 **Backend:**
 
 - [x] Implementar endpoint `GET /api/users/me`
-- [ ] Implementar endpoint `PUT /api/users/me` (nome, avatar)
-- [ ] Implementar endpoint `PUT /api/users/me/password` (requer password atual)
-- [ ] Criar DTOs: `UserProfileDto`, `UpdateProfileRequest`, `ChangePasswordRequest`
-- [ ] Validar password atual e aplicar requisitos do Identity
+- [x] Implementar endpoint `PUT /api/users/me` (nome, avatar)
+- [x] Implementar endpoint `PUT /api/users/me/password` (requer password atual)
+- [x] Criar DTOs: `UserProfileDto`, `UpdateProfileRequest`, `ChangePasswordRequest`
+- [x] Validar password atual e aplicar requisitos do Identity
 
 **Frontend:**
 
 - [x] UI base em `/settings` e `/profile` (sem integração backend)
-- [ ] Integrar com `GET/PUT /api/users/me`
-- [ ] Implementar alteração de password (com confirmação)
-- [ ] Ligar upload/preview de avatar (URL)
-- [ ] Adicionar confirmação antes de alterações sensíveis
+- [x] Integrar com `GET/PUT /api/users/me`
+- [x] Implementar alteração de password (com confirmação)
+- [x] Ligar upload/preview de avatar (URL)
+- [x] Adicionar confirmação antes de alterações sensíveis
 
 ---
 

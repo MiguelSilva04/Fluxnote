@@ -1,45 +1,40 @@
-import { Component } from '@angular/core';
+import { Component, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LucideAngularModule } from 'lucide-angular';
+import { ButtonComponent } from '../button/button.component';
 
 @Component({
   selector: 'app-work-in-progress',
   standalone: true,
-  imports: [CommonModule, LucideAngularModule],
+  imports: [CommonModule, LucideAngularModule, ButtonComponent],
   template: `
-    <div class="bg-gray-50 py-16 px-4">
-      <div class="w-full max-w-md mx-auto bg-white shadow-lg rounded-2xl border border-gray-200 px-8 py-12 text-center space-y-6">
-        <div class="flex justify-center space-x-4">
-          <lucide-icon name="construction" class="w-8 h-8 text-orange-500 animate-bounce"></lucide-icon>
-          <lucide-icon name="wrench" class="w-8 h-8 text-blue-500 animate-bounce delay-200"></lucide-icon>
-          <lucide-icon name="cog" class="w-8 h-8 text-green-500 animate-bounce delay-400"></lucide-icon>
-        </div>
+    @if (show()) {
+      <div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50" (click)="close.emit()">
+        <div class="bg-white rounded-xl shadow-xl max-w-sm w-full mx-4 p-6" (click)="$event.stopPropagation()">
+          <div class="text-center mb-4">
+          <div class="h-16 w-16 rounded-full bg-amber-100 flex items-center justify-center mx-auto mb-4">
+                <lucide-icon name="construction" class="h-8 w-8 text-amber-600"></lucide-icon>
+              </div>
+            <h3 class="text-xl font-bold text-gray-900 mb-2">Work in Progress</h3>
+            <p class="text-sm text-gray-600 mb-4">This feature is currently under development and will be available soon.</p>
 
-        <div class="space-y-2">
-          <h1 class="text-2xl font-bold text-gray-900">
-            Work in Progress
-          </h1>
-          <p class="text-gray-600">
-            Esta funcionalidade ainda está a ser desenvolvida.
-          </p>
-        </div>
-
-        <div class="space-y-2">
-          <div class="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
-            <div class="h-full bg-gradient-to-r from-emerald-400 to-emerald-600 rounded-full animate-pulse progress-bar"></div>
+            <div class="space-y-2 mb-4">
+              <div class="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+                <div class="h-full bg-gradient-to-r from-emerald-400 to-emerald-600 rounded-full animate-pulse progress-bar"></div>
+              </div>
+              <p class="text-xs text-gray-500">Soon will be available!</p>
+            </div>
           </div>
-          <p class="text-sm text-gray-500">
-            Em breve estará disponível!
-          </p>
-        </div>
 
-        <div class="pt-4">
-          <p class="text-sm text-gray-400 italic">
-            A construir algo incrível...
-          </p>
+          <app-button
+            customClass="w-full bg-[#155347] hover:bg-[#0d3d31]"
+            (click)="close.emit()"
+          >
+            Got it
+          </app-button>
         </div>
       </div>
-    </div>
+    }
   `,
   styles: [`
     .delay-200 {
@@ -53,4 +48,7 @@ import { LucideAngularModule } from 'lucide-angular';
     }
   `]
 })
-export class WorkInProgressComponent {}
+export class WorkInProgressComponent {
+  show = input<boolean>(false);
+  close = output<void>();
+}

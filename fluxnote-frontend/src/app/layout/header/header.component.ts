@@ -35,10 +35,18 @@ import { AuthService, PanelStateService } from '../../core/services';
         </button>
         <button
           (click)="panelState.openProfilePanel()"
-          class="h-9 w-9 rounded-full text-white flex items-center justify-center text-sm font-medium hover:opacity-90 transition-opacity"
-          [style.background]="user()?.color"
+          class="h-9 w-9 rounded-full text-white flex items-center justify-center text-sm font-medium hover:opacity-90 transition-opacity overflow-hidden"
+          [style.background]="user()?.profilePictureUrl ? 'transparent' : user()?.color"
         >
-          {{ user()?.initials }}
+          @if (user()?.profilePictureUrl) {
+            <img
+              [src]="user()?.profilePictureUrl"
+              alt="Profile"
+              class="h-full w-full object-cover"
+            />
+          } @else {
+            {{ user()?.initials }}
+          }
         </button>
       </div>
     </header>

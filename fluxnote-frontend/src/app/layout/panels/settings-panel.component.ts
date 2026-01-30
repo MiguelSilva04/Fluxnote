@@ -1,14 +1,13 @@
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 import { LucideAngularModule } from 'lucide-angular';
 import { PanelStateService } from '../../core/services';
-import { ButtonComponent } from '../../shared/components/ui';
+import { ButtonComponent, WorkInProgressComponent } from '../../shared/components/ui';
 
 @Component({
   selector: 'app-settings-panel',
   standalone: true,
-  imports: [CommonModule, FormsModule, LucideAngularModule, ButtonComponent],
+  imports: [CommonModule, LucideAngularModule, ButtonComponent, WorkInProgressComponent],
   template: `
     @if (panelState.isSettingsPanelOpen()) {
       <!-- Backdrop -->
@@ -30,15 +29,13 @@ import { ButtonComponent } from '../../shared/components/ui';
               <lucide-icon name="globe" class="h-5 w-5 text-gray-600"></lucide-icon>
               <h3 class="text-base font-bold text-gray-900">Language</h3>
             </div>
-            <select
-              [(ngModel)]="language"
-              class="w-full h-10 px-4 rounded-lg border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-[#155347] bg-white"
+            <div
+              (click)="showWipModal.set(true)"
+              class="w-full h-10 px-4 rounded-lg border border-gray-300 text-sm bg-white flex items-center justify-between cursor-pointer hover:bg-gray-50"
             >
-              <option value="pt-PT">Português (Portugal)</option>
-              <option value="en-US">English (US)</option>
-              <option value="es-ES">Español</option>
-              <option value="fr-FR">Français</option>
-            </select>
+              <span class="text-gray-900">Português (Portugal)</span>
+              <lucide-icon name="chevron-down" class="h-4 w-4 text-gray-500"></lucide-icon>
+            </div>
           </div>
 
           <!-- Theme Settings -->
@@ -49,16 +46,17 @@ import { ButtonComponent } from '../../shared/components/ui';
             </div>
             <div class="space-y-2">
               @for (option of themeOptions; track option.value) {
-                <label class="flex items-center gap-3 p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50">
-                  <input
-                    type="radio"
-                    name="theme"
-                    [value]="option.value"
-                    [(ngModel)]="theme"
-                    class="text-[#155347] focus:ring-[#155347]"
-                  />
+                <div
+                  (click)="option.value !== theme && showWipModal.set(true)"
+                  [class]="'flex items-center gap-3 p-3 border rounded-lg transition-colors ' + (option.value === theme ? 'border-[#155347] bg-[#155347]/5' : 'border-gray-200 cursor-pointer hover:bg-gray-50')"
+                >
+                  <div [class]="'w-4 h-4 rounded-full border-2 flex items-center justify-center ' + (option.value === theme ? 'border-[#155347]' : 'border-gray-300')">
+                    @if (option.value === theme) {
+                      <div class="w-2 h-2 rounded-full bg-[#155347]"></div>
+                    }
+                  </div>
                   <span class="text-sm font-medium text-gray-900">{{ option.label }}</span>
-                </label>
+                </div>
               }
             </div>
           </div>
@@ -71,49 +69,39 @@ import { ButtonComponent } from '../../shared/components/ui';
             </div>
             <div class="space-y-3">
               @for (notif of notificationOptions; track notif.key) {
-                <label class="flex items-center justify-between p-3 border border-gray-200 rounded-lg">
+                <div class="flex items-center justify-between p-3 border border-gray-200 rounded-lg">
                   <span class="text-sm font-medium text-gray-900">{{ notif.label }}</span>
                   <button
-                    (click)="toggleNotification(notif.key)"
-                    [class]="'relative inline-flex h-6 w-11 items-center rounded-full transition-colors ' + (notifications()[notif.key] ? 'bg-[#155347]' : 'bg-gray-200')"
+                    (click)="showWipModal.set(true)"
+                    [class]="'relative inline-flex h-6 w-11 items-center rounded-full transition-colors cursor-pointer ' + (notifications[notif.key] ? 'bg-[#155347]' : 'bg-gray-200')"
                   >
                     <span
-                      [class]="'inline-block h-4 w-4 transform rounded-full bg-white transition-transform ' + (notifications()[notif.key] ? 'translate-x-6' : 'translate-x-1')"
+                      [class]="'inline-block h-4 w-4 transform rounded-full bg-white transition-transform ' + (notifications[notif.key] ? 'translate-x-6' : 'translate-x-1')"
                     ></span>
                   </button>
-                </label>
+                </div>
               }
             </div>
-          </div>
-
-          <!-- Privacy & Security -->
-          <div>
-            <div class="flex items-center gap-2 mb-4">
-              <lucide-icon name="shield" class="h-5 w-5 text-gray-600"></lucide-icon>
-              <h3 class="text-base font-bold text-gray-900">Privacy & Security</h3>
-            </div>
-            <button class="w-full flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-left">
-              <lucide-icon name="key" class="h-5 w-5 text-gray-500"></lucide-icon>
-              <span class="text-sm font-medium text-gray-900">Change Password</span>
-            </button>
           </div>
         </div>
 
         <div class="p-6 border-t border-gray-200">
-          <app-button (onClick)="panelState.closeSettingsPanel()" customClass="w-full bg-[#155347] hover:bg-[#0d3d31]">
+          <app-button (onClick)="showWipModal.set(true)" customClass="w-full bg-[#155347] hover:bg-[#0d3d31]">
             Save Changes
           </app-button>
         </div>
       </aside>
+
+      <app-work-in-progress [show]="showWipModal()" (close)="showWipModal.set(false)" />
     }
   `
 })
 export class SettingsPanelComponent {
   panelState = inject(PanelStateService);
+  showWipModal = signal(false);
 
-  language = 'pt-PT';
   theme = 'light';
-  notifications = signal({ email: true, push: true, desktop: false });
+  notifications: Record<string, boolean> = { email: true, push: true, desktop: false };
 
   themeOptions = [
     { value: 'light', label: 'Light' },
@@ -122,12 +110,8 @@ export class SettingsPanelComponent {
   ];
 
   notificationOptions = [
-    { key: 'email' as const, label: 'Email Notifications' },
-    { key: 'push' as const, label: 'Push Notifications' },
-    { key: 'desktop' as const, label: 'Desktop Notifications' }
+    { key: 'email', label: 'Email Notifications' },
+    { key: 'push', label: 'Push Notifications' },
+    { key: 'desktop', label: 'Desktop Notifications' }
   ];
-
-  toggleNotification(key: 'email' | 'push' | 'desktop'): void {
-    this.notifications.update(n => ({ ...n, [key]: !n[key] }));
-  }
 }
