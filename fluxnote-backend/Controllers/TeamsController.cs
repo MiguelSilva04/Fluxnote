@@ -29,16 +29,15 @@ namespace Fluxnote.Backend.Controllers
             if (userId is null)
                 return Unauthorized(new { message = "User not authenticated." });
 
-            // Obter equipas onde o utilizador é membro
-            var userTeamIds = await _context.TeamMember
+            // Obter equipas onde o utilizador é membro (incluindo a role)
+            var userTeamMemberships = await _context.TeamMember
                 .Where(m => m.UserId == userId)
-                .Select(m => m.TeamId)
-                .ToListAsync();
+                .ToDictionaryAsync(m => m.TeamId, m => (int)m.Role);
 
             var teams = await _context.Team
                 .Include(t => t.Members)
                 .Include(t => t.Documents.Where(d => !d.IsDeleted))
-                .Where(t => userTeamIds.Contains(t.Id))
+                .Where(t => userTeamMemberships.Keys.Contains(t.Id))
                 .Select(t => new TeamDto
                 {
                     Id = t.Id,
@@ -65,6 +64,12 @@ namespace Fluxnote.Backend.Controllers
                 })
                 .ToListAsync();
 
+            // Preencher CurrentUserRole após a query
+            foreach (var team in teams)
+            {
+                team.CurrentUserRole = userTeamMemberships.GetValueOrDefault(team.Id, 0);
+            }
+
             return Ok(teams);
         }
 
@@ -76,11 +81,11 @@ namespace Fluxnote.Backend.Controllers
             if (userId is null)
                 return Unauthorized(new { message = "User not authenticated." });
 
-            // Verificar se o utilizador é membro da equipa
-            var isMember = await _context.TeamMember
-                .AnyAsync(m => m.TeamId == id && m.UserId == userId);
+            // Verificar se o utilizador é membro da equipa e obter a sua role
+            var membership = await _context.TeamMember
+                .FirstOrDefaultAsync(m => m.TeamId == id && m.UserId == userId);
 
-            if (!isMember)
+            if (membership == null)
             {
                 return StatusCode(StatusCodes.Status403Forbidden, new
                 {
@@ -108,6 +113,7 @@ namespace Fluxnote.Backend.Controllers
                 UpdatedAt = team.UpdatedAt,
                 IsActive = team.IsActive,
                 DeletionScheduled = team.DeletionScheduled,
+                CurrentUserRole = (int)membership.Role,
                 Members = team.Members.Select(m => new TeamMemberDto
                 {
                     Id = m.Id,

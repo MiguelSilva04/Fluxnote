@@ -1,7 +1,7 @@
 import { Component, inject, signal, ViewChild } from '@angular/core';
 // TODO: BACKEND INTEGRATION - Descomentar quando implementar ngOnInit
 // import { OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
@@ -621,8 +621,10 @@ export class DocumentEditorComponent {
     console.log('Saving document content:', content.substring(0, 100) + '...');
   }
 
+  private location = inject(Location);
+
   navigateBack(): void {
-    this.router.navigate(['/dashboard']);
+    this.location.back();
   }
 
   toggleAIPanel(): void {

@@ -93,10 +93,8 @@ export class TeamsComponent {
     this.teams.set(null);
     this.teamService.getTeams().subscribe({
       next: (teams) => {
-        // Update local state or handle response
         this.teams.set(teams);
         this.loading.set(false);
-        //console.log(teams);
       },
       error: (err) => {
         console.error(err);
@@ -119,6 +117,14 @@ export class TeamsComponent {
    */
   handleViewTeamDetails(teamId: number): void {
     this.router.navigate(['/team-detail', teamId]);
+  }
+
+  /**
+   * Navega para o editor de um documento.
+   * @param docId ID do documento
+   */
+  handleDocumentClick(docId: number): void {
+    this.router.navigate(['/editor', docId]);
   }
 
   /**
@@ -148,6 +154,35 @@ export class TeamsComponent {
       .map(word => word[0].toUpperCase())
       .join('')
       .slice(0, 2); // opcional: limita a 2 letras
+  }
+
+  /**
+   * Converte o número da role para texto legível.
+   * @param role Número da role (0=Member, 1=TeamAdmin, 2=Owner)
+   * @returns Texto da role
+   */
+  getRoleName(role: number): string {
+    const roleNames: { [key: number]: string } = {
+      0: 'Member',
+      1: 'Team Admin',
+      2: 'Owner'
+    };
+    return roleNames[role] ?? 'Unknown';
+  }
+
+  /**
+   * Retorna a classe CSS do badge com base na role.
+   * @param role Número da role
+   * @returns Classes CSS para o badge
+   */
+  getRoleBadgeClass(role: number): string {
+    const baseClasses = 'px-2 py-1 text-xs font-medium rounded-full';
+    switch (role) {
+      case 2: return `${baseClasses} bg-[#155347] text-white`; // Owner
+      case 1: return `${baseClasses} bg-blue-100 text-blue-800`; // Team Admin
+      case 0: return `${baseClasses} bg-gray-100 text-gray-800`; // Member
+      default: return `${baseClasses} bg-gray-100 text-gray-600`;
+    }
   }
   
   /**

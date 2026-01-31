@@ -118,6 +118,10 @@
                         <h3 class="text-lg font-bold text-gray-900">
                           {{ team.name }}
                         </h3>
+
+                        <span [class]="getRoleBadgeClass(team.currentUserRole)">
+                          {{ getRoleName(team.currentUserRole) }}
+                        </span>
         
                         <span class="text-sm text-gray-500">
                           Created {{ timeAgo(team.createdAt) }}
@@ -167,7 +171,10 @@
                   <div class="mt-6 pt-6 border-t border-gray-100">
                     <div class="space-y-2">
                       @for (doc of team.documents; track doc.id) {
-                        <div class="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg transition-colors cursor-pointer">
+                        <div 
+                          (click)="handleDocumentClick(doc.id)"
+                          class="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg transition-colors cursor-pointer"
+                        >
                           <div class="flex items-center gap-3 flex-1">
                             <lucide-icon name="file-text" class="h-4 w-4 text-gray-400"></lucide-icon>
                             <span class="text-sm font-medium text-gray-900">

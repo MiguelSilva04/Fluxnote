@@ -22,6 +22,7 @@ export interface TeamGet {
   updatedAt: string;
   isActive: boolean;
   deletionScheduled: string;
+  currentUserRole: number;
   members: TeamMemberToPost[];
   documents: TeamDocument[];
 }

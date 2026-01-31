@@ -12,6 +12,7 @@ namespace Fluxnote.Backend.Dtos.Teams
         public DateTime UpdatedAt { get; set; }
         public bool IsActive { get; set; }
         public DateTime? DeletionScheduled { get; set; }
+        public int CurrentUserRole { get; set; }
         public List<TeamMemberDto> Members { get; set; } = new();
         public List<TeamDocumentDto> Documents { get; set; } = new();
     }
