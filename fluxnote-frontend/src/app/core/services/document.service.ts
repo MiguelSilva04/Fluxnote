@@ -1,43 +1,118 @@
-import { Injectable, signal } from '@angular/core';
-// TODO: BACKEND INTEGRATION - Adicionar imports necessários quando backend estiver pronto
-// import { HttpClient } from '@angular/common/http';
-// import { Observable, catchError, throwError } from 'rxjs';
-// import { environment } from '../../../environments/environment';
-import { Document, Version, Comment, AISuggestion } from '../models';
+import { inject, Injectable, signal } from '@angular/core';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { Observable, catchError, tap, throwError } from 'rxjs';
+import { 
+  Document, 
+  DocumentDto, 
+  DocumentDetailDto, 
+  CreateDocumentRequest, 
+  Version, 
+  Comment, 
+  AISuggestion 
+} from '../models';
 
 @Injectable({
   providedIn: 'root'
 })
 export class DocumentService {
-  // TODO: BACKEND INTEGRATION - Injectar HttpClient no construtor
-  // constructor(private http: HttpClient) {}
-  private readonly _documents = signal<Document[]>([
-    { id: 1, title: 'Q4 Marketing Strategy', lastEdited: '2 hours ago', sharedWith: 3, status: 'active' },
-    { id: 2, title: 'Product Roadmap 2024', lastEdited: 'Yesterday', sharedWith: 5, status: 'active' },
-    { id: 3, title: 'Team Meeting Notes', lastEdited: '3 days ago', sharedWith: 2, status: 'archived' }
-  ]);
+  private http = inject(HttpClient);
 
-  private readonly _currentDocument = signal<Document | null>(null);
+  private readonly _documents = signal<DocumentDto[]>([]);
+  private readonly _currentDocument = signal<DocumentDetailDto | null>(null);
   private readonly _isLoading = signal(false);
+  private readonly _error = signal<string | null>(null);
 
   readonly documents = this._documents.asReadonly();
   readonly currentDocument = this._currentDocument.asReadonly();
   readonly isLoading = this._isLoading.asReadonly();
+  readonly error = this._error.asReadonly();
 
-  // TODO: BACKEND INTEGRATION - Alterar para método assíncrono que chama o backend
-  // Endpoint: GET /api/documents/{id}/versions (se existir no Sprint 1)
-  // 
-  // getVersions(documentId: number): Observable<Version[]> {
-  //   return this.http.get<Version[]>(`${environment.apiUrl}/api/documents/${documentId}/versions`)
-  //     .pipe(
-  //       catchError((error) => {
-  //         console.error('Error loading versions:', error);
-  //         return throwError(() => error);
-  //       })
-  //     );
-  // }
+  /**
+   * Carrega a lista de documentos do utilizador
+   * @param filters Filtros opcionais (teamId, search)
+   */
+  getDocuments(filters?: { teamId?: number; search?: string }): Observable<DocumentDto[]> {
+    this._isLoading.set(true);
+    this._error.set(null);
+
+    let params = new HttpParams();
+    if (filters?.teamId) {
+      params = params.set('teamId', filters.teamId.toString());
+    }
+    if (filters?.search) {
+      params = params.set('search', filters.search);
+    }
+
+    return this.http.get<DocumentDto[]>('/api/documents', { params }).pipe(
+      tap(docs => {
+        this._documents.set(docs);
+        this._isLoading.set(false);
+      }),
+      catchError(error => {
+        this._isLoading.set(false);
+        this._error.set(error.error?.message || 'Error loading documents');
+        console.error('Error loading documents:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  /**
+   * Carrega os detalhes de um documento específico
+   * @param id ID do documento
+   */
+  getDocument(id: number): Observable<DocumentDetailDto> {
+    this._isLoading.set(true);
+    this._error.set(null);
+
+    return this.http.get<DocumentDetailDto>(`/api/documents/${id}`).pipe(
+      tap(doc => {
+        this._currentDocument.set(doc);
+        this._isLoading.set(false);
+      }),
+      catchError(error => {
+        this._isLoading.set(false);
+        this._error.set(error.error?.message || 'Error loading document');
+        console.error('Error loading document:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  /**
+   * Cria um novo documento
+   * @param request Dados do documento (título, teamId ou teamName)
+   */
+  createDocument(request: CreateDocumentRequest): Observable<DocumentDto> {
+    this._isLoading.set(true);
+    this._error.set(null);
+
+    return this.http.post<DocumentDto>('/api/documents', request).pipe(
+      tap(doc => {
+        // Adiciona o novo documento à lista local
+        this._documents.update(docs => [doc, ...docs]);
+        this._isLoading.set(false);
+      }),
+      catchError(error => {
+        this._isLoading.set(false);
+        this._error.set(error.error?.message || 'Error creating document');
+        console.error('Error creating document:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  /**
+   * Limpa o documento atual
+   */
+  clearCurrentDocument(): void {
+    this._currentDocument.set(null);
+  }
+
+  // ===============================
+  // Métodos mock para funcionalidades futuas
+  // ===============================
   
-  // TEMPORÁRIO: Mock data para desenvolvimento sem backend
   getVersions(): Version[] {
     return [
       { id: 7, number: 7, author: 'João Silva', description: 'Added introduction section and fixed spelling errors.', timestamp: '2 hours ago' },
@@ -60,124 +135,4 @@ export class DocumentService {
       { id: 3, title: 'Generate content from prompt', description: 'Create new content based on your instructions', icon: '🤖' }
     ];
   }
-
-  setCurrentDocument(doc: Document): void {
-    this._currentDocument.set(doc);
-  }
-
-  createDocument(teamId: number): Document {
-    const newDoc: Document = {
-      id: Date.now(),
-      title: 'Untitled Document',
-      lastEdited: 'Just now',
-      sharedWith: 0,
-      status: 'active'
-    };
-    this._documents.update(docs => [...docs, newDoc]);
-    return newDoc;
-  }
-
-  updateDocument(id: number, updates: Partial<Document>): void {
-    this._documents.update(docs =>
-      docs.map(doc => doc.id === id ? { ...doc, ...updates } : doc)
-    );
-  }
-
-  deleteDocument(id: number): void {
-    this._documents.update(docs => docs.filter(doc => doc.id !== id));
-  }
-
-  // TODO: BACKEND INTEGRATION - Implementar métodos para integração com backend
-  // 
-  // /**
-  //  * Carrega metadados do documento (título, última atualização, etc.)
-  //  * Endpoint: GET /api//documents/{id}
-  //  */
-  // loadDocument(id: number): Observable<Document> {
-  //   return this.http.get<Document>(`${environment.apiUrl}/api//documents/${id}`)
-  //     .pipe(
-  //       catchError((error) => {
-  //         console.error('Error loading document:', error);
-  //         return throwError(() => error);
-  //       })
-  //     );
-  // }
-  //
-  // /**
-  //  * Carrega conteúdo do documento (HTML)
-  //  * Endpoint: GET /api//documents/{id}/content
-  //  */
-  // loadDocumentContent(id: number): Observable<string> {
-  //   return this.http.get(`${environment.apiUrl}/api//documents/${id}/content`, {
-  //     responseType: 'text'
-  //   }).pipe(
-  //     catchError((error) => {
-  //       console.error('Error loading document content:', error);
-  //       return throwError(() => error);
-  //     })
-  //   );
-  // }
-  //
-  // /**
-  //  * Atualiza metadados do documento (título, etc.)
-  //  * Endpoint: PUT /api//documents/{id}
-  //  */
-  // updateDocumentMetadata(id: number, updates: { title?: string }): Observable<void> {
-  //   return this.http.put<void>(`${environment.apiUrl}/api/documents/${id}`, updates)
-  //     .pipe(
-  //       catchError((error) => {
-  //         console.error('Error updating document metadata:', error);
-  //         return throwError(() => error);
-  //       })
-  //     );
-  // }
-  //
-  // /**
-  //  * Guarda conteúdo do documento (HTML)
-  //  * Endpoint: PUT /api/documents/{id}/content
-  //  */
-  // saveDocumentContent(id: number, content: string): Observable<void> {
-  //   return this.http.put<void>(`${environment.apiUrl}/api/documents/${id}/content`, { content })
-  //     .pipe(
-  //       catchError((error) => {
-  //         console.error('Error saving document content:', error);
-  //         return throwError(() => error);
-  //       })
-  //     );
-  // }
-  //
-  // /**
-  //  * Lista documentos do utilizador
-  //  * Endpoint: GET /api/documents
-  //  */
-  // getDocuments(filters?: { teamId?: number; search?: string }): Observable<Document[]> {
-  //   let url = `${environment.apiUrl}/api/documents`;
-  //   const params = new URLSearchParams();
-  //   if (filters?.teamId) params.append('teamId', filters.teamId.toString());
-  //   if (filters?.search) params.append('search', filters.search);
-  //   if (params.toString()) url += `?${params.toString()}`;
-  //
-  //   return this.http.get<Document[]>(url)
-  //     .pipe(
-  //       catchError((error) => {
-  //         console.error('Error loading documents:', error);
-  //         return throwError(() => error);
-  //       })
-  //     );
-  // }
-  //
-  // /**
-  //  * Cria novo documento
-  //  * Endpoint: POST /api/documents
-  //  */
-  // createDocument(teamId?: number): Observable<Document> {
-  //   const payload = teamId ? { teamId } : {};
-  //   return this.http.post<Document>(`${environment.apiUrl}/api/documents`, payload)
-  //     .pipe(
-  //       catchError((error) => {
-  //         console.error('Error creating document:', error);
-  //         return throwError(() => error);
-  //       })
-  //     );
-  // }
 }

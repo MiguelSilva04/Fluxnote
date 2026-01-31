@@ -1,4 +1,4 @@
-import { Component, inject, signal, computed } from '@angular/core';
+import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -6,6 +6,7 @@ import { LucideAngularModule } from 'lucide-angular';
 import { DashboardLayoutComponent } from '../../../layout/dashboard-layout/dashboard-layout.component';
 import { ButtonComponent, CardComponent, CardContentComponent, BadgeComponent } from '../../../shared/components/ui';
 import { DocumentService, TeamService } from '../../../core/services';
+import { DocumentDto, TeamGet } from '../../../core/models';
 
 @Component({
   selector: 'app-dashboard',
@@ -27,123 +28,247 @@ import { DocumentService, TeamService } from '../../../core/services';
           <h1 class="text-3xl font-bold text-gray-900 mb-2">My Documents</h1>
           <p class="text-gray-600">Manage and organize your documents</p>
         </div>
-        <app-button (onClick)="openTeamSelectModal()" [leftIcon]="true" customClass="bg-[#155347] hover:bg-[#0d3d31]">
+        <app-button (onClick)="openCreateDocumentModal()" [leftIcon]="true" customClass="bg-[#155347] hover:bg-[#0d3d31]">
           <lucide-icon leftIcon name="plus" class="h-4 w-4"></lucide-icon>
           New Document
         </app-button>
       </div>
 
+      <!-- Loading State -->
+      @if (isLoading()) {
+        <div class="flex items-center justify-center py-12">
+          <lucide-icon name="loader-circle" class="h-8 w-8 text-[#155347] animate-spin"></lucide-icon>
+          <span class="ml-3 text-gray-600">Loading documents...</span>
+        </div>
+      }
+
+      <!-- Error State -->
+      @if (error()) {
+        <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+          <div class="flex items-center gap-2 text-red-700">
+            <lucide-icon name="alert-circle" class="h-5 w-5"></lucide-icon>
+            <span>{{ error() }}</span>
+          </div>
+        </div>
+      }
+
       <!-- Tabs -->
-      <div class="flex items-center justify-between mb-6">
-        <div class="flex gap-1 border-b border-gray-200">
-          @for (tab of tabs; track tab.id) {
+      @if (!isLoading()) {
+        <div class="flex items-center justify-between mb-6">
+          <div class="flex gap-1 border-b border-gray-200 overflow-x-auto">
+            <!-- All Documents tab -->
             <button
-              (click)="activeTab.set(tab.id)"
-              [class]="'px-4 py-2 text-sm font-medium border-b-2 transition-colors ' + (activeTab() === tab.id ? 'border-[#155347] text-[#155347]' : 'border-transparent text-gray-600 hover:text-gray-900')"
+              (click)="selectTeamFilter(null)"
+              [class]="'px-4 py-2 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ' + (selectedTeamFilter() === null ? 'border-[#155347] text-[#155347]' : 'border-transparent text-gray-600 hover:text-gray-900')"
             >
-              {{ tab.label }}
+              All Documents
             </button>
-          }
-        </div>
-
-        <div class="flex items-center gap-2">
-          <button
-            (click)="viewMode.set('grid')"
-            [class]="'p-2 rounded-lg transition-colors ' + (viewMode() === 'grid' ? 'bg-gray-100 text-gray-900' : 'text-gray-600 hover:bg-gray-50')"
-          >
-            <lucide-icon name="grid-3x3" class="h-5 w-5"></lucide-icon>
-          </button>
-          <button
-            (click)="viewMode.set('list')"
-            [class]="'p-2 rounded-lg transition-colors ' + (viewMode() === 'list' ? 'bg-gray-100 text-gray-900' : 'text-gray-600 hover:bg-gray-50')"
-          >
-            <lucide-icon name="list" class="h-5 w-5"></lucide-icon>
-          </button>
-        </div>
-      </div>
-
-      <!-- Documents Grid -->
-      <div [class]="viewMode() === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6' : 'space-y-4'">
-        @for (doc of documents(); track doc.id) {
-          <app-card customClass="hover:shadow-lg transition-shadow cursor-pointer" (click)="handleDocumentClick(doc.id)">
-            <app-card-content customClass="p-6">
-              <div class="flex items-start justify-between mb-4">
-                <div class="p-3 bg-[#e8f0ee] rounded-lg">
-                  <lucide-icon name="file-text" class="h-6 w-6 text-[#155347]"></lucide-icon>
-                </div>
-                <button class="p-1 hover:bg-gray-100 rounded" (click)="$event.stopPropagation()">
-                  <lucide-icon name="ellipsis-vertical" class="h-5 w-5 text-gray-400"></lucide-icon>
+            <!-- Team tabs -->
+            @if (isLoadingTeamTabs()) {
+              <div class="flex items-center px-4 py-2">
+                <lucide-icon name="loader-circle" class="h-4 w-4 text-gray-400 animate-spin"></lucide-icon>
+              </div>
+            } @else {
+              @for (team of userTeams(); track team.id) {
+                <button
+                  (click)="selectTeamFilter(team.id)"
+                  [class]="'px-4 py-2 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ' + (selectedTeamFilter() === team.id ? 'border-[#155347] text-[#155347]' : 'border-transparent text-gray-600 hover:text-gray-900')"
+                >
+                  {{ team.name }}
                 </button>
-              </div>
-              <h3 class="text-lg font-bold text-gray-900 mb-2">{{ doc.title }}</h3>
-              <div class="flex items-center gap-4 text-sm text-gray-600">
-                <div class="flex items-center gap-1">
-                  <lucide-icon name="clock" class="h-4 w-4"></lucide-icon>
-                  <span>{{ doc.lastEdited }}</span>
-                </div>
-                <div class="flex items-center gap-1">
-                  <lucide-icon name="users" class="h-4 w-4"></lucide-icon>
-                  <span>{{ doc.sharedWith }}</span>
-                </div>
-              </div>
-            </app-card-content>
-          </app-card>
-        }
-      </div>
+              }
+            }
+          </div>
 
-      <!-- Team Selection Modal -->
-      @if (isTeamSelectModalOpen()) {
+          <div class="flex items-center gap-2">
+            <button
+              (click)="viewMode.set('grid')"
+              [class]="'p-2 rounded-lg transition-colors ' + (viewMode() === 'grid' ? 'bg-gray-100 text-gray-900' : 'text-gray-600 hover:bg-gray-50')"
+            >
+              <lucide-icon name="grid-3x3" class="h-5 w-5"></lucide-icon>
+            </button>
+            <button
+              (click)="viewMode.set('list')"
+              [class]="'p-2 rounded-lg transition-colors ' + (viewMode() === 'list' ? 'bg-gray-100 text-gray-900' : 'text-gray-600 hover:bg-gray-50')"
+            >
+              <lucide-icon name="list" class="h-5 w-5"></lucide-icon>
+            </button>
+          </div>
+        </div>
+
+        <!-- Empty State -->
+        @if (filteredDocuments().length === 0 && !isLoading()) {
+          <div class="text-center py-12">
+            <div class="p-4 bg-gray-100 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+              <lucide-icon name="file-text" class="h-8 w-8 text-gray-400"></lucide-icon>
+            </div>
+            @if (selectedTeamFilter() === null) {
+              <h3 class="text-lg font-medium text-gray-900 mb-2">No documents yet</h3>
+              <p class="text-gray-600 mb-4">Create your first document to get started</p>
+            } @else {
+              <h3 class="text-lg font-medium text-gray-900 mb-2">No documents in this team</h3>
+              <p class="text-gray-600 mb-4">Create a document for this team</p>
+            }
+            <app-button (onClick)="openCreateDocumentModal()" customClass="bg-[#155347] hover:bg-[#0d3d31]">
+              <lucide-icon name="plus" class="h-4 w-4 mr-2"></lucide-icon>
+              Create Document
+            </app-button>
+          </div>
+        }
+
+        <!-- Documents Grid -->
+        @if (filteredDocuments().length > 0) {
+          <div [class]="viewMode() === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6' : 'space-y-4'">
+            @for (doc of filteredDocuments(); track doc.id) {
+              <app-card customClass="hover:shadow-lg transition-shadow cursor-pointer" (click)="handleDocumentClick(doc.id)">
+                <app-card-content customClass="p-6">
+                  <div class="flex items-start justify-between mb-4">
+                    <div class="p-3 bg-[#e8f0ee] rounded-lg">
+                      <lucide-icon name="file-text" class="h-6 w-6 text-[#155347]"></lucide-icon>
+                    </div>
+                    <button class="p-1 hover:bg-gray-100 rounded" (click)="$event.stopPropagation()">
+                      <lucide-icon name="ellipsis-vertical" class="h-5 w-5 text-gray-400"></lucide-icon>
+                    </button>
+                  </div>
+                  <h3 class="text-lg font-bold text-gray-900 mb-2">{{ doc.title }}</h3>
+                  <div class="flex items-center gap-4 text-sm text-gray-600">
+                    <div class="flex items-center gap-1">
+                      <lucide-icon name="clock" class="h-4 w-4"></lucide-icon>
+                      <span>{{ formatDate(doc.updatedAt) }}</span>
+                    </div>
+                    <div class="flex items-center gap-1">
+                      <lucide-icon name="users" class="h-4 w-4"></lucide-icon>
+                      <span>{{ doc.teamName }}</span>
+                    </div>
+                  </div>
+                </app-card-content>
+              </app-card>
+            }
+          </div>
+        }
+      }
+
+      <!-- Create Document Modal -->
+      @if (isCreateModalOpen()) {
         <div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div class="bg-white rounded-xl shadow-2xl w-full max-w-lg">
             <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
-              <h2 class="text-lg font-bold text-gray-900">Novo Documento</h2>
-              <button (click)="closeTeamSelectModal()" class="text-gray-400 hover:text-gray-600">×</button>
+              <h2 class="text-lg font-bold text-gray-900">New Document</h2>
+              <button (click)="closeCreateModal()" class="text-gray-400 hover:text-gray-600 text-2xl">×</button>
             </div>
 
             <div class="p-6 space-y-4">
-              <p class="text-sm text-gray-600">
-                Escolha uma equipa onde seja o proprietário para o seu novo documento ou crie uma nova.
-              </p>
-
-              <div class="relative">
-                <lucide-icon name="search" class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400"></lucide-icon>
+              <!-- Document Title -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Document Title</label>
                 <input
                   type="text"
-                  placeholder="Nome da equipa..."
-                  [(ngModel)]="searchTeam"
-                  class="w-full h-10 pl-10 pr-4 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#155347] focus:border-transparent text-sm"
+                  placeholder="e.g., Weekly Report..."
+                  [(ngModel)]="documentTitle"
+                  class="w-full h-10 px-4 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#155347] focus:border-transparent text-sm"
                 />
               </div>
 
-              <div>
-                <h3 class="text-sm font-medium text-gray-700 mb-3">As suas Equipas (Proprietário)</h3>
-                <div class="space-y-2 max-h-64 overflow-y-auto">
-                  @for (team of filteredTeams(); track team.id) {
-                    <button
-                      (click)="selectedTeam.set(team.id)"
-                      [class]="'w-full flex items-center justify-between p-4 rounded-lg border-2 transition-all ' + (selectedTeam() === team.id ? 'border-[#155347] bg-[#e8f0ee]' : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50')"
-                    >
-                      <span class="font-medium text-gray-900">{{ team.name }}</span>
-                      <app-badge [customClass]="team.badge + ' text-white'">{{ team.role }}</app-badge>
-                    </button>
-                  }
-                </div>
+              <!-- Team Selection Mode Toggle -->
+              <div class="flex gap-2">
+                <button
+                  (click)="createTeamMode.set(false)"
+                  [class]="'flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-colors ' + (!createTeamMode() ? 'bg-[#155347] text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200')"
+                >
+                  Existing Team
+                </button>
+                <button
+                  (click)="createTeamMode.set(true)"
+                  [class]="'flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-colors ' + (createTeamMode() ? 'bg-[#155347] text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200')"
+                >
+                  Create New Team
+                </button>
               </div>
 
-              <button class="flex items-center gap-2 text-sm font-medium text-[#155347] hover:underline">
-                <lucide-icon name="plus" class="h-4 w-4"></lucide-icon>
-                Criar nova equipa
-              </button>
+              <!-- Existing Team Selection -->
+              @if (!createTeamMode()) {
+                <div>
+                  <p class="text-sm text-gray-600 mb-3">
+                    Select a team where you are the owner.
+                  </p>
+
+                  <div class="relative mb-3">
+                    <lucide-icon name="search" class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400"></lucide-icon>
+                    <input
+                      type="text"
+                      placeholder="Search team..."
+                      [(ngModel)]="searchTeam"
+                      class="w-full h-10 pl-10 pr-4 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#155347] focus:border-transparent text-sm"
+                    />
+                  </div>
+
+                  @if (isLoadingTeams()) {
+                    <div class="flex items-center justify-center py-8">
+                      <lucide-icon name="loader-circle" class="h-6 w-6 text-[#155347] animate-spin"></lucide-icon>
+                    </div>
+                  } @else if (filteredTeams().length === 0) {
+                    <div class="text-center py-8 text-gray-500">
+                      <p>No teams available.</p>
+                      <button 
+                        (click)="createTeamMode.set(true)"
+                        class="text-[#155347] hover:underline mt-2"
+                      >
+                        Create new team
+                      </button>
+                    </div>
+                  } @else {
+                    <div class="space-y-2 max-h-48 overflow-y-auto">
+                      @for (team of filteredTeams(); track team.id) {
+                        <button
+                          (click)="selectedTeamId.set(team.id)"
+                          [class]="'w-full flex items-center justify-between p-4 rounded-lg border-2 transition-all ' + (selectedTeamId() === team.id ? 'border-[#155347] bg-[#e8f0ee]' : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50')"
+                        >
+                          <span class="font-medium text-gray-900">{{ team.name }}</span>
+                          <app-badge customClass="bg-[#155347] text-white">Owner</app-badge>
+                        </button>
+                      }
+                    </div>
+                  }
+                </div>
+              }
+
+              <!-- Create New Team -->
+              @if (createTeamMode()) {
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">New Team Name</label>
+                  <input
+                    type="text"
+                    placeholder="e.g., Project Alpha..."
+                    [(ngModel)]="newTeamName"
+                    class="w-full h-10 px-4 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#155347] focus:border-transparent text-sm"
+                  />
+                  <p class="text-xs text-gray-500 mt-2">
+                    A new team will be automatically created with you as the owner.
+                  </p>
+                </div>
+              }
+
+              <!-- Error Message -->
+              @if (createError()) {
+                <div class="bg-red-50 border border-red-200 rounded-lg p-3">
+                  <p class="text-sm text-red-700">{{ createError() }}</p>
+                </div>
+              }
             </div>
 
             <div class="px-6 py-4 bg-gray-50 border-t border-gray-100 flex justify-end gap-3">
-              <app-button variant="ghost" (onClick)="closeTeamSelectModal()">Cancelar</app-button>
+              <app-button variant="ghost" (onClick)="closeCreateModal()">Cancel</app-button>
               <app-button
-                (onClick)="handleTeamSelect()"
-                [disabled]="!selectedTeam()"
+                (onClick)="handleCreateDocument()"
+                [disabled]="!canCreateDocument() || isCreating()"
                 customClass="bg-[#155347] hover:bg-[#0d3d31] disabled:bg-gray-300 disabled:cursor-not-allowed"
               >
-                Continuar
+                @if (isCreating()) {
+                  <lucide-icon name="loader-circle" class="h-4 w-4 mr-2 animate-spin"></lucide-icon>
+                  Creating...
+                } @else {
+                  Create Document
+                }
               </app-button>
             </div>
           </div>
@@ -152,32 +277,60 @@ import { DocumentService, TeamService } from '../../../core/services';
     </app-dashboard-layout>
   `
 })
-export class DashboardComponent {
+export class DashboardComponent implements OnInit {
   private router = inject(Router);
   private documentService = inject(DocumentService);
   private teamService = inject(TeamService);
 
+  // View state
   viewMode = signal<'grid' | 'list'>('grid');
-  activeTab = signal('all');
-  isTeamSelectModalOpen = signal(false);
-  selectedTeam = signal<number | null>(null);
+  selectedTeamFilter = signal<number | null>(null);
+
+  // Modal state
+  isCreateModalOpen = signal(false);
+  createTeamMode = signal(false);
+  selectedTeamId = signal<number | null>(null);
+  documentTitle = '';
+  newTeamName = '';
   searchTeamQuery = signal('');
 
-  documents = this.documentService.documents;
-  myTeams = this.teamService.myTeams;
+  // Loading states
+  isLoading = this.documentService.isLoading;
+  error = this.documentService.error;
+  isLoadingTeams = signal(false);
+  isLoadingTeamTabs = signal(false);
+  isCreating = signal(false);
+  createError = signal<string | null>(null);
 
-  tabs = [
-    { id: 'all', label: 'All Documents' },
-    { id: 'recent', label: 'Recent' },
-    { id: 'shared', label: 'Shared with me' }
-  ];
+  // Data
+  documents = this.documentService.documents;
+  ownerTeams = signal<TeamGet[]>([]);
+  userTeams = signal<TeamGet[]>([]);
+
+  // Documentos filtrados pela equipa selecionada
+  filteredDocuments = computed(() => {
+    const teamId = this.selectedTeamFilter();
+    const docs = this.documents();
+    if (teamId === null) {
+      return docs; // All documents
+    }
+    return docs.filter(doc => doc.teamId === teamId);
+  });
 
   filteredTeams = computed(() => {
     const query = this.searchTeamQuery().toLowerCase();
-    return this.myTeams().filter(team =>
+    return this.ownerTeams().filter(team =>
       team.name.toLowerCase().includes(query)
     );
   });
+
+  canCreateDocument(): boolean {
+    const hasTitle = this.documentTitle.trim().length > 0;
+    if (this.createTeamMode()) {
+      return hasTitle && this.newTeamName.trim().length > 0;
+    }
+    return hasTitle && this.selectedTeamId() !== null;
+  }
 
   get searchTeam(): string {
     return this.searchTeamQuery();
@@ -187,23 +340,110 @@ export class DashboardComponent {
     this.searchTeamQuery.set(value);
   }
 
-  openTeamSelectModal(): void {
-    this.isTeamSelectModalOpen.set(true);
+  ngOnInit(): void {
+    this.loadDocuments();
+    this.loadUserTeams();
   }
 
-  closeTeamSelectModal(): void {
-    this.isTeamSelectModalOpen.set(false);
-    this.selectedTeam.set(null);
+  loadDocuments(teamId?: number): void {
+    this.documentService.getDocuments(teamId ? { teamId } : undefined).subscribe();
   }
 
-  handleTeamSelect(): void {
-    if (this.selectedTeam()) {
-      this.closeTeamSelectModal();
-      this.router.navigate(['/editor']);
-    }
+  loadUserTeams(): void {
+    this.isLoadingTeamTabs.set(true);
+    this.teamService.getTeams().subscribe({
+      next: (teams) => {
+        this.userTeams.set(teams);
+        this.isLoadingTeamTabs.set(false);
+      },
+      error: (err) => {
+        console.error('Error loading teams:', err);
+        this.isLoadingTeamTabs.set(false);
+      }
+    });
+  }
+
+  selectTeamFilter(teamId: number | null): void {
+    this.selectedTeamFilter.set(teamId);
+  }
+
+  loadOwnerTeams(): void {
+    this.isLoadingTeams.set(true);
+    this.teamService.getTeams().subscribe({
+      next: (teams) => {
+        // Filtrar apenas equipas onde o utilizador é Owner (TODO)
+        this.ownerTeams.set(teams);
+        this.isLoadingTeams.set(false);
+      },
+      error: (err) => {
+        console.error('Error loading teams:', err);
+        this.isLoadingTeams.set(false);
+      }
+    });
+  }
+
+  openCreateDocumentModal(): void {
+    this.isCreateModalOpen.set(true);
+    this.createTeamMode.set(false);
+    this.documentTitle = '';
+    this.newTeamName = '';
+    this.selectedTeamId.set(null);
+    this.createError.set(null);
+    this.loadOwnerTeams();
+  }
+
+  closeCreateModal(): void {
+    this.isCreateModalOpen.set(false);
+    this.documentTitle = '';
+    this.newTeamName = '';
+    this.selectedTeamId.set(null);
+    this.createTeamMode.set(false);
+    this.createError.set(null);
+  }
+
+  handleCreateDocument(): void {
+    if (!this.canCreateDocument()) return;
+
+    this.isCreating.set(true);
+    this.createError.set(null);
+
+    const request = {
+      title: this.documentTitle.trim(),
+      teamId: this.createTeamMode() ? undefined : this.selectedTeamId() ?? undefined,
+      teamName: this.createTeamMode() ? this.newTeamName.trim() : undefined
+    };
+
+    this.documentService.createDocument(request).subscribe({
+      next: (doc) => {
+        this.isCreating.set(false);
+        this.closeCreateModal();
+        // Navegar para o editor com o novo documento
+        this.router.navigate(['/editor', doc.id]);
+      },
+      error: (err) => {
+        this.isCreating.set(false);
+        const message = err.error?.message || err.error?.errors?.[0] || 'Error creating document';
+        this.createError.set(message);
+        console.error('Error creating document:', err);
+      }
+    });
   }
 
   handleDocumentClick(docId: number): void {
-    this.router.navigate(['/editor']);
+    this.router.navigate(['/editor', docId]);
+  }
+
+  formatDate(dateString: string): string {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+    if (diffHours < 1) return 'Just now';
+    if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
+    if (diffDays === 1) return 'Yesterday';
+    if (diffDays < 7) return `${diffDays} days ago`;
+    return date.toLocaleDateString();
   }
 }

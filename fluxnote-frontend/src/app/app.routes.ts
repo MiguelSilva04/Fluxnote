@@ -102,6 +102,12 @@ export const routes: Routes = [
       import('./features/editor/document-editor.component').then((m) => m.DocumentEditorComponent),
   },
   {
+    path: 'editor/:id',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/editor/document-editor.component').then((m) => m.DocumentEditorComponent),
+  },
+  {
     path: 'teams',
     canActivate: [authGuard],
     loadComponent: () =>

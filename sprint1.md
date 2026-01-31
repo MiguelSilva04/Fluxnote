@@ -234,12 +234,12 @@ Este sprint foca-se em estabelecer a base funcional da aplicação FluxNote, imp
 
 #### Critérios de Aceitação
 
-- [ ] Posso criar um documento com um título
-- [ ] Se não especificar equipa, é criada uma automaticamente
-- [ ] Se especificar equipa (onde sou Owner), o documento é associado a ela
-- [ ] O documento aparece na minha dashboard
-- [ ] Após criação, sou redirecionado para o editor
-- [ ] Não posso criar mais documentos do que o limite do plano (Free = 10)
+- [x] Posso criar um documento com um título
+- [x] Se não especificar equipa, é criada uma automaticamente
+- [x] Se especificar equipa (onde sou Owner), o documento é associado a ela
+- [x] O documento aparece na minha dashboard
+- [x] Após criação, sou redirecionado para o editor
+- [x] Não posso criar mais documentos do que o limite do plano (Free = 10)
 
 #### Tasks Técnicas
 
@@ -254,10 +254,9 @@ Este sprint foca-se em estabelecer a base funcional da aplicação FluxNote, imp
 
 **Frontend:**
 
-- [x] Botão “Novo Documento” + modal de seleção de equipa (mock)
-- [x] `DocumentService` com lista mock em memória
-- [ ] Integrar com `POST /api/documents` e limites reais
-- [ ] Mostrar contador real de documentos vs limite
+- [x] Botão “Novo Documento” + modal de seleção de equipa funcional (se não for fornecida equipa, tem de clicar em Criar Nova Equipa em que aparece um field para inserir o nome)
+- [x] `DocumentService`
+- [x] Integrar com `POST /api/documents`  
 
 ---
 
