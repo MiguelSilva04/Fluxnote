@@ -5,11 +5,18 @@ namespace Fluxnote.Backend.Models
     public class User : IdentityUser
     {
         public string? FullName { get; set; }
+        public string? Location { get; set; }
+        public string? Bio { get; set; }
+        public string? Timezone { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
         public string? ProfilePictureUrl { get; set; }
         public AccountStatus AccountStatus { get; set; } = AccountStatus.Active;
         public AuthProvider AuthProvider { get; set; } = AuthProvider.Local;
+
+        // Username change tracking (max 3 per month)
+        public int UsernameChangesThisMonth { get; set; } = 0;
+        public DateTime? LastUsernameChangeReset { get; set; }
     }
 
     public enum AuthProvider

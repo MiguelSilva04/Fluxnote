@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(del \"c:\\\\Users\\\\guesi.DESKTOP-4N7APLK\\\\OneDrive\\\\Documents\\\\Fluxnote\\\\fluxnote-frontend\\\\src\\\\app\\\\shared\\\\components\\\\ui\\\\wip\\\\WorkInProgress.tsx\")",
+      "Bash(dotnet test:*)",
+      "Bash(npx tsc:*)"
+    ]
+  }
+}

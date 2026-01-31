@@ -43,6 +43,14 @@ import { ModalComponent, ButtonComponent } from '../../shared/components/ui';
           Subscriptions
         </a>
         <a
+          routerLink="/profile"
+          routerLinkActive="bg-[#e8f0ee] text-[#155347]"
+          class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+        >
+          <lucide-icon name="user" class="h-5 w-5"></lucide-icon>
+          Profile
+        </a>
+        <a
           routerLink="/settings"
           routerLinkActive="bg-[#e8f0ee] text-[#155347]"
           class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors text-gray-600 hover:bg-gray-50 hover:text-gray-900"

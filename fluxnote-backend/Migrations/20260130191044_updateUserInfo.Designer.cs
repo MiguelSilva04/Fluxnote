@@ -4,6 +4,7 @@ using Fluxnote.Backend.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace fluxnotebackend.Migrations
 {
     [DbContext(typeof(FluxnoteServerContext))]
-    partial class FluxnoteServerContextModelSnapshot : ModelSnapshot
+    [Migration("20260130191044_updateUserInfo")]
+    partial class updateUserInfo
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -94,9 +97,6 @@ namespace fluxnotebackend.Migrations
                     b.Property<int>("AuthProvider")
                         .HasColumnType("int");
 
-                    b.Property<string>("Bio")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
@@ -113,9 +113,6 @@ namespace fluxnotebackend.Migrations
 
                     b.Property<string>("FullName")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("LastUsernameChangeReset")
-                        .HasColumnType("datetime2");
 
                     b.Property<string>("Location")
                         .HasColumnType("nvarchar(max)");
@@ -149,9 +146,6 @@ namespace fluxnotebackend.Migrations
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Timezone")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("bit");
 
@@ -161,9 +155,6 @@ namespace fluxnotebackend.Migrations
                     b.Property<string>("UserName")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
-
-                    b.Property<int>("UsernameChangesThisMonth")
-                        .HasColumnType("int");
 
                     b.HasKey("Id");
 

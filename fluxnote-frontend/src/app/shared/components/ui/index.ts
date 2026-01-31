@@ -3,3 +3,4 @@ export { CardComponent, CardHeaderComponent, CardContentComponent, CardFooterCom
 export { InputComponent } from './input/input.component';
 export { ModalComponent } from './modal/modal.component';
 export { BadgeComponent } from './badge/badge.component';
+export { WorkInProgressComponent } from './wip/work-in-progress.component';

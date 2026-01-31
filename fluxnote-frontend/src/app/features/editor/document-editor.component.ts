@@ -391,7 +391,7 @@ import { Collaborator, Version, Comment, AISuggestion } from '../../core/models'
 
             <div class="p-6 space-y-4">
               <div class="flex items-start gap-3 p-4 bg-red-50 border border-red-200 rounded-lg">
-                <lucide-icon name="alert-triangle" class="h-5 w-5 text-red-600 shrink-0 mt-0.5"></lucide-icon>
+                <lucide-icon name="triangle-alert" class="h-5 w-5 text-red-600 shrink-0 mt-0.5"></lucide-icon>
                 <p class="text-sm text-red-800 font-medium">
                   This action will replace the current version of the document with the selected version.
                 </p>

@@ -38,10 +38,20 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
         {
             var testSettings = new Dictionary<string, string?>
             {
-                // In-memory config still useful (keeps settings available regardless of env)
+                // JWT configuration
                 { "Jwt:Key", "test-secret-key-please-change-for-ci" },
                 { "Jwt:Issuer", "fluxnote-tests" },
-                { "Jwt:Audience", "fluxnote-tests" }
+                { "Jwt:Audience", "fluxnote-tests" },
+                { "Jwt:AccessTokenMinutes", "15" },
+                // Auth configuration
+                { "Auth:RefreshIdleDays", "7" },
+                { "Auth:RefreshAbsoluteDays", "7" },
+                { "Auth:RefreshAbsoluteDaysRememberMe", "30" },
+                { "Auth:RefreshCookieName", "fluxnote_rt" },
+                // Disable rate limiting for tests
+                { "IpRateLimiting:EnableEndpointRateLimiting", "false" },
+                // Frontend
+                { "Frontend:BaseUrl", "http://localhost:4200" }
             };
 
             configBuilder.AddInMemoryCollection(testSettings);
