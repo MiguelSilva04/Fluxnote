@@ -1,107 +1,174 @@
 import { Routes } from '@angular/router';
+import { authGuard, guestGuard, pendingEmailGuard } from './core/services/auth.guard';
 
 export const routes: Routes = [
   // Landing page routes  dashboard
   {
     path: '',
-    loadComponent: () => import('./features/landing/pages/landing.component').then(m => m.LandingComponent)
+    canActivate: [guestGuard],
+    loadComponent: () =>
+      import('./features/landing/pages/landing.component').then((m) => m.LandingComponent),
   },
   {
     path: 'demo',
-    loadComponent: () => import('./features/landing/pages/demo.component').then(m => m.DemoPageComponent)
+    loadComponent: () =>
+      import('./features/landing/pages/demo.component').then((m) => m.DemoPageComponent),
   },
   {
     path: 'technologies',
-    loadComponent: () => import('./features/landing/pages/technologies.component').then(m => m.TechnologiesPageComponent)
+    loadComponent: () =>
+      import('./features/landing/pages/technologies.component').then(
+        (m) => m.TechnologiesPageComponent,
+      ),
   },
   {
     path: 'about',
-    loadComponent: () => import('./features/landing/pages/about.component').then(m => m.AboutPageComponent)
+    loadComponent: () =>
+      import('./features/landing/pages/about.component').then((m) => m.AboutPageComponent),
   },
   {
     path: 'contact',
-    loadComponent: () => import('./features/landing/pages/contact.component').then(m => m.ContactPageComponent)
+    loadComponent: () =>
+      import('./features/landing/pages/contact.component').then((m) => m.ContactPageComponent),
   },
   {
     path: 'blog',
-    loadComponent: () => import('./features/landing/pages/blog.component').then(m => m.BlogPageComponent)
+    loadComponent: () =>
+      import('./features/landing/pages/blog.component').then((m) => m.BlogPageComponent),
   },
   {
     path: 'privacy',
-    loadComponent: () => import('./features/landing/pages/privacy.component').then(m => m.PrivacyPageComponent)
+    loadComponent: () =>
+      import('./features/landing/pages/privacy.component').then((m) => m.PrivacyPageComponent),
   },
   {
     path: 'terms',
-    loadComponent: () => import('./features/landing/pages/terms.component').then(m => m.TermsPageComponent)
+    loadComponent: () =>
+      import('./features/landing/pages/terms.component').then((m) => m.TermsPageComponent),
   },
 
   // Auth routes
   {
-    path: 'login',
-    loadComponent: () => import('./features/auth/pages/login/login.component').then(m => m.LoginComponent)
+    path: 'register',
+    canActivate: [guestGuard],
+    loadComponent: () =>
+      import('./features/auth/pages/register/register.component').then((m) => m.RegisterComponent),
   },
   {
-    path: 'register',
-    loadComponent: () => import('./features/auth/pages/register/register.component').then(m => m.RegisterComponent)
+    path: 'pending-email',
+    canActivate: [guestGuard, pendingEmailGuard],
+    loadComponent: () =>
+      import('./features/auth/pages/pending-email/pending-email.component').then(
+        (m) => m.PendingEmailComponent,
+      ),
+  },
+  {
+    path: 'confirm-email',
+    canActivate: [guestGuard],
+    loadComponent: () =>
+      import('./features/auth/pages/confirm-email/confirm-email.component').then(
+        (m) => m.ConfirmEmailComponent,
+      ),
+  },
+  {
+    path: 'login',
+    canActivate: [guestGuard],
+    loadComponent: () =>
+      import('./features/auth/pages/login/login.component').then(
+        (m) => m.LoginComponent
+      ),
   },
   {
     path: 'forgot-password',
-    loadComponent: () => import('./features/auth/pages/forgot-password/forgot-password.component').then(m => m.ForgotPasswordComponent)
+    canActivate: [guestGuard],
+    loadComponent: () =>
+      import('./features/auth/pages/forgot-password/forgot-password.component').then(
+        (m) => m.ForgotPasswordComponent,
+      ),
   },
 
   // Main app routes
   {
     path: 'dashboard',
-    loadComponent: () => import('./features/dashboard/pages/dashboard.component').then(m => m.DashboardComponent)
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/dashboard/pages/dashboard.component').then((m) => m.DashboardComponent),
   },
-  // TODO: BACKEND INTEGRATION - Alterar rota para aceitar ID do documento
-  // Mudar de 'editor' para 'documents/:id' quando backend estiver pronto
+  
   {
-    path: 'editor', // Mudar para: path: 'documents/:id'
-    loadComponent: () => import('./features/editor/document-editor.component').then(m => m.DocumentEditorComponent)
+    path: 'editor',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/editor/document-editor.component').then((m) => m.DocumentEditorComponent),
   },
   {
     path: 'teams',
-    loadComponent: () => import('./features/teams/pages/teams.component').then(m => m.TeamsComponent)
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/teams/pages/teams.component').then((m) => m.TeamsComponent),
   },
   {
-    path: 'team-detail',
-    loadComponent: () => import('./features/teams/pages/team-detail.component').then(m => m.TeamDetailComponent)
+    path: 'team-detail/:id',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/teams/pages/team-detail.component').then((m) => m.TeamDetailComponent),
   },
   {
     path: 'subscriptions',
-    loadComponent: () => import('./features/subscriptions/pages/subscriptions.component').then(m => m.SubscriptionsComponent)
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/subscriptions/pages/subscriptions.component').then(
+        (m) => m.SubscriptionsComponent,
+      ),
   },
   {
     path: 'settings',
-    loadComponent: () => import('./features/settings/pages/settings.component').then(m => m.SettingsComponent)
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/settings/pages/settings.component').then((m) => m.SettingsComponent),
   },
   {
     path: 'help',
-    loadComponent: () => import('./features/help/pages/help.component').then(m => m.HelpComponent)
+    loadComponent: () =>
+      import('./features/help/pages/help.component').then((m) => m.HelpComponent),
   },
   {
     path: 'profile',
-    loadComponent: () => import('./features/profile/pages/profile.component').then(m => m.ProfileComponent)
+    loadComponent: () =>
+      import('./features/profile/pages/profile.component').then((m) => m.ProfileComponent),
   },
   {
     path: 'notifications',
-    loadComponent: () => import('./features/notifications/pages/notifications.component').then(m => m.NotificationsComponent)
+    loadComponent: () =>
+      import('./features/notifications/pages/notifications.component').then(
+        (m) => m.NotificationsComponent,
+      ),
   },
   {
     path: 'version-history',
-    loadComponent: () => import('./features/versions/pages/version-history.component').then(m => m.VersionHistoryComponent)
+    loadComponent: () =>
+      import('./features/versions/pages/version-history.component').then(
+        (m) => m.VersionHistoryComponent,
+      ),
+  },
+  {
+    path: 'work-in-progress',
+    loadComponent: () => 
+      import('./shared/components/ui/wip/work-in-progress.component').then(
+        (m) => m.WorkInProgressComponent,
+      ),
   },
 
   // Backend API test route
   {
     path: 'people',
-    loadComponent: () => import('./features/people/people.component').then(m => m.PeopleComponent)
+    loadComponent: () =>
+      import('./features/people/people.component').then((m) => m.PeopleComponent),
   },
 
   // Wildcard redirect to landing
   {
     path: '**',
-    redirectTo: ''
-  }
+    redirectTo: '',
+  },
 ];

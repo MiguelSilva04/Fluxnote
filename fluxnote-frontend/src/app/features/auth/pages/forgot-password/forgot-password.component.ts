@@ -61,7 +61,7 @@ import { ButtonComponent, InputComponent, CardComponent, CardContentComponent } 
           } @else {
             <div class="text-center py-4">
               <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-6">
-                <lucide-icon name="check-circle" class="h-8 w-8 text-green-600"></lucide-icon>
+                <lucide-icon name="badge-check" class="h-8 w-8 text-green-600"></lucide-icon>
               </div>
               <h2 class="text-2xl font-bold text-gray-900 mb-2">Check your email</h2>
               <p class="text-gray-600 mb-8">

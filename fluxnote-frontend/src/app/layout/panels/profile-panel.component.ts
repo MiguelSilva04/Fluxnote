@@ -1,13 +1,14 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LucideAngularModule } from 'lucide-angular';
-import { PanelStateService } from '../../core/services';
+import { AuthService, PanelStateService } from '../../core/services';
 import { ButtonComponent, BadgeComponent } from '../../shared/components/ui';
+import { RouterLink } from "@angular/router";
 
 @Component({
   selector: 'app-profile-panel',
   standalone: true,
-  imports: [CommonModule, LucideAngularModule, ButtonComponent, BadgeComponent],
+  imports: [CommonModule, LucideAngularModule, ButtonComponent, BadgeComponent, RouterLink],
   template: `
     @if (panelState.isProfilePanelOpen()) {
       <!-- Backdrop -->
@@ -26,31 +27,57 @@ import { ButtonComponent, BadgeComponent } from '../../shared/components/ui';
           <!-- Profile Picture & Basic Info -->
           <div class="text-center">
             <div class="relative inline-block mb-4">
-              <div class="h-24 w-24 rounded-full bg-gradient-to-br from-blue-900 to-purple-900 flex items-center justify-center text-white text-2xl font-bold mx-auto">
-                AM
-              </div>
+              @if (user()?.profilePictureUrl) {
+                <img
+                  [src]="user()?.profilePictureUrl"
+                  alt="Profile"
+                  class="h-24 w-24 rounded-full object-cover mx-auto"
+                />
+              } @else {
+                <div class="h-24 w-24 rounded-full flex items-center justify-center text-white text-2xl font-bold mx-auto"
+                    [style.background]="user()?.color">
+                  {{ user()?.initials }}
+                </div>
+              }
               <div class="absolute bottom-1 right-1 h-5 w-5 rounded-full bg-green-500 border-4 border-white"></div>
             </div>
-            <h3 class="text-xl font-bold text-gray-900 mb-1">Alex Morgan</h3>
-            <p class="text-sm text-gray-600">alex.morgan&#64;fluxnote.com</p>
+            <h3 class="text-xl font-bold text-gray-900 mb-1">{{ user()?.fullName }}</h3>
+            @if (user()?.userName) {
+              <p class="text-sm text-[#155347] font-medium mb-1">{{'@' + user()?.userName}}</p>
+            }
+            <p class="text-sm text-gray-600">{{ user()?.email }}</p>
+            @if (user()?.bio) {
+              <p class="text-sm text-gray-500 mt-2 italic">"{{ user()?.bio }}"</p>
+            }
           </div>
 
           <!-- Quick Info -->
           <div class="space-y-3">
             <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-              <lucide-icon name="user" class="h-5 w-5 text-gray-500"></lucide-icon>
+              <lucide-icon name="badge-euro" class="h-5 w-5 text-gray-500"></lucide-icon>
               <div>
-                <p class="text-xs text-gray-500">Role</p>
-                <p class="text-sm font-medium text-gray-900">Team Owner</p>
+                <p class="text-xs text-gray-500">Plan</p>
+                <p class="text-sm font-medium text-gray-900">Professional</p>
               </div>
             </div>
-            <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-              <lucide-icon name="mail" class="h-5 w-5 text-gray-500"></lucide-icon>
-              <div>
-                <p class="text-xs text-gray-500">Email</p>
-                <p class="text-sm font-medium text-gray-900">alex.morgan&#64;fluxnote.com</p>
+            @if (user()?.createdAt) {
+              <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                <lucide-icon name="calendar" class="h-5 w-5 text-gray-500"></lucide-icon>
+                <div>
+                  <p class="text-xs text-gray-500">Member Since</p>
+                  <p class="text-sm font-medium text-gray-900">{{ formatDate(user()?.createdAt) }}</p>
+                </div>
               </div>
-            </div>
+            }
+            @if (user()?.timezone) {
+              <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                <lucide-icon name="clock" class="h-5 w-5 text-gray-500"></lucide-icon>
+                <div>
+                  <p class="text-xs text-gray-500">Timezone</p>
+                  <p class="text-sm font-medium text-gray-900">{{ user()?.timezone }}</p>
+                </div>
+              </div>
+            }
           </div>
 
           <!-- Associated Teams -->
@@ -76,10 +103,14 @@ import { ButtonComponent, BadgeComponent } from '../../shared/components/ui';
 
           <!-- Account Actions -->
           <div class="space-y-2">
-            <button class="w-full flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-left">
-              <lucide-icon name="settings" class="h-5 w-5 text-gray-500"></lucide-icon>
+            <a
+              routerLink="/profile"
+              (click)="panelState.closeProfilePanel()"
+              class="w-full flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-left cursor-pointer"
+            >
+              <lucide-icon name="user" class="h-5 w-5 text-gray-500"></lucide-icon>
               <span class="text-sm font-medium text-gray-900">Account Settings</span>
-            </button>
+            </a>
           </div>
         </div>
 
@@ -89,14 +120,44 @@ import { ButtonComponent, BadgeComponent } from '../../shared/components/ui';
           </app-button>
         </div>
       </aside>
+
+      <!-- WIP Modal -->
+      @if (showWipModal()) {
+        <div class="fixed inset-0 bg-black/50 flex items-center justify-center z-[60]" (click)="showWipModal.set(false)">
+          <div class="bg-white rounded-xl shadow-xl max-w-sm w-full mx-4 p-6" (click)="$event.stopPropagation()">
+            <div class="text-center mb-4">
+              <div class="h-16 w-16 rounded-full bg-amber-100 flex items-center justify-center mx-auto mb-4">
+                <lucide-icon name="construction" class="h-8 w-8 text-amber-600"></lucide-icon>
+              </div>
+              <h3 class="text-lg font-bold text-gray-900 mb-2">Work in Progress</h3>
+              <p class="text-sm text-gray-600">This feature is currently under development and will be available soon.</p>
+            </div>
+
+            <app-button
+              customClass="w-full bg-[#155347] hover:bg-[#0d3d31]"
+              (onClick)="showWipModal.set(false)"
+            >
+              Got it
+            </app-button>
+          </div>
+        </div>
+      }
     }
   `
 })
 export class ProfilePanelComponent {
   panelState = inject(PanelStateService);
+  user = inject(AuthService).currentUser;
+  showWipModal = signal(false);
 
   userTeams = [
     { name: 'Marketing Team', role: 'Editor' },
     { name: 'Product Team', role: 'Owner' }
   ];
+
+  formatDate(dateString?: string): string {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+  }
 }

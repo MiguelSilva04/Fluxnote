@@ -161,7 +161,7 @@ import { TextEditorComponent } from './components/text-editor.component';
               @if (aiGenerating()) {
                 <div class="p-4 bg-blue-50 border border-blue-200 rounded-lg mb-6">
                   <div class="flex items-center gap-3">
-                    <lucide-icon name="loader-2" class="h-5 w-5 text-blue-600 animate-spin"></lucide-icon>
+                    <lucide-icon name="loader-circle" class="h-5 w-5 text-blue-600 animate-spin"></lucide-icon>
                     <p class="text-sm text-blue-900">Generating suggestion...</p>
                   </div>
                 </div>
@@ -408,7 +408,7 @@ import { TextEditorComponent } from './components/text-editor.component';
 
             <div class="p-6 space-y-4">
               <div class="flex items-start gap-3 p-4 bg-red-50 border border-red-200 rounded-lg">
-                <lucide-icon name="alert-triangle" class="h-5 w-5 text-red-600 shrink-0 mt-0.5"></lucide-icon>
+                <lucide-icon name="triangle-alert" class="h-5 w-5 text-red-600 shrink-0 mt-0.5"></lucide-icon>
                 <p class="text-sm text-red-800 font-medium">
                   This action will replace the current version of the document with the selected version.
                 </p>

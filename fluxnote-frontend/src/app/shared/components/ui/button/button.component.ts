@@ -14,7 +14,7 @@ import { LucideAngularModule, Loader2 } from 'lucide-angular';
       (click)="onClick.emit($event)"
     >
       @if (isLoading) {
-        <lucide-icon name="loader-2" class="mr-2 h-4 w-4 animate-spin"></lucide-icon>
+        <lucide-icon name="loader-circle" class="mr-2 h-4 w-4 animate-spin"></lucide-icon>
       }
       @if (!isLoading && leftIcon) {
         <span class="mr-2">

@@ -1,0 +1,123 @@
+<app-dashboard-layout>
+  @if (loading()) {
+    <div class="flex items-center justify-center h-[60vh]">
+      <div class="text-gray-500 text-sm animate-pulse">
+        Loading team details...
+      </div>
+    </div>
+  }
+  @else if (selectedTeam()) {
+    <div class="max-w-4xl">
+
+      <!-- Header -->
+      <div class="flex items-center gap-4 mb-8">
+        <button (click)="goBack()" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+          <lucide-icon name="arrow-left" class="h-5 w-5 text-gray-600"></lucide-icon>
+        </button>
+
+        <div class="flex items-center gap-4 flex-1">
+          <div class="h-16 w-16 rounded-full bg-[#155347] text-white flex items-center justify-center text-xl font-bold">
+            {{ getInitials(selectedTeam()?.name ?? '') }}
+          </div>
+
+          <div>
+            <div class="flex items-center gap-3 mb-1">
+              <h1 class="text-2xl font-bold text-gray-900">{{ selectedTeam()?.name ?? '' }}</h1>
+              <app-badge variant="default">Team</app-badge>
+            </div>
+
+            <p class="text-gray-600">
+              {{ selectedTeam()?.members?.length ?? 0 }} members
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        <!-- Members Section -->
+        <div class="lg:col-span-2">
+          <app-card>
+            <app-card-content customClass="p-6">
+              <div class="flex items-center justify-between mb-6">
+                <h2 class="text-lg font-bold text-gray-900">Team Members</h2>
+              </div>
+
+              <div class="space-y-4">
+                @for (member of selectedTeam()?.members ?? []; track member?.id ?? member?.email) {
+                  <div class="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                    <div>
+                      <p class="text-sm font-medium text-gray-900">
+                        {{ member?.name }}
+                      </p>
+                      <p class="text-xs text-gray-500">
+                        {{ member.email }}
+                      </p>
+                    </div>
+
+                    <app-badge variant="outline">
+                      {{ roleNames[member.role] }}
+                    </app-badge>                    
+                  </div>
+                }
+              </div>
+            </app-card-content>
+          </app-card>
+        </div>
+
+        <!-- Stats Section -->
+        <div class="space-y-6">
+
+          <app-card>
+            <app-card-content customClass="p-6">
+              <h3 class="text-sm font-semibold text-gray-900 mb-4">Team Stats</h3>
+
+              <div class="space-y-4">
+                <div class="flex items-center justify-between">
+                  <span class="text-sm text-gray-600">Documents</span>
+                  <span class="text-sm font-bold text-gray-900">
+                    {{ selectedTeam()?.documents?.length ?? 0 }}
+                  </span>
+                </div>
+
+                <div class="flex items-center justify-between">
+                  <span class="text-sm text-gray-600">Members</span>
+                  <span class="text-sm font-bold text-gray-900">
+                    {{ selectedTeam()?.members?.length ?? 0 }}
+                  </span>
+                </div>
+
+                <div class="flex items-center justify-between">
+                  <span class="text-sm text-gray-600">Created</span>
+                  <span class="text-sm font-bold text-gray-900">
+                    {{ selectedTeam()?.createdAt ? (selectedTeam()?.createdAt | date) : '' }}
+                  </span>
+                </div>
+              </div>
+            </app-card-content>
+          </app-card>
+
+          <!-- Documents Section -->
+          <app-card>
+            <app-card-content customClass="p-6">
+              <h3 class="text-sm font-semibold text-gray-900 mb-4">Documents</h3>
+
+              <div class="space-y-2">
+                @if (selectedTeam()?.documents) {
+                  @for (doc of selectedTeam()!.documents; track doc.id) {
+                    <div class="p-2 border-b text-sm cursor-pointer hover:bg-gray-50 rounded">
+                      {{ doc.title }}
+                    </div>
+                  }
+                }
+              </div>
+
+            </app-card-content>
+          </app-card>
+
+        </div>
+
+      </div>
+    </div>
+  }
+</app-dashboard-layout>
