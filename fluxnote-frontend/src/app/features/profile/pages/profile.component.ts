@@ -195,7 +195,7 @@ import { AuthService } from '../../../core/services';
                       rows="3"
                       class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#155347] text-sm resize-none"
                     ></textarea>
-                    <p class="text-xs text-gray-400 mt-1 text-right">{{ formData().bio?.length || 0 }}/500</p>
+                    <p class="text-xs text-gray-400 mt-1 text-right">{{ formData().bio.length }}/500</p>
                   </div>
                 </div>
                 <div class="mt-4 flex justify-end gap-2">
