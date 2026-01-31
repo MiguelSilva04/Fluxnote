@@ -1,13 +1,17 @@
-﻿using Fluxnote.Backend.Data;
+using Fluxnote.Backend.Data;
+using Fluxnote.Backend.Dtos.Teams;
 using Fluxnote.Backend.Models;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace Fluxnote.Backend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class TeamsController : ControllerBase
     {
         private readonly FluxnoteServerContext _context;
@@ -19,31 +23,111 @@ namespace Fluxnote.Backend.Controllers
 
         // GET: api/Teams
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Team>>> GetTeams()
+        public async Task<ActionResult<IEnumerable<TeamDto>>> GetTeams()
         {
-           //Inclui os members
-            return await _context.Team.Include(t => t.Members).Include(t=> t.Documents).ToListAsync();
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId is null)
+                return Unauthorized(new { message = "Utilizador não autenticado." });
+
+            // Obter equipas onde o utilizador é membro
+            var userTeamIds = await _context.TeamMember
+                .Where(m => m.UserId == userId)
+                .Select(m => m.TeamId)
+                .ToListAsync();
+
+            var teams = await _context.Team
+                .Include(t => t.Members)
+                .Include(t => t.Documents.Where(d => !d.IsDeleted))
+                .Where(t => userTeamIds.Contains(t.Id))
+                .Select(t => new TeamDto
+                {
+                    Id = t.Id,
+                    Name = t.Name,
+                    OwnerId = t.OwnerId,
+                    CreatedAt = t.CreatedAt,
+                    UpdatedAt = t.UpdatedAt,
+                    IsActive = t.IsActive,
+                    DeletionScheduled = t.DeletionScheduled,
+                    Members = t.Members.Select(m => new TeamMemberDto
+                    {
+                        Id = m.Id,
+                        Name = m.Name,
+                        UserId = m.UserId,
+                        Role = (int)m.Role,
+                        JoinedAt = m.JoinedAt
+                    }).ToList(),
+                    Documents = t.Documents.Select(d => new TeamDocumentDto
+                    {
+                        Id = d.Id,
+                        Title = d.Title,
+                        UpdatedAt = d.UpdatedAt
+                    }).ToList()
+                })
+                .ToListAsync();
+
+            return Ok(teams);
         }
 
         // GET: api/Teams/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Team>> GetTeam(int id)
+        public async Task<ActionResult<TeamDto>> GetTeam(int id)
         {
-            //Inclui os members
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId is null)
+                return Unauthorized(new { message = "Utilizador não autenticado." });
+
+            // Verificar se o utilizador é membro da equipa
+            var isMember = await _context.TeamMember
+                .AnyAsync(m => m.TeamId == id && m.UserId == userId);
+
+            if (!isMember)
+            {
+                return StatusCode(StatusCodes.Status403Forbidden, new
+                {
+                    message = "Sem permissão.",
+                    errors = new[] { "Não és membro desta equipa." }
+                });
+            }
+
             var team = await _context.Team
-            .Include(t => t.Members).Include(t => t.Documents)
-            .FirstOrDefaultAsync(t=> t.Id == id);
+                .Include(t => t.Members)
+                .Include(t => t.Documents.Where(d => !d.IsDeleted))
+                .FirstOrDefaultAsync(t => t.Id == id);
 
             if (team == null)
             {
-                return NotFound();
+                return NotFound(new { message = "Equipa não encontrada." });
             }
 
-            return team;
+            var dto = new TeamDto
+            {
+                Id = team.Id,
+                Name = team.Name,
+                OwnerId = team.OwnerId,
+                CreatedAt = team.CreatedAt,
+                UpdatedAt = team.UpdatedAt,
+                IsActive = team.IsActive,
+                DeletionScheduled = team.DeletionScheduled,
+                Members = team.Members.Select(m => new TeamMemberDto
+                {
+                    Id = m.Id,
+                    Name = m.Name,
+                    UserId = m.UserId,
+                    Role = (int)m.Role,
+                    JoinedAt = m.JoinedAt
+                }).ToList(),
+                Documents = team.Documents.Select(d => new TeamDocumentDto
+                {
+                    Id = d.Id,
+                    Title = d.Title,
+                    UpdatedAt = d.UpdatedAt
+                }).ToList()
+            };
+
+            return Ok(dto);
         }
 
         // PUT: api/Teams/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         public async Task<IActionResult> PutTeam(int id, Team team)
         {
@@ -74,12 +158,9 @@ namespace Fluxnote.Backend.Controllers
         }
 
         // POST: api/Teams
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<ActionResult<Team>> PostTeam(Team team)
         {
-            //_context.TeamMember.Add(team.Owner);
-            //team.CreatedAt = DateTime.UtcNow;
             _context.Team.Add(team);
             await _context.SaveChangesAsync();
 

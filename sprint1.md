@@ -245,12 +245,12 @@ Este sprint foca-se em estabelecer a base funcional da aplicação FluxNote, imp
 
 **Backend:**
 
-- [ ] Criar entidade `Document` (conforme model)
-- [ ] Implementar `POST /api/documents`
-- [ ] Criar lógica de “equipa automática” se não for passada
-- [ ] Validar limites do plano (Free = 10 docs)
-- [ ] Inicializar conteúdo com Y.Doc vazio
-- [ ] Migration para Documents
+- [x] Criar entidade `Document` (conforme model)
+- [x] Implementar `POST /api/documents`
+- [x] Criar lógica de “equipa automática” se não for passada
+- [x] Validar limites do plano (Free = 10 docs)
+- [x] Inicializar conteúdo com Y.Doc vazio
+- [x] Migration para Documents
 
 **Frontend:**
 
