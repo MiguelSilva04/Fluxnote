@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { LucideAngularModule } from 'lucide-angular';
 import { AuthService, PanelStateService } from '../../core/services';
 import { ButtonComponent, BadgeComponent } from '../../shared/components/ui';
+import { RouterLink } from "@angular/router";
 
 @Component({
   selector: 'app-profile-panel',
   standalone: true,
-  imports: [CommonModule, LucideAngularModule, ButtonComponent, BadgeComponent],
+  imports: [CommonModule, LucideAngularModule, ButtonComponent, BadgeComponent, RouterLink],
   template: `
     @if (panelState.isProfilePanelOpen()) {
       <!-- Backdrop -->
@@ -41,7 +42,13 @@ import { ButtonComponent, BadgeComponent } from '../../shared/components/ui';
               <div class="absolute bottom-1 right-1 h-5 w-5 rounded-full bg-green-500 border-4 border-white"></div>
             </div>
             <h3 class="text-xl font-bold text-gray-900 mb-1">{{ user()?.fullName }}</h3>
+            @if (user()?.userName) {
+              <p class="text-sm text-[#155347] font-medium mb-1">{{'@' + user()?.userName}}</p>
+            }
             <p class="text-sm text-gray-600">{{ user()?.email }}</p>
+            @if (user()?.bio) {
+              <p class="text-sm text-gray-500 mt-2 italic">"{{ user()?.bio }}"</p>
+            }
           </div>
 
           <!-- Quick Info -->
@@ -53,6 +60,24 @@ import { ButtonComponent, BadgeComponent } from '../../shared/components/ui';
                 <p class="text-sm font-medium text-gray-900">Professional</p>
               </div>
             </div>
+            @if (user()?.createdAt) {
+              <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                <lucide-icon name="calendar" class="h-5 w-5 text-gray-500"></lucide-icon>
+                <div>
+                  <p class="text-xs text-gray-500">Member Since</p>
+                  <p class="text-sm font-medium text-gray-900">{{ formatDate(user()?.createdAt) }}</p>
+                </div>
+              </div>
+            }
+            @if (user()?.timezone) {
+              <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                <lucide-icon name="clock" class="h-5 w-5 text-gray-500"></lucide-icon>
+                <div>
+                  <p class="text-xs text-gray-500">Timezone</p>
+                  <p class="text-sm font-medium text-gray-900">{{ user()?.timezone }}</p>
+                </div>
+              </div>
+            }
           </div>
 
           <!-- Associated Teams -->
@@ -78,13 +103,14 @@ import { ButtonComponent, BadgeComponent } from '../../shared/components/ui';
 
           <!-- Account Actions -->
           <div class="space-y-2">
-            <button
-              (click)="showWipModal.set(true)"
-              class="w-full flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-left"
+            <a
+              routerLink="/profile"
+              (click)="panelState.closeProfilePanel()"
+              class="w-full flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-left cursor-pointer"
             >
-              <lucide-icon name="settings" class="h-5 w-5 text-gray-500"></lucide-icon>
+              <lucide-icon name="user" class="h-5 w-5 text-gray-500"></lucide-icon>
               <span class="text-sm font-medium text-gray-900">Account Settings</span>
-            </button>
+            </a>
           </div>
         </div>
 
@@ -128,4 +154,10 @@ export class ProfilePanelComponent {
     { name: 'Marketing Team', role: 'Editor' },
     { name: 'Product Team', role: 'Owner' }
   ];
+
+  formatDate(dateString?: string): string {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+  }
 }

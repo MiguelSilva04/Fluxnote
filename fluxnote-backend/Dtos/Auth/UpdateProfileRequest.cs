@@ -16,4 +16,14 @@ public class UpdateProfileRequest
 
     [Phone(ErrorMessage = "Invalid phone number format.")]
     public string? PhoneNumber { get; set; }
+
+    [StringLength(30, MinimumLength = 3, ErrorMessage = "Username must be between 3 and 30 characters.")]
+    [RegularExpression(@"^[a-zA-Z0-9_]+$", ErrorMessage = "Username can only contain letters, numbers, and underscores.")]
+    public string? UserName { get; set; }
+
+    [StringLength(500, ErrorMessage = "Bio cannot exceed 500 characters.")]
+    public string? Bio { get; set; }
+
+    [StringLength(50, ErrorMessage = "Timezone cannot exceed 50 characters.")]
+    public string? Timezone { get; set; }
 }

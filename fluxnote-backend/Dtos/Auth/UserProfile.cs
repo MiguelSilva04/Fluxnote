@@ -9,4 +9,8 @@ public class UserProfile
     public string ProfilePictureUrl { get; set; } = default!;
     public string? Location { get; set; } = default!;
     public string PhoneNumber { get; set; } = default!;
+    public string? Bio { get; set; }
+    public string? Timezone { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public int UsernameChangesRemaining { get; set; }
 }

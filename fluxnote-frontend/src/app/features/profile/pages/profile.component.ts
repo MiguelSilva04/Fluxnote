@@ -66,7 +66,13 @@ import { AuthService } from '../../../core/services';
                   </button>
                 </div>
                 <h2 class="text-xl font-bold text-gray-900 mb-1">{{formData().fullName || user()?.fullName || ''}}</h2>
-                <p class="text-sm text-gray-600 mb-4">{{user()?.email || ''}}</p>
+                @if (formData().userName || user()?.userName) {
+                  <p class="text-sm text-[#155347] font-medium mb-1">{{'@' + (formData().userName || user()?.userName)}}</p>
+                }
+                <p class="text-sm text-gray-600 mb-2">{{user()?.email || ''}}</p>
+                @if (user()?.createdAt) {
+                  <p class="text-xs text-gray-400 mb-4">Member since {{ formatDate(user()?.createdAt) }}</p>
+                }
                 <app-badge variant="default">Pro Plan</app-badge>
               </app-card-content>
             </app-card>
@@ -86,6 +92,32 @@ import { AuthService } from '../../../core/services';
                       (ngModelChange)="updateFormField('fullName', $event)"
                       class="w-full h-10 px-4 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#155347] text-sm"
                     />
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                      Username
+                      @if (user()?.usernameChangesRemaining !== undefined) {
+                        <span class="text-xs text-gray-400 font-normal ml-2">
+                          ({{ user()?.usernameChangesRemaining }} changes remaining this month)
+                        </span>
+                      }
+                    </label>
+                    <div class="relative">
+                      <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">@</span>
+                      <input
+                        type="text"
+                        [ngModel]="formData().userName"
+                        (ngModelChange)="updateFormField('userName', $event)"
+                        placeholder="username"
+                        maxlength="30"
+                        [disabled]="user()?.usernameChangesRemaining === 0 && formData().userName === originalData.userName"
+                        [class]="'w-full h-10 pl-8 pr-4 rounded-lg border focus:outline-none focus:ring-2 focus:ring-[#155347] text-sm ' +
+                          (user()?.usernameChangesRemaining === 0 && formData().userName === originalData.userName ? 'border-gray-200 bg-gray-50 text-gray-500 cursor-not-allowed' : 'border-gray-300')"
+                      />
+                    </div>
+                    @if (user()?.usernameChangesRemaining === 0) {
+                      <p class="text-xs text-amber-600 mt-1">You've reached your username change limit for this month.</p>
+                    }
                   </div>
                   <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
@@ -116,6 +148,54 @@ import { AuthService } from '../../../core/services';
                       placeholder="City, Country"
                       class="w-full h-10 px-4 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#155347] text-sm"
                     />
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Timezone</label>
+                    <select
+                      [ngModel]="formData().timezone"
+                      (ngModelChange)="updateFormField('timezone', $event)"
+                      class="w-full h-10 px-4 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#155347] text-sm bg-white"
+                    >
+                      <option value="">Select timezone</option>
+                      <option value="UTC-12:00">UTC-12:00 (Baker Island)</option>
+                      <option value="UTC-11:00">UTC-11:00 (American Samoa)</option>
+                      <option value="UTC-10:00">UTC-10:00 (Hawaii)</option>
+                      <option value="UTC-09:00">UTC-09:00 (Alaska)</option>
+                      <option value="UTC-08:00">UTC-08:00 (Pacific Time)</option>
+                      <option value="UTC-07:00">UTC-07:00 (Mountain Time)</option>
+                      <option value="UTC-06:00">UTC-06:00 (Central Time)</option>
+                      <option value="UTC-05:00">UTC-05:00 (Eastern Time)</option>
+                      <option value="UTC-04:00">UTC-04:00 (Atlantic Time)</option>
+                      <option value="UTC-03:00">UTC-03:00 (Buenos Aires)</option>
+                      <option value="UTC-02:00">UTC-02:00 (Mid-Atlantic)</option>
+                      <option value="UTC-01:00">UTC-01:00 (Azores)</option>
+                      <option value="UTC+00:00">UTC+00:00 (London, Lisbon)</option>
+                      <option value="UTC+01:00">UTC+01:00 (Paris, Berlin)</option>
+                      <option value="UTC+02:00">UTC+02:00 (Cairo, Athens)</option>
+                      <option value="UTC+03:00">UTC+03:00 (Moscow, Istanbul)</option>
+                      <option value="UTC+04:00">UTC+04:00 (Dubai)</option>
+                      <option value="UTC+05:00">UTC+05:00 (Karachi)</option>
+                      <option value="UTC+05:30">UTC+05:30 (Mumbai)</option>
+                      <option value="UTC+06:00">UTC+06:00 (Dhaka)</option>
+                      <option value="UTC+07:00">UTC+07:00 (Bangkok)</option>
+                      <option value="UTC+08:00">UTC+08:00 (Singapore, Beijing)</option>
+                      <option value="UTC+09:00">UTC+09:00 (Tokyo, Seoul)</option>
+                      <option value="UTC+10:00">UTC+10:00 (Sydney)</option>
+                      <option value="UTC+11:00">UTC+11:00 (Solomon Islands)</option>
+                      <option value="UTC+12:00">UTC+12:00 (Auckland)</option>
+                    </select>
+                  </div>
+                  <div class="md:col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Bio</label>
+                    <textarea
+                      [ngModel]="formData().bio"
+                      (ngModelChange)="updateFormField('bio', $event)"
+                      placeholder="Tell us a bit about yourself..."
+                      maxlength="500"
+                      rows="3"
+                      class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#155347] text-sm resize-none"
+                    ></textarea>
+                    <p class="text-xs text-gray-400 mt-1 text-right">{{ formData().bio?.length || 0 }}/500</p>
                   </div>
                 </div>
                 <div class="mt-4 flex justify-end gap-2">
@@ -449,7 +529,10 @@ export class ProfileComponent {
     fullName: '',
     phoneNumber: '',
     location: '',
-    profilePictureUrl: ''
+    profilePictureUrl: '',
+    userName: '',
+    bio: '',
+    timezone: ''
   });
 
   // UI state
@@ -461,6 +544,8 @@ export class ProfileComponent {
   showConfirmModal = signal(false);
   showPasswordConfirmModal = signal(false);
   showWipModal = signal(false);
+  showLogoutModal = signal(false);
+  showLogoutAllModal = signal(false);
   avatarUrl = '';
   avatarUrlError = signal(false);
   avatarPreview = signal<string | null>(null);
@@ -476,11 +561,14 @@ export class ProfileComponent {
   showConfirmPassword = signal(false);
 
   // Original values for comparison
-  private originalData = {
+  originalData = {
     fullName: '',
     phoneNumber: '',
     location: '',
-    profilePictureUrl: ''
+    profilePictureUrl: '',
+    userName: '',
+    bio: '',
+    timezone: ''
   };
 
   constructor() {
@@ -498,7 +586,10 @@ export class ProfileComponent {
       fullName: user.fullName || '',
       phoneNumber: user.phoneNumber || '',
       location: user.location || '',
-      profilePictureUrl: user.profilePictureUrl || ''
+      profilePictureUrl: user.profilePictureUrl || '',
+      userName: user.userName || '',
+      bio: user.bio || '',
+      timezone: user.timezone || ''
     };
     this.formData.set(data);
     this.originalData = { ...data };
@@ -518,7 +609,10 @@ export class ProfileComponent {
       current.fullName !== this.originalData.fullName ||
       current.phoneNumber !== this.originalData.phoneNumber ||
       current.location !== this.originalData.location ||
-      current.profilePictureUrl !== this.originalData.profilePictureUrl
+      current.profilePictureUrl !== this.originalData.profilePictureUrl ||
+      current.userName !== this.originalData.userName ||
+      current.bio !== this.originalData.bio ||
+      current.timezone !== this.originalData.timezone
     );
   });
 
@@ -556,6 +650,15 @@ export class ProfileComponent {
     }
     if (current.profilePictureUrl !== this.originalData.profilePictureUrl) {
       request.profilePictureUrl = current.profilePictureUrl;
+    }
+    if (current.userName !== this.originalData.userName) {
+      request.userName = current.userName;
+    }
+    if (current.bio !== this.originalData.bio) {
+      request.bio = current.bio;
+    }
+    if (current.timezone !== this.originalData.timezone) {
+      request.timezone = current.timezone;
     }
 
     const result = await this.authService.updateProfile(request);
@@ -682,5 +785,21 @@ export class ProfileComponent {
       this.successMessage.set('');
       this.errorMessage.set('');
     }, 5000);
+  }
+
+  formatDate(dateString?: string): string {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+  }
+
+  confirmLogout(): void {
+    this.showLogoutModal.set(false);
+    this.authService.logout();
+  }
+
+  confirmLogoutAll(): void {
+    this.showLogoutAllModal.set(false);
+    this.authService.logoutAll();
   }
 }

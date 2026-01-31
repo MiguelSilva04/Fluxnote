@@ -1,5 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
 import { PanelStateService } from '../../core/services';
 import { ButtonComponent, WorkInProgressComponent } from '../../shared/components/ui';
@@ -7,7 +8,7 @@ import { ButtonComponent, WorkInProgressComponent } from '../../shared/component
 @Component({
   selector: 'app-settings-panel',
   standalone: true,
-  imports: [CommonModule, LucideAngularModule, ButtonComponent, WorkInProgressComponent],
+  imports: [CommonModule, RouterLink, LucideAngularModule, ButtonComponent, WorkInProgressComponent],
   template: `
     @if (panelState.isSettingsPanelOpen()) {
       <!-- Backdrop -->
@@ -82,6 +83,17 @@ import { ButtonComponent, WorkInProgressComponent } from '../../shared/component
                 </div>
               }
             </div>
+          </div>
+          
+          <div class="space-y-2">
+            <a
+              routerLink="/settings"
+              (click)="panelState.closeSettingsPanel()"
+              class="w-full flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-left cursor-pointer"
+            >
+              <lucide-icon name="settings" class="h-5 w-5 text-gray-500"></lucide-icon>
+              <span class="text-sm font-medium text-gray-900">Settings</span>
+            </a>
           </div>
         </div>
 

@@ -8,6 +8,10 @@ export interface User {
   profilePictureUrl?: string;
   location?: string;
   phoneNumber?: string;
+  bio?: string;
+  timezone?: string;
+  createdAt?: string;
+  usernameChangesRemaining?: number;
 }
 
 export interface Collaborator {

@@ -1,8 +1,9 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LucideAngularModule } from 'lucide-angular';
 import { DashboardLayoutComponent } from '../../../layout/dashboard-layout/dashboard-layout.component';
 import { ButtonComponent, CardComponent, CardContentComponent, WorkInProgressComponent } from '../../../shared/components/ui';
+import { AuthService } from '../../../core/services';
 
 @Component({
   selector: 'app-settings',
@@ -92,6 +93,34 @@ import { ButtonComponent, CardComponent, CardContentComponent, WorkInProgressCom
             </app-card-content>
           </app-card>
 
+          <app-card>
+              <app-card-content customClass="p-6">
+                <h3 class="text-lg font-bold text-gray-900 mb-4">Session</h3>
+                <div class="space-y-3">
+                  <button
+                    (click)="showLogoutModal.set(true)"
+                    class="w-full flex items-center gap-3 p-4 border border-gray-200 rounded-lg hover:bg-red-50 transition-colors text-left group"
+                  >
+                    <lucide-icon name="log-out" class="h-5 w-5 text-gray-500 group-hover:text-red-500"></lucide-icon>
+                    <div>
+                      <p class="text-sm font-medium text-gray-900 group-hover:text-red-600">Logout</p>
+                      <p class="text-xs text-gray-500">Sign out of your current session</p>
+                    </div>
+                  </button>
+                  <button
+                    (click)="showLogoutAllModal.set(true)"
+                    class="w-full flex items-center gap-3 p-4 border border-red-200 rounded-lg hover:bg-red-50 transition-colors text-left group"
+                  >
+                    <lucide-icon name="log-out" class="h-5 w-5 text-red-500"></lucide-icon>
+                    <div>
+                      <p class="text-sm font-medium text-red-600">Logout from All Devices</p>
+                      <p class="text-xs text-gray-500">Sign out of all sessions on all devices</p>
+                    </div>
+                  </button>
+                </div>
+              </app-card-content>
+            </app-card>
+
           <div class="flex justify-end">
             <app-button (click)="showWipModal.set(true)" customClass="bg-[#155347] hover:bg-[#0d3d31]">Save Changes</app-button>
           </div>
@@ -99,6 +128,60 @@ import { ButtonComponent, CardComponent, CardContentComponent, WorkInProgressCom
       </div>
 
       <app-work-in-progress [show]="showWipModal()" (close)="showWipModal.set(false)" />
+
+      <!-- Logout Confirmation Modal -->
+      @if (showLogoutModal()) {
+        <div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50" (click)="showLogoutModal.set(false)">
+          <div class="bg-white rounded-xl shadow-xl max-w-sm w-full mx-4 p-6" (click)="$event.stopPropagation()">
+            <div class="text-center mb-4">
+              <div class="h-12 w-12 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4">
+                <lucide-icon name="log-out" class="h-6 w-6 text-red-600"></lucide-icon>
+              </div>
+              <h3 class="text-lg font-bold text-gray-900 mb-2">Confirm Logout</h3>
+              <p class="text-sm text-gray-600">Are you sure you want to sign out of your current session?</p>
+            </div>
+
+            <div class="flex gap-2">
+              <app-button variant="outline" class="flex-1" (onClick)="showLogoutModal.set(false)">
+                Cancel
+              </app-button>
+              <app-button
+                customClass="flex-1 bg-red-600 hover:bg-red-700"
+                (onClick)="confirmLogout()"
+              >
+                Logout
+              </app-button>
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- Logout All Confirmation Modal -->
+      @if (showLogoutAllModal()) {
+        <div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50" (click)="showLogoutAllModal.set(false)">
+          <div class="bg-white rounded-xl shadow-xl max-w-sm w-full mx-4 p-6" (click)="$event.stopPropagation()">
+            <div class="text-center mb-4">
+              <div class="h-12 w-12 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4">
+                <lucide-icon name="triangle-alert" class="h-6 w-6 text-red-600"></lucide-icon>
+              </div>
+              <h3 class="text-lg font-bold text-gray-900 mb-2">Logout from All Devices</h3>
+              <p class="text-sm text-gray-600">This will sign you out from all devices and sessions. You will need to log in again on each device.</p>
+            </div>
+
+            <div class="flex gap-2">
+              <app-button variant="outline" class="flex-1" (onClick)="showLogoutAllModal.set(false)">
+                Cancel
+              </app-button>
+              <app-button
+                customClass="flex-1 bg-red-600 hover:bg-red-700"
+                (onClick)="confirmLogoutAll()"
+              >
+                Logout All
+              </app-button>
+            </div>
+          </div>
+        </div>
+      }
     </app-dashboard-layout>
   `
 })
@@ -106,6 +189,9 @@ export class SettingsComponent {
   theme = 'light';
   notifications: Record<string, boolean> = { email: true, push: true, desktop: false };
   showWipModal = signal(false);
+  private authService = inject(AuthService);
+  showLogoutModal = signal(false);
+  showLogoutAllModal = signal(false);
 
   themeOptions = [
     { value: 'light', label: 'Light' },
@@ -118,4 +204,14 @@ export class SettingsComponent {
     { key: 'push', label: 'Push Notifications' },
     { key: 'desktop', label: 'Desktop Notifications' }
   ];
+
+  confirmLogout(): void {
+    this.showLogoutModal.set(false);
+    this.authService.logout();
+  }
+
+  confirmLogoutAll(): void {
+    this.showLogoutAllModal.set(false);
+    this.authService.logoutAll();
+  }
 }

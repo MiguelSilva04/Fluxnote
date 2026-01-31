@@ -232,6 +232,9 @@ public class AuthController : ControllerBase
                 message = "User not found."
             });
         }
+
+        var usernameChangesRemaining = CalculateUsernameChangesRemaining(user);
+
         var profile = new UserProfile
         {
             Id = user.Id,
@@ -240,14 +243,61 @@ public class AuthController : ControllerBase
             UserName = user.UserName!,
             ProfilePictureUrl = user.ProfilePictureUrl!,
             Location = user.Location!,
-            PhoneNumber = user.PhoneNumber!
+            PhoneNumber = user.PhoneNumber!,
+            Bio = user.Bio,
+            Timezone = user.Timezone,
+            CreatedAt = user.CreatedAt,
+            UsernameChangesRemaining = usernameChangesRemaining
         };
         return Ok(profile);
     }
 
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [HttpGet("users/check-username/{username}")]
+    public async Task<IActionResult> CheckUsernameAvailability(string username)
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (userId is null)
+            return Unauthorized(new { message = "Invalid claims." });
+
+        // Validate username format
+        if (string.IsNullOrWhiteSpace(username) || username.Length < 3 || username.Length > 30)
+        {
+            return BadRequest(new { available = false, message = "Username must be between 3 and 30 characters." });
+        }
+
+        if (!System.Text.RegularExpressions.Regex.IsMatch(username, @"^[a-zA-Z0-9_]+$"))
+        {
+            return BadRequest(new { available = false, message = "Username can only contain letters, numbers, and underscores." });
+        }
+
+        // Check if username is taken by another user
+        var existingUser = await _userManager.FindByNameAsync(username);
+        var isAvailable = existingUser is null || existingUser.Id == userId;
+
+        return Ok(new { available = isAvailable, message = isAvailable ? "Username is available." : "Username is already taken." });
+    }
+
+    private int CalculateUsernameChangesRemaining(User user)
+    {
+        const int maxChangesPerMonth = 3;
+        var now = DateTime.UtcNow;
+
+        // Reset counter if we're in a new month
+        if (user.LastUsernameChangeReset is null ||
+            user.LastUsernameChangeReset.Value.Year != now.Year ||
+            user.LastUsernameChangeReset.Value.Month != now.Month)
+        {
+            return maxChangesPerMonth;
+        }
+
+        return Math.Max(0, maxChangesPerMonth - user.UsernameChangesThisMonth);
+    }
+
     // -------------------------
     // UPDATE PROFILE
-    // - Atualiza nome, avatar, localização, telefone
+    // - Atualiza nome, avatar, localização, telefone, bio, timezone, username
+    // - Username pode ser alterado no máximo 3 vezes por mês
     // -------------------------
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [HttpPut("users/me")]
@@ -260,6 +310,45 @@ public class AuthController : ControllerBase
         var user = await _userManager.FindByIdAsync(userId);
         if (user is null)
             return Unauthorized(new { message = "User not found." });
+
+        var now = DateTime.UtcNow;
+
+        // Handle username change with 3/month limit
+        if (request.UserName is not null && request.UserName != user.UserName)
+        {
+            // Reset counter if we're in a new month
+            if (user.LastUsernameChangeReset is null ||
+                user.LastUsernameChangeReset.Value.Year != now.Year ||
+                user.LastUsernameChangeReset.Value.Month != now.Month)
+            {
+                user.UsernameChangesThisMonth = 0;
+                user.LastUsernameChangeReset = now;
+            }
+
+            // Check if user has remaining changes
+            if (user.UsernameChangesThisMonth >= 3)
+            {
+                return BadRequest(new
+                {
+                    message = "Username change limit reached.",
+                    errors = new[] { "You can only change your username 3 times per month. Please try again next month." }
+                });
+            }
+
+            // Check if username is already taken
+            var existingUser = await _userManager.FindByNameAsync(request.UserName);
+            if (existingUser is not null && existingUser.Id != userId)
+            {
+                return BadRequest(new
+                {
+                    message = "Username already taken.",
+                    errors = new[] { "This username is already in use. Please choose a different one." }
+                });
+            }
+
+            user.UserName = request.UserName;
+            user.UsernameChangesThisMonth++;
+        }
 
         // atualiza apenas os campos passados no request
         if (request.FullName is not null)
@@ -274,7 +363,13 @@ public class AuthController : ControllerBase
         if (request.PhoneNumber is not null)
             user.PhoneNumber = request.PhoneNumber;
 
-        user.UpdatedAt = DateTime.UtcNow;
+        if (request.Bio is not null)
+            user.Bio = request.Bio;
+
+        if (request.Timezone is not null)
+            user.Timezone = request.Timezone;
+
+        user.UpdatedAt = now;
 
         var result = await _userManager.UpdateAsync(user);
         if (!result.Succeeded)
@@ -286,6 +381,8 @@ public class AuthController : ControllerBase
             });
         }
 
+        var usernameChangesRemaining = CalculateUsernameChangesRemaining(user);
+
         var profile = new UserProfile
         {
             Id = user.Id,
@@ -294,7 +391,11 @@ public class AuthController : ControllerBase
             UserName = user.UserName!,
             ProfilePictureUrl = user.ProfilePictureUrl!,
             Location = user.Location!,
-            PhoneNumber = user.PhoneNumber!
+            PhoneNumber = user.PhoneNumber!,
+            Bio = user.Bio,
+            Timezone = user.Timezone,
+            CreatedAt = user.CreatedAt,
+            UsernameChangesRemaining = usernameChangesRemaining
         };
 
         return Ok(profile);

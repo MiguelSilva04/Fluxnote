@@ -60,6 +60,10 @@ export interface UserProfile {
   profilePictureUrl: string;
   location: string;
   phoneNumber: string;
+  bio?: string;
+  timezone?: string;
+  createdAt: string;
+  usernameChangesRemaining: number;
 }
 
 export interface UpdateProfileRequest {
@@ -67,6 +71,9 @@ export interface UpdateProfileRequest {
   profilePictureUrl?: string;
   location?: string;
   phoneNumber?: string;
+  userName?: string;
+  bio?: string;
+  timezone?: string;
 }
 
 export interface ChangePasswordRequest {
@@ -269,25 +276,10 @@ export class AuthService {
 
       // Guarda o access token APENAS em memória (signal) para evitar fácil acesso não desejado
       this._accessToken.set(res.accessToken);
-      this.setAuthenticatedState(res.accessToken);
       this._status.set('authenticated');
-      const resUser = await firstValueFrom(
-        this.http.get<UserProfile>(`${this.baseUrl}/users/me`, {
-          headers: { Authorization: `Bearer ${this._accessToken()}` }
-        })
-      );
-      const user: User = {
-        id: resUser.id,
-        email: resUser.email,
-        fullName: resUser.fullName,
-        userName: resUser.userName,
-        profilePictureUrl: resUser.profilePictureUrl,
-        location: resUser.location,
-        phoneNumber: resUser.phoneNumber,
-        initials: this.getInitials(resUser.fullName),  
-        color: this.generateColorFromName(resUser.id)    
-      };
-      this._currentUser.set(user);
+
+      // Carrega o perfil completo do utilizador (imagem, bio, etc.)
+      await this.loadUserProfile();
     } catch {
       // Refresh token inválido/expirado ou não existe
       this._accessToken.set(null);
@@ -351,8 +343,13 @@ export class AuthService {
 
       // atualiza access token em memória
       this._accessToken.set(res.accessToken);
-      this.setAuthenticatedState(res.accessToken);
       this._status.set('authenticated');
+
+      // Atualiza o perfil do utilizador se ainda não estiver carregado
+      if (!this._currentUser()) {
+        await this.loadUserProfile();
+      }
+
       return true;
     } catch (error: any) {
       // Rate limit - não fazer logout, apenas falhar silenciosamente
@@ -408,8 +405,11 @@ export class AuthService {
       // access token fica APENAS em memória (não localStorage)
       // refresh token fica em cookie HttpOnly (gerido pelo backend)
       this._accessToken.set(res.accessToken);
-      this.setAuthenticatedState(res.accessToken);
       this._status.set('authenticated');
+
+      // Busca o perfil completo do utilizador (inclui imagem, bio, etc.)
+      await this.loadUserProfile()
+
       return { success: true };
     } catch (error: any) {
       // extrai mensagens de erro diretamente do corpo da resposta HTTP
@@ -573,25 +573,6 @@ export class AuthService {
   }
 
   /**
-   * método privado para extrair o user do JWT
-   */
-  private extractUserFromToken(token: string): User | null {
-    try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      const name = payload.name || '';
-      return {
-        id: payload.sub,
-        email: payload.email,
-        initials: this.getInitials(name),
-        color: this.generateColorFromName(name)
-      };
-    } catch (err) {
-      console.log(`Erro a extrair o user do JWT: ${err}`);
-      return null;
-    }
-  }
-
-  /**
    * Helper para gerar as iniciais do user
    */
   private getInitials(name: string): string {
@@ -616,13 +597,38 @@ export class AuthService {
   }
 
   /**
-   * Helper para guardar o user após obter o JWT
+   * Carrega o perfil completo do utilizador a partir do endpoint /users/me.
+   * Atualiza o signal _currentUser com todos os dados do perfil (imagem, bio, etc.).
    */
-  private setAuthenticatedState(accessToken: string): void {
-    this._accessToken.set(accessToken);
-    const user = this.extractUserFromToken(accessToken);
-    this._currentUser.set(user);
-    this._status.set("authenticated");
+  private async loadUserProfile(): Promise<void> {
+    const token = this._accessToken();
+    if (!token) return;
+
+    try {
+      const resUser = await firstValueFrom(
+        this.http.get<UserProfile>(`${this.baseUrl}/users/me`, {
+          headers: { Authorization: `Bearer ${token}` }
+        })
+      );
+      const user: User = {
+        id: resUser.id,
+        email: resUser.email,
+        fullName: resUser.fullName,
+        userName: resUser.userName,
+        profilePictureUrl: resUser.profilePictureUrl,
+        location: resUser.location,
+        phoneNumber: resUser.phoneNumber,
+        bio: resUser.bio,
+        timezone: resUser.timezone,
+        createdAt: resUser.createdAt,
+        usernameChangesRemaining: resUser.usernameChangesRemaining,
+        initials: this.getInitials(resUser.fullName),
+        color: this.generateColorFromName(resUser.id)
+      };
+      this._currentUser.set(user);
+    } catch (error) {
+      console.warn('Failed to load user profile:', error);
+    }
   }
 
   /**
@@ -690,6 +696,10 @@ export class AuthService {
         profilePictureUrl: res.profilePictureUrl,
         location: res.location,
         phoneNumber: res.phoneNumber,
+        bio: res.bio,
+        timezone: res.timezone,
+        createdAt: res.createdAt,
+        usernameChangesRemaining: res.usernameChangesRemaining,
         initials: this.getInitials(res.fullName),
         color: this.generateColorFromName(res.id)
       };
@@ -775,29 +785,70 @@ export class AuthService {
   }
 
   /**
-   * termina a sessão do utilizador atual e limpa todos os dados de autenticação.
-   * este método remove o access token da memória, limpa os dados do utilizador armazenados
-   * localmente, e define o estado de autenticação como 'unauthenticated'.
-   * 
-   * o refresh token armazenado em cookie HttpOnly deve ser invalidado através de uma
-   * chamada ao endpoint /logout no backend, se esse endpoint existir. caso contrário,
-   * o cookie expirará naturalmente ou será limpo pelo browser.
-   * 
-   * após o logout, o utilizador é redirecionado para a página de login. este método
-   * não realiza requisições assíncronas ao backend, sendo uma operação síncrona que
-   * apenas limpa o estado local.
-   * 
+   * verifica se um username está disponível.
+   * útil para validar em tempo real antes de submeter o formulário.
+   *
+   * @param username - nome de utilizador a verificar
+   * @returns Promise com o resultado da verificação
+   */
+  async checkUsernameAvailability(username: string): Promise<{ available: boolean; message: string }> {
+    try {
+      const token = this.getAccessToken();
+      if (!token) {
+        return { available: false, message: 'Not authenticated.' };
+      }
+
+      const res = await firstValueFrom(
+        this.http.get<{ available: boolean; message: string }>(
+          `${this.baseUrl}/users/check-username/${encodeURIComponent(username)}`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        )
+      );
+
+      return res;
+    } catch (error: any) {
+      const errorBody = error.error || {};
+      return {
+        available: false,
+        message: errorBody.message || 'Failed to check username availability.'
+      };
+    }
+  }
+
+  /**
+   * termina a sessão atual do utilizador.
+   * invalida apenas o refresh token da sessão actual, mantendo outras sessões activas.
+   *
    * @example
    * ```typescript
-   * // em um componente ou serviço
    * this.auth.logout();
-   * // utilizador será redirecionado para /login automaticamente
    * ```
    */
   async logout(): Promise<void> {
+    await this.logoutCore('/logout');
+  }
+
+  /**
+   * termina todas as sessões do utilizador em todos os dispositivos.
+   * invalida todos os refresh tokens associados ao utilizador.
+   *
+   * @example
+   * ```typescript
+   * this.auth.logoutAll();
+   * ```
+   */
+  async logoutAll(): Promise<void> {
+    await this.logoutCore('/logout-all');
+  }
+
+  /**
+   * método privado que executa a lógica comum de logout.
+   * limpa os dados locais e redireciona para a página de login.
+   */
+  private async logoutCore(endpoint: string): Promise<void> {
     try {
       await firstValueFrom(
-        this.http.post(`${this.baseUrl}/logout-all`, {}, { withCredentials: true })
+        this.http.post(`${this.baseUrl}${endpoint}`, {}, { withCredentials: true })
       );
     } catch (err) {
       console.log("Logout error: ", err);
