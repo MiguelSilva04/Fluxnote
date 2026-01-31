@@ -108,7 +108,7 @@ export const routes: Routes = [
       import('./features/teams/pages/teams.component').then((m) => m.TeamsComponent),
   },
   {
-    path: 'team-detail',
+    path: 'team-detail/:id',
     canActivate: [authGuard],
     loadComponent: () =>
       import('./features/teams/pages/team-detail.component').then((m) => m.TeamDetailComponent),

@@ -22,15 +22,14 @@ export interface TeamGet {
   updatedAt: string;
   isActive: boolean;
   deletionScheduled: string;
-  members: [];
+  members: TeamMemberToPost[];
+  documents: TeamDocument[];
 }
 
 
 export interface TeamDocument {
   id: number;
-  name: string;
-  lastEdited: string;
-  myRole: string;
+  title: string;
 }
 
 export interface TeamMember {
@@ -43,9 +42,11 @@ export interface TeamMember {
 }
 
 export interface TeamMemberToPost {
+  id?: number,
   name: string;
   email: string;
   role: number;
   teamId :number;
+  userId? : string;
   //joinedAt: string;
 }

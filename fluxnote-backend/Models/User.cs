@@ -10,6 +10,7 @@ namespace Fluxnote.Backend.Models
         public string? ProfilePictureUrl { get; set; }
         public AccountStatus AccountStatus { get; set; } = AccountStatus.Active;
         public AuthProvider AuthProvider { get; set; } = AuthProvider.Local;
+        public ICollection<TeamMember> Teams { get; set; } = new List<TeamMember>();
     }
 
     public enum AuthProvider

@@ -18,6 +18,8 @@ namespace Fluxnote.Backend.Data
         //public DbSet<Fluxnote.Backend.Models.Person> Person { get; set; } = default!;
         public DbSet<Fluxnote.Backend.Models.Team> Team { get; set; } = default!;
         public DbSet<Fluxnote.Backend.Models.TeamMember> TeamMember { get; set; } = default!;
+
+        public DbSet<Fluxnote.Backend.Models.Document> Document { get; set; } = default!;
         public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
         protected override void OnModelCreating(ModelBuilder builder)
         {

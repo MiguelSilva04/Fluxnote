@@ -125,7 +125,7 @@ if (!app.Environment.IsEnvironment("Testing"))
     try
     {
         db.Database.Migrate();
-        SeedData.Initialize(services);   
+        //SeedData.Initialize(services);   
 }
 
 

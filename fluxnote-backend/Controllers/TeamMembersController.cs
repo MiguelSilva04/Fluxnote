@@ -1,5 +1,4 @@
 using Fluxnote.Backend.Data;
-using Fluxnote.Backend.Dtos;
 using Fluxnote.Backend.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;

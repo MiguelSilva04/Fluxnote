@@ -92,68 +92,111 @@
       </div> -->
       <!-- Teams List -->
       <div class="space-y-4">
-        @for (team of teams(); track team.id) {
-          <app-card customClass="overflow-hidden">
-            <div class="p-6">
-              <div class="flex items-center justify-between">
-                <div class="flex items-center gap-4 flex-1">
-                  <!-- Avatar simples com primeira letra -->
-                  <div
-                    class="h-12 w-12 rounded-full bg-[#155347] text-white flex items-center justify-center text-sm font-bold"
-                  >
-                    {{ team.name.charAt(0) }}
-                  </div>
-
-                  <div class="flex-1">
-                    <h3 class="text-lg font-bold text-gray-900">
-                      {{ team.name }}
-                    </h3>
-
-                    <div class="flex items-center gap-3 text-sm text-gray-500">
-                      <span>Criado em {{ team.createdAt }}</span>
-                      <span>•</span>
-                      <span>
-                        Status:
+        @if (loading()) {
+          <div class="flex items-center justify-center h-[60vh]">
+            <div class="text-gray-500 text-sm animate-pulse">
+              Loading teams...
+            </div>
+          </div>
+        }
+        @else if(teams()){
+          @for (team of teams(); track team.id) 
+          {
+            <app-card customClass="overflow-hidden">
+              <div class="p-6">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-4 flex-1">
+                    <!-- Avatar -->
+                    <div class="h-12 w-12 rounded-full bg-[#155347] text-white flex items-center justify-center text-sm font-bold"
+                    >
+                      {{ getInitials(team.name)}}
+                    </div>
+        
+                    <div class="flex-1">
+                      <div class="flex items-center gap-3 mb-1">
+                        <h3 class="text-lg font-bold text-gray-900">
+                          {{ team.name }}
+                        </h3>
+        
+                        <span class="text-sm text-gray-500">
+                          Created {{ timeAgo(team.createdAt) }}
+                        </span>
+                      </div>
+        
+                      <!-- <div class="flex items-center gap-3 text-sm text-gray-500">
+                        <span>Status:</span>
                         <span
                           [class.text-green-600]="team.isActive"
                           [class.text-red-600]="!team.isActive"
+                          class="font-medium"
                         >
                           {{ team.isActive ? 'Ativo' : 'Inativo' }}
                         </span>
-                      </span>
+                      </div> -->
                     </div>
                   </div>
-                </div>
-
-                <div class="flex items-center gap-4">
-                  <!-- Members -->
-                  <div class="flex items-center gap-2 text-sm text-gray-600">
-                    <lucide-icon name="users" class="h-4 w-4"></lucide-icon>
-                    <span>{{ team.members.length }} Members</span>
+        
+                  <div class="flex items-center gap-4">
+                    <!-- Members -->
+                    <div class="flex items-center gap-2 text-sm text-gray-600">
+                      <lucide-icon name="users" class="h-4 w-4"></lucide-icon>
+                      <span>{{ team.members.length }} Members</span>
+                    </div>
+        
+                    <!-- View details -->
+                    <app-button
+                      variant="outline"
+                      size="sm"
+                      customClass="text-[#155347] border-[#155347]"
+                      (onClick)="handleViewTeamDetails(team.id)"
+                    >
+                      View Team Details
+                    </app-button>
+  
+                    <button (click)="toggleTeam(team.id)" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                      <lucide-icon
+                        [name]="expandedTeam() === team.id ? 'chevron-up' : 'chevron-down'"
+                        class="h-5 w-5 text-gray-500"
+                      ></lucide-icon>
+                    </button>
                   </div>
-
-                  <!-- View details -->
-                  <app-button
-                    variant="outline"
-                    size="sm"
-                    customClass="text-[#155347] border-[#155347]"
-                    (onClick)="handleViewTeamDetails(team.id)"
-                  >
-                    View Team Details
-                  </app-button>
                 </div>
+  
+                @if (expandedTeam() === team.id && team.documents.length > 0) {
+                  <div class="mt-6 pt-6 border-t border-gray-100">
+                    <div class="space-y-2">
+                      @for (doc of team.documents; track doc.id) {
+                        <div class="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg transition-colors cursor-pointer">
+                          <div class="flex items-center gap-3 flex-1">
+                            <lucide-icon name="file-text" class="h-4 w-4 text-gray-400"></lucide-icon>
+                            <span class="text-sm font-medium text-gray-900">
+                              {{ doc.title }}
+                            </span>
+                          </div>
+                
+                        </div>
+                      }
+                    </div>
+                  </div>
+                }
+                
+        
+                <!-- Deletion scheduled -->
+                @if (team.deletionScheduled) {
+                  <div class="mt-6 pt-6 border-t border-gray-100">
+                    <span class="text-sm text-red-600">
+                      Deleção agendada para {{ team.deletionScheduled }}
+                    </span>
+                  </div>
+                }
               </div>
+            </app-card>
+          }
 
-              <!-- Deletion scheduled -->
-              @if (team.deletionScheduled) {
-                <div class="mt-4 text-sm text-red-600">
-                  Deleção agendada para {{ team.deletionScheduled }}
-                </div>
-              }
-            </div>
-          </app-card>
-        }
+        } 
+        
       </div>
+      
     </div>
 
     <!-- Create Team Modal -->
@@ -165,7 +208,7 @@
     >
       <div class="space-y-4">
         <app-input label="Team Name" placeholder="e.g. Design Team" [(ngModel)]="newTeamName"></app-input>
-        <app-input label="Description" placeholder="What is this team for?" [(ngModel)]="newTeamDescription"></app-input>
+        <!--app-input label="Description" placeholder="What is this team for?" [(ngModel)]="newTeamDescription"></app-input-->
       </div>
       <div footer class="flex gap-3">
         <app-button variant="ghost" (onClick)="isCreateModalOpen.set(false)">Cancel</app-button>

@@ -1,5 +1,4 @@
-﻿using Fluxnote.Backend.Dtos;
-using Fluxnote.Backend.Data;
+﻿using Fluxnote.Backend.Data;
 using Fluxnote.Backend.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -23,7 +22,7 @@ namespace Fluxnote.Backend.Controllers
         public async Task<ActionResult<IEnumerable<Team>>> GetTeams()
         {
            //Inclui os members
-            return await _context.Team.Include(t => t.Members).ToListAsync();
+            return await _context.Team.Include(t => t.Members).Include(t=> t.Documents).ToListAsync();
         }
 
         // GET: api/Teams/5
@@ -32,8 +31,8 @@ namespace Fluxnote.Backend.Controllers
         {
             //Inclui os members
             var team = await _context.Team
-            .Include(t => t.Members)
-            .FirstOrDefaultAsync();
+            .Include(t => t.Members).Include(t => t.Documents)
+            .FirstOrDefaultAsync(t=> t.Id == id);
 
             if (team == null)
             {
@@ -80,7 +79,7 @@ namespace Fluxnote.Backend.Controllers
         public async Task<ActionResult<Team>> PostTeam(Team team)
         {
             //_context.TeamMember.Add(team.Owner);
-
+            //team.CreatedAt = DateTime.UtcNow;
             _context.Team.Add(team);
             await _context.SaveChangesAsync();
 
