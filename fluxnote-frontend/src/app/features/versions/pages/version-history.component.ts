@@ -27,7 +27,7 @@ import { ButtonComponent, BadgeComponent } from '../../../shared/components/ui';
       <!-- Warning Banner -->
       <div class="bg-amber-50 border-b border-amber-200 px-6 py-3">
         <div class="flex items-center gap-2 text-amber-800">
-          <lucide-icon name="alert-triangle" class="h-5 w-5"></lucide-icon>
+          <lucide-icon name="triangle-alert" class="h-5 w-5"></lucide-icon>
           <p class="text-sm">
             <strong>Warning:</strong> Restoring a version will replace the current document content.
             This action cannot be undone.

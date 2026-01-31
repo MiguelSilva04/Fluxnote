@@ -1,14 +1,18 @@
 ﻿using Fluxnote.Backend.Contracts.Auth;
-using Fluxnote.Backend.Services.Email;
+using Fluxnote.Backend.Data;
+using Fluxnote.Backend.Dtos.Auth;
 using Fluxnote.Backend.Models;
+using Fluxnote.Backend.Services.Auth;
+using Fluxnote.Backend.Services.Email;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
-using Fluxnote.Backend.Data;
-using Fluxnote.Backend.Dtos.Auth;
-using Fluxnote.Backend.Services.Auth;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Fluxnote.Backend.Controllers;
 
@@ -212,6 +216,246 @@ public class AuthController : ControllerBase
         });
     }
 
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [HttpGet("users/me")]
+    public async Task<IActionResult> Me()
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (userId is null)
+            return Unauthorized("Invalid claims for obtaining user id.");
+
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user is null)
+        {
+            return Unauthorized(new
+            {
+                message = "User not found."
+            });
+        }
+
+        var usernameChangesRemaining = CalculateUsernameChangesRemaining(user);
+
+        var profile = new UserProfile
+        {
+            Id = user.Id,
+            Email = user.Email!,
+            FullName = user.FullName!,
+            UserName = user.UserName!,
+            ProfilePictureUrl = user.ProfilePictureUrl!,
+            Location = user.Location!,
+            PhoneNumber = user.PhoneNumber!,
+            Bio = user.Bio,
+            Timezone = user.Timezone,
+            CreatedAt = user.CreatedAt,
+            UsernameChangesRemaining = usernameChangesRemaining
+        };
+        return Ok(profile);
+    }
+
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [HttpGet("users/check-username/{username}")]
+    public async Task<IActionResult> CheckUsernameAvailability(string username)
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (userId is null)
+            return Unauthorized(new { message = "Invalid claims." });
+
+        // Validate username format
+        if (string.IsNullOrWhiteSpace(username) || username.Length < 3 || username.Length > 30)
+        {
+            return BadRequest(new { available = false, message = "Username must be between 3 and 30 characters." });
+        }
+
+        if (!System.Text.RegularExpressions.Regex.IsMatch(username, @"^[a-zA-Z0-9_]+$"))
+        {
+            return BadRequest(new { available = false, message = "Username can only contain letters, numbers, and underscores." });
+        }
+
+        // Check if username is taken by another user
+        var existingUser = await _userManager.FindByNameAsync(username);
+        var isAvailable = existingUser is null || existingUser.Id == userId;
+
+        return Ok(new { available = isAvailable, message = isAvailable ? "Username is available." : "Username is already taken." });
+    }
+
+    private int CalculateUsernameChangesRemaining(User user)
+    {
+        const int maxChangesPerMonth = 3;
+        var now = DateTime.UtcNow;
+
+        // Reset counter if we're in a new month
+        if (user.LastUsernameChangeReset is null ||
+            user.LastUsernameChangeReset.Value.Year != now.Year ||
+            user.LastUsernameChangeReset.Value.Month != now.Month)
+        {
+            return maxChangesPerMonth;
+        }
+
+        return Math.Max(0, maxChangesPerMonth - user.UsernameChangesThisMonth);
+    }
+
+    // -------------------------
+    // UPDATE PROFILE
+    // - Atualiza nome, avatar, localização, telefone, bio, timezone, username
+    // - Username pode ser alterado no máximo 3 vezes por mês
+    // -------------------------
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [HttpPut("users/me")]
+    public async Task<IActionResult> UpdateProfile([FromBody] UpdateProfileRequest request)
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (userId is null)
+            return Unauthorized(new { message = "Invalid claims for obtaining user id." });
+
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user is null)
+            return Unauthorized(new { message = "User not found." });
+
+        var now = DateTime.UtcNow;
+
+        // Handle username change with 3/month limit
+        if (request.UserName is not null && request.UserName != user.UserName)
+        {
+            // Reset counter if we're in a new month
+            if (user.LastUsernameChangeReset is null ||
+                user.LastUsernameChangeReset.Value.Year != now.Year ||
+                user.LastUsernameChangeReset.Value.Month != now.Month)
+            {
+                user.UsernameChangesThisMonth = 0;
+                user.LastUsernameChangeReset = now;
+            }
+
+            // Check if user has remaining changes
+            if (user.UsernameChangesThisMonth >= 3)
+            {
+                return BadRequest(new
+                {
+                    message = "Username change limit reached.",
+                    errors = new[] { "You can only change your username 3 times per month. Please try again next month." }
+                });
+            }
+
+            // Check if username is already taken
+            var existingUser = await _userManager.FindByNameAsync(request.UserName);
+            if (existingUser is not null && existingUser.Id != userId)
+            {
+                return BadRequest(new
+                {
+                    message = "Username already taken.",
+                    errors = new[] { "This username is already in use. Please choose a different one." }
+                });
+            }
+
+            user.UserName = request.UserName;
+            user.UsernameChangesThisMonth++;
+        }
+
+        // atualiza apenas os campos passados no request
+        if (request.FullName is not null)
+            user.FullName = request.FullName;
+
+        if (request.ProfilePictureUrl is not null)
+            user.ProfilePictureUrl = request.ProfilePictureUrl;
+
+        if (request.Location is not null)
+            user.Location = request.Location;
+
+        if (request.PhoneNumber is not null)
+            user.PhoneNumber = request.PhoneNumber;
+
+        if (request.Bio is not null)
+            user.Bio = request.Bio;
+
+        if (request.Timezone is not null)
+            user.Timezone = request.Timezone;
+
+        user.UpdatedAt = now;
+
+        var result = await _userManager.UpdateAsync(user);
+        if (!result.Succeeded)
+        {
+            return BadRequest(new
+            {
+                message = "Failed to update profile.",
+                errors = result.Errors.Select(e => e.Description)
+            });
+        }
+
+        var usernameChangesRemaining = CalculateUsernameChangesRemaining(user);
+
+        var profile = new UserProfile
+        {
+            Id = user.Id,
+            Email = user.Email!,
+            FullName = user.FullName!,
+            UserName = user.UserName!,
+            ProfilePictureUrl = user.ProfilePictureUrl!,
+            Location = user.Location!,
+            PhoneNumber = user.PhoneNumber!,
+            Bio = user.Bio,
+            Timezone = user.Timezone,
+            CreatedAt = user.CreatedAt,
+            UsernameChangesRemaining = usernameChangesRemaining
+        };
+
+        return Ok(profile);
+    }
+
+    // -------------------------
+    // CHANGE PASSWORD
+    // - Requer password atual para segurança
+    // - Aplica requisitos do Identity
+    // -------------------------
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [HttpPut("users/me/password")]
+    public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest request)
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (userId is null)
+            return Unauthorized(new { message = "Invalid claims for obtaining user id." });
+
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user is null)
+            return Unauthorized(new { message = "User not found." });
+
+        // verifica se o utilizador usa autenticação local
+        if (user.AuthProvider != AuthProvider.Local)
+        {
+            return BadRequest(new
+            {
+                message = "Cannot change password.",
+                errors = new[] { "Password change is only available for accounts using email/password authentication." }
+            });
+        }
+
+        // valida a password atual
+        var passwordValid = await _userManager.CheckPasswordAsync(user, request.CurrentPassword);
+        if (!passwordValid)
+        {
+            return BadRequest(new
+            {
+                message = "Invalid current password.",
+                errors = new[] { "The current password is incorrect." }
+            });
+        }
+
+        // altera a password usando o Identity (aplica todas as validações configuradas)
+        var result = await _userManager.ChangePasswordAsync(user, request.CurrentPassword, request.NewPassword);
+        if (!result.Succeeded)
+        {
+            return BadRequest(new
+            {
+                message = "Failed to change password.",
+                errors = result.Errors.Select(e => e.Description)
+            });
+        }
+
+        user.UpdatedAt = DateTime.UtcNow;
+        await _userManager.UpdateAsync(user);
+
+        return Ok(new { message = "Password changed successfully." });
+    }
+
     // -------------------------
     // REFRESH
     // Status codes:
@@ -225,7 +469,6 @@ public class AuthController : ControllerBase
     [HttpPost("refresh")]
     public async Task<IActionResult> Refresh()
     {
-        Console.WriteLine("REFRESH ACTION HIT");
         var cookieName = _configuration["Auth:RefreshCookieName"] ?? "fluxnote_rt";
         if (!Request.Cookies.TryGetValue(cookieName, out var refreshPlain) || string.IsNullOrWhiteSpace(refreshPlain))
         {

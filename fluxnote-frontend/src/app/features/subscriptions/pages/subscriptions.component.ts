@@ -2,7 +2,7 @@ import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LucideAngularModule } from 'lucide-angular';
 import { DashboardLayoutComponent } from '../../../layout/dashboard-layout/dashboard-layout.component';
-import { ButtonComponent, CardComponent, CardContentComponent, BadgeComponent } from '../../../shared/components/ui';
+import { ButtonComponent, CardComponent, CardContentComponent, BadgeComponent, WorkInProgressComponent } from '../../../shared/components/ui';
 
 @Component({
   selector: 'app-subscriptions',
@@ -14,7 +14,8 @@ import { ButtonComponent, CardComponent, CardContentComponent, BadgeComponent } 
     ButtonComponent,
     CardComponent,
     CardContentComponent,
-    BadgeComponent
+    BadgeComponent,
+    WorkInProgressComponent
   ],
   template: `
     <app-dashboard-layout>
@@ -90,6 +91,7 @@ import { ButtonComponent, CardComponent, CardContentComponent, BadgeComponent } 
                       [variant]="plan.current ? 'primary' : plan.buttonVariant"
                       [customClass]="'w-full ' + (plan.current ? 'bg-[#155347] hover:bg-[#0d3d31] cursor-default' : plan.recommended ? 'bg-[#155347] hover:bg-[#0d3d31]' : '')"
                       [disabled]="plan.current"
+                      (click)="!plan.current && showWipModal.set(true)"
                     >
                       {{ plan.buttonText }}
                     </app-button>
@@ -191,17 +193,20 @@ import { ButtonComponent, CardComponent, CardContentComponent, BadgeComponent } 
                 </div>
               </div>
               <div class="mt-6">
-                <app-button customClass="bg-[#155347] hover:bg-[#0d3d31]">Update Payment Method</app-button>
+                <app-button customClass="bg-[#155347] hover:bg-[#0d3d31]" (click)="showWipModal.set(true)">Update Payment Method</app-button>
               </div>
             </app-card-content>
           </app-card>
         }
       </div>
+
+      <app-work-in-progress [show]="showWipModal()" (close)="showWipModal.set(false)" />
     </app-dashboard-layout>
   `
 })
 export class SubscriptionsComponent {
   activeTab = signal<'plans' | 'notifications'>('plans');
+  showWipModal = signal(false);
 
   plans = [
     {

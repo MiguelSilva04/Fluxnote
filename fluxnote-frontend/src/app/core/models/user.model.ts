@@ -1,11 +1,17 @@
 export interface User {
   id?: string;
-  name: string;
   email: string;
   initials: string;
   color: string;
-  role?: string;
-  avatar?: string;
+  fullName?: string;
+  userName?: string;
+  profilePictureUrl?: string;
+  location?: string;
+  phoneNumber?: string;
+  bio?: string;
+  timezone?: string;
+  createdAt?: string;
+  usernameChangesRemaining?: number;
 }
 
 export interface Collaborator {
