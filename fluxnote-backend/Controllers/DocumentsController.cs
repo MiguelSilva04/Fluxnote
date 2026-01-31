@@ -33,7 +33,7 @@ namespace Fluxnote.Backend.Controllers
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userId is null)
-                return Unauthorized(new { message = "Utilizador não autenticado." });
+                return Unauthorized(new { message = "User not authenticated." });
 
             // Obter IDs das equipas onde o utilizador é membro
             var userTeamIds = await _context.TeamMember
@@ -88,11 +88,11 @@ namespace Fluxnote.Backend.Controllers
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userId is null)
-                return Unauthorized(new { message = "Utilizador não autenticado." });
+                return Unauthorized(new { message = "User not authenticated." });
 
             var user = await _userManager.FindByIdAsync(userId);
             if (user is null)
-                return Unauthorized(new { message = "Utilizador não encontrado." });
+                return Unauthorized(new { message = "User not found." });
 
             // Validar limite de documentos (Free = 10)
             var userDocumentCount = await _context.Document
@@ -102,8 +102,8 @@ namespace Fluxnote.Backend.Controllers
             {
                 return BadRequest(new
                 {
-                    message = "Limite de documentos atingido.",
-                    errors = new[] { $"O plano Free permite no máximo {FreeDocumentLimit} documentos." }
+                    message = "Document limit reached.",
+                    errors = new[] { $"Free plan allows up to {FreeDocumentLimit} documents." }
                 });
             }
 
@@ -118,7 +118,7 @@ namespace Fluxnote.Backend.Controllers
 
                 if (existingTeam is null)
                 {
-                    return NotFound(new { message = "Equipa não encontrada." });
+                    return NotFound(new { message = "Team not found." });
                 }
 
                 // Verificar se o utilizador é Owner da equipa
@@ -129,8 +129,8 @@ namespace Fluxnote.Backend.Controllers
                 {
                     return StatusCode(StatusCodes.Status403Forbidden, new
                     {
-                        message = "Sem permissão.",
-                        errors = new[] { "Apenas o Owner da equipa pode criar documentos." }
+                        message = "Permission denied.",
+                        errors = new[] { "Only the team Owner can create documents." }
                     });
                 }
 
@@ -138,10 +138,20 @@ namespace Fluxnote.Backend.Controllers
             }
             else
             {
-                // Criar equipa automática para o utilizador
+                // Validar que o nome da equipa foi fornecido
+                if (string.IsNullOrWhiteSpace(request.TeamName))
+                {
+                    return BadRequest(new
+                    {
+                        message = "Team name is mandatory.",
+                        errors = new[] { "If you don't specify an existing team, you must provide a name for the new team." }
+                    });
+                }
+
+                // Criar nova equipa com o nome fornecido
                 team = new Team
                 {
-                    Name = $"Equipa de {user.FullName ?? user.Email}",
+                    Name = request.TeamName.Trim(),
                     OwnerId = 0, // Será atualizado após criar o TeamMember
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow,
@@ -209,7 +219,7 @@ namespace Fluxnote.Backend.Controllers
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userId is null)
-                return Unauthorized(new { message = "Utilizador não autenticado." });
+                return Unauthorized(new { message = "User not authenticated." });
 
             var document = await _context.Document
                 .Include(d => d.Team)
@@ -218,7 +228,7 @@ namespace Fluxnote.Backend.Controllers
 
             if (document is null)
             {
-                return NotFound(new { message = "Documento não encontrado." });
+                return NotFound(new { message = "Document not found." });
             }
 
             // Verificar se o utilizador tem acesso (é membro da equipa)
@@ -229,8 +239,8 @@ namespace Fluxnote.Backend.Controllers
             {
                 return StatusCode(StatusCodes.Status403Forbidden, new
                 {
-                    message = "Sem permissão.",
-                    errors = new[] { "Não tens acesso a este documento." }
+                    message = "Permission denied.",
+                    errors = new[] { "You don't have access to this document." }
                 });
             }
 

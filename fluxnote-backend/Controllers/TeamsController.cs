@@ -27,7 +27,7 @@ namespace Fluxnote.Backend.Controllers
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userId is null)
-                return Unauthorized(new { message = "Utilizador não autenticado." });
+                return Unauthorized(new { message = "User not authenticated." });
 
             // Obter equipas onde o utilizador é membro
             var userTeamIds = await _context.TeamMember
@@ -74,7 +74,7 @@ namespace Fluxnote.Backend.Controllers
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userId is null)
-                return Unauthorized(new { message = "Utilizador não autenticado." });
+                return Unauthorized(new { message = "User not authenticated." });
 
             // Verificar se o utilizador é membro da equipa
             var isMember = await _context.TeamMember
@@ -84,8 +84,8 @@ namespace Fluxnote.Backend.Controllers
             {
                 return StatusCode(StatusCodes.Status403Forbidden, new
                 {
-                    message = "Sem permissão.",
-                    errors = new[] { "Não és membro desta equipa." }
+                    message = "Permission denied.",
+                    errors = new[] { "You are not a member of this team." }
                 });
             }
 
@@ -96,7 +96,7 @@ namespace Fluxnote.Backend.Controllers
 
             if (team == null)
             {
-                return NotFound(new { message = "Equipa não encontrada." });
+                return NotFound(new { message = "Team not found." });
             }
 
             var dto = new TeamDto

@@ -10,8 +10,14 @@ namespace Fluxnote.Backend.Dtos.Documents
 
         /// <summary>
         /// ID da equipa onde o documento será criado.
-        /// Se não for especificado, será criada uma equipa automática.
+        /// Se não for especificado, será criada uma nova equipa.
         /// </summary>
         public int? TeamId { get; set; }
+
+        /// <summary>
+        /// Nome da equipa a criar (obrigatório se TeamId não for especificado).
+        /// </summary>
+        [MaxLength(100, ErrorMessage = "O nome da equipa não pode ter mais de 100 caracteres")]
+        public string? TeamName { get; set; }
     }
 }
