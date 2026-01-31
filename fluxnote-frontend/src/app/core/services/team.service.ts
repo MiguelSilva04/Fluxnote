@@ -149,7 +149,7 @@ export class TeamService {
       throw new Error('User information is not available');
     }
     var owner: TeamMemberToPost = {
-      name: this.user.name ?? '',
+      name: this.user.fullName ?? '',
       email: this.user.email ?? '',
       role: 2,
       teamId: 0,
