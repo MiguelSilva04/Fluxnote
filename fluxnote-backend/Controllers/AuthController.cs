@@ -739,4 +739,14 @@ public class AuthController : ControllerBase
 
     [HttpPost("ping")]
     public IActionResult Ping() => Ok("pong");
+
+
+    //// GET: api/users
+    //[HttpGet("users")]
+    //public async Task<ActionResult<IEnumerable<User>>> GetUsers()
+    //{
+    //    //Inclui os teammembers
+    //    return await _db.Users.Include(u => u.Teams).ToListAsync();
+    //}
+
 }

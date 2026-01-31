@@ -130,15 +130,19 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Auto-apply migrations on startup (avoid in tests)
+// Inserts Seed & Auto-apply migrations on startup (avoid in tests)
 if (!app.Environment.IsEnvironment("Testing"))
 {
     using var scope = app.Services.CreateScope();
-    var db = scope.ServiceProvider.GetRequiredService<FluxnoteServerContext>();
+    var services = scope.ServiceProvider;
+    var db = services.GetRequiredService<FluxnoteServerContext>();
     try
     {
         db.Database.Migrate();
-    }
+        //SeedData.Initialize(services);   
+}
+
+
     catch (SqliteException ex)
     {
         // SQLite can throw if migrations are applied against an existing DB schema in some test scenarios.

@@ -13,6 +13,7 @@ namespace Fluxnote.Backend.Models
         public string? ProfilePictureUrl { get; set; }
         public AccountStatus AccountStatus { get; set; } = AccountStatus.Active;
         public AuthProvider AuthProvider { get; set; } = AuthProvider.Local;
+        public ICollection<TeamMember> Teams { get; set; } = new List<TeamMember>();
 
         // Username change tracking (max 3 per month)
         public int UsernameChangesThisMonth { get; set; } = 0;
