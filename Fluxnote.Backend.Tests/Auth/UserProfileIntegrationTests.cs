@@ -365,9 +365,40 @@ public class UserProfileIntegrationTests : IClassFixture<CustomWebApplicationFac
         };
 
         var resp = await _client.PostAsJsonAsync("/api/auth/login", loginRequest);
-        var body = await resp.Content.ReadFromJsonAsync<LoginResponse>();
+        var content = await resp.Content.ReadAsStringAsync();
 
-        return body?.AccessToken;
+        if (!resp.IsSuccessStatusCode)
+        {
+            // Surface server response for easier debugging instead of attempting JSON deserialization on non-success responses.
+            throw new InvalidOperationException($"Login failed with status {resp.StatusCode}. Response body: {content}");
+        }
+
+        try
+        {
+            // Prefer the built-in JSON reader when the server declares a JSON media type.
+            var mediaType = resp.Content.Headers.ContentType?.MediaType;
+            if (mediaType is "application/json" or "text/json" or "application/problem+json")
+            {
+                var body = await resp.Content.ReadFromJsonAsync<LoginResponse>();
+                return body?.AccessToken;
+            }
+
+            // Fallback: attempt to deserialize the raw string (handles cases where server returns JSON without correct Content-Type).
+            var bodyFallback = System.Text.Json.JsonSerializer.Deserialize<LoginResponse?>(content, new System.Text.Json.JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            });
+
+            if (bodyFallback is null)
+                throw new InvalidOperationException($"Login returned unexpected body that could not be deserialized. Body: {content}");
+
+            return bodyFallback.AccessToken;
+        }
+        catch (System.Text.Json.JsonException ex)
+        {
+            // Include the response body in the thrown exception to make the root cause obvious in test output.
+            throw new InvalidOperationException($"Failed to parse login response as JSON. Body: {content}", ex);
+        }
     }
 
     private HttpClient CreateAuthenticatedClient(string accessToken)

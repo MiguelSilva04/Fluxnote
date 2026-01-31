@@ -419,8 +419,26 @@ public class AuthIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         };
 
         var resp = await _client.PostAsJsonAsync("/api/auth/login", loginRequest);
+        var content = await resp.Content.ReadAsStringAsync();
 
-        var body = await resp.Content.ReadFromJsonAsync<LoginResponse>();
+        if (!resp.IsSuccessStatusCode)
+        {
+            throw new InvalidOperationException($"Login failed with status {resp.StatusCode}. Response body: {content}");
+        }
+
+        LoginResponse? body = null;
+        try
+        {
+            body = System.Text.Json.JsonSerializer.Deserialize<LoginResponse>(content, new System.Text.Json.JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            });
+        }
+        catch (System.Text.Json.JsonException ex)
+        {
+            throw new InvalidOperationException($"Failed to parse login response as JSON. Body: {content}", ex);
+        }
+
         var setCookie = resp.Headers.TryGetValues("Set-Cookie", out var cookies)
             ? cookies.FirstOrDefault()
             : null;
