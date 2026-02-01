@@ -58,6 +58,15 @@ export class DocumentService {
   }
 
   /**
+   * Pesquisa documentos sem afetar o estado global (para usar no header)
+   * @param query Termo de pesquisa
+   */
+  searchDocuments(query: string): Observable<DocumentDto[]> {
+    const params = new HttpParams().set('search', query);
+    return this.http.get<DocumentDto[]>('/api/documents', { params });
+  }
+
+  /**
    * Carrega os detalhes de um documento específico
    * @param id ID do documento
    */
@@ -100,6 +109,77 @@ export class DocumentService {
         return throwError(() => error);
       })
     );
+  }
+
+  /**
+   * Atualiza um documento existente (título e/ou conteúdo)
+   * @param id ID do documento
+   * @param data Dados a atualizar
+   */
+  updateDocument(id: number, data: { title?: string; content?: string }): Observable<DocumentDetailDto> {
+    return this.http.put<DocumentDetailDto>(`/api/documents/${id}`, data).pipe(
+      tap(doc => {
+        this._currentDocument.set(doc);
+        // Atualizar também na lista de documentos se existir
+        this._documents.update(docs => 
+          docs.map(d => d.id === id ? { ...d, title: doc.title, updatedAt: doc.updatedAt } : d)
+        );
+      }),
+      catchError(error => {
+        console.error('Error updating document:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  /**
+   * Apaga um documento (soft delete - move para lixeira)
+   * @param id ID do documento
+   */
+  deleteDocument(id: number): Observable<void> {
+    return this.http.delete<void>(`/api/documents/${id}`).pipe(
+      tap({
+        next: () => {
+          // Remove o documento da lista local
+          this._documents.update(docs => docs.filter(d => d.id !== id));
+          // Limpa o documento atual se for o que foi apagado
+          if (this._currentDocument()?.id === id) {
+            this._currentDocument.set(null);
+          }
+        }
+      }),
+      catchError(error => {
+        console.error('Error deleting document:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  // ===============================
+  // Métodos da Lixeira (Trash)
+  // ===============================
+
+  /**
+   * Carrega os documentos na lixeira do utilizador
+   */
+  getTrash(): Observable<DocumentDto[]> {
+    return this.http.get<DocumentDto[]>('/api/documents/trash');
+  }
+
+  /**
+   * Restaura um documento da lixeira
+   * @param id ID do documento
+   */
+  restoreDocument(id: number): Observable<void> {
+    return this.http.post<void>(`/api/documents/${id}/restore`, {});
+  }
+
+  /**
+   * Elimina permanentemente um documento da lixeira
+   * @param id ID do documento
+   */
+  permanentDeleteDocument(id: number): Observable<void> {
+    return this.http.delete<void>(`/api/documents/${id}/permanent`);
   }
 
   /**

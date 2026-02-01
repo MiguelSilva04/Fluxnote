@@ -1,11 +1,12 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
 import { DashboardLayoutComponent } from '../../../layout/dashboard-layout/dashboard-layout.component';
 import { ButtonComponent, CardComponent, BadgeComponent, ModalComponent, InputComponent } from '../../../shared/components/ui';
-import { TeamService } from '../../../core/services';
+import { TeamService, DocumentService, AuthService } from '../../../core/services';
+import { TeamDocument } from '../../../core/models';
 
 /**
  * Componente responsável por apresentar e gerir a lista de equipas.
@@ -35,6 +36,16 @@ export class TeamsComponent {
   teamService = inject(TeamService);
 
   /**
+   * Serviço de documentos para operações de delete.
+   */
+  documentService = inject(DocumentService);
+
+  /**
+   * Serviço de autenticação para verificar owner.
+   */
+  authService = inject(AuthService);
+
+  /**
    * Router para navegação entre rotas.
    */
   router = inject(Router);
@@ -45,9 +56,51 @@ export class TeamsComponent {
   teams = this.teamService.teams;
 
   /**
+   * Signal para armazenar o texto de pesquisa de equipas.
+   */
+  searchQuery = signal('');
+
+  /**
+   * Lista filtrada de equipas com base no termo de pesquisa.
+   * Filtra por nome da equipa e nome dos membros.
+   */
+  filteredTeams = computed(() => {
+    const teams = this.teams();
+    const query = this.searchQuery().toLowerCase().trim();
+    
+    if (!teams || !query) {
+      return teams;
+    }
+    
+    return teams.filter(team => {
+      // Pesquisa no nome da equipa
+      if (team.name.toLowerCase().includes(query)) {
+        return true;
+      }
+      
+      // Pesquisa nos nomes dos membros
+      if (team.members?.some(member => member.name.toLowerCase().includes(query))) {
+        return true;
+      }
+      
+      // Pesquisa nos títulos dos documentos
+      if (team.documents?.some(doc => doc.title.toLowerCase().includes(query))) {
+        return true;
+      }
+      
+      return false;
+    });
+  });
+
+  /**
    * Signal que controla qual equipa está expandida na interface.
    */
   expandedTeam = signal<number | null>(1);
+
+  /**
+   * Signal que controla o menu de documento aberto.
+   */
+  openDocumentMenu = signal<number | null>(null);
 
   /**
    * Signal que controla a visibilidade do modal de criação de equipa.
@@ -55,9 +108,19 @@ export class TeamsComponent {
   isCreateModalOpen = signal(false);
 
   /**
-   * Texto utilizado para pesquisa de equipas.
+   * Signal que controla a visibilidade do modal de delete.
    */
-  searchQuery = '';
+  isDeleteModalOpen = signal(false);
+
+  /**
+   * ID do documento a apagar.
+   */
+  documentToDelete = signal<number | null>(null);
+
+  /**
+   * Signal que controla o estado de loading do delete.
+   */
+  isDeleting = signal(false);
 
   /**
    * Nome da nova equipa a ser criada.
@@ -125,6 +188,62 @@ export class TeamsComponent {
    */
   handleDocumentClick(docId: number): void {
     this.router.navigate(['/editor', docId]);
+  }
+
+  /**
+   * Abre/fecha o menu de opções de um documento.
+   */
+  toggleDocumentMenu(event: Event, docId: number): void {
+    event.stopPropagation();
+    this.openDocumentMenu.update(current => current === docId ? null : docId);
+  }
+
+  /**
+   * Verifica se o utilizador atual é o criador do documento.
+   */
+  isDocumentOwner(doc: TeamDocument): boolean {
+    const currentUser = this.authService.currentUser();
+    return currentUser?.id === doc.createdById;
+  }
+
+  /**
+   * Apaga um documento.
+   */
+  handleDeleteDocument(event: Event, docId: number): void {
+    event.stopPropagation();
+    this.openDocumentMenu.set(null);
+    this.documentToDelete.set(docId);
+    this.isDeleteModalOpen.set(true);
+  }
+
+  /**
+   * Fecha o modal de confirmação de delete.
+   */
+  closeDeleteModal(): void {
+    this.isDeleteModalOpen.set(false);
+    this.documentToDelete.set(null);
+  }
+
+  /**
+   * Confirma e executa o delete do documento.
+   */
+  confirmDelete(): void {
+    const docId = this.documentToDelete();
+    if (!docId) return;
+
+    this.isDeleting.set(true);
+    this.documentService.deleteDocument(docId).subscribe({
+      next: () => {
+        this.isDeleting.set(false);
+        this.closeDeleteModal();
+        // Recarregar equipas para atualizar a lista de documentos
+        this.loadTeams();
+      },
+      error: (err) => {
+        this.isDeleting.set(false);
+        console.error('Error deleting document:', err);
+      }
+    });
   }
 
   /**

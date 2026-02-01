@@ -1,11 +1,9 @@
-import { Component, inject, signal, ViewChild } from '@angular/core';
-// TODO: BACKEND INTEGRATION - Descomentar quando implementar ngOnInit
-// import { OnInit } from '@angular/core';
+import { Component, inject, signal, ViewChild, OnInit } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
-import { ButtonComponent, BadgeComponent } from '../../shared/components/ui';
+import { ButtonComponent, BadgeComponent, WorkInProgressComponent } from '../../shared/components/ui';
 import { DocumentService } from '../../core/services';
 import { Collaborator, Version, Comment, AISuggestion } from '../../core/models';
 import { TextEditorComponent } from './components/text-editor.component';
@@ -24,32 +22,27 @@ import { TextEditorComponent } from './components/text-editor.component';
     ButtonComponent,
     BadgeComponent,
     TextEditorComponent,
+    WorkInProgressComponent,
   ],
   template: `
     <div class="min-h-screen bg-gray-50 flex flex-col relative">
-      <!-- Collaborative Cursors -->
-      @for (user of collaborators; track user.name; let idx = $index) {
-        <div
-          class="absolute pointer-events-none z-50 transition-all duration-300"
-          [style.left.px]="100 + idx * 200"
-          [style.top.px]="150 + idx * 100"
-        >
-          <svg width="24" height="24" viewBox="0 0 24 24" [style.fill]="user.color">
-            <path d="M5.65 2.95L19.07 12.52L11.97 13.65L8.95 20.68L5.65 2.95Z" />
-          </svg>
-          <span
-            class="ml-2 px-2 py-1 text-xs text-white rounded-md whitespace-nowrap"
-            [style.backgroundColor]="user.color"
-          >
-            {{ user.name }}
-          </span>
+      <!-- Loading State -->
+      @if (isLoading()) {
+        <div class="flex flex-col items-center justify-center h-screen gap-4">
+          <lucide-icon name="loader-circle" class="h-10 w-10 text-[#155347] animate-spin"></lucide-icon>
+          <div class="text-gray-500 text-sm">Loading document...</div>
         </div>
-      }
-
-      <!-- Header -->
-      <header class="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between shrink-0">
-        <div class="flex items-center gap-4">
-          <button (click)="navigateBack()" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+      } @else if (loadError()) {
+        <div class="flex flex-col items-center justify-center h-screen gap-4">
+          <lucide-icon name="alert-circle" class="h-10 w-10 text-red-500"></lucide-icon>
+          <div class="text-red-600 text-sm">{{ loadError() }}</div>
+          <div class="text-gray-500 text-xs">Redirecting to dashboard...</div>
+        </div>
+      } @else {
+        <!-- Header -->
+        <header class="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between shrink-0">
+          <div class="flex items-center gap-4">
+            <button (click)="navigateBack()" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
             <lucide-icon name="arrow-left" class="h-5 w-5 text-gray-600"></lucide-icon>
           </button>
           <div class="flex-1">
@@ -77,33 +70,19 @@ import { TextEditorComponent } from './components/text-editor.component';
           </div>
         </div>
         <div class="flex items-center gap-2">
-          <!-- Active collaborators -->
-          <div class="flex items-center -space-x-2 mr-4">
-            @for (user of collaborators; track user.name) {
-              <div
-                class="h-8 w-8 rounded-full border-2 border-white flex items-center justify-center text-white text-xs font-medium"
-                [style.backgroundColor]="user.color"
-                [title]="user.name"
-              >
-                {{ user.initials }}
-              </div>
-            }
-          </div>
-
-          <app-button variant="outline" size="sm" [leftIcon]="true" (onClick)="toggleAIPanel()">
+          <app-button variant="outline" size="sm" [leftIcon]="true" (onClick)="showWipModal.set(true)">
             <lucide-icon leftIcon name="sparkles" class="h-4 w-4"></lucide-icon>
             AI Assistant
           </app-button>
-          <app-button variant="outline" size="sm" [leftIcon]="true" (onClick)="toggleVersionHistory()">
+          <app-button variant="outline" size="sm" [leftIcon]="true" (onClick)="showWipModal.set(true)">
             <lucide-icon leftIcon name="clock" class="h-4 w-4"></lucide-icon>
             History
           </app-button>
-          <app-button variant="outline" size="sm" [leftIcon]="true" (onClick)="toggleComments()">
+          <app-button variant="outline" size="sm" [leftIcon]="true" (onClick)="showWipModal.set(true)">
             <lucide-icon leftIcon name="message-square" class="h-4 w-4"></lucide-icon>
             Comments
-            <app-badge customClass="ml-2 bg-red-500 text-white">2</app-badge>
           </app-button>
-          <app-button variant="outline" size="sm" [leftIcon]="true" (onClick)="showShareModal.set(true)">
+          <app-button variant="outline" size="sm" [leftIcon]="true" (onClick)="showWipModal.set(true)">
             <lucide-icon leftIcon name="share-2" class="h-4 w-4"></lucide-icon>
             Share
           </app-button>
@@ -441,25 +420,33 @@ import { TextEditorComponent } from './components/text-editor.component';
           </div>
         </div>
       }
+      } <!-- End of @else (loading) -->
+
+      <!-- Work in Progress Modal -->
+      <app-work-in-progress [show]="showWipModal()" (close)="showWipModal.set(false)" />
     </div>
   `,
 })
-// TODO: BACKEND INTEGRATION - Adicionar implements OnInit quando implementar ngOnInit
-export class DocumentEditorComponent {
+export class DocumentEditorComponent implements OnInit {
   @ViewChild('editor') editor!: TextEditorComponent;
 
   private router = inject(Router);
-  // TODO: BACKEND INTEGRATION - Descomentar quando backend estiver pronto
-  // private route = inject(ActivatedRoute);
+  private route = inject(ActivatedRoute);
   private documentService = inject(DocumentService);
+  private location = inject(Location);
   
-  // TODO: BACKEND INTEGRATION - Adicionar campo para armazenar ID do documento
-  // documentId: number | null = null;
+  // ID do documento atual
+  documentId: number | null = null;
+  
+  // Estado de carregamento
+  isLoading = signal(true);
+  loadError = signal<string | null>(null);
 
   showVersionHistory = signal(false);
   showComments = signal(false);
   showShareModal = signal(false);
   showAIPanel = signal(false);
+  showWipModal = signal(false);
   isRestoreModalOpen = signal(false);
   versionToRestore = signal<number | null>(null);
   newComment = '';
@@ -468,36 +455,16 @@ export class DocumentEditorComponent {
   restoreConfirmed = false;
 
   // Document state
-  // TODO: BACKEND INTEGRATION - Remover valores hardcoded e carregar do backend
-  // Estes valores devem vir de:
-  // - GET /api/v1/documents/{id} -> para documentTitle
-  // - GET /api/v1/documents/{id}/content -> para initialContent
-  documentTitle = 'Market Analysis 2024';
-  originalTitle = 'Market Analysis 2024';
+  documentTitle = '';
+  originalTitle = '';
   isEditingTitle = signal(false);
   lastEdited = signal(new Date());
 
-  // TODO: BACKEND INTEGRATION - Este conteúdo deve ser carregado do backend
-  // Chamar documentService.loadDocumentContent(id) em ngOnInit
-  initialContent = `
-    <h1>Market Analysis 2024: The Impact of Technological Innovation</h1>
-    <p>The year 2024 marks a period of unprecedented transformation in the global scenario, primarily driven by the rapid evolution and adoption of new technologies. Artificial intelligence (AI) continues to be a central engine behind this change, redefining sectors from manufacturing to services.</p>
-    <p>Beyond AI, quantum computing and biotechnology are also emerging as fields with the potential to revolutionize the technological landscape in the next decade. Although still in early stages of commercialization, investment in research and development in these areas is robust.</p>
-    <p>Environmental sustainability and corporate social responsibility (CSR) also play a crucial role in business decisions and investment in 2024. Consumers and investors are increasingly aware of companies' impact on the planet and society.</p>
-    <h2>Key Trends</h2>
-    <ul>
-      <li>Artificial Intelligence adoption across industries</li>
-      <li>Quantum computing research breakthroughs</li>
-      <li>Sustainable technology investments</li>
-      <li>Remote work infrastructure improvements</li>
-    </ul>
-    <blockquote>The future belongs to those who prepare for it today. - Malcolm X</blockquote>
-  `;
+  // Conteúdo inicial do editor (carregado do backend)
+  initialContent = '';
 
-  collaborators: Collaborator[] = [
-    { name: 'Sarah Kim', initials: 'SK', color: '#3B82F6' },
-    { name: 'John Doe', initials: 'JD', color: '#8B5CF6' },
-  ];
+  // TODO: Implementar colaboração em tempo real
+  collaborators: Collaborator[] = [];
 
   versions: Version[] = this.documentService.getVersions();
   comments: Comment[] = this.documentService.getComments();
@@ -505,45 +472,53 @@ export class DocumentEditorComponent {
 
   lastEditedText = signal('Last edited just now');
 
-  // TODO: BACKEND INTEGRATION - Implementar ngOnInit para carregar documento do backend
-  // ngOnInit(): void {
-  //   const documentId = this.route.snapshot.paramMap.get('id');
-  //   if (documentId) {
-  //     this.documentId = +documentId;
-  //     this.loadDocument(this.documentId);
-  //   } else {
-  //     // Redirecionar para dashboard se não houver ID
-  //     this.router.navigate(['/dashboard']);
-  //   }
-  // }
-  //
-  // private loadDocument(id: number): void {
-  //   this.documentService.loadDocument(id).subscribe({
-  //     next: (doc) => {
-  //       this.documentTitle = doc.title;
-  //       this.originalTitle = doc.title;
-  //       this.lastEditedText.set(this.formatLastEdited(doc.updatedAt));
-  //     },
-  //     error: (err) => {
-  //       console.error('Error loading document:', err);
-  //       // Redirecionar para dashboard em caso de erro
-  //       this.router.navigate(['/dashboard']);
-  //     }
-  //   });
-  //
-  //   this.documentService.loadDocumentContent(id).subscribe({
-  //     next: (content) => {
-  //       this.initialContent = content;
-  //       // Se o editor já estiver inicializado, atualizar conteúdo
-  //       if (this.editor) {
-  //         this.editor.setContent(content);
-  //       }
-  //     },
-  //     error: (err) => {
-  //       console.error('Error loading document content:', err);
-  //     }
-  //   });
-  // }
+  ngOnInit(): void {
+    const id = this.route.snapshot.paramMap.get('id');
+    if (id) {
+      this.documentId = +id;
+      this.loadDocument(this.documentId);
+    } else {
+      // Redirecionar para dashboard se não houver ID
+      this.router.navigate(['/dashboard']);
+    }
+  }
+
+  private loadDocument(id: number): void {
+    this.isLoading.set(true);
+    this.loadError.set(null);
+
+    this.documentService.getDocument(id).subscribe({
+      next: (doc) => {
+        this.documentTitle = doc.title;
+        this.originalTitle = doc.title;
+        this.initialContent = doc.content || '';
+        this.lastEdited.set(new Date(doc.updatedAt));
+        this.lastEditedText.set(this.formatLastEdited(new Date(doc.updatedAt)));
+        this.isLoading.set(false);
+      },
+      error: (err) => {
+        console.error('Error loading document:', err);
+        this.loadError.set(err.error?.message || 'Error loading document');
+        this.isLoading.set(false);
+        // Redirecionar para dashboard após delay
+        setTimeout(() => this.router.navigate(['/dashboard']), 2000);
+      }
+    });
+  }
+
+  private formatLastEdited(date: Date): string {
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+
+    if (diffMins < 1) return 'Last edited just now';
+    if (diffMins < 60) return `Last edited ${diffMins} minute${diffMins > 1 ? 's' : ''} ago`;
+    if (diffHours < 24) return `Last edited ${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
+    if (diffDays === 1) return 'Last edited yesterday';
+    return `Last edited ${diffDays} days ago`;
+  }
 
   startEditingTitle(): void {
     this.originalTitle = this.documentTitle;
@@ -562,23 +537,23 @@ export class DocumentEditorComponent {
       this.documentTitle = this.originalTitle;
     }
     this.isEditingTitle.set(false);
-    this.updateLastEdited();
     
-    // TODO: BACKEND INTEGRATION - Guardar título no backend
-    // if (this.documentId) {
-    //   this.documentService.updateDocumentMetadata(this.documentId, {
-    //     title: this.documentTitle
-    //   }).subscribe({
-    //     next: () => {
-    //       console.log('Title saved successfully');
-    //     },
-    //     error: (err) => {
-    //       console.error('Error saving title:', err);
-    //       // Reverter título em caso de erro
-    //       this.documentTitle = this.originalTitle;
-    //     }
-    //   });
-    // }
+    // Guardar título no backend
+    if (this.documentId && this.documentTitle !== this.originalTitle) {
+      this.documentService.updateDocument(this.documentId, {
+        title: this.documentTitle
+      }).subscribe({
+        next: () => {
+          this.originalTitle = this.documentTitle;
+          this.updateLastEdited();
+        },
+        error: (err) => {
+          console.error('Error saving title:', err);
+          // Reverter título em caso de erro
+          this.documentTitle = this.originalTitle;
+        }
+      });
+    }
   }
 
   cancelTitleEdit(): void {
@@ -592,36 +567,28 @@ export class DocumentEditorComponent {
   }
 
   onContentChange(content: string): void {
-    this.updateLastEdited();
+    // Função que é chamada quando o conteúdo do editor muda,
+    // fica aqui para se for preciso fazer algo em tempo real
   }
 
   onSave(content: string): void {
-    // TODO: BACKEND INTEGRATION - Implementar guardar conteúdo no backend
-    // Endpoint: PUT /api/v1/documents/{id}/content
-    // 
-    // if (this.documentId) {
-    //   this.documentService.saveDocumentContent(this.documentId, content).subscribe({
-    //     next: () => {
-    //       console.log('Document saved successfully');
-    //       this.editor.setSaveStatus('saved');
-    //       this.updateLastEdited();
-    //     },
-    //     error: (err) => {
-    //       console.error('Error saving document:', err);
-    //       this.editor.setSaveStatus('error');
-    //       // Opcional: Mostrar notificação de erro ao utilizador
-    //     }
-    //   });
-    // } else {
-    //   console.warn('Cannot save: Document ID is missing');
-    //   this.editor.setSaveStatus('error');
-    // }
-    
-    // TEMPORÁRIO: Apenas para desenvolvimento sem backend
-    console.log('Saving document content:', content.substring(0, 100) + '...');
-  }
+    if (!this.documentId) {
+      console.warn('Cannot save: Document ID is missing');
+      this.editor.setSaveStatus('error');
+      return;
+    }
 
-  private location = inject(Location);
+    this.documentService.updateDocument(this.documentId, { content }).subscribe({
+      next: () => {
+        this.editor.setSaveStatus('saved');
+        this.updateLastEdited();
+      },
+      error: (err) => {
+        console.error('Error saving document:', err);
+        this.editor.setSaveStatus('error');
+      }
+    });
+  }
 
   navigateBack(): void {
     this.location.back();

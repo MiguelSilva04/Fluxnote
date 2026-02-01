@@ -11,6 +11,7 @@ export interface DocumentDto {
   createdAt: string;
   updatedAt: string;
   isDeleted: boolean;
+  preview?: string; // Preview do texto (usado em pesquisas)
 }
 
 /**

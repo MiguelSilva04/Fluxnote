@@ -13,6 +13,11 @@
     font-size: 16px;
   }
 
+  :host ::ng-deep .ql-container:focus,
+  :host ::ng-deep .ql-editor:focus {
+    outline: none;
+  }
+
   :host ::ng-deep .ql-editor {
     padding: 3rem;
     min-height: 600px;
@@ -81,8 +86,33 @@
     border-radius: 0.5rem;
     margin: 1rem 0;
     cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-user-drag: none;
+    -webkit-touch-callout: none;
+  }
+
+  :host ::ng-deep .ql-editor img::selection {
+    background: transparent;
+  }
+
+  :host ::ng-deep .ql-editor img::-moz-selection {
+    background: transparent;
   }
 
   :host ::ng-deep .ql-editor img:hover {
     box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  }
+
+  /* Alignment styles */
+  :host ::ng-deep .ql-editor .ql-align-center {
+    text-align: center;
+  }
+
+  :host ::ng-deep .ql-editor .ql-align-right {
+    text-align: right;
+  }
+
+  :host ::ng-deep .ql-editor .ql-align-justify {
+    text-align: justify;
   }

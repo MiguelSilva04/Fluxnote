@@ -29,6 +29,8 @@ interface EditorFormats {
   listBullet: boolean;
   align: string;
   header: string;
+  textColor: string;
+  backgroundColor: string;
 }
 
 const DEFAULT_FORMATS: EditorFormats = {
@@ -43,6 +45,8 @@ const DEFAULT_FORMATS: EditorFormats = {
   listBullet: false,
   align: '',
   header: '',
+  textColor: '#000000',
+  backgroundColor: '#ffffff',
 };
 
 @Component({
@@ -67,6 +71,11 @@ export class TextEditorComponent implements OnInit, AfterViewInit, OnDestroy {
   saveStatus = signal<SaveStatus>('idle');
   formats: EditorFormats = { ...DEFAULT_FORMATS };
 
+  // Manipulação de imagem
+  selectedImage = signal<HTMLImageElement | null>(null);
+  showImageMenu = signal(false);
+  imageMenuPosition = signal({ top: 0, left: 0 });
+
   private quill!: Quill;
   private destroy$ = new Subject<void>();
   private contentChange$ = new Subject<string>();
@@ -81,11 +90,23 @@ export class TextEditorComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngAfterViewInit(): void {
     this.initializeQuill();
+    
+    // Fechar menus de cores ao clicar fora
+    document.addEventListener('click', this.handleClickOutside.bind(this));
   }
 
   ngOnDestroy(): void {
+    document.removeEventListener('click', this.handleClickOutside.bind(this));
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  private handleClickOutside(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+    if (!target.closest('.relative')) {
+      this.showTextColorMenu.set(false);
+      this.showBgColorMenu.set(false);
+    }
   }
 
   private initializeQuill(): void {
@@ -97,14 +118,15 @@ export class TextEditorComponent implements OnInit, AfterViewInit, OnDestroy {
       },
     });
 
+    // Desativar corretor ortográfico
+    this.quill.root.setAttribute('spellcheck', 'false');
+
     if (this.initialContent()) {
       this.quill.root.innerHTML = this.initialContent();
     }
 
     this.quill.on('text-change', () => {
-      const content = this.quill.root.innerHTML;
-      this.contentChange.emit(content);
-      this.contentChange$.next(content);
+      this.triggerContentChange();
       this.saveStatus.set('idle');
     });
 
@@ -118,7 +140,7 @@ export class TextEditorComponent implements OnInit, AfterViewInit, OnDestroy {
       this.updateActiveFormats();
     });
 
-    // Intercept drag & drop to validate image size (capture phase to run before Quill)
+    // Interceptar drag & drop para validar tamanho da imagem (fase de captura para executar antes do Quill)
     this.quill.root.addEventListener(
       'drop',
       (e: DragEvent) => {
@@ -134,6 +156,17 @@ export class TextEditorComponent implements OnInit, AfterViewInit, OnDestroy {
       },
       true
     );
+
+    // Handler de clique em imagem para manipulação
+    this.quill.root.addEventListener('click', (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (target.tagName === 'IMG') {
+        e.preventDefault();
+        this.selectImage(target as HTMLImageElement);
+      } else {
+        this.deselectImage();
+      }
+    });
   }
 
   private handleDroppedImage(file: File): void {
@@ -169,6 +202,8 @@ export class TextEditorComponent implements OnInit, AfterViewInit, OnDestroy {
       listBullet: quillFormats['list'] === 'bullet',
       align: (quillFormats['align'] as string) || '',
       header: (quillFormats['header'] as string) || '',
+      textColor: (quillFormats['color'] as string) || '#000000',
+      backgroundColor: (quillFormats['background'] as string) || '#ffffff',
     };
 
     if (this.headerSelect) {
@@ -240,6 +275,62 @@ export class TextEditorComponent implements OnInit, AfterViewInit, OnDestroy {
     this.updateActiveFormats();
   }
 
+  // Menus de cores
+  showTextColorMenu = signal(false);
+  showBgColorMenu = signal(false);
+
+  textColors = [
+    { name: 'Black', value: '#000000' },
+    { name: 'Dark Gray', value: '#4a4a4a' },
+    { name: 'Gray', value: '#9b9b9b' },
+    { name: 'Light Gray', value: '#d9d9d9' },
+    { name: 'White', value: '#ffffff' },
+    { name: 'Red', value: '#e53935' },
+    { name: 'Orange', value: '#fb8c00' },
+    { name: 'Yellow', value: '#fdd835' },
+    { name: 'Green', value: '#43a047' },
+    { name: 'Teal', value: '#00897b' },
+    { name: 'Blue', value: '#1e88e5' },
+    { name: 'Purple', value: '#8e24aa' },
+  ];
+
+  backgroundColors = [
+    { name: 'No Color', value: '#ffffff' },
+    { name: 'Light Gray', value: '#f5f5f5' },
+    { name: 'Light Red', value: '#ffebee' },
+    { name: 'Light Orange', value: '#fff3e0' },
+    { name: 'Light Yellow', value: '#fffde7' },
+    { name: 'Light Green', value: '#e8f5e9' },
+    { name: 'Light Teal', value: '#e0f2f1' },
+    { name: 'Light Blue', value: '#e3f2fd' },
+    { name: 'Light Purple', value: '#f3e5f5' },
+    { name: 'Red', value: '#ffcdd2' },
+    { name: 'Yellow', value: '#fff59d' },
+    { name: 'Green', value: '#c8e6c9' },
+  ];
+
+  toggleTextColorMenu(): void {
+    this.showBgColorMenu.set(false);
+    this.showTextColorMenu.update(v => !v);
+  }
+
+  toggleBgColorMenu(): void {
+    this.showTextColorMenu.set(false);
+    this.showBgColorMenu.update(v => !v);
+  }
+
+  applyTextColor(color: string): void {
+    this.quill.format('color', color || false);
+    this.showTextColorMenu.set(false);
+    this.updateActiveFormats();
+  }
+
+  applyBackgroundColor(color: string): void {
+    this.quill.format('background', color || false);
+    this.showBgColorMenu.set(false);
+    this.updateActiveFormats();
+  }
+
   insertImage(): void {
     this.imageInput.nativeElement.click();
   }
@@ -276,6 +367,104 @@ export class TextEditorComponent implements OnInit, AfterViewInit, OnDestroy {
     const range = this.quill.getSelection(true);
     this.quill.insertEmbed(range.index, 'image', imageUrl);
     this.quill.setSelection(range.index + 1);
+  }
+
+  // Métodos de manipulação de imagem
+  private selectImage(img: HTMLImageElement): void {
+    // Remover seleção da imagem anterior
+    this.deselectImage();
+    
+    this.selectedImage.set(img);
+    img.classList.add('selected-image');
+    
+    // Calcular posição do menu
+    const rect = img.getBoundingClientRect();
+    const editorRect = this.editorContainer.nativeElement.getBoundingClientRect();
+    
+    this.imageMenuPosition.set({
+      top: rect.top - editorRect.top - 45,
+      left: rect.left - editorRect.left + (rect.width / 2) - 100
+    });
+    
+    this.showImageMenu.set(true);
+  }
+
+  deselectImage(): void {
+    const currentImage = this.selectedImage();
+    if (currentImage) {
+      currentImage.classList.remove('selected-image');
+    }
+    this.selectedImage.set(null);
+    this.showImageMenu.set(false);
+  }
+
+  setImageSize(size: 'small' | 'medium' | 'large' | 'full'): void {
+    const img = this.selectedImage();
+    if (!img) return;
+
+    // Remover classes de tamanho existentes
+    img.classList.remove('img-small', 'img-medium', 'img-large', 'img-full');
+    
+    switch (size) {
+      case 'small':
+        img.style.width = '25%';
+        break;
+      case 'medium':
+        img.style.width = '50%';
+        break;
+      case 'large':
+        img.style.width = '75%';
+        break;
+      case 'full':
+        img.style.width = '100%';
+        break;
+    }
+    
+    img.style.height = 'auto';
+    this.triggerContentChange();
+  }
+
+  setImageAlign(align: 'left' | 'center' | 'right'): void {
+    const img = this.selectedImage();
+    if (!img) return;
+
+    // Resetar estilos
+    img.style.display = 'block';
+    img.style.marginLeft = '';
+    img.style.marginRight = '';
+    img.style.float = '';
+
+    switch (align) {
+      case 'left':
+        img.style.float = 'left';
+        img.style.marginRight = '1rem';
+        break;
+      case 'center':
+        img.style.marginLeft = 'auto';
+        img.style.marginRight = 'auto';
+        break;
+      case 'right':
+        img.style.float = 'right';
+        img.style.marginLeft = '1rem';
+        break;
+    }
+    
+    this.triggerContentChange();
+  }
+
+  deleteImage(): void {
+    const img = this.selectedImage();
+    if (!img) return;
+
+    img.remove();
+    this.deselectImage();
+    this.triggerContentChange();
+  }
+
+  private triggerContentChange(): void {
+    const content = this.quill.root.innerHTML;
+    this.contentChange.emit(content);
+    this.contentChange$.next(content);
   }
 
   getToolbarButtonClass(isActive: boolean | string | undefined): string {

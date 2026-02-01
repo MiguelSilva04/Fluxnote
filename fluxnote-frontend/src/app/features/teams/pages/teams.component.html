@@ -5,11 +5,12 @@
         <h1 class="text-2xl font-bold text-gray-900">My Teams</h1>
         <div class="flex items-center gap-3">
           <div class="relative">
-            <lucide-icon name="search" class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400"></lucide-icon>
+            <lucide-icon name="search" class="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400"></lucide-icon>
             <input
               type="text"
               placeholder="Search teams..."
-              [(ngModel)]="searchQuery"
+              [ngModel]="searchQuery()"
+              (ngModelChange)="searchQuery.set($event)"
               class="h-10 pl-10 pr-4 rounded-lg border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-[#155347] focus:border-transparent text-sm w-64"
             />
           </div>
@@ -100,8 +101,8 @@
             </div>
           </div>
         }
-        @else if(teams()){
-          @for (team of teams(); track team.id) 
+        @else if(filteredTeams()){
+          @for (team of filteredTeams(); track team.id) 
           {
             <app-card customClass="overflow-hidden">
               <div class="p-6">
@@ -181,7 +182,29 @@
                               {{ doc.title }}
                             </span>
                           </div>
-                
+                          
+                          <!-- Menu de opções do documento -->
+                          @if (isDocumentOwner(doc)) {
+                            <div class="relative">
+                              <button 
+                                class="p-1 hover:bg-gray-200 rounded" 
+                                (click)="toggleDocumentMenu($event, doc.id)"
+                              >
+                                <lucide-icon name="ellipsis-vertical" class="h-4 w-4 text-gray-400"></lucide-icon>
+                              </button>
+                              @if (openDocumentMenu() === doc.id) {
+                                <div class="absolute right-0 top-6 bg-white rounded-lg shadow-lg border border-gray-200 py-1 min-w-[120px] z-10">
+                                  <button
+                                    (click)="handleDeleteDocument($event, doc.id)"
+                                    class="w-full px-3 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
+                                  >
+                                    <lucide-icon name="trash-2" class="h-4 w-4"></lucide-icon>
+                                    Delete
+                                  </button>
+                                </div>
+                              }
+                            </div>
+                          }
                         </div>
                       }
                     </div>
@@ -199,6 +222,16 @@
                 }
               </div>
             </app-card>
+          }
+          @empty {
+            <!-- Estado vazio da pesquisa -->
+            <div class="flex flex-col items-center justify-center h-[40vh] gap-4">
+              <lucide-icon name="search-x" class="h-12 w-12 text-gray-300"></lucide-icon>
+              <div class="text-center">
+                <p class="text-gray-600 font-medium">No teams found</p>
+                <p class="text-gray-400 text-sm">Try searching with different keywords</p>
+              </div>
+            </div>
           }
 
         } 
@@ -221,6 +254,34 @@
       <div footer class="flex gap-3">
         <app-button variant="ghost" (onClick)="isCreateModalOpen.set(false)">Cancel</app-button>
         <app-button (onClick)="createTeam()">Create Team</app-button>
+      </div>
+    </app-modal>
+
+    <!-- Delete Confirmation Modal -->
+    <app-modal
+      [isOpen]="isDeleteModalOpen()"
+      title="Delete Document"
+      (onClose)="closeDeleteModal()"
+      [hasFooter]="true"
+      maxWidth="sm"
+    >
+      <div class="text-center">
+        <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
+          <lucide-icon name="trash-2" class="h-6 w-6 text-red-600"></lucide-icon>
+        </div>
+        <p class="text-gray-600">
+          Are you sure you want to delete this document? This action cannot be undone.
+        </p>
+      </div>
+      <div footer class="flex gap-3 w-full">
+        <app-button variant="ghost" customClass="flex-1" (onClick)="closeDeleteModal()">Cancel</app-button>
+        <app-button 
+          customClass="flex-1 bg-red-600 hover:bg-red-700" 
+          (onClick)="confirmDelete()"
+          [isLoading]="isDeleting()"
+        >
+          Delete
+        </app-button>
       </div>
     </app-modal>
   </app-dashboard-layout>

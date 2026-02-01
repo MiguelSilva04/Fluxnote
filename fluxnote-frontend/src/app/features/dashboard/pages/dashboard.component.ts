@@ -4,8 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
 import { DashboardLayoutComponent } from '../../../layout/dashboard-layout/dashboard-layout.component';
-import { ButtonComponent, CardComponent, CardContentComponent, BadgeComponent } from '../../../shared/components/ui';
-import { DocumentService, TeamService } from '../../../core/services';
+import { ButtonComponent, CardComponent, CardContentComponent, BadgeComponent, ModalComponent } from '../../../shared/components/ui';
+import { DocumentService, TeamService, AuthService } from '../../../core/services';
 import { DocumentDto, TeamGet } from '../../../core/models';
 
 @Component({
@@ -19,7 +19,8 @@ import { DocumentDto, TeamGet } from '../../../core/models';
     ButtonComponent,
     CardComponent,
     CardContentComponent,
-    BadgeComponent
+    BadgeComponent,
+    ModalComponent
   ],
   template: `
     <app-dashboard-layout>
@@ -126,9 +127,30 @@ import { DocumentDto, TeamGet } from '../../../core/models';
                     <div class="p-3 bg-[#e8f0ee] rounded-lg">
                       <lucide-icon name="file-text" class="h-6 w-6 text-[#155347]"></lucide-icon>
                     </div>
-                    <button class="p-1 hover:bg-gray-100 rounded" (click)="$event.stopPropagation()">
-                      <lucide-icon name="ellipsis-vertical" class="h-5 w-5 text-gray-400"></lucide-icon>
-                    </button>
+                    <!-- Menu dropdown -->
+                    <div class="relative">
+                      <button 
+                        class="p-1 hover:bg-gray-100 rounded" 
+                        (click)="toggleDocumentMenu($event, doc.id)"
+                      >
+                        <lucide-icon name="ellipsis-vertical" class="h-5 w-5 text-gray-400"></lucide-icon>
+                      </button>
+                      @if (openDocumentMenu() === doc.id) {
+                        <div class="absolute right-0 top-8 bg-white rounded-lg shadow-lg border border-gray-200 py-1 min-w-[140px] z-10">
+                          @if (isDocumentOwner(doc)) {
+                            <button
+                              (click)="handleDeleteDocument($event, doc.id)"
+                              class="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
+                            >
+                              <lucide-icon name="trash-2" class="h-4 w-4"></lucide-icon>
+                              Delete
+                            </button>
+                          } @else {
+                            <span class="px-4 py-2 text-sm text-gray-400">No actions available</span>
+                          }
+                        </div>
+                      }
+                    </div>
                   </div>
                   <h3 class="text-lg font-bold text-gray-900 mb-2">{{ doc.title }}</h3>
                   <div class="flex items-center gap-4 text-sm text-gray-600">
@@ -274,6 +296,34 @@ import { DocumentDto, TeamGet } from '../../../core/models';
           </div>
         </div>
       }
+
+      <!-- Delete Confirmation Modal -->
+      <app-modal
+        [isOpen]="isDeleteModalOpen()"
+        title="Delete Document"
+        (onClose)="closeDeleteModal()"
+        [hasFooter]="true"
+        maxWidth="sm"
+      >
+        <div class="text-center">
+          <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
+            <lucide-icon name="trash-2" class="h-6 w-6 text-red-600"></lucide-icon>
+          </div>
+          <p class="text-gray-600">
+            Are you sure you want to delete this document? This action cannot be undone.
+          </p>
+        </div>
+        <div footer class="flex gap-3 w-full">
+          <app-button variant="ghost" customClass="flex-1" (onClick)="closeDeleteModal()">Cancel</app-button>
+          <app-button 
+            customClass="flex-1 bg-red-600 hover:bg-red-700" 
+            (onClick)="confirmDelete()"
+            [isLoading]="isDeleting()"
+          >
+            Delete
+          </app-button>
+        </div>
+      </app-modal>
     </app-dashboard-layout>
   `
 })
@@ -281,10 +331,12 @@ export class DashboardComponent implements OnInit {
   private router = inject(Router);
   private documentService = inject(DocumentService);
   private teamService = inject(TeamService);
+  private authService = inject(AuthService);
 
   // View state
   viewMode = signal<'grid' | 'list'>('grid');
   selectedTeamFilter = signal<number | null>(null);
+  openDocumentMenu = signal<number | null>(null);
 
   // Modal state
   isCreateModalOpen = signal(false);
@@ -293,6 +345,11 @@ export class DashboardComponent implements OnInit {
   documentTitle = '';
   newTeamName = '';
   searchTeamQuery = signal('');
+
+  // Delete modal state
+  isDeleteModalOpen = signal(false);
+  documentToDelete = signal<number | null>(null);
+  isDeleting = signal(false);
 
   // Loading states
   isLoading = this.documentService.isLoading;
@@ -431,6 +488,46 @@ export class DashboardComponent implements OnInit {
 
   handleDocumentClick(docId: number): void {
     this.router.navigate(['/editor', docId]);
+  }
+
+  toggleDocumentMenu(event: Event, docId: number): void {
+    event.stopPropagation();
+    this.openDocumentMenu.update(current => current === docId ? null : docId);
+  }
+
+  isDocumentOwner(doc: DocumentDto): boolean {
+    const currentUser = this.authService.currentUser();
+    return currentUser?.id === doc.createdById;
+  }
+
+  handleDeleteDocument(event: Event, docId: number): void {
+    event.stopPropagation();
+    this.openDocumentMenu.set(null);
+    this.documentToDelete.set(docId);
+    this.isDeleteModalOpen.set(true);
+  }
+
+  closeDeleteModal(): void {
+    this.isDeleteModalOpen.set(false);
+    this.documentToDelete.set(null);
+  }
+
+  confirmDelete(): void {
+    const docId = this.documentToDelete();
+    if (!docId) return;
+
+    this.isDeleting.set(true);
+    this.documentService.deleteDocument(docId).subscribe({
+      next: () => {
+        this.isDeleting.set(false);
+        this.closeDeleteModal();
+      },
+      error: (err) => {
+        this.isDeleting.set(false);
+        console.error('Error deleting document:', err);
+        // Poderia mostrar um toast de erro aqui
+      }
+    });
   }
 
   formatDate(dateString: string): string {

@@ -14,6 +14,11 @@ namespace Fluxnote.Backend.Dtos.Documents
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
         public bool IsDeleted { get; set; }
+        
+        /// <summary>
+        /// Preview do texto (usado em pesquisas)
+        /// </summary>
+        public string? Preview { get; set; }
     }
 
     /// <summary>
@@ -32,7 +37,7 @@ namespace Fluxnote.Backend.Dtos.Documents
         public bool IsDeleted { get; set; }
 
         /// <summary>
-        /// Conteúdo Y.Doc serializado em Base64
+        /// Conteúdo HTML do documento
         /// </summary>
         public string? Content { get; set; }
 

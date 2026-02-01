@@ -55,11 +55,12 @@ namespace Fluxnote.Backend.Controllers
                         Role = (int)m.Role,
                         JoinedAt = m.JoinedAt
                     }).ToList(),
-                    Documents = t.Documents.Select(d => new TeamDocumentDto
+                    Documents = t.Documents.Where(d => !d.IsDeleted).Select(d => new TeamDocumentDto
                     {
                         Id = d.Id,
                         Title = d.Title,
-                        UpdatedAt = d.UpdatedAt
+                        UpdatedAt = d.UpdatedAt,
+                        CreatedById = d.CreatedById
                     }).ToList()
                 })
                 .ToListAsync();
@@ -122,11 +123,12 @@ namespace Fluxnote.Backend.Controllers
                     Role = (int)m.Role,
                     JoinedAt = m.JoinedAt
                 }).ToList(),
-                Documents = team.Documents.Select(d => new TeamDocumentDto
+                Documents = team.Documents.Where(d => !d.IsDeleted).Select(d => new TeamDocumentDto
                 {
                     Id = d.Id,
                     Title = d.Title,
-                    UpdatedAt = d.UpdatedAt
+                    UpdatedAt = d.UpdatedAt,
+                    CreatedById = d.CreatedById
                 }).ToList()
             };
 

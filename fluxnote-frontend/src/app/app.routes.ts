@@ -120,6 +120,12 @@ export const routes: Routes = [
       import('./features/teams/pages/team-detail.component').then((m) => m.TeamDetailComponent),
   },
   {
+    path: 'trash',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/trash/pages/trash.component').then((m) => m.TrashComponent),
+  },
+  {
     path: 'subscriptions',
     canActivate: [authGuard],
     loadComponent: () =>

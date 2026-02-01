@@ -85,7 +85,7 @@ import { ToastService } from '../../../../shared/services/toast.service';
                 <button
                   type="button"
                   (click)="showPassword.set(!showPassword())"
-                  class="absolute right-3 top-[34px] text-gray-400 hover:text-gray-600"
+                  class="absolute right-3 top-[38px] text-gray-400 hover:text-gray-600"
                 >
                   <lucide-icon
                     [name]="showPassword() ? 'eye-off' : 'eye'"

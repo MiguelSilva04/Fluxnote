@@ -31,6 +31,8 @@ export interface TeamGet {
 export interface TeamDocument {
   id: number;
   title: string;
+  updatedAt?: string;
+  createdById?: string;
 }
 
 export interface TeamMember {
