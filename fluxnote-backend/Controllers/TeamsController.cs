@@ -179,12 +179,29 @@ namespace Fluxnote.Backend.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteTeam(int id)
         {
-            var team = await _context.Team.FindAsync(id);
+            var team = await _context.Team
+                .Include(t => t.Members)
+                .Include(t => t.Documents)
+                .FirstOrDefaultAsync(t => t.Id == id);
+                
             if (team == null)
             {
                 return NotFound();
             }
 
+            // Remove primeiro todos os membros da equipa
+            if (team.Members != null && team.Members.Any())
+            {
+                _context.TeamMember.RemoveRange(team.Members);
+            }
+
+            // Remove todos os documentos da equipa
+            if (team.Documents != null && team.Documents.Any())
+            {
+                _context.Document.RemoveRange(team.Documents);
+            }
+
+            // Agora remove a equipa
             _context.Team.Remove(team);
             await _context.SaveChangesAsync();
 

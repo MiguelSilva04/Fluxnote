@@ -105,7 +105,10 @@
               <div class="space-y-2">
                 @if (selectedTeam()?.documents) {
                   @for (doc of selectedTeam()!.documents; track doc.id) {
-                    <div class="p-2 border-b text-sm cursor-pointer hover:bg-gray-50 rounded">
+                    <div 
+                      (click)="openDocument(doc.id)"
+                      class="p-2 border-b text-sm cursor-pointer hover:bg-gray-50 rounded"
+                    >
                       {{ doc.title }}
                     </div>
                   }
@@ -115,9 +118,68 @@
             </app-card-content>
           </app-card>
 
+          <!-- Delete Team Section -->
+          <app-card>
+            <app-card-content customClass="p-6">
+              <h3 class="text-sm font-semibold text-gray-900 mb-4">Danger Zone</h3>
+              <p class="text-xs text-gray-500 mb-4">
+                Once you delete a team, there is no going back. Please be certain.
+              </p>
+              <button
+                (click)="openDeleteModal()"
+                class="w-full flex items-center justify-center gap-2 px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 transition-colors"
+              >
+                <lucide-icon name="trash-2" class="h-4 w-4"></lucide-icon>
+                Delete Team
+              </button>
+            </app-card-content>
+          </app-card>
+
         </div>
 
       </div>
     </div>
   }
+
+  <!-- Delete Team Modal -->
+  <app-modal
+    [isOpen]="isDeleteModalOpen()"
+    title="Delete Team"
+    maxWidth="sm"
+    [hasFooter]="true"
+    (onClose)="closeDeleteModal()"
+  >
+    <div class="space-y-4">
+      <div class="flex items-center justify-center w-12 h-12 mx-auto bg-red-100 rounded-full">
+        <lucide-icon name="triangle-alert" class="h-6 w-6 text-red-600"></lucide-icon>
+      </div>
+      <p class="text-center text-gray-600">
+        Are you sure you want to delete <strong>{{ selectedTeam()?.name }}</strong>?
+        This action cannot be undone and all documents in this team will be permanently deleted.
+      </p>
+    </div>
+
+    <div footer class="flex gap-3">
+      <app-button
+        variant="outline"
+        (onClick)="closeDeleteModal()"
+        customClass="flex-1"
+        [disabled]="isDeleting()"
+      >
+        Cancel
+      </app-button>
+      <app-button
+        (onClick)="confirmDeleteTeam()"
+        customClass="flex-1 bg-red-600 hover:bg-red-700 text-white"
+        [disabled]="isDeleting()"
+      >
+        @if (isDeleting()) {
+          <lucide-icon name="loader-circle" class="h-4 w-4 animate-spin mr-2"></lucide-icon>
+          Deleting...
+        } @else {
+          Delete Team
+        }
+      </app-button>
+    </div>
+  </app-modal>
 </app-dashboard-layout>
