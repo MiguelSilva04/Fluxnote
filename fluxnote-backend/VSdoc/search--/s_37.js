@@ -1,0 +1,1 @@
+search_result['37']=["topic_0000000000000019.html","TeamMembersController Class","Controlador para gestão de membros de equipas.\r\nPermite operações CRUD sobre a associação entre utilizadores e equipas."];

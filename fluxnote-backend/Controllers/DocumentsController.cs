@@ -10,6 +10,43 @@ using System.Security.Claims;
 
 namespace Fluxnote.Backend.Controllers
 {
+    /// <summary>
+    /// Controlador responsável pela gestão de documentos colaborativos.
+    /// Suporta CRUD completo, pesquisa, lixeira e recuperação de documentos.
+    /// </summary>
+    /// <remarks>
+    /// <b>Rota Base:</b> api/documents<br/>
+    /// <b>Autenticação:</b> JWT Bearer obrigatório em todos os endpoints.
+    ///
+    /// <b>Endpoints Disponíveis:</b>
+    /// <list type="table">
+    ///     <listheader>
+    ///         <term>Método</term>
+    ///         <description>Rota e Descrição</description>
+    ///     </listheader>
+    ///     <item><term>GET</term><description>/ - Listar documentos (com filtros opcionais)</description></item>
+    ///     <item><term>GET</term><description>/{id} - Obter detalhes de um documento</description></item>
+    ///     <item><term>POST</term><description>/ - Criar novo documento</description></item>
+    ///     <item><term>PUT</term><description>/{id} - Atualizar documento</description></item>
+    ///     <item><term>DELETE</term><description>/{id} - Mover para lixeira (soft delete)</description></item>
+    ///     <item><term>GET</term><description>/trash - Listar documentos na lixeira</description></item>
+    ///     <item><term>POST</term><description>/{id}/restore - Restaurar da lixeira</description></item>
+    ///     <item><term>DELETE</term><description>/{id}/permanent - Eliminar permanentemente</description></item>
+    /// </list>
+    ///
+    /// <b>Regras de Negócio:</b>
+    /// <list type="bullet">
+    ///     <item><description>Limite de 10 documentos por utilizador (plano Free)</description></item>
+    ///     <item><description>Apenas membros da equipa podem ver/editar documentos</description></item>
+    ///     <item><description>Apenas o Owner da equipa pode criar documentos</description></item>
+    ///     <item><description>Apenas o criador pode mover para lixeira, restaurar ou eliminar permanentemente</description></item>
+    ///     <item><description>Pesquisa funciona em título e texto plano extraído do HTML</description></item>
+    /// </list>
+    ///
+    /// <b>Armazenamento de Conteúdo:</b><br/>
+    /// O conteúdo HTML é convertido para bytes UTF-8 e armazenado como varbinary.<br/>
+    /// O texto plano é extraído automaticamente para funcionalidade de pesquisa.
+    /// </remarks>
     [Route("api/[controller]")]
     [ApiController]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
@@ -18,16 +55,42 @@ namespace Fluxnote.Backend.Controllers
         private readonly FluxnoteServerContext _context;
         private readonly UserManager<User> _userManager;
 
-        // Limite de documentos para o plano Free
+        /// <summary>
+        /// Limite de documentos para o plano Free.
+        /// </summary>
         private const int FreeDocumentLimit = 10;
 
+        /// <summary>
+        /// Construtor com injeção de dependências.
+        /// </summary>
+        /// <param name="context">Contexto da base de dados.</param>
+        /// <param name="userManager">Gestor de utilizadores do Identity.</param>
         public DocumentsController(FluxnoteServerContext context, UserManager<User> userManager)
         {
             _context = context;
             _userManager = userManager;
         }
 
-        // GET: api/Documents
+        /// <summary>
+        /// Lista os documentos acessíveis pelo utilizador autenticado.
+        /// </summary>
+        /// <param name="teamId">Filtrar por ID de equipa (opcional).</param>
+        /// <param name="search">Termo de pesquisa em título e conteúdo (opcional).</param>
+        /// <returns>
+        /// <list type="bullet">
+        ///     <item><b>200 OK:</b> Lista de DocumentDto ordenada por UpdatedAt (desc).</item>
+        ///     <item><b>401 Unauthorized:</b> Token inválido.</item>
+        /// </list>
+        /// </returns>
+        /// <remarks>
+        /// <b>Filtros:</b>
+        /// <list type="bullet">
+        ///     <item><description><b>teamId:</b> Retorna apenas documentos dessa equipa</description></item>
+        ///     <item><description><b>search:</b> Pesquisa case-insensitive em título e PlainText</description></item>
+        /// </list>
+        /// <b>Preview:</b> Quando há pesquisa, inclui preview com contexto em torno do match.<br/>
+        /// <b>Acesso:</b> Apenas documentos de equipas onde o utilizador é membro.
+        /// </remarks>
         [HttpGet]
         public async Task<ActionResult<IEnumerable<DocumentDto>>> GetDocuments([FromQuery] int? teamId, [FromQuery] string? search)
         {
@@ -165,7 +228,28 @@ namespace Fluxnote.Backend.Controllers
             return null;
         }
 
-        // POST: api/Documents
+        /// <summary>
+        /// Cria um novo documento numa equipa.
+        /// </summary>
+        /// <param name="request">Dados do documento: Title, TeamId (opcional), TeamName (opcional).</param>
+        /// <returns>
+        /// <list type="bullet">
+        ///     <item><b>201 Created:</b> Documento criado com sucesso (DocumentDto).</item>
+        ///     <item><b>400 Bad Request:</b> Limite de documentos atingido ou nome de equipa em falta.</item>
+        ///     <item><b>401 Unauthorized:</b> Token inválido.</item>
+        ///     <item><b>403 Forbidden:</b> Utilizador não é Owner da equipa.</item>
+        ///     <item><b>404 Not Found:</b> Equipa especificada não existe.</item>
+        /// </list>
+        /// </returns>
+        /// <remarks>
+        /// <b>Comportamento:</b>
+        /// <list type="bullet">
+        ///     <item><description>Se TeamId especificado: adiciona à equipa existente (requer ser Owner)</description></item>
+        ///     <item><description>Se apenas TeamName: cria nova equipa com o utilizador como Owner</description></item>
+        /// </list>
+        /// <b>Limite:</b> Máximo 10 documentos por utilizador (plano Free).<br/>
+        /// <b>Permissão:</b> Apenas o Owner da equipa pode criar documentos.
+        /// </remarks>
         [HttpPost]
         public async Task<ActionResult<DocumentDto>> CreateDocument([FromBody] CreateDocumentRequest request)
         {
@@ -316,7 +400,22 @@ namespace Fluxnote.Backend.Controllers
             return CreatedAtAction(nameof(GetDocument), new { id = document.Id }, dto);
         }
 
-        // GET: api/Documents/5
+        /// <summary>
+        /// Obtém os detalhes completos de um documento, incluindo conteúdo.
+        /// </summary>
+        /// <param name="id">ID do documento.</param>
+        /// <returns>
+        /// <list type="bullet">
+        ///     <item><b>200 OK:</b> Detalhes do documento (DocumentDetailDto com Content e PlainText).</item>
+        ///     <item><b>401 Unauthorized:</b> Token inválido.</item>
+        ///     <item><b>403 Forbidden:</b> Utilizador não é membro da equipa.</item>
+        ///     <item><b>404 Not Found:</b> Documento não encontrado ou na lixeira.</item>
+        /// </list>
+        /// </returns>
+        /// <remarks>
+        /// <b>Conteúdo:</b> O campo Content contém o HTML armazenado (convertido de bytes UTF-8).<br/>
+        /// <b>Acesso:</b> Requer que o utilizador seja membro da equipa do documento.
+        /// </remarks>
         [HttpGet("{id}")]
         public async Task<ActionResult<DocumentDetailDto>> GetDocument(int id)
         {
@@ -384,7 +483,28 @@ namespace Fluxnote.Backend.Controllers
             return Ok(dto);
         }
 
-        // PUT: api/Documents/5
+        /// <summary>
+        /// Atualiza o título e/ou conteúdo de um documento.
+        /// </summary>
+        /// <param name="id">ID do documento.</param>
+        /// <param name="request">Campos a atualizar: Title (opcional), Content (opcional).</param>
+        /// <returns>
+        /// <list type="bullet">
+        ///     <item><b>200 OK:</b> Documento atualizado (DocumentDetailDto).</item>
+        ///     <item><b>401 Unauthorized:</b> Token inválido.</item>
+        ///     <item><b>403 Forbidden:</b> Utilizador não é membro da equipa.</item>
+        ///     <item><b>404 Not Found:</b> Documento não encontrado ou na lixeira.</item>
+        /// </list>
+        /// </returns>
+        /// <remarks>
+        /// <b>Processamento de Conteúdo:</b>
+        /// <list type="bullet">
+        ///     <item><description>Content HTML é convertido para bytes UTF-8</description></item>
+        ///     <item><description>PlainText é extraído automaticamente (tags HTML removidas)</description></item>
+        ///     <item><description>UpdatedAt é atualizado para a hora atual</description></item>
+        /// </list>
+        /// <b>Acesso:</b> Requer que o utilizador seja membro da equipa.
+        /// </remarks>
         [HttpPut("{id}")]
         public async Task<ActionResult<DocumentDetailDto>> UpdateDocument(int id, [FromBody] UpdateDocumentRequest request)
         {

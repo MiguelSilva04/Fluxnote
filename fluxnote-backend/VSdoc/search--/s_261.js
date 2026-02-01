@@ -1,0 +1,1 @@
+search_result['261']=["topic_00000000000000A2.html","RefreshToken.AbsoluteDays Property","Número de dias para expiração absoluta da sessão."];

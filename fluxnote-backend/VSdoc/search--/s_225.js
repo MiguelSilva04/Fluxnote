@@ -1,0 +1,1 @@
+search_result['225']=["topic_0000000000000088.html","Document Class","Representa um documento colaborativo no sistema Fluxnote.\r\nOs documentos pertencem a equipas e podem ser editados colaborativamente."];

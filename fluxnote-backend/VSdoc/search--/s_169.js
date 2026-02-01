@@ -1,0 +1,1 @@
+search_result['169']=["topic_0000000000000064.html","DocumentDetailDto.TeamId Property","ID da equipa a que o documento pertence."];

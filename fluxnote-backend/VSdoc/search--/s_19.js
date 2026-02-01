@@ -1,0 +1,1 @@
+search_result['19']=["topic_000000000000000C.html","AuthController.Logout Method","Termina a sessão atual do utilizador."];

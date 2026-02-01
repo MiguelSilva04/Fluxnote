@@ -1,0 +1,1 @@
+search_result['62']=["topic_0000000000000026.html","TeamsController.DeleteTeam Method","Elimina uma equipa e todos os seus dados associados."];

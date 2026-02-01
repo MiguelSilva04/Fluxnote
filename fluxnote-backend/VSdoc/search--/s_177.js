@@ -1,0 +1,1 @@
+search_result['177']=["topic_000000000000006C.html","DocumentDetailDto.PlainText Property","Texto plano extraído do HTML (sem tags)."];

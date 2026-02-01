@@ -1,0 +1,1 @@
+search_result['265']=["topic_00000000000000A6.html","RefreshToken.isActive Property","Indica se o token está ativo (não revogado e não expirado)."];
