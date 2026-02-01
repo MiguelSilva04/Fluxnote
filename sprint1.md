@@ -206,7 +206,6 @@ Este sprint foca-se em estabelecer a base funcional da aplicação FluxNote, imp
 - [ ] Como Owner, posso eliminar documentos (mover para lixeira)
 - [ ] Como Owner, posso restaurar documentos da lixeira
 - [ ] Como Owner, posso eliminar permanentemente documentos
-- [ ] Como Owner, posso renomear a equipa
 - [ ] Como Owner, posso eliminar a equipa
 
 #### Tasks Técnicas
@@ -214,15 +213,18 @@ Este sprint foca-se em estabelecer a base funcional da aplicação FluxNote, imp
 **Backend:**
 
 - [ ] Implementar `TeamRole` e políticas `[Authorize]` para Owner
-- [ ] Criar método `ResolveDocumentAccess` (permissões por equipa)
-- [ ] `PUT /api/teams/{teamId}` (renomear) e `DELETE /api/teams/{teamId}` (eliminar)
-- [ ] Handlers de policy para verificação de roles
+- [ ] Implementar `DocumentPermission` (entidade que associa os TeamMembers aos Documents) e `DocumentRole`
+- [ ] Atualizar `GET /api/documents` para fornecer apenas os documentos em que exista um registo DocumentPermission com o atual TeamMember, exceto o Owner (e futuramente TeamAdmin) que pulam essa verificação
+- [ ] Atualizar `GET /api/documents/:id` e `PUT /api/documents/:id` para verificar se existe um registo DocumentPermission com o atual TeamMember, exceto o Owner (e futuramente TeamAdmin) que pulam essa verificação
 
 **Frontend:**
 
 - [ ] Mostrar opções de gestão só para Owner (depende de API)
 - [ ] Modal de confirmação para ações destrutivas
-- [ ] Página de settings da equipa (`/teams/{id}/settings`)
+- [ ] Painel no Team Details com os membros da equipa juntamente com a sua TeamRole, selecionável pelo Owner
+- [ ] Um Painel no Team Details por cada Documento com a DocumentRole de cada membro, selecionável pelo Owner (Editor, Viewer)
+- [ ] No Painel anterior, o Owner consegue adicionar e remover TeamMembers (que não sejam Owner ou futuramente TeamAdmin) aos documentos, quando adiciona tem de selecionar a DocumentRole (Editor,Viewer) a atribuir
+- [ ] Membros da Equipa apenas conseguem ver os documentos na sua dashboard/página de equipa se tiverem um DocumentPermission associado (Owners e futuramente TeamAdmins são exceções a essa regra)
 
 ---
 
@@ -234,30 +236,29 @@ Este sprint foca-se em estabelecer a base funcional da aplicação FluxNote, imp
 
 #### Critérios de Aceitação
 
-- [ ] Posso criar um documento com um título
-- [ ] Se não especificar equipa, é criada uma automaticamente
-- [ ] Se especificar equipa (onde sou Owner), o documento é associado a ela
-- [ ] O documento aparece na minha dashboard
-- [ ] Após criação, sou redirecionado para o editor
-- [ ] Não posso criar mais documentos do que o limite do plano (Free = 10)
+- [x] Posso criar um documento com um título
+- [x] Se não especificar equipa, é criada uma automaticamente
+- [x] Se especificar equipa (onde sou Owner), o documento é associado a ela
+- [x] O documento aparece na minha dashboard
+- [x] Após criação, sou redirecionado para o editor
+- [x] Não posso criar mais documentos do que o limite do plano (Free = 10)
 
 #### Tasks Técnicas
 
 **Backend:**
 
-- [ ] Criar entidade `Document` (conforme model)
-- [ ] Implementar `POST /api/documents`
-- [ ] Criar lógica de “equipa automática” se não for passada
-- [ ] Validar limites do plano (Free = 10 docs)
-- [ ] Inicializar conteúdo com Y.Doc vazio
-- [ ] Migration para Documents
+- [x] Criar entidade `Document` (conforme model)
+- [x] Implementar `POST /api/documents`
+- [x] Criar lógica de “equipa automática” se não for passada
+- [x] Validar limites do plano (Free = 10 docs)
+- [x] Inicializar conteúdo com Y.Doc vazio
+- [x] Migration para Documents
 
 **Frontend:**
 
-- [x] Botão “Novo Documento” + modal de seleção de equipa (mock)
-- [x] `DocumentService` com lista mock em memória
-- [ ] Integrar com `POST /api/documents` e limites reais
-- [ ] Mostrar contador real de documentos vs limite
+- [x] Botão “Novo Documento” + modal de seleção de equipa funcional (se não for fornecida equipa, tem de clicar em Criar Nova Equipa em que aparece um field para inserir o nome)
+- [x] `DocumentService`
+- [x] Integrar com `POST /api/documents`  
 
 ---
 
@@ -381,6 +382,12 @@ public enum TeamRole
     Member = 0,
     TeamAdmin = 1,
     Owner = 2
+}
+
+public enum DocumentRole
+{
+    Viewer = 0,
+    Editor = 1
 }
 ```
 

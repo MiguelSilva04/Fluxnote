@@ -102,6 +102,12 @@ export const routes: Routes = [
       import('./features/editor/document-editor.component').then((m) => m.DocumentEditorComponent),
   },
   {
+    path: 'editor/:id',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/editor/document-editor.component').then((m) => m.DocumentEditorComponent),
+  },
+  {
     path: 'teams',
     canActivate: [authGuard],
     loadComponent: () =>
@@ -112,6 +118,12 @@ export const routes: Routes = [
     canActivate: [authGuard],
     loadComponent: () =>
       import('./features/teams/pages/team-detail.component').then((m) => m.TeamDetailComponent),
+  },
+  {
+    path: 'trash',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/trash/pages/trash.component').then((m) => m.TrashComponent),
   },
   {
     path: 'subscriptions',

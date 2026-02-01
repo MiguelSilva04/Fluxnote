@@ -1,3 +1,48 @@
+/**
+ * DTO para listagem de documentos
+ */
+export interface DocumentDto {
+  id: number;
+  title: string;
+  teamId: number;
+  teamName: string;
+  createdById: string;
+  createdByName: string;
+  createdAt: string;
+  updatedAt: string;
+  isDeleted: boolean;
+  preview?: string; // Preview do texto (usado em pesquisas)
+}
+
+/**
+ * DTO para detalhes do documento com conteúdo
+ */
+export interface DocumentDetailDto {
+  id: number;
+  title: string;
+  teamId: number;
+  teamName: string;
+  createdById: string;
+  createdByName: string;
+  createdAt: string;
+  updatedAt: string;
+  isDeleted: boolean;
+  content?: string; // Y.Doc em Base64
+  plainText?: string;
+}
+
+/**
+ * Request para criar documento
+ */
+export interface CreateDocumentRequest {
+  title: string;
+  teamId?: number;
+  teamName?: string;
+}
+
+/**
+ * @deprecated Use DocumentDto instead - mantido para compatibilidade temporária
+ */
 export interface Document {
   id: number;
   title: string;

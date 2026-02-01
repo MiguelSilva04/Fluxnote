@@ -22,6 +22,7 @@ export interface TeamGet {
   updatedAt: string;
   isActive: boolean;
   deletionScheduled: string;
+  currentUserRole: number;
   members: TeamMemberToPost[];
   documents: TeamDocument[];
 }
@@ -30,6 +31,8 @@ export interface TeamGet {
 export interface TeamDocument {
   id: number;
   title: string;
+  updatedAt?: string;
+  createdById?: string;
 }
 
 export interface TeamMember {

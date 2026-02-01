@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
 import { DashboardLayoutComponent } from '../../../layout/dashboard-layout/dashboard-layout.component';
-import { ButtonComponent, CardComponent, CardContentComponent, BadgeComponent } from '../../../shared/components/ui';
+import { ButtonComponent, CardComponent, CardContentComponent, BadgeComponent, ModalComponent } from '../../../shared/components/ui';
 import { TeamService } from '../../../core/services';
 import { TeamGet } from '../../../core/models';
 
@@ -18,10 +18,11 @@ import { TeamGet } from '../../../core/models';
     CommonModule,
     LucideAngularModule,
     DashboardLayoutComponent,
-    //ButtonComponent,
+    ButtonComponent,
     CardComponent,
     CardContentComponent,
-    BadgeComponent
+    BadgeComponent,
+    ModalComponent
   ],
   templateUrl: `./team-detail.component.html`
 })
@@ -56,6 +57,12 @@ export class TeamDetailComponent {
   };
   
   loading = signal(true);
+  
+  /** Signal para controlar a abertura do modal de delete */
+  isDeleteModalOpen = signal(false);
+  
+  /** Signal para indicar se está a eliminar */
+  isDeleting = signal(false);
 
   /* members = [
     { id: 1, name: 'Alex Morgan', email: 'alex.morgan@fluxnote.com', role: 'Owner', initials: 'AM', color: '#155347' },
@@ -72,12 +79,14 @@ export class TeamDetailComponent {
 
   /**
    * Método de ciclo de vida chamado na inicialização do componente.
-   * Obtém o ID da equipa da rota e carrega os dados.
+   * Subscreve às mudanças de parâmetro da rota para recarregar quando o ID muda.
    */
   ngOnInit(): void {
-    var teamId = Number(this.route.snapshot.paramMap.get('id'));
-    //console.log("Id do details é ", teamId);
-    this.loadTeam(teamId);
+    // Subscreve às mudanças de parâmetro para recarregar quando navega entre equipas
+    this.route.params.subscribe(params => {
+      const teamId = Number(params['id']);
+      this.loadTeam(teamId);
+    });
   }
 
   /**
@@ -113,6 +122,8 @@ export class TeamDetailComponent {
       error: (err) => {
         console.error(err);
         this.loading.set(false);
+        // Redireciona para dashboard se a equipa não existir ou não tiver acesso
+        this.router.navigate(['/dashboard']);
       }
     });
   }
@@ -122,5 +133,48 @@ export class TeamDetailComponent {
    */
   goBack(): void {
     this.router.navigate(['/teams']);
+  }
+
+  /**
+   * Abre o editor de um documento.
+   * @param docId ID do documento
+   */
+  openDocument(docId: number): void {
+    this.router.navigate(['/editor', docId]);
+  }
+
+  /**
+   * Abre o modal de confirmação para eliminar a equipa.
+   */
+  openDeleteModal(): void {
+    this.isDeleteModalOpen.set(true);
+  }
+
+  /**
+   * Fecha o modal de confirmação.
+   */
+  closeDeleteModal(): void {
+    this.isDeleteModalOpen.set(false);
+  }
+
+  /**
+   * Confirma e elimina a equipa.
+   */
+  confirmDeleteTeam(): void {
+    const team = this.selectedTeam();
+    if (!team) return;
+
+    this.isDeleting.set(true);
+    this.teamService.deleteTeam(team.id).subscribe({
+      next: () => {
+        this.isDeleting.set(false);
+        this.isDeleteModalOpen.set(false);
+        this.router.navigate(['/teams']);
+      },
+      error: (err) => {
+        console.error('Error deleting team:', err);
+        this.isDeleting.set(false);
+      }
+    });
   }
 }

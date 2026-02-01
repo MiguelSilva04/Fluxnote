@@ -204,6 +204,14 @@ export class TeamService {
     this.teamCreatedSource.next();
   }
 
+  /**
+   * Elimina uma equipa pelo ID.
+   * @param id ID da equipa a eliminar
+   */
+  deleteTeam(id: number) {
+    return this.http.delete(`/api/teams/${id}`);
+  }
+
   /* updateTeam(id: number, updates: Partial<Team>, http: HttpClient): void {
     http.put<Team>(`/api/teams/${id}`, updates)
       .subscribe({

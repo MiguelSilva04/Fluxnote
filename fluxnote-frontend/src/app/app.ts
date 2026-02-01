@@ -1,22 +1,41 @@
-import { ApplicationRef, Component, afterNextRender, inject } from '@angular/core';
-import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
+import { ApplicationRef, Component, afterNextRender, inject, signal } from '@angular/core';
+import { NavigationEnd, NavigationStart, Router, RouterOutlet } from '@angular/router';
+import { CommonModule } from '@angular/common';
 import { AuthService } from './core/services/auth.service';
 import { ToastComponent } from './shared/components/ui/toast/toast.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, ToastComponent],
+  imports: [RouterOutlet, ToastComponent, CommonModule],
   template: `
+    <!-- Loading bar durante navegação -->
+    @if (isNavigating()) {
+      <div class="fixed top-0 left-0 right-0 z-[9999]">
+        <div class="h-1 bg-[#155347] animate-loading-bar"></div>
+      </div>
+    }
     <router-outlet></router-outlet>
     <app-toast></app-toast>
-  `
+  `,
+  styles: [`
+    @keyframes loading-bar {
+      0% { width: 0%; left: 0; }
+      100% { width: 100%; left: 0; }
+    }
+    .animate-loading-bar {
+      position: absolute;
+      animation: loading-bar 0.8s ease-out forwards;
+    }
+  `]
 })
 export class App {
   private appRef = inject(ApplicationRef);
   private router = inject(Router);
   private auth = inject(AuthService);
   title = 'FluxNote';
+  
+  isNavigating = signal(false);
 
   constructor() {
     afterNextRender(() => {
@@ -24,7 +43,11 @@ export class App {
     });
 
     this.router.events.subscribe(event => {
+      if (event instanceof NavigationStart) {
+        this.isNavigating.set(true);
+      }
       if (event instanceof NavigationEnd) {
+        this.isNavigating.set(false);
         queueMicrotask(() => this.appRef.tick());
       }
     });

@@ -69,6 +69,14 @@ import { ModalComponent, ButtonComponent } from '../../shared/components/ui';
           <lucide-icon name="badge-question-mark" class="h-5 w-5"></lucide-icon>
           Help & Support
         </a>
+        <a
+          routerLink="/trash"
+          routerLinkActive="bg-[#e8f0ee] text-[#155347]"
+          class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors"
+        >
+          <lucide-icon name="trash-2" class="h-5 w-5"></lucide-icon>
+          Trash
+        </a>
         <button
           (click)="showLogoutModal.set(true)"
           class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 transition-colors"

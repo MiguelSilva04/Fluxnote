@@ -1,76 +1,88 @@
-import { Component, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, inject, signal, ViewChild, OnInit } from '@angular/core';
+import { CommonModule, Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
-import { ButtonComponent, BadgeComponent } from '../../shared/components/ui';
+import { ButtonComponent, BadgeComponent, WorkInProgressComponent } from '../../shared/components/ui';
 import { DocumentService } from '../../core/services';
 import { Collaborator, Version, Comment, AISuggestion } from '../../core/models';
+import { TextEditorComponent } from './components/text-editor.component';
+
+// TODO: BACKEND INTEGRATION - Adicionar import do HttpClient quando necessário
+// import { HttpClient } from '@angular/common/http';
+// import { Observable, catchError, of } from 'rxjs';
 
 @Component({
   selector: 'app-document-editor',
   standalone: true,
-  imports: [CommonModule, FormsModule, LucideAngularModule, ButtonComponent, BadgeComponent],
+  imports: [
+    CommonModule,
+    FormsModule,
+    LucideAngularModule,
+    ButtonComponent,
+    BadgeComponent,
+    TextEditorComponent,
+    WorkInProgressComponent,
+  ],
   template: `
     <div class="min-h-screen bg-gray-50 flex flex-col relative">
-      <!-- Collaborative Cursors -->
-      @for (user of collaborators; track user.name; let idx = $index) {
-        <div
-          class="absolute pointer-events-none z-50 transition-all duration-300"
-          [style.left.px]="100 + idx * 200"
-          [style.top.px]="150 + idx * 100"
-        >
-          <svg width="24" height="24" viewBox="0 0 24 24" [style.fill]="user.color">
-            <path d="M5.65 2.95L19.07 12.52L11.97 13.65L8.95 20.68L5.65 2.95Z" />
-          </svg>
-          <span
-            class="ml-2 px-2 py-1 text-xs text-white rounded-md whitespace-nowrap"
-            [style.backgroundColor]="user.color"
-          >
-            {{ user.name }}
-          </span>
+      <!-- Loading State -->
+      @if (isLoading()) {
+        <div class="flex flex-col items-center justify-center h-screen gap-4">
+          <lucide-icon name="loader-circle" class="h-10 w-10 text-[#155347] animate-spin"></lucide-icon>
+          <div class="text-gray-500 text-sm">Loading document...</div>
         </div>
-      }
-
-      <!-- Header -->
-      <header class="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between shrink-0">
-        <div class="flex items-center gap-4">
-          <button (click)="navigateBack()" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+      } @else if (loadError()) {
+        <div class="flex flex-col items-center justify-center h-screen gap-4">
+          <lucide-icon name="alert-circle" class="h-10 w-10 text-red-500"></lucide-icon>
+          <div class="text-red-600 text-sm">{{ loadError() }}</div>
+          <div class="text-gray-500 text-xs">Redirecting to dashboard...</div>
+        </div>
+      } @else {
+        <!-- Header -->
+        <header class="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between shrink-0">
+          <div class="flex items-center gap-4">
+            <button (click)="navigateBack()" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
             <lucide-icon name="arrow-left" class="h-5 w-5 text-gray-600"></lucide-icon>
           </button>
-          <div>
-            <h1 class="text-lg font-bold text-gray-900">Market Analysis 2024</h1>
-            <p class="text-xs text-gray-500">Last edited 2 hours ago</p>
+          <div class="flex-1">
+            <!-- Editable Title -->
+            @if (isEditingTitle()) {
+              <input
+                #titleInput
+                type="text"
+                [(ngModel)]="documentTitle"
+                (blur)="saveTitle()"
+                (keydown.enter)="saveTitle()"
+                (keydown.escape)="cancelTitleEdit()"
+                class="text-lg font-bold text-gray-900 bg-transparent border-b-2 border-[#155347] focus:outline-none w-full max-w-md"
+              />
+            } @else {
+              <h1
+                (click)="startEditingTitle()"
+                class="text-lg font-bold text-gray-900 cursor-pointer hover:text-[#155347] transition-colors"
+                title="Click to edit title"
+              >
+                {{ documentTitle }}
+              </h1>
+            }
+            <p class="text-xs text-gray-500">{{ lastEditedText() }}</p>
           </div>
         </div>
         <div class="flex items-center gap-2">
-          <!-- Active collaborators -->
-          <div class="flex items-center -space-x-2 mr-4">
-            @for (user of collaborators; track user.name) {
-              <div
-                class="h-8 w-8 rounded-full border-2 border-white flex items-center justify-center text-white text-xs font-medium"
-                [style.backgroundColor]="user.color"
-                [title]="user.name"
-              >
-                {{ user.initials }}
-              </div>
-            }
-          </div>
-
-          <app-button variant="outline" size="sm" [leftIcon]="true" (onClick)="toggleAIPanel()">
+          <app-button variant="outline" size="sm" [leftIcon]="true" (onClick)="showWipModal.set(true)">
             <lucide-icon leftIcon name="sparkles" class="h-4 w-4"></lucide-icon>
             AI Assistant
           </app-button>
-          <app-button variant="outline" size="sm" [leftIcon]="true" (onClick)="toggleVersionHistory()">
+          <app-button variant="outline" size="sm" [leftIcon]="true" (onClick)="showWipModal.set(true)">
             <lucide-icon leftIcon name="clock" class="h-4 w-4"></lucide-icon>
             History
           </app-button>
-          <app-button variant="outline" size="sm" [leftIcon]="true" (onClick)="toggleComments()">
+          <app-button variant="outline" size="sm" [leftIcon]="true" (onClick)="showWipModal.set(true)">
             <lucide-icon leftIcon name="message-square" class="h-4 w-4"></lucide-icon>
             Comments
-            <app-badge customClass="ml-2 bg-red-500 text-white">2</app-badge>
           </app-button>
-          <app-button variant="outline" size="sm" [leftIcon]="true" (onClick)="showShareModal.set(true)">
+          <app-button variant="outline" size="sm" [leftIcon]="true" (onClick)="showWipModal.set(true)">
             <lucide-icon leftIcon name="share-2" class="h-4 w-4"></lucide-icon>
             Share
           </app-button>
@@ -82,31 +94,15 @@ import { Collaborator, Version, Comment, AISuggestion } from '../../core/models'
 
       <div class="flex flex-1 overflow-hidden">
         <!-- Main Editor -->
-        <main class="flex-1 overflow-y-auto p-8">
-          <div class="max-w-4xl mx-auto bg-white shadow-sm border border-gray-200 rounded-xl p-12">
-            <h2 class="text-3xl font-bold text-gray-900 mb-6">
-              Market Analysis 2024: The Impact of Technological Innovation
-            </h2>
-            <div class="space-y-4 text-gray-800 leading-relaxed">
-              <p>
-                The year 2024 marks a period of unprecedented transformation in the global scenario,
-                primarily driven by the rapid evolution and adoption of new technologies. Artificial
-                intelligence (AI) continues to be a central engine behind this change, redefining
-                sectors from manufacturing to services.
-              </p>
-              <p>
-                Beyond AI, quantum computing and biotechnology are also emerging as fields with the
-                potential to revolutionize the technological landscape in the next decade. Although
-                still in early stages of commercialization, investment in research and development
-                in these areas is robust.
-              </p>
-              <p>
-                Environmental sustainability and corporate social responsibility (CSR) also play a
-                crucial role in business decisions and investment in 2024. Consumers and investors
-                are increasingly aware of companies' impact on the planet and society.
-              </p>
-            </div>
-          </div>
+        <main class="flex-1 flex flex-col overflow-hidden">
+          <app-rich-text-editor
+            #editor
+            [initialContent]="initialContent"
+            placeholder="Start writing your document..."
+            [autoSaveDelay]="2000"
+            (contentChange)="onContentChange($event)"
+            (save)="onSave($event)"
+          />
         </main>
 
         <!-- AI Assistant Panel -->
@@ -424,17 +420,33 @@ import { Collaborator, Version, Comment, AISuggestion } from '../../core/models'
           </div>
         </div>
       }
+      } <!-- End of @else (loading) -->
+
+      <!-- Work in Progress Modal -->
+      <app-work-in-progress [show]="showWipModal()" (close)="showWipModal.set(false)" />
     </div>
-  `
+  `,
 })
-export class DocumentEditorComponent {
+export class DocumentEditorComponent implements OnInit {
+  @ViewChild('editor') editor!: TextEditorComponent;
+
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
   private documentService = inject(DocumentService);
+  private location = inject(Location);
+  
+  // ID do documento atual
+  documentId: number | null = null;
+  
+  // Estado de carregamento
+  isLoading = signal(true);
+  loadError = signal<string | null>(null);
 
   showVersionHistory = signal(false);
   showComments = signal(false);
   showShareModal = signal(false);
-  showAIPanel = signal(true);
+  showAIPanel = signal(false);
+  showWipModal = signal(false);
   isRestoreModalOpen = signal(false);
   versionToRestore = signal<number | null>(null);
   newComment = '';
@@ -442,33 +454,160 @@ export class DocumentEditorComponent {
   aiGenerating = signal(false);
   restoreConfirmed = false;
 
-  collaborators: Collaborator[] = [
-    { name: 'Sarah Kim', initials: 'SK', color: '#3B82F6' },
-    { name: 'John Doe', initials: 'JD', color: '#8B5CF6' }
-  ];
+  // Document state
+  documentTitle = '';
+  originalTitle = '';
+  isEditingTitle = signal(false);
+  lastEdited = signal(new Date());
+
+  // Conteúdo inicial do editor (carregado do backend)
+  initialContent = '';
+
+  // TODO: Implementar colaboração em tempo real
+  collaborators: Collaborator[] = [];
 
   versions: Version[] = this.documentService.getVersions();
   comments: Comment[] = this.documentService.getComments();
   aiSuggestions: AISuggestion[] = this.documentService.getAISuggestions();
 
+  lastEditedText = signal('Last edited just now');
+
+  ngOnInit(): void {
+    const id = this.route.snapshot.paramMap.get('id');
+    if (id) {
+      this.documentId = +id;
+      this.loadDocument(this.documentId);
+    } else {
+      // Redirecionar para dashboard se não houver ID
+      this.router.navigate(['/dashboard']);
+    }
+  }
+
+  private loadDocument(id: number): void {
+    this.isLoading.set(true);
+    this.loadError.set(null);
+
+    this.documentService.getDocument(id).subscribe({
+      next: (doc) => {
+        this.documentTitle = doc.title;
+        this.originalTitle = doc.title;
+        this.initialContent = doc.content || '';
+        this.lastEdited.set(new Date(doc.updatedAt));
+        this.lastEditedText.set(this.formatLastEdited(new Date(doc.updatedAt)));
+        this.isLoading.set(false);
+      },
+      error: (err) => {
+        console.error('Error loading document:', err);
+        this.loadError.set(err.error?.message || 'Error loading document');
+        this.isLoading.set(false);
+        // Redirecionar para dashboard após delay
+        setTimeout(() => this.router.navigate(['/dashboard']), 2000);
+      }
+    });
+  }
+
+  private formatLastEdited(date: Date): string {
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+
+    if (diffMins < 1) return 'Last edited just now';
+    if (diffMins < 60) return `Last edited ${diffMins} minute${diffMins > 1 ? 's' : ''} ago`;
+    if (diffHours < 24) return `Last edited ${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
+    if (diffDays === 1) return 'Last edited yesterday';
+    return `Last edited ${diffDays} days ago`;
+  }
+
+  startEditingTitle(): void {
+    this.originalTitle = this.documentTitle;
+    this.isEditingTitle.set(true);
+    setTimeout(() => {
+      const input = document.querySelector('input[type="text"]') as HTMLInputElement;
+      if (input) {
+        input.focus();
+        input.select();
+      }
+    }, 0);
+  }
+
+  saveTitle(): void {
+    if (this.documentTitle.trim() === '') {
+      this.documentTitle = this.originalTitle;
+    }
+    this.isEditingTitle.set(false);
+    
+    // Guardar título no backend
+    if (this.documentId && this.documentTitle !== this.originalTitle) {
+      this.documentService.updateDocument(this.documentId, {
+        title: this.documentTitle
+      }).subscribe({
+        next: () => {
+          this.originalTitle = this.documentTitle;
+          this.updateLastEdited();
+        },
+        error: (err) => {
+          console.error('Error saving title:', err);
+          // Reverter título em caso de erro
+          this.documentTitle = this.originalTitle;
+        }
+      });
+    }
+  }
+
+  cancelTitleEdit(): void {
+    this.documentTitle = this.originalTitle;
+    this.isEditingTitle.set(false);
+  }
+
+  private updateLastEdited(): void {
+    this.lastEdited.set(new Date());
+    this.lastEditedText.set('Last edited just now');
+  }
+
+  onContentChange(content: string): void {
+    // Função que é chamada quando o conteúdo do editor muda,
+    // fica aqui para se for preciso fazer algo em tempo real
+  }
+
+  onSave(content: string): void {
+    if (!this.documentId) {
+      console.warn('Cannot save: Document ID is missing');
+      this.editor.setSaveStatus('error');
+      return;
+    }
+
+    this.documentService.updateDocument(this.documentId, { content }).subscribe({
+      next: () => {
+        this.editor.setSaveStatus('saved');
+        this.updateLastEdited();
+      },
+      error: (err) => {
+        console.error('Error saving document:', err);
+        this.editor.setSaveStatus('error');
+      }
+    });
+  }
+
   navigateBack(): void {
-    this.router.navigate(['/dashboard']);
+    this.location.back();
   }
 
   toggleAIPanel(): void {
-    this.showAIPanel.update(v => !v);
+    this.showAIPanel.update((v) => !v);
     this.showVersionHistory.set(false);
     this.showComments.set(false);
   }
 
   toggleVersionHistory(): void {
-    this.showVersionHistory.update(v => !v);
+    this.showVersionHistory.update((v) => !v);
     this.showComments.set(false);
     this.showAIPanel.set(false);
   }
 
   toggleComments(): void {
-    this.showComments.update(v => !v);
+    this.showComments.update((v) => !v);
     this.showVersionHistory.set(false);
     this.showAIPanel.set(false);
   }
@@ -476,7 +615,7 @@ export class DocumentEditorComponent {
   handleVersionSelect(versionId: number): void {
     const current = this.selectedVersions();
     if (current.includes(versionId)) {
-      this.selectedVersions.set(current.filter(id => id !== versionId));
+      this.selectedVersions.set(current.filter((id) => id !== versionId));
     } else if (current.length < 2) {
       this.selectedVersions.set([...current, versionId]);
     }

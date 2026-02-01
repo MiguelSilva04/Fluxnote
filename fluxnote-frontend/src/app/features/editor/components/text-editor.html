@@ -1,0 +1,333 @@
+<div class="flex flex-col h-full">
+    <!-- Toolbar -->
+    <div class="bg-white border-b border-gray-200 px-4 py-2 flex items-center gap-1 flex-wrap">
+      <!-- Text formatting -->
+      <div class="flex items-center gap-1 pr-3 border-r border-gray-200">
+        <button
+          type="button"
+          (click)="format('bold')"
+          [class]="getToolbarButtonClass(formats.bold)"
+          title="Bold (Ctrl+B)"
+        >
+          <lucide-icon name="bold" class="h-4 w-4"></lucide-icon>
+        </button>
+        <button
+          type="button"
+          (click)="format('italic')"
+          [class]="getToolbarButtonClass(formats.italic)"
+          title="Italic (Ctrl+I)"
+        >
+          <lucide-icon name="italic" class="h-4 w-4"></lucide-icon>
+        </button>
+        <button
+          type="button"
+          (click)="format('underline')"
+          [class]="getToolbarButtonClass(formats.underline)"
+          title="Underline (Ctrl+U)"
+        >
+          <lucide-icon name="underline" class="h-4 w-4"></lucide-icon>
+        </button>
+        <button
+          type="button"
+          (click)="format('strike')"
+          [class]="getToolbarButtonClass(formats.strike)"
+          title="Strikethrough"
+        >
+          <lucide-icon name="strikethrough" class="h-4 w-4"></lucide-icon>
+        </button>
+      </div>
+
+      <!-- Headers -->
+      <div class="flex items-center gap-1 px-3 border-r border-gray-200">
+        <select
+          (change)="formatHeader($event)"
+          class="h-8 px-2 text-sm border border-gray-200 rounded hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#155347]"
+          #headerSelect
+        >
+          <option value="">Normal</option>
+          <option value="1">Heading 1</option>
+          <option value="2">Heading 2</option>
+          <option value="3">Heading 3</option>
+        </select>
+      </div>
+
+      <!-- Lists -->
+      <div class="flex items-center gap-1 px-3 border-r border-gray-200">
+        <button
+          type="button"
+          (click)="formatList('ordered')"
+          [class]="getToolbarButtonClass(formats.listOrdered)"
+          title="Numbered List"
+        >
+          <lucide-icon name="list-ordered" class="h-4 w-4"></lucide-icon>
+        </button>
+        <button
+          type="button"
+          (click)="formatList('bullet')"
+          [class]="getToolbarButtonClass(formats.listBullet)"
+          title="Bullet List"
+        >
+          <lucide-icon name="list" class="h-4 w-4"></lucide-icon>
+        </button>
+      </div>
+
+      <!-- Alignment -->
+      <div class="flex items-center gap-1 px-3 border-r border-gray-200">
+        <button
+          type="button"
+          (click)="formatAlign('')"
+          [class]="getToolbarButtonClass(!formats.align || formats.align === '')"
+          title="Align Left"
+        >
+          <lucide-icon name="text-align-start" class="h-4 w-4"></lucide-icon>
+        </button>
+        <button
+          type="button"
+          (click)="formatAlign('center')"
+          [class]="getToolbarButtonClass(formats.align === 'center')"
+          title="Align Center"
+        >
+          <lucide-icon name="text-align-justify" class="h-4 w-4"></lucide-icon>
+        </button>
+        <button
+          type="button"
+          (click)="formatAlign('right')"
+          [class]="getToolbarButtonClass(formats.align === 'right')"
+          title="Align Right"
+        >
+          <lucide-icon name="text-align-end" class="h-4 w-4"></lucide-icon>
+        </button>
+      </div>
+
+      <!-- Colors -->
+      <div class="flex items-center gap-1 px-3 border-r border-gray-200">
+        <!-- Text Color -->
+        <div class="relative">
+          <button
+            type="button"
+            (click)="toggleTextColorMenu()"
+            class="p-2 rounded hover:bg-gray-100 transition-colors text-gray-600 flex flex-col items-center"
+            title="Text Color"
+          >
+            <lucide-icon name="type" class="h-4 w-4"></lucide-icon>
+            <div 
+              class="w-4 h-1 rounded-sm mt-0.5" 
+              [style.background-color]="formats.textColor || '#000000'"
+            ></div>
+          </button>
+          @if (showTextColorMenu()) {
+            <div class="absolute top-full left-0 mt-1 p-3 bg-white border border-gray-200 rounded-lg shadow-lg z-50 w-52">
+              <p class="text-xs text-gray-500 mb-2">Text Color</p>
+              <div class="flex flex-wrap gap-2">
+                @for (color of textColors; track color.value) {
+                  <button
+                    type="button"
+                    (click)="applyTextColor(color.value)"
+                    class="w-7 h-7 rounded border border-gray-300 hover:scale-110 hover:shadow-md transition-all"
+                    [style.background-color]="color.value"
+                    [title]="color.name"
+                  ></button>
+                }
+              </div>
+              <button
+                type="button"
+                (click)="applyTextColor('')"
+                class="w-full mt-3 px-2 py-1.5 text-xs text-gray-600 hover:bg-gray-100 rounded border border-gray-200"
+              >
+                Remove color
+              </button>
+            </div>
+          }
+        </div>
+        <!-- Background Color -->
+        <div class="relative">
+          <button
+            type="button"
+            (click)="toggleBgColorMenu()"
+            class="p-2 rounded hover:bg-gray-100 transition-colors text-gray-600 flex flex-col items-center"
+            title="Background Color"
+          >
+            <lucide-icon name="highlighter" class="h-4 w-4"></lucide-icon>
+            <div 
+              class="w-4 h-1 rounded-sm mt-0.5 border border-gray-300" 
+              [style.background-color]="formats.backgroundColor || '#ffffff'"
+            ></div>
+          </button>
+          @if (showBgColorMenu()) {
+            <div class="absolute top-full left-0 mt-1 p-3 bg-white border border-gray-200 rounded-lg shadow-lg z-50 w-52">
+              <p class="text-xs text-gray-500 mb-2">Highlight Color</p>
+              <div class="flex flex-wrap gap-2">
+                @for (color of backgroundColors; track color.value) {
+                  <button
+                    type="button"
+                    (click)="applyBackgroundColor(color.value)"
+                    class="w-7 h-7 rounded border border-gray-300 hover:scale-110 hover:shadow-md transition-all"
+                    [style.background-color]="color.value"
+                    [title]="color.name"
+                  ></button>
+                }
+              </div>
+              <button
+                type="button"
+                (click)="applyBackgroundColor('')"
+                class="w-full mt-3 px-2 py-1.5 text-xs text-gray-600 hover:bg-gray-100 rounded border border-gray-200"
+              >
+                Remove highlight
+              </button>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Other -->
+      <div class="flex items-center gap-1 px-3">
+        <button
+          type="button"
+          (click)="formatLink()"
+          [class]="getToolbarButtonClass(formats.link)"
+          title="Insert Link"
+        >
+          <lucide-icon name="link" class="h-4 w-4"></lucide-icon>
+        </button>
+        <button
+          type="button"
+          (click)="insertImage()"
+          [class]="getToolbarButtonClass(false)"
+          title="Insert Image"
+        >
+          <lucide-icon name="image" class="h-4 w-4"></lucide-icon>
+        </button>
+        <button
+          type="button"
+          (click)="formatBlockquote()"
+          [class]="getToolbarButtonClass(formats.blockquote)"
+          title="Blockquote"
+        >
+          <lucide-icon name="quote" class="h-4 w-4"></lucide-icon>
+        </button>
+        <button
+          type="button"
+          (click)="formatCode()"
+          [class]="getToolbarButtonClass(formats.codeBlock)"
+          title="Code Block"
+        >
+          <lucide-icon name="code" class="h-4 w-4"></lucide-icon>
+        </button>
+      </div>
+
+      <!-- Save status -->
+      <div class="ml-auto flex items-center gap-2">
+        @switch (saveStatus()) {
+          @case ('saving') {
+            <div class="flex items-center gap-2 text-gray-500">
+              <lucide-icon name="loader" class="h-4 w-4 animate-spin"></lucide-icon>
+              <span class="text-sm">Saving...</span>
+            </div>
+          }
+          @case ('saved') {
+            <div class="flex items-center gap-2 text-green-600">
+              <lucide-icon name="check" class="h-4 w-4"></lucide-icon>
+              <span class="text-sm">Saved</span>
+            </div>
+          }
+          @case ('error') {
+            <div class="flex items-center gap-2 text-red-600">
+              <lucide-icon name="alert-circle" class="h-4 w-4"></lucide-icon>
+              <span class="text-sm">Error saving</span>
+            </div>
+          }
+        }
+      </div>
+    </div>
+
+    <!-- Hidden file input for image upload -->
+    <input
+      type="file"
+      #imageInput
+      (change)="onImageSelected($event)"
+      accept="image/*"
+      class="hidden"
+    />
+
+    <!-- Editor container -->
+    <div class="flex-1 overflow-y-auto bg-gray-50 p-8 relative">
+      <div class="max-w-4xl mx-auto bg-white shadow-sm border border-gray-200 rounded-xl min-h-[600px] relative">
+        <div #editorContainer class="quill-editor-container"></div>
+        
+        <!-- Image manipulation menu -->
+        @if (showImageMenu()) {
+          <div 
+            class="absolute bg-white border border-gray-200 rounded-lg shadow-lg p-2 flex items-center gap-1 z-50"
+            [style.top.px]="imageMenuPosition().top"
+            [style.left.px]="imageMenuPosition().left"
+          >
+            <!-- Size options -->
+            <div class="flex items-center gap-1 pr-2 border-r border-gray-200">
+              <button
+                type="button"
+                (click)="setImageSize('small')"
+                class="px-2 py-1 text-xs rounded hover:bg-gray-100 transition-colors"
+                title="Small (25%)"
+              >S</button>
+              <button
+                type="button"
+                (click)="setImageSize('medium')"
+                class="px-2 py-1 text-xs rounded hover:bg-gray-100 transition-colors"
+                title="Medium (50%)"
+              >M</button>
+              <button
+                type="button"
+                (click)="setImageSize('large')"
+                class="px-2 py-1 text-xs rounded hover:bg-gray-100 transition-colors"
+                title="Large (75%)"
+              >L</button>
+              <button
+                type="button"
+                (click)="setImageSize('full')"
+                class="px-2 py-1 text-xs rounded hover:bg-gray-100 transition-colors"
+                title="Full width (100%)"
+              >Full</button>
+            </div>
+            
+            <!-- Alignment options -->
+            <div class="flex items-center gap-1 pr-2 border-r border-gray-200">
+              <button
+                type="button"
+                (click)="setImageAlign('left')"
+                class="p-1.5 rounded hover:bg-gray-100 transition-colors"
+                title="Align left"
+              >
+                <lucide-icon name="align-horizontal-distribute-start" class="h-4 w-4"></lucide-icon>
+              </button>
+              <button
+                type="button"
+                (click)="setImageAlign('center')"
+                class="p-1.5 rounded hover:bg-gray-100 transition-colors"
+                title="Align center"
+              >
+                <lucide-icon name="align-horizontal-distribute-center" class="h-4 w-4"></lucide-icon>
+              </button>
+              <button
+                type="button"
+                (click)="setImageAlign('right')"
+                class="p-1.5 rounded hover:bg-gray-100 transition-colors"
+                title="Align right"
+              >
+                <lucide-icon name="align-horizontal-distribute-end" class="h-4 w-4"></lucide-icon>
+              </button>
+            </div>
+            
+            <!-- Delete -->
+            <button
+              type="button"
+              (click)="deleteImage()"
+              class="p-1.5 rounded hover:bg-red-100 text-red-600 transition-colors"
+              title="Delete image"
+            >
+              <lucide-icon name="trash-2" class="h-4 w-4"></lucide-icon>
+            </button>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
