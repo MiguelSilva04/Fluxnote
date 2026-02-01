@@ -53,13 +53,10 @@ namespace Fluxnote.Backend.Data
             : base(options)
         {
         }
-<<<<<<< HEAD
-=======
 
         /// <summary>
         /// DbSet para equipas colaborativas.
         /// </summary>
->>>>>>> origin/main
         public DbSet<Fluxnote.Backend.Models.Team> Team { get; set; } = default!;
 
         /// <summary>
@@ -71,14 +68,11 @@ namespace Fluxnote.Backend.Data
         /// DbSet para documentos colaborativos.
         /// </summary>
         public DbSet<Fluxnote.Backend.Models.Document> Document { get; set; } = default!;
-<<<<<<< HEAD
         public DbSet<Fluxnote.Backend.Models.DocumentPermission> DocumentPermission { get; set; } = default!;
-=======
 
         /// <summary>
         /// DbSet para refresh tokens de autenticação.
         /// </summary>
->>>>>>> origin/main
         public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
 
         /// <summary>

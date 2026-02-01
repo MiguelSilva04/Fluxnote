@@ -190,7 +190,6 @@ builder.WebHost.ConfigureKestrel(options =>
 // Regista validadores FluentValidation do assembly
 builder.Services.AddValidatorsFromAssemblyContaining<RegisterRequestValidator>();
 builder.Services.AddAuthorization();
-<<<<<<< HEAD
 builder.Services.AddAuthorization(options =>
 {
     // Política para Owner (pode ser usado com [Authorize(Policy = "TeamOwner")])
@@ -201,7 +200,6 @@ builder.Services.AddAuthorization(options =>
         policy.RequireAuthenticatedUser();
     });
 });
-=======
 
 // ==============================================================================
 // 6. CORS (Cross-Origin Resource Sharing)
@@ -209,7 +207,6 @@ builder.Services.AddAuthorization(options =>
 // Permite pedidos do frontend Angular (localhost:4200).
 // AllowCredentials: Necessário para cookies de refresh token.
 
->>>>>>> origin/main
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("spa", policy =>
