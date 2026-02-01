@@ -12,7 +12,7 @@ public class TeamAutorizationService
         _context = context;
     }
 
-    public async Task<bool> IsteamOwnerAsync(int teamId, string userId)
+    public async Task<bool> IsTeamOwnerAsync(int teamId, string userId)
     {
         var membership = await GetTeamMemberAsync(teamId, userId);
         return membership != null && membership.Role == TeamRole.Owner;
