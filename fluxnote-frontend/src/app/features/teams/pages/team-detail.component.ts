@@ -79,12 +79,14 @@ export class TeamDetailComponent {
 
   /**
    * Método de ciclo de vida chamado na inicialização do componente.
-   * Obtém o ID da equipa da rota e carrega os dados.
+   * Subscreve às mudanças de parâmetro da rota para recarregar quando o ID muda.
    */
   ngOnInit(): void {
-    var teamId = Number(this.route.snapshot.paramMap.get('id'));
-    //console.log("Id do details é ", teamId);
-    this.loadTeam(teamId);
+    // Subscreve às mudanças de parâmetro para recarregar quando navega entre equipas
+    this.route.params.subscribe(params => {
+      const teamId = Number(params['id']);
+      this.loadTeam(teamId);
+    });
   }
 
   /**
@@ -120,6 +122,8 @@ export class TeamDetailComponent {
       error: (err) => {
         console.error(err);
         this.loading.set(false);
+        // Redireciona para dashboard se a equipa não existir ou não tiver acesso
+        this.router.navigate(['/dashboard']);
       }
     });
   }

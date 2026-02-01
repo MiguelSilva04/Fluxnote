@@ -1,9 +1,10 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LucideAngularModule } from 'lucide-angular';
-import { AuthService, PanelStateService } from '../../core/services';
+import { AuthService, PanelStateService, TeamService } from '../../core/services';
 import { ButtonComponent, BadgeComponent } from '../../shared/components/ui';
-import { RouterLink } from "@angular/router";
+import { Router, RouterLink } from "@angular/router";
+import { TeamGet } from '../../core/models';
 
 @Component({
   selector: 'app-profile-panel',
@@ -87,16 +88,27 @@ import { RouterLink } from "@angular/router";
               <h4 class="text-base font-bold text-gray-900">Teams</h4>
             </div>
             <div class="space-y-2">
-              @for (team of userTeams; track team.name) {
-                <div class="flex items-center justify-between p-3 border border-gray-200 rounded-lg">
-                  <span class="text-sm font-medium text-gray-900">{{ team.name }}</span>
-                  <app-badge
-                    [variant]="team.role === 'Owner' ? 'default' : 'outline'"
-                    [customClass]="team.role === 'Owner' ? 'bg-[#155347]' : ''"
-                  >
-                    {{ team.role }}
-                  </app-badge>
+              @if (isLoadingTeams()) {
+                <div class="flex items-center justify-center py-4">
+                  <lucide-icon name="loader-circle" class="h-5 w-5 text-[#155347] animate-spin"></lucide-icon>
                 </div>
+              } @else if (userTeams().length === 0) {
+                <p class="text-sm text-gray-500 text-center py-4">No teams yet</p>
+              } @else {
+                @for (team of userTeams(); track team.id) {
+                  <div 
+                    (click)="goToTeam(team.id)"
+                    class="flex items-center justify-between p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
+                  >
+                    <span class="text-sm font-medium text-gray-900">{{ team.name }}</span>
+                    <app-badge
+                      [variant]="team.currentUserRole === 2 ? 'default' : 'outline'"
+                      [customClass]="team.currentUserRole === 2 ? 'bg-[#155347]' : ''"
+                    >
+                      {{ getRoleName(team.currentUserRole) }}
+                    </app-badge>
+                  </div>
+                }
               }
             </div>
           </div>
@@ -145,15 +157,47 @@ import { RouterLink } from "@angular/router";
     }
   `
 })
-export class ProfilePanelComponent {
+export class ProfilePanelComponent implements OnInit {
   panelState = inject(PanelStateService);
   user = inject(AuthService).currentUser;
+  private teamService = inject(TeamService);
+  private router = inject(Router);
+  
   showWipModal = signal(false);
+  userTeams = signal<TeamGet[]>([]);
+  isLoadingTeams = signal(false);
 
-  userTeams = [
-    { name: 'Marketing Team', role: 'Editor' },
-    { name: 'Product Team', role: 'Owner' }
-  ];
+  ngOnInit(): void {
+    this.loadTeams();
+  }
+
+  loadTeams(): void {
+    this.isLoadingTeams.set(true);
+    this.teamService.getTeams().subscribe({
+      next: (teams) => {
+        this.userTeams.set(teams);
+        this.isLoadingTeams.set(false);
+      },
+      error: () => {
+        this.userTeams.set([]);
+        this.isLoadingTeams.set(false);
+      }
+    });
+  }
+
+  getRoleName(role: number): string {
+    switch (role) {
+      case 0: return 'Member';
+      case 1: return 'Team Admin';
+      case 2: return 'Owner';
+      default: return 'Member';
+    }
+  }
+
+  goToTeam(teamId: number): void {
+    this.panelState.closeProfilePanel();
+    this.router.navigate(['/team-detail', teamId]);
+  }
 
   formatDate(dateString?: string): string {
     if (!dateString) return '';
