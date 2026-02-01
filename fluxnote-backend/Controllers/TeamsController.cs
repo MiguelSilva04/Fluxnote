@@ -283,6 +283,8 @@ namespace Fluxnote.Backend.Controllers
         public async Task<IActionResult> DeleteTeam(int id)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId is null)
+                return Unauthorized(new { message = "User not authenticated." });
             var team = await _context.Team
                 .Include(t => t.Members)
                 .Include(t => t.Documents)
@@ -293,7 +295,8 @@ namespace Fluxnote.Backend.Controllers
                 return NotFound();
             }
 
-            if (!team.OwnerId.Equals(userId))
+            var isOwner = team.Members.Any(m => m.UserId == userId && m.Role == TeamRole.Owner);
+            if (!isOwner)
             {
                 return StatusCode(StatusCodes.Status403Forbidden, new
                 {
