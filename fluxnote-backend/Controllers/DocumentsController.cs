@@ -42,6 +42,7 @@ namespace Fluxnote.Backend.Controllers
                 .ToListAsync();
 
             // Query base: documentos das equipas do utilizador, não eliminados
+            // Futuramente: Buscar apenas documentos em que exista um registo DocumentPermission com o TeamMemberID e DocumentID exceto se for Owner ou TeamAdmin
             var query = _context.Document
                 .Include(d => d.Team)
                 .Include(d => d.CreatedBy)
@@ -284,6 +285,7 @@ namespace Fluxnote.Backend.Controllers
             }
 
             // Verificar se o utilizador tem acesso (é membro da equipa)
+            // Futuramente: Verificar se existe um registo DocumentPermission com o TeamMemberID e DocumentID exceto se for Owner ou TeamAdmin
             var isMember = await _context.TeamMember
                 .AnyAsync(m => m.TeamId == document.TeamId && m.UserId == userId);
 
@@ -333,6 +335,7 @@ namespace Fluxnote.Backend.Controllers
             }
 
             // Verificar se o utilizador tem acesso (é membro da equipa)
+            // Futuramente: Verificar se existe um registo DocumentPermission com o TeamMemberID e DocumentID cuja DocumentRole é Editor
             var isMember = await _context.TeamMember
                 .AnyAsync(m => m.TeamId == document.TeamId && m.UserId == userId);
 
