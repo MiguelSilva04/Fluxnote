@@ -1,0 +1,1 @@
+search_result['196']=["topic_0000000000000075.html","TeamDto.CreatedAt Property","Data de criação da equipa (UTC)."];

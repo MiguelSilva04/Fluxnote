@@ -9,6 +9,33 @@ using System.Security.Claims;
 
 namespace Fluxnote.Backend.Controllers
 {
+    /// <summary>
+    /// Controlador responsável pela gestão de equipas colaborativas.
+    /// </summary>
+    /// <remarks>
+    /// <b>Rota Base:</b> api/teams<br/>
+    /// <b>Autenticação:</b> JWT Bearer obrigatório em todos os endpoints.
+    ///
+    /// <b>Endpoints Disponíveis:</b>
+    /// <list type="table">
+    ///     <listheader>
+    ///         <term>Método</term>
+    ///         <description>Rota e Descrição</description>
+    ///     </listheader>
+    ///     <item><term>GET</term><description>/ - Listar equipas do utilizador</description></item>
+    ///     <item><term>GET</term><description>/{id} - Obter detalhes de uma equipa</description></item>
+    ///     <item><term>POST</term><description>/ - Criar nova equipa</description></item>
+    ///     <item><term>PUT</term><description>/{id} - Atualizar equipa</description></item>
+    ///     <item><term>DELETE</term><description>/{id} - Eliminar equipa (cascade)</description></item>
+    /// </list>
+    ///
+    /// <b>Notas:</b>
+    /// <list type="bullet">
+    ///     <item><description>Equipas são normalmente criadas via DocumentsController (ao criar documento)</description></item>
+    ///     <item><description>Eliminação remove em cascata todos os membros e documentos</description></item>
+    ///     <item><description>CurrentUserRole indica o papel do utilizador na equipa (0=Member, 1=TeamAdmin, 2=Owner)</description></item>
+    /// </list>
+    /// </remarks>
     [Route("api/[controller]")]
     [ApiController]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
@@ -16,12 +43,33 @@ namespace Fluxnote.Backend.Controllers
     {
         private readonly FluxnoteServerContext _context;
 
+        /// <summary>
+        /// Construtor com injeção de dependências.
+        /// </summary>
+        /// <param name="context">Contexto da base de dados.</param>
         public TeamsController(FluxnoteServerContext context)
         {
             _context = context;
         }
 
-        // GET: api/Teams
+        /// <summary>
+        /// Lista todas as equipas onde o utilizador é membro.
+        /// </summary>
+        /// <returns>
+        /// <list type="bullet">
+        ///     <item><b>200 OK:</b> Lista de TeamDto com membros e documentos.</item>
+        ///     <item><b>401 Unauthorized:</b> Token inválido.</item>
+        /// </list>
+        /// </returns>
+        /// <remarks>
+        /// <b>Dados Incluídos:</b>
+        /// <list type="bullet">
+        ///     <item><description>Informação básica da equipa (nome, datas, estado)</description></item>
+        ///     <item><description>Lista de membros com papéis</description></item>
+        ///     <item><description>Lista de documentos não eliminados</description></item>
+        ///     <item><description>CurrentUserRole: papel do utilizador nessa equipa</description></item>
+        /// </list>
+        /// </remarks>
         [HttpGet]
         public async Task<ActionResult<IEnumerable<TeamDto>>> GetTeams()
         {
@@ -74,7 +122,18 @@ namespace Fluxnote.Backend.Controllers
             return Ok(teams);
         }
 
-        // GET: api/Teams/5
+        /// <summary>
+        /// Obtém os detalhes de uma equipa específica.
+        /// </summary>
+        /// <param name="id">ID da equipa.</param>
+        /// <returns>
+        /// <list type="bullet">
+        ///     <item><b>200 OK:</b> Detalhes da equipa (TeamDto).</item>
+        ///     <item><b>401 Unauthorized:</b> Token inválido.</item>
+        ///     <item><b>403 Forbidden:</b> Utilizador não é membro da equipa.</item>
+        ///     <item><b>404 Not Found:</b> Equipa não encontrada.</item>
+        /// </list>
+        /// </returns>
         [HttpGet("{id}")]
         public async Task<ActionResult<TeamDto>> GetTeam(int id)
         {
@@ -135,7 +194,21 @@ namespace Fluxnote.Backend.Controllers
             return Ok(dto);
         }
 
-        // PUT: api/Teams/5
+        /// <summary>
+        /// Atualiza os dados de uma equipa.
+        /// </summary>
+        /// <param name="id">ID da equipa.</param>
+        /// <param name="team">Objeto Team com dados atualizados.</param>
+        /// <returns>
+        /// <list type="bullet">
+        ///     <item><b>204 No Content:</b> Equipa atualizada com sucesso.</item>
+        ///     <item><b>400 Bad Request:</b> ID não corresponde ao objeto.</item>
+        ///     <item><b>404 Not Found:</b> Equipa não encontrada.</item>
+        /// </list>
+        /// </returns>
+        /// <remarks>
+        /// <b>⚠️ Nota:</b> Este endpoint necessita de validação de permissões adicionais.
+        /// </remarks>
         [HttpPut("{id}")]
         public async Task<IActionResult> PutTeam(int id, Team team)
         {
@@ -165,7 +238,19 @@ namespace Fluxnote.Backend.Controllers
             return NoContent();
         }
 
-        // POST: api/Teams
+        /// <summary>
+        /// Cria uma nova equipa.
+        /// </summary>
+        /// <param name="team">Dados da equipa a criar.</param>
+        /// <returns>
+        /// <list type="bullet">
+        ///     <item><b>201 Created:</b> Equipa criada com sucesso.</item>
+        /// </list>
+        /// </returns>
+        /// <remarks>
+        /// <b>Nota:</b> Na prática, equipas são normalmente criadas através do
+        /// DocumentsController quando um documento é criado sem especificar equipa.
+        /// </remarks>
         [HttpPost]
         public async Task<ActionResult<Team>> PostTeam(Team team)
         {
@@ -175,7 +260,25 @@ namespace Fluxnote.Backend.Controllers
             return CreatedAtAction("GetTeam", new { id = team.Id }, team);
         }
 
-        // DELETE: api/Teams/5
+        /// <summary>
+        /// Elimina uma equipa e todos os seus dados associados.
+        /// </summary>
+        /// <param name="id">ID da equipa a eliminar.</param>
+        /// <returns>
+        /// <list type="bullet">
+        ///     <item><b>204 No Content:</b> Equipa eliminada com sucesso.</item>
+        ///     <item><b>404 Not Found:</b> Equipa não encontrada.</item>
+        /// </list>
+        /// </returns>
+        /// <remarks>
+        /// <b>⚠️ OPERAÇÃO DESTRUTIVA - Eliminação em Cascata:</b>
+        /// <list type="bullet">
+        ///     <item><description>Todos os TeamMember da equipa são removidos</description></item>
+        ///     <item><description>Todos os Document da equipa são removidos</description></item>
+        ///     <item><description>A equipa é removida</description></item>
+        /// </list>
+        /// <b>⚠️ Nota:</b> Este endpoint necessita de validação de permissões (apenas Owner deveria poder eliminar).
+        /// </remarks>
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteTeam(int id)
         {

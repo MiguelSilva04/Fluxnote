@@ -1,0 +1,1 @@
+search_result['307']=["topic_00000000000000C4.html","User.AccountStatus Property","Estado atual da conta do utilizador.\r\nDetermina se o utilizador pode aceder ao sistema."];

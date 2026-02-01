@@ -1,0 +1,1 @@
+search_result['292']=["topic_00000000000000B7.html","TeamMember.JoinedAt Property","Data e hora em que o membro entrou na equipa (UTC)."];
