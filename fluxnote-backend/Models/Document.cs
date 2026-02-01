@@ -125,5 +125,9 @@ namespace Fluxnote.Backend.Models
         /// Referência de navegação para o utilizador criador.
         /// </summary>
         public User CreatedBy { get; set; } = null!;
+        
+        // Coleção de permissões
+        public ICollection<DocumentPermission> Permissions { get; set; } = new List<DocumentPermission>();
+
     }
 }

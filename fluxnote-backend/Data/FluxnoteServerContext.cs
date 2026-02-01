@@ -1,10 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Fluxnote.Backend.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Fluxnote.Backend.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection.Emit;
+using System.Threading.Tasks;
 
 namespace Fluxnote.Backend.Data
 {
@@ -67,6 +68,7 @@ namespace Fluxnote.Backend.Data
         /// DbSet para documentos colaborativos.
         /// </summary>
         public DbSet<Fluxnote.Backend.Models.Document> Document { get; set; } = default!;
+        public DbSet<Fluxnote.Backend.Models.DocumentPermission> DocumentPermission { get; set; } = default!;
 
         /// <summary>
         /// DbSet para refresh tokens de autenticação.
@@ -112,6 +114,29 @@ namespace Fluxnote.Backend.Data
                 entity.HasIndex(d => d.TeamId);
                 entity.HasIndex(d => d.CreatedById);
                 entity.HasIndex(d => d.IsDeleted);
+            });
+
+            builder.Entity<DocumentPermission>(entity =>
+            {
+                // Relação com TeamMember
+                entity.HasOne(dp => dp.TeamMember)
+                      .WithMany(tm => tm.DocumentPermissions)
+                      .HasForeignKey(dp => dp.TeamMemberId)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+                // Relação com Document
+                entity.HasOne(dp => dp.Document)
+                      .WithMany(d => d.Permissions)
+                      .HasForeignKey(dp => dp.DocumentId)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+                // Índice único: um TeamMember só pode ter uma permissão por Document
+                entity.HasIndex(dp => new { dp.TeamMemberId, dp.DocumentId })
+                      .IsUnique();
+
+                // Índices para performance
+                entity.HasIndex(dp => dp.DocumentId);
+                entity.HasIndex(dp => dp.TeamMemberId);
             });
 
             // Configuração específica para SQL Server (SQLite usa BLOB por defeito)

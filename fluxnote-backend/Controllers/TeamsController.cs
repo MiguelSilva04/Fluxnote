@@ -282,6 +282,9 @@ namespace Fluxnote.Backend.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteTeam(int id)
         {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId is null)
+                return Unauthorized(new { message = "User not authenticated." });
             var team = await _context.Team
                 .Include(t => t.Members)
                 .Include(t => t.Documents)
@@ -290,6 +293,16 @@ namespace Fluxnote.Backend.Controllers
             if (team == null)
             {
                 return NotFound();
+            }
+
+            var isOwner = team.Members.Any(m => m.UserId == userId && m.Role == TeamRole.Owner);
+            if (!isOwner)
+            {
+                return StatusCode(StatusCodes.Status403Forbidden, new
+                {
+                    message = "Permission denied.",
+                    errors = new[] { "Only the team owner can delete the team." }
+                });
             }
 
             // Remove primeiro todos os membros da equipa

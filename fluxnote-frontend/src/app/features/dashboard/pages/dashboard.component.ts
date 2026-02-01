@@ -47,7 +47,7 @@ import { DocumentDto, TeamGet } from '../../../core/models';
       @if (error()) {
         <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
           <div class="flex items-center gap-2 text-red-700">
-            <lucide-icon name="alert-circle" class="h-5 w-5"></lucide-icon>
+            <lucide-icon name="circle-alert" class="h-5 w-5"></lucide-icon>
             <span>{{ error() }}</span>
           </div>
         </div>
@@ -127,17 +127,17 @@ import { DocumentDto, TeamGet } from '../../../core/models';
                     <div class="p-3 bg-[#e8f0ee] rounded-lg">
                       <lucide-icon name="file-text" class="h-6 w-6 text-[#155347]"></lucide-icon>
                     </div>
-                    <!-- Menu dropdown -->
-                    <div class="relative">
-                      <button 
-                        class="p-1 hover:bg-gray-100 rounded" 
-                        (click)="toggleDocumentMenu($event, doc.id)"
-                      >
-                        <lucide-icon name="ellipsis-vertical" class="h-5 w-5 text-gray-400"></lucide-icon>
-                      </button>
-                      @if (openDocumentMenu() === doc.id) {
-                        <div class="absolute right-0 top-8 bg-white rounded-lg shadow-lg border border-gray-200 py-1 min-w-[140px] z-10">
-                          @if (isDocumentOwner(doc)) {
+                    <!-- Menu dropdown - Only show if user is Owner of the team -->
+                    @if (isTeamOwner(doc.teamId)) {
+                      <div class="relative">
+                        <button 
+                          class="p-1 hover:bg-gray-100 rounded" 
+                          (click)="toggleDocumentMenu($event, doc.id)"
+                        >
+                          <lucide-icon name="ellipsis-vertical" class="h-5 w-5 text-gray-400"></lucide-icon>
+                        </button>
+                        @if (openDocumentMenu() === doc.id) {
+                          <div class="absolute right-0 top-8 bg-white rounded-lg shadow-lg border border-gray-200 py-1 min-w-[140px] z-10">
                             <button
                               (click)="handleDeleteDocument($event, doc.id)"
                               class="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
@@ -145,12 +145,10 @@ import { DocumentDto, TeamGet } from '../../../core/models';
                               <lucide-icon name="trash-2" class="h-4 w-4"></lucide-icon>
                               Delete
                             </button>
-                          } @else {
-                            <span class="px-4 py-2 text-sm text-gray-400">No actions available</span>
-                          }
-                        </div>
-                      }
-                    </div>
+                          </div>
+                        }
+                      </div>
+                    }
                   </div>
                   <h3 class="text-lg font-bold text-gray-900 mb-2">{{ doc.title }}</h3>
                   <div class="flex items-center gap-4 text-sm text-gray-600">
@@ -246,7 +244,9 @@ import { DocumentDto, TeamGet } from '../../../core/models';
                           [class]="'w-full flex items-center justify-between p-4 rounded-lg border-2 transition-all ' + (selectedTeamId() === team.id ? 'border-[#155347] bg-[#e8f0ee]' : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50')"
                         >
                           <span class="font-medium text-gray-900">{{ team.name }}</span>
-                          <app-badge customClass="bg-[#155347] text-white">Owner</app-badge>
+                          @if (team.currentUserRole === 2) {
+                            <app-badge customClass="bg-[#155347] text-white">Owner</app-badge>
+                          }
                         </button>
                       }
                     </div>
@@ -313,10 +313,10 @@ import { DocumentDto, TeamGet } from '../../../core/models';
             Are you sure you want to delete this document? This action cannot be undone.
           </p>
         </div>
-        <div footer class="flex gap-3 w-full">
-          <app-button variant="ghost" customClass="flex-1" (onClick)="closeDeleteModal()">Cancel</app-button>
+        <div footer class="flex gap-3 w-full justify-center">
+          <app-button variant="ghost" customClass="flex-1 max-w-[120px]" (onClick)="closeDeleteModal()">Cancel</app-button>
           <app-button 
-            customClass="flex-1 bg-red-600 hover:bg-red-700" 
+            customClass="flex-1 max-w-[120px] bg-red-600 hover:bg-red-700" 
             (onClick)="confirmDelete()"
             [isLoading]="isDeleting()"
           >
@@ -428,8 +428,9 @@ export class DashboardComponent implements OnInit {
     this.isLoadingTeams.set(true);
     this.teamService.getTeams().subscribe({
       next: (teams) => {
-        // Filtrar apenas equipas onde o utilizador é Owner (TODO)
-        this.ownerTeams.set(teams);
+        // Filtrar apenas equipas onde o utilizador é Owner (currentUserRole === 2)
+        const ownerOnlyTeams = teams.filter(team => team.currentUserRole === 2);
+        this.ownerTeams.set(ownerOnlyTeams);
         this.isLoadingTeams.set(false);
       },
       error: (err) => {
@@ -498,6 +499,11 @@ export class DashboardComponent implements OnInit {
   isDocumentOwner(doc: DocumentDto): boolean {
     const currentUser = this.authService.currentUser();
     return currentUser?.id === doc.createdById;
+  }
+
+  isTeamOwner(teamId: number): boolean {
+    const team = this.userTeams().find(t => t.id === teamId);
+    return team?.currentUserRole === 2; // 2 = Owner
   }
 
   handleDeleteDocument(event: Event, docId: number): void {

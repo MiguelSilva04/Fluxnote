@@ -34,7 +34,7 @@ import { TextEditorComponent } from './components/text-editor.component';
         </div>
       } @else if (loadError()) {
         <div class="flex flex-col items-center justify-center h-screen gap-4">
-          <lucide-icon name="alert-circle" class="h-10 w-10 text-red-500"></lucide-icon>
+          <lucide-icon name="circle-alert" class="h-10 w-10 text-red-500"></lucide-icon>
           <div class="text-red-600 text-sm">{{ loadError() }}</div>
           <div class="text-gray-500 text-xs">Redirecting to dashboard...</div>
         </div>
