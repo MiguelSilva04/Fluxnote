@@ -35,5 +35,9 @@ namespace Fluxnote.Backend.Models
         // Navigation properties
         public Team Team { get; set; } = null!;
         public User CreatedBy { get; set; } = null!;
+        
+        // Coleção de permissões
+        public ICollection<DocumentPermission> Permissions { get; set; } = new List<DocumentPermission>();
+
     }
 }

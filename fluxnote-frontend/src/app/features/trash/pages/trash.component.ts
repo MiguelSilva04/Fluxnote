@@ -49,31 +49,31 @@ import { DocumentDto } from '../../../core/models';
 
       <!-- Trash Documents Grid -->
       @if (!isLoading() && trashDocuments().length > 0) {
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-5 gap-6">
           @for (doc of trashDocuments(); track doc.id) {
             <app-card customClass="hover:shadow-lg transition-shadow">
-              <app-card-content customClass="p-6">
-                <div class="flex items-start justify-between mb-4">
-                  <div class="p-3 bg-red-50 rounded-lg">
-                    <lucide-icon name="file-text" class="h-6 w-6 text-red-400"></lucide-icon>
+              <app-card-content customClass="p-4">
+                <div class="flex flex-col items-center text-center mb-3">
+                  <div class="p-2 bg-red-50 rounded-lg mb-3">
+                    <lucide-icon name="file-text" class="h-5 w-5 text-red-400"></lucide-icon>
+                  </div>
+                  <h3 class="text-base font-bold text-gray-900 mb-2">{{ doc.title }}</h3>
+                  <div class="flex flex-col items-center gap-1 text-xs text-gray-600 mb-3">
+                    <div class="flex items-center gap-1">
+                      <lucide-icon name="clock" class="h-3 w-3"></lucide-icon>
+                      <span>Deleted {{ formatDate(doc.updatedAt) }}</span>
+                    </div>
+                    <div class="flex items-center gap-1">
+                      <lucide-icon name="users" class="h-3 w-3"></lucide-icon>
+                      <span>{{ doc.teamName }}</span>
+                    </div>
                   </div>
                 </div>
-                <h3 class="text-lg font-bold text-gray-900 mb-2">{{ doc.title }}</h3>
-                <div class="flex items-center gap-4 text-sm text-gray-600 mb-4">
-                  <div class="flex items-center gap-1">
-                    <lucide-icon name="clock" class="h-4 w-4"></lucide-icon>
-                    <span>Deleted {{ formatDate(doc.updatedAt) }}</span>
-                  </div>
-                  <div class="flex items-center gap-1">
-                    <lucide-icon name="users" class="h-4 w-4"></lucide-icon>
-                    <span>{{ doc.teamName }}</span>
-                  </div>
-                </div>
-                <div class="flex gap-2">
+                <div class="flex gap-2 justify-center">
                   <app-button 
                     variant="outline" 
                     size="sm" 
-                    customClass="flex-1"
+                    customClass="flex-1 max-w-[120px]"
                     (onClick)="handleRestore(doc.id)"
                   >
                     <lucide-icon name="undo-2" class="h-4 w-4 mr-1"></lucide-icon>
@@ -82,7 +82,7 @@ import { DocumentDto } from '../../../core/models';
                   <app-button 
                     variant="outline" 
                     size="sm" 
-                    customClass="flex-1 text-red-600 border-red-200 hover:bg-red-50"
+                    customClass="flex-1 max-w-[120px] text-red-600 border-red-200 hover:bg-red-50"
                     (onClick)="openDeleteModal(doc.id)"
                   >
                     <lucide-icon name="trash-2" class="h-4 w-4 mr-1"></lucide-icon>
@@ -114,10 +114,10 @@ import { DocumentDto } from '../../../core/models';
             This action cannot be undone.
           </p>
         </div>
-        <div footer class="flex gap-3 w-full">
-          <app-button variant="ghost" customClass="flex-1" (onClick)="closeDeleteModal()">Cancel</app-button>
+        <div footer class="flex gap-3 w-full justify-center">
+          <app-button variant="ghost" customClass="flex-1 max-w-[140px]" (onClick)="closeDeleteModal()">Cancel</app-button>
           <app-button 
-            customClass="flex-1 bg-red-600 hover:bg-red-700" 
+            customClass="flex-1 max-w-[140px] bg-red-600 hover:bg-red-700" 
             (onClick)="confirmPermanentDelete()"
             [isLoading]="isDeleting()"
           >

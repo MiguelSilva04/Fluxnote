@@ -4,6 +4,7 @@ using FluentValidation.AspNetCore;
 using Fluxnote.Backend.Data;
 using Fluxnote.Backend.Models;
 using Fluxnote.Backend.Services.Auth;
+using Fluxnote.Backend.Services.Authorization;
 using Fluxnote.Backend.Services.Email;
 using Fluxnote.Backend.Validators;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -76,7 +77,7 @@ else
     builder.Services.AddScoped<IEmailSender, ConsoleEmailSender>();
 }
 
-
+builder.Services.AddScoped<TeamAutorizationService>();
 
 builder.Services.AddScoped<TokenService>();
 
@@ -120,6 +121,16 @@ builder.WebHost.ConfigureKestrel(options =>
 });
 builder.Services.AddValidatorsFromAssemblyContaining<RegisterRequestValidator>();
 builder.Services.AddAuthorization();
+builder.Services.AddAuthorization(options =>
+{
+    // Política para Owner (pode ser usado com [Authorize(Policy = "TeamOwner")])
+    options.AddPolicy("TeamOwner", policy =>
+    {
+        // Esta política será verificada manualmente nos controllers
+        // pois precisamos do teamId do contexto da requisição
+        policy.RequireAuthenticatedUser();
+    });
+});
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("spa", policy =>

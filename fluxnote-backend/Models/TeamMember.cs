@@ -17,6 +17,9 @@ namespace Fluxnote.Backend.Models
 
         public DateTime JoinedAt { get; set; } = DateTime.UtcNow;
 
+        // Documentos a que este membro tem acesso
+        public ICollection<DocumentPermission> DocumentPermissions { get; set; } = new List<DocumentPermission>();
+
     }
 
     public enum TeamRole

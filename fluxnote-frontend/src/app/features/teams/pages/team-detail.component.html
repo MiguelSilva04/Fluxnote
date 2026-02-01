@@ -118,22 +118,24 @@
             </app-card-content>
           </app-card>
 
-          <!-- Delete Team Section -->
-          <app-card>
-            <app-card-content customClass="p-6">
-              <h3 class="text-sm font-semibold text-gray-900 mb-4">Danger Zone</h3>
-              <p class="text-xs text-gray-500 mb-4">
-                Once you delete a team, there is no going back. Please be certain.
-              </p>
-              <button
-                (click)="openDeleteModal()"
-                class="w-full flex items-center justify-center gap-2 px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 transition-colors"
-              >
-                <lucide-icon name="trash-2" class="h-4 w-4"></lucide-icon>
-                Delete Team
-              </button>
-            </app-card-content>
-          </app-card>
+          <!-- Delete Team Section - Only visible for Owners -->
+          @if (selectedTeam()?.currentUserRole === 2) {
+            <app-card>
+              <app-card-content customClass="p-6">
+                <h3 class="text-sm font-semibold text-gray-900 mb-4">Danger Zone</h3>
+                <p class="text-xs text-gray-500 mb-4">
+                  Once you delete a team, there is no going back. Please be certain.
+                </p>
+                <button
+                  (click)="openDeleteModal()"
+                  class="w-full flex items-center justify-center gap-2 px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 transition-colors"
+                >
+                  <lucide-icon name="trash-2" class="h-4 w-4"></lucide-icon>
+                  Delete Team
+                </button>
+              </app-card-content>
+            </app-card>
+          }
 
         </div>
 

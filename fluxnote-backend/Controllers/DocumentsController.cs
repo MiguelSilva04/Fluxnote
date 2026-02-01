@@ -36,10 +36,21 @@ namespace Fluxnote.Backend.Controllers
                 return Unauthorized(new { message = "User not authenticated." });
 
             // Obter IDs das equipas onde o utilizador é membro
-            var userTeamIds = await _context.TeamMember
+            var userTeamMembers = await _context.TeamMember
                 .Where(m => m.UserId == userId)
-                .Select(m => m.TeamId)
                 .ToListAsync();
+
+            if(!userTeamMembers.Any())
+            {
+                // O utilizador não é membro de nenhuma equipa
+                return Ok(new List<DocumentDto>());
+            }
+
+            var userTeamIds = userTeamMembers.Select(m => m.TeamId).ToList();
+            var ownerTeamIds = userTeamMembers
+                .Where(m => m.Role == TeamRole.Owner)
+                .Select(m => m.TeamId)
+                .ToList();
 
             // Query base: documentos das equipas do utilizador, não eliminados
             // Futuramente: Buscar apenas documentos em que exista um registo DocumentPermission com o TeamMemberID e DocumentID exceto se for Owner ou TeamAdmin
@@ -64,37 +75,56 @@ namespace Fluxnote.Backend.Controllers
                     (d.PlainText != null && d.PlainText.ToLower().Contains(searchLower)));
             }
 
-            // Ordenar por última atualização (mais recentes primeiro)
-            var rawDocuments = await query
+            var allDocuments = await query
                 .OrderByDescending(d => d.UpdatedAt)
-                .Select(d => new 
-                {
-                    d.Id,
-                    d.Title,
-                    d.TeamId,
-                    TeamName = d.Team.Name,
-                    d.CreatedById,
-                    CreatedByName = d.CreatedBy.FullName ?? d.CreatedBy.Email ?? "",
-                    d.CreatedAt,
-                    d.UpdatedAt,
-                    d.IsDeleted,
-                    d.PlainText
-                })
                 .ToListAsync();
 
-            // Criar DTOs com preview se houver pesquisa
-            var documents = rawDocuments.Select(d => new DocumentDto
+            // Filtrar por DocumentPermission (exceto Owners/TeamAdmins)
+            var accessibleDocuments = new List<Document>();
+
+            foreach (var doc in allDocuments)
             {
-                Id = d.Id,
-                Title = d.Title,
-                TeamId = d.TeamId,
-                TeamName = d.TeamName,
-                CreatedById = d.CreatedById,
-                CreatedByName = d.CreatedByName,
-                CreatedAt = d.CreatedAt,
-                UpdatedAt = d.UpdatedAt,
-                IsDeleted = d.IsDeleted,
-                Preview = searchLower != null ? GeneratePreview(d.PlainText, d.Title, searchLower) : null
+                var userTeamMember = userTeamMembers.FirstOrDefault(m => m.TeamId == doc.TeamId);
+
+                if (userTeamMember == null)
+                    continue;
+
+                // Owners e TeamAdmins veem todos os documentos da equipa
+                if (ownerTeamIds.Contains(doc.TeamId))
+                {
+                    accessibleDocuments.Add(doc);
+                }
+                else
+                {
+                    // Verificar se existe DocumentPermission para este TeamMember e Document
+                    var hasPermission = await _context.DocumentPermission
+                        .AnyAsync(dp => dp.TeamMemberId == userTeamMember.Id && dp.DocumentId == doc.Id);
+
+                    if (hasPermission)
+                    {
+                        accessibleDocuments.Add(doc);
+                    }
+                }
+            }
+
+            // Criar DTOs
+            var documents = accessibleDocuments.Select(d =>
+            {
+                var team = d.Team;
+                var createdBy = d.CreatedBy;
+                return new DocumentDto
+                {
+                    Id = d.Id,
+                    Title = d.Title,
+                    TeamId = d.TeamId,
+                    TeamName = team.Name,
+                    CreatedById = d.CreatedById,
+                    CreatedByName = createdBy.FullName ?? createdBy.Email ?? "",
+                    CreatedAt = d.CreatedAt,
+                    UpdatedAt = d.UpdatedAt,
+                    IsDeleted = d.IsDeleted,
+                    Preview = searchLower != null ? GeneratePreview(d.PlainText, d.Title, searchLower) : null
+                };
             }).ToList();
 
             return Ok(documents);
@@ -161,6 +191,7 @@ namespace Fluxnote.Backend.Controllers
             }
 
             Team team;
+            TeamMember? ownerTeamMember = null;
 
             if (request.TeamId.HasValue)
             {
@@ -175,10 +206,10 @@ namespace Fluxnote.Backend.Controllers
                 }
 
                 // Verificar se o utilizador é Owner da equipa
-                var isOwner = existingTeam.Members
-                    .Any(m => m.UserId == userId && m.Role == TeamRole.Owner);
+                ownerTeamMember = existingTeam.Members
+                    .FirstOrDefault(m => m.UserId == userId && m.Role == TeamRole.Owner);
 
-                if (!isOwner)
+                if (ownerTeamMember == null)
                 {
                     return StatusCode(StatusCodes.Status403Forbidden, new
                     {
@@ -230,6 +261,8 @@ namespace Fluxnote.Backend.Controllers
                 // Atualizar o OwnerId da equipa
                 team.OwnerId = teamMember.Id;
                 await _context.SaveChangesAsync();
+
+                ownerTeamMember = teamMember;
             }
 
             // Criar o documento
@@ -248,6 +281,23 @@ namespace Fluxnote.Backend.Controllers
 
             _context.Document.Add(document);
             await _context.SaveChangesAsync();
+
+            // Criar DocumentPermission para o Owner (que criou o documento)
+            // Nota: O Owner já tem acesso total, mas cria se a permissão para consistência
+            if (ownerTeamMember != null)
+            {
+                var documentPermission = new DocumentPermission
+                {
+                    TeamMemberId = ownerTeamMember.Id,
+                    DocumentId = document.Id,
+                    Role = DocumentRole.Editor,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                };
+
+                _context.DocumentPermission.Add(documentPermission);
+                await _context.SaveChangesAsync();
+            }
 
             // Retornar o DTO
             var dto = new DocumentDto
@@ -284,12 +334,30 @@ namespace Fluxnote.Backend.Controllers
                 return NotFound(new { message = "Document not found." });
             }
 
-            // Verificar se o utilizador tem acesso (é membro da equipa)
-            // Futuramente: Verificar se existe um registo DocumentPermission com o TeamMemberID e DocumentID exceto se for Owner ou TeamAdmin
-            var isMember = await _context.TeamMember
-                .AnyAsync(m => m.TeamId == document.TeamId && m.UserId == userId);
+            // Obter TeamMember do utilizador nesta equipa
+            var userTeamMember = await _context.TeamMember
+                .FirstOrDefaultAsync(m => m.TeamId == document.TeamId && m.UserId == userId);
 
-            if (!isMember)
+            if (userTeamMember == null)
+            {
+                return StatusCode(StatusCodes.Status403Forbidden, new
+                {
+                    message = "Permission denied.",
+                    errors = new[] { "You are not a member of this team." }
+                });
+            }
+
+            // Verificar se é Owner ou TeamAdmin (têm acesso total)
+            bool hasAccess = userTeamMember.Role == TeamRole.Owner || userTeamMember.Role == TeamRole.TeamAdmin;
+
+            // Se não for Owner/Admin, verificar DocumentPermission
+            if (!hasAccess)
+            {
+                hasAccess = await _context.DocumentPermission
+                    .AnyAsync(dp => dp.TeamMemberId == userTeamMember.Id && dp.DocumentId == document.Id);
+            }
+
+            if (!hasAccess)
             {
                 return StatusCode(StatusCodes.Status403Forbidden, new
                 {
@@ -334,17 +402,37 @@ namespace Fluxnote.Backend.Controllers
                 return NotFound(new { message = "Document not found." });
             }
 
-            // Verificar se o utilizador tem acesso (é membro da equipa)
-            // Futuramente: Verificar se existe um registo DocumentPermission com o TeamMemberID e DocumentID cuja DocumentRole é Editor
-            var isMember = await _context.TeamMember
-                .AnyAsync(m => m.TeamId == document.TeamId && m.UserId == userId);
+            // Obter TeamMember do utilizador nesta equipa
+            var userTeamMember = await _context.TeamMember
+                .FirstOrDefaultAsync(m => m.TeamId == document.TeamId && m.UserId == userId);
 
-            if (!isMember)
+            if (userTeamMember == null)
             {
                 return StatusCode(StatusCodes.Status403Forbidden, new
                 {
                     message = "Permission denied.",
-                    errors = new[] { "You don't have access to this document." }
+                    errors = new[] { "You are not a member of this team." }
+                });
+            }
+
+            // Verificar se é Owner ou TeamAdmin (podem editar)
+            bool canEdit = userTeamMember.Role == TeamRole.Owner || userTeamMember.Role == TeamRole.TeamAdmin;
+
+            // Se não for Owner/Admin, verificar se tem DocumentPermission com Role = Editor
+            if (!canEdit)
+            {
+                var permission = await _context.DocumentPermission
+                    .FirstOrDefaultAsync(dp => dp.TeamMemberId == userTeamMember.Id && dp.DocumentId == document.Id);
+
+                canEdit = permission != null && permission.Role == DocumentRole.Editor;
+            }
+
+            if (!canEdit)
+            {
+                return StatusCode(StatusCodes.Status403Forbidden, new
+                {
+                    message = "Permission denied.",
+                    errors = new[] { "You don't have permission to edit this document." }
                 });
             }
 
@@ -359,7 +447,7 @@ namespace Fluxnote.Backend.Controllers
             {
                 // Guardar conteúdo HTML como bytes UTF-8
                 document.Content = System.Text.Encoding.UTF8.GetBytes(request.Content);
-                
+
                 // Extrair texto limpo para pesquisa (remover tags HTML)
                 document.PlainText = StripHtmlTags(request.Content);
             }
@@ -388,7 +476,7 @@ namespace Fluxnote.Backend.Controllers
 
         // DELETE: api/Documents/5
         /// <summary>
-        /// Move um documento para a lixeira (soft delete). Apenas o criador pode apagar.
+        /// Move um documento para a lixeira (soft delete). Apenas o Owner da equipa pode apagar.
         /// </summary>
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteDocument(int id)
@@ -405,13 +493,16 @@ namespace Fluxnote.Backend.Controllers
                 return NotFound(new { message = "Document not found." });
             }
 
-            // Verificar se o utilizador é o criador do documento
-            if (document.CreatedById != userId)
+            // Verificar se o utilizador é Owner da equipa do documento
+            var userTeamMember = await _context.TeamMember
+                .FirstOrDefaultAsync(m => m.TeamId == document.TeamId && m.UserId == userId);
+
+            if (userTeamMember == null || userTeamMember.Role != TeamRole.Owner)
             {
                 return StatusCode(StatusCodes.Status403Forbidden, new
                 {
                     message = "Permission denied.",
-                    errors = new[] { "Only the document creator can delete it." }
+                    errors = new[] { "Only the team Owner can delete documents." }
                 });
             }
 
