@@ -7,8 +7,7 @@ public class UpdateProfileRequest
     [StringLength(100, MinimumLength = 2, ErrorMessage = "Full name must be between 2 and 100 characters.")]
     public string? FullName { get; set; }
 
-    [StringLength(500, ErrorMessage = "Profile picture URL cannot exceed 500 characters.")]
-    [Url(ErrorMessage = "Profile picture must be a valid URL.")]
+    [StringLength(2800000, ErrorMessage = "Profile picture data is too large (max 2MB).")]
     public string? ProfilePictureUrl { get; set; }
 
     [StringLength(100, ErrorMessage = "Location cannot exceed 100 characters.")]

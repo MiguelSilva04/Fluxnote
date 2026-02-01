@@ -4,13 +4,14 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
 import { AuthService, PanelStateService, DocumentService } from '../../core/services';
+import { WorkInProgressComponent } from '../../shared/components/ui';
 import { DocumentDto } from '../../core/models';
 import { Subject, debounceTime, takeUntil, distinctUntilChanged } from 'rxjs';
 
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [CommonModule, FormsModule, LucideAngularModule],
+  imports: [CommonModule, FormsModule, LucideAngularModule, WorkInProgressComponent],
   template: `
     <header class="h-16 bg-white border-b border-gray-200 px-6 flex items-center justify-between shrink-0">
       <div class="flex items-center gap-4 flex-1">
@@ -72,7 +73,7 @@ import { Subject, debounceTime, takeUntil, distinctUntilChanged } from 'rxjs';
       </div>
       <div class="flex items-center gap-2">
         <button
-          (click)="panelState.openNotificationsPanel()"
+          (click)="showWipModal.set(true)"
           class="relative p-2 text-gray-500 hover:bg-gray-100 rounded-lg transition-colors"
         >
           <lucide-icon name="bell" class="h-5 w-5"></lucide-icon>
@@ -101,6 +102,8 @@ import { Subject, debounceTime, takeUntil, distinctUntilChanged } from 'rxjs';
         </button>
       </div>
     </header>
+
+    <app-work-in-progress [show]="showWipModal()" (close)="showWipModal.set(false)" />
   `,
   styles: [`
     .line-clamp-2 {
@@ -191,4 +194,5 @@ export class HeaderComponent implements OnDestroy {
   private escapeRegex(str: string): string {
     return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   }
+  showWipModal = signal(false);
 }

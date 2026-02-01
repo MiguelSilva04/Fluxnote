@@ -288,31 +288,96 @@ import { AuthService } from '../../../core/services';
               </button>
             </div>
 
-            <div class="space-y-4">
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Image URL</label>
-                <input
-                  type="url"
-                  [(ngModel)]="avatarUrl"
-                  placeholder="https://example.com/image.jpg"
-                  class="w-full h-10 px-4 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#155347] text-sm"
-                />
-              </div>
+            <!-- Tabs -->
+            <div class="flex border-b border-gray-200 mb-4">
+              <button
+                (click)="uploadMode.set('file')"
+                [class]="'flex-1 py-2 text-sm font-medium border-b-2 transition-colors ' +
+                  (uploadMode() === 'file' ? 'border-[#155347] text-[#155347]' : 'border-transparent text-gray-500 hover:text-gray-700')"
+              >
+                Upload File
+              </button>
+              <button
+                (click)="uploadMode.set('url')"
+                [class]="'flex-1 py-2 text-sm font-medium border-b-2 transition-colors ' +
+                  (uploadMode() === 'url' ? 'border-[#155347] text-[#155347]' : 'border-transparent text-gray-500 hover:text-gray-700')"
+              >
+                Image URL
+              </button>
+            </div>
 
-              @if (avatarUrl) {
-                <div class="text-center">
-                  <p class="text-sm text-gray-500 mb-2">Preview:</p>
-                  <img
-                    [src]="avatarUrl"
-                    alt="Preview"
-                    class="h-20 w-20 rounded-full object-cover mx-auto border-2 border-gray-200"
-                    (error)="avatarUrlError.set(true)"
-                    (load)="avatarUrlError.set(false)"
-                  />
-                  @if (avatarUrlError()) {
-                    <p class="text-xs text-red-500 mt-2">Invalid image URL</p>
-                  }
+            <div class="space-y-4">
+              <!-- File Upload Mode -->
+              @if (uploadMode() === 'file') {
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Choose Image</label>
+                  <div
+                    [class]="'border-2 border-dashed rounded-lg p-6 text-center transition-colors cursor-pointer ' +
+                      (isDragging() ? 'border-[#155347] bg-[#155347]/5' : 'border-gray-300 hover:border-[#155347]')"
+                    (click)="fileInput.click()"
+                    (dragover)="onDragOver($event)"
+                    (dragleave)="onDragLeave($event)"
+                    (drop)="onDrop($event)"
+                  >
+                    <input
+                      #fileInput
+                      type="file"
+                      accept="image/jpeg,image/png,image/gif,image/webp"
+                      class="hidden"
+                      (change)="onFileSelected($event)"
+                    />
+                    <lucide-icon [name]="isDragging() ? 'image' : 'upload'" [class]="'h-8 w-8 mx-auto mb-2 ' + (isDragging() ? 'text-[#155347]' : 'text-gray-400')"></lucide-icon>
+                    <p class="text-sm text-gray-600">{{ isDragging() ? 'Drop image here' : 'Click or drag an image here' }}</p>
+                    <p class="text-xs text-gray-400 mt-1">JPEG, PNG, GIF or WebP (max 2MB)</p>
+                  </div>
                 </div>
+
+                @if (fileError()) {
+                  <p class="text-xs text-red-500">{{ fileError() }}</p>
+                }
+
+                @if (filePreview()) {
+                  <div class="text-center">
+                    <p class="text-sm text-gray-500 mb-2">Preview:</p>
+                    <img
+                      [src]="filePreview()"
+                      alt="Preview"
+                      class="h-20 w-20 rounded-full object-cover mx-auto border-2 border-gray-200"
+                    />
+                    @if (selectedFile()) {
+                      <p class="text-xs text-gray-400 mt-2">{{ selectedFile()?.name }}</p>
+                    }
+                  </div>
+                }
+              }
+
+              <!-- URL Mode -->
+              @if (uploadMode() === 'url') {
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Image URL</label>
+                  <input
+                    type="url"
+                    [(ngModel)]="avatarUrl"
+                    placeholder="https://example.com/image.jpg"
+                    class="w-full h-10 px-4 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#155347] text-sm"
+                  />
+                </div>
+
+                @if (avatarUrl) {
+                  <div class="text-center">
+                    <p class="text-sm text-gray-500 mb-2">Preview:</p>
+                    <img
+                      [src]="avatarUrl"
+                      alt="Preview"
+                      class="h-20 w-20 rounded-full object-cover mx-auto border-2 border-gray-200"
+                      (error)="avatarUrlError.set(true)"
+                      (load)="avatarUrlError.set(false)"
+                    />
+                    @if (avatarUrlError()) {
+                      <p class="text-xs text-red-500 mt-2">Invalid image URL</p>
+                    }
+                  </div>
+                }
               }
 
               <div class="flex gap-2 pt-2">
@@ -322,7 +387,7 @@ import { AuthService } from '../../../core/services';
                 <app-button
                   customClass="flex-1 bg-[#155347] hover:bg-[#0d3d31]"
                   (click)="saveAvatar()"
-                  [disabled]="!avatarUrl || avatarUrlError() || isSavingAvatar()"
+                  [disabled]="!canSaveAvatar() || isSavingAvatar()"
                 >
                   {{ isSavingAvatar() ? 'Saving...' : 'Save' }}
                 </app-button>
@@ -549,6 +614,11 @@ export class ProfileComponent {
   avatarUrl = '';
   avatarUrlError = signal(false);
   avatarPreview = signal<string | null>(null);
+  uploadMode = signal<'url' | 'file'>('url');
+  selectedFile = signal<File | null>(null);
+  filePreview = signal<string | null>(null);
+  fileError = signal('');
+  isDragging = signal(false);
 
   // Password form (using signals for reactivity)
   currentPassword = signal('');
@@ -681,36 +751,121 @@ export class ProfileComponent {
     this.showAvatarModal.set(false);
     this.avatarUrl = '';
     this.avatarUrlError.set(false);
+    this.uploadMode.set('file');
+    this.selectedFile.set(null);
+    this.filePreview.set(null);
+    this.fileError.set('');
+    this.isDragging.set(false);
   }
 
   isSavingAvatar = signal(false);
 
-  async saveAvatar() {
-    if (this.avatarUrl && !this.avatarUrlError()) {
-      this.isSavingAvatar.set(true);
+  onDragOver(event: DragEvent) {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDragging.set(true);
+  }
 
-      const result = await this.authService.updateProfile({
-        profilePictureUrl: this.avatarUrl
-      });
+  onDragLeave(event: DragEvent) {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDragging.set(false);
+  }
 
-      if (result.success) {
-        // Update local state to reflect saved value
-        this.formData.update(current => ({
-          ...current,
-          profilePictureUrl: this.avatarUrl
-        }));
-        this.originalData.profilePictureUrl = this.avatarUrl;
-        this.avatarPreview.set(null); // Clear preview since it's now the actual image
-        this.successMessage.set('Profile picture updated successfully.');
-        this.closeAvatarModal();
-        this.autoHideMessages();
-      } else {
-        this.errorMessage.set(result.errors?.join(', ') || result.message || 'Failed to update profile picture.');
-        this.autoHideMessages();
-      }
+  onDrop(event: DragEvent) {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDragging.set(false);
 
-      this.isSavingAvatar.set(false);
+    const file = event.dataTransfer?.files?.[0];
+    if (file) {
+      this.processFile(file);
     }
+  }
+
+  onFileSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+
+    if (!file) return;
+    this.processFile(file);
+  }
+
+  private processFile(file: File) {
+
+    // Validate file type
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+    if (!allowedTypes.includes(file.type)) {
+      this.fileError.set('Invalid file type. Please select a JPEG, PNG, GIF or WebP image.');
+      this.selectedFile.set(null);
+      this.filePreview.set(null);
+      return;
+    }
+
+    // Validate file size (max 2MB)
+    const maxSize = 2 * 1024 * 1024; // 2MB
+    if (file.size > maxSize) {
+      this.fileError.set('File is too large. Maximum size is 2MB.');
+      this.selectedFile.set(null);
+      this.filePreview.set(null);
+      return;
+    }
+
+    this.fileError.set('');
+    this.selectedFile.set(file);
+
+    // Convert to base64 for preview
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.filePreview.set(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+  }
+
+  canSaveAvatar(): boolean {
+    if (this.uploadMode() === 'file') {
+      return !!this.filePreview() && !this.fileError();
+    } else {
+      return !!this.avatarUrl && !this.avatarUrlError();
+    }
+  }
+
+  async saveAvatar() {
+    if (!this.canSaveAvatar()) return;
+
+    this.isSavingAvatar.set(true);
+
+    let profilePictureUrl: string;
+
+    if (this.uploadMode() === 'file') {
+      // Use base64 from file
+      profilePictureUrl = this.filePreview()!;
+    } else {
+      // Use URL
+      profilePictureUrl = this.avatarUrl;
+    }
+
+    const result = await this.authService.updateProfile({
+      profilePictureUrl
+    });
+
+    if (result.success) {
+      // Update local state to reflect saved value
+      this.formData.update(current => ({
+        ...current,
+        profilePictureUrl
+      }));
+      this.originalData.profilePictureUrl = profilePictureUrl;
+      this.avatarPreview.set(null);
+      this.successMessage.set('Profile picture updated successfully.');
+      this.closeAvatarModal();
+      this.autoHideMessages();
+    } else {
+      this.errorMessage.set(result.errors?.join(', ') || result.message || 'Failed to update profile picture.');
+      this.autoHideMessages();
+    }
+
+    this.isSavingAvatar.set(false);
   }
 
   onAvatarError() {

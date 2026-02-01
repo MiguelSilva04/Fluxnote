@@ -90,3 +90,5 @@ Desktop.ini
 # JetBrains Rider
 .idea/
 *.sln.iml
+
+.claude/
