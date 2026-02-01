@@ -1,0 +1,1 @@
+search_result['77']=["topic_0000000000000030.html","ChangePasswordRequest Class","DTO para pedido de alteração de password.\r\nUsado no endpoint PUT /api/auth/users/me/password."];

@@ -1,0 +1,1 @@
+search_result['35']=["topic_0000000000000017.html","DocumentsController.RestoreDocument Method","Restaura um documento da lixeira. Apenas o criador pode restaurar."];

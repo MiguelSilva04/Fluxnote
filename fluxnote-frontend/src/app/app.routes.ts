@@ -141,16 +141,19 @@ export const routes: Routes = [
   },
   {
     path: 'help',
+    canActivate: [authGuard],
     loadComponent: () =>
       import('./features/help/pages/help.component').then((m) => m.HelpComponent),
   },
   {
     path: 'profile',
+    canActivate: [authGuard],
     loadComponent: () =>
       import('./features/profile/pages/profile.component').then((m) => m.ProfileComponent),
   },
   {
     path: 'notifications',
+    canActivate: [authGuard],
     loadComponent: () =>
       import('./features/notifications/pages/notifications.component').then(
         (m) => m.NotificationsComponent,
@@ -158,24 +161,11 @@ export const routes: Routes = [
   },
   {
     path: 'version-history',
+    canActivate: [authGuard],
     loadComponent: () =>
       import('./features/versions/pages/version-history.component').then(
         (m) => m.VersionHistoryComponent,
       ),
-  },
-  {
-    path: 'work-in-progress',
-    loadComponent: () => 
-      import('./shared/components/ui/wip/work-in-progress.component').then(
-        (m) => m.WorkInProgressComponent,
-      ),
-  },
-
-  // Backend API test route
-  {
-    path: 'people',
-    loadComponent: () =>
-      import('./features/people/people.component').then((m) => m.PeopleComponent),
   },
 
   // Wildcard redirect to landing

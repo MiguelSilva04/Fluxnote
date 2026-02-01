@@ -1,0 +1,1 @@
+search_result['200']=["topic_0000000000000079.html","TeamDto.CurrentUserRole Property","Papel do utilizador autenticado nesta equipa."];

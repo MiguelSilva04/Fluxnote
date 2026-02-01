@@ -1,0 +1,1 @@
+search_result['143']=["topic_0000000000000054.html","CreateDocumentRequest.TeamId Property","ID da equipa onde o documento será criado."];

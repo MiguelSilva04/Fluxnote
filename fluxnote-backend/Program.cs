@@ -1,9 +1,35 @@
-﻿using AspNetCoreRateLimit;
+﻿// ==============================================================================
+// PROGRAM.CS - Ponto de Entrada e Configuração da Aplicação Fluxnote Backend
+// ==============================================================================
+//
+// Este ficheiro configura todos os serviços e middleware da aplicação ASP.NET Core.
+//
+// ÍNDICE DE CONFIGURAÇÕES:
+// 1. Base de Dados (Entity Framework Core + SQL Server)
+// 2. Autenticação JWT Bearer
+// 3. Rate Limiting (AspNetCoreRateLimit)
+// 4. Serviços de Email (Dev/Produção)
+// 5. ASP.NET Core Identity
+// 6. CORS (Cross-Origin Resource Sharing)
+// 7. Swagger/OpenAPI
+// 8. Pipeline de Middleware
+//
+// DEPENDÊNCIAS (appsettings.json):
+// - ConnectionStrings:FluxnoteServerContext
+// - Jwt:Key, Jwt:Issuer, Jwt:Audience
+// - IpRateLimiting (secção)
+// - EmailOptions (secção)
+// - Auth:RefreshIdleDays, Auth:RefreshAbsoluteDays, etc.
+//
+// ==============================================================================
+
+using AspNetCoreRateLimit;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Fluxnote.Backend.Data;
 using Fluxnote.Backend.Models;
 using Fluxnote.Backend.Services.Auth;
+using Fluxnote.Backend.Services.Authorization;
 using Fluxnote.Backend.Services.Email;
 using Fluxnote.Backend.Validators;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -15,10 +41,21 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
-
 var builder = WebApplication.CreateBuilder(args);
+
+// ==============================================================================
+// 1. BASE DE DADOS - Entity Framework Core com SQL Server
+// ==============================================================================
+// Configura o contexto EF Core com SQL Server (LocalDB em desenvolvimento).
+// Connection string definida em appsettings.json.
 builder.Services.AddDbContext<FluxnoteServerContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("FluxnoteServerContext") ?? throw new InvalidOperationException("Connection string 'FluxnoteServerContext' not found.")));
+
+// ==============================================================================
+// 2. AUTENTICAÇÃO JWT BEARER
+// ==============================================================================
+// Configuração do JSON Web Token para autenticação stateless.
+// Chave, emissor e audiência definidos em appsettings.json.
 
 var jwtKey = builder.Configuration["Jwt:Key"];
 var jwtIssuer = builder.Configuration["Jwt:Issuer"];
@@ -27,9 +64,12 @@ var jwtAudience = builder.Configuration["Jwt:Audience"];
 if (string.IsNullOrWhiteSpace(jwtKey))
     throw new InvalidOperationException("Jwt:Key missing (Jwt__Key).");
 
+// Configuração de serviços da aplicação
 
-// Add services to the container.
-
+// Esquema de autenticação JWT Bearer
+// - ValidateIssuer/Audience: Verifica se o token foi emitido por esta aplicação
+// - ValidateLifetime: Verifica se o token não expirou
+// - ClockSkew: Tolerância de 30 segundos para diferenças de relógio
 builder.Services
     .AddAuthentication(options =>
     {
@@ -51,39 +91,68 @@ builder.Services
         };
     });
 
-// Configuração de rate limiting
+// ==============================================================================
+// 3. RATE LIMITING (AspNetCoreRateLimit)
+// ==============================================================================
+// Proteção contra abusos limitando pedidos por IP.
+// Configuração em appsettings.json: IpRateLimiting e IpRateLimitPolicies.
+// Limites por endpoint:
+// - POST /auth/login: 5 pedidos / 15 minutos
+// - POST /auth/register: 3 pedidos / hora
+// - POST /auth/refresh: 10 pedidos / minuto
 builder.Services.AddMemoryCache();
 builder.Services.Configure<IpRateLimitOptions>(builder.Configuration.GetSection("IpRateLimiting"));
 builder.Services.Configure<IpRateLimitPolicies>(builder.Configuration.GetSection("IpRateLimitPolicies"));
 builder.Services.AddInMemoryRateLimiting();
 builder.Services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
 
+// ==============================================================================
+// 4. SERVIÇOS DE EMAIL
+// ==============================================================================
+// Desenvolvimento: ConsoleEmailSender escreve para consola e armazena em memória
+// Produção: SmtpEmailSender envia via SMTP (usar quando configurado)
+// Configuração em appsettings.json: EmailOptions
+
 builder.Services.Configure<EmailOptions>(builder.Configuration.GetSection("EmailOptions"));
 
-// Caso tivessemos um serviço de email real, aqui é onde separariamos os ambientes
-/*if (builder.Environment.IsDevelopment())
-    builder.Services.AddScoped<IEmailSender, ConsoleEmailSender>();
-else
-    builder.Services.AddScoped<IEmailSender, SmtpEmailSender>();*/
-
+// Registo condicional baseado no ambiente
 if (builder.Environment.IsDevelopment())
 {
+    // DevEmailStore: armazena links de confirmação em memória para testes
     builder.Services.AddSingleton<IDevEmailStore, DevEmailStore>();
+    // ConsoleEmailSender: escreve emails para consola (não envia realmente)
     builder.Services.AddScoped<IEmailSender, ConsoleEmailSender>();
 }
 else
 {
+    // Em produção, usar SmtpEmailSender quando configurado
+    // Por agora, usa ConsoleEmailSender como fallback
     builder.Services.AddScoped<IEmailSender, ConsoleEmailSender>();
 }
 
+builder.Services.AddScoped<TeamAutorizationService>();
 
-
+// Serviço de geração e validação de tokens JWT
 builder.Services.AddScoped<TokenService>();
+
+// ==============================================================================
+// 5. ASP.NET CORE IDENTITY
+// ==============================================================================
+// Sistema de gestão de utilizadores e autenticação.
+// Configura políticas de password e requisitos de email.
+// Integra com FluxnoteServerContext via Entity Framework.
 
 builder.Services.AddIdentity<User, IdentityRole>(options =>
 {
+    // Email único obrigatório para cada utilizador
     options.User.RequireUniqueEmail = true;
 
+    // Política de password forte:
+    // - Mínimo 8 caracteres
+    // - Pelo menos 1 dígito
+    // - Pelo menos 1 minúscula
+    // - Pelo menos 1 maiúscula
+    // - Pelo menos 1 caractere especial
     options.Password.RequiredLength = 8;
     options.Password.RequireDigit = true;
     options.Password.RequireLowercase = true;
@@ -118,23 +187,49 @@ builder.WebHost.ConfigureKestrel(options =>
 {
     options.Limits.MaxRequestBodySize = 5 * 1024 * 1024; // 5MB
 });
+// Regista validadores FluentValidation do assembly
 builder.Services.AddValidatorsFromAssemblyContaining<RegisterRequestValidator>();
 builder.Services.AddAuthorization();
+builder.Services.AddAuthorization(options =>
+{
+    // Política para Owner (pode ser usado com [Authorize(Policy = "TeamOwner")])
+    options.AddPolicy("TeamOwner", policy =>
+    {
+        // Esta política será verificada manualmente nos controllers
+        // pois precisamos do teamId do contexto da requisição
+        policy.RequireAuthenticatedUser();
+    });
+});
+
+// ==============================================================================
+// 6. CORS (Cross-Origin Resource Sharing)
+// ==============================================================================
+// Permite pedidos do frontend Angular (localhost:4200).
+// AllowCredentials: Necessário para cookies de refresh token.
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("spa", policy =>
     {
         policy.WithOrigins(
-            "http://localhost:4200",
-            "http://127.0.0.1:4200"
+            "http://localhost:4200",    // Frontend Angular desenvolvimento
+            "http://127.0.0.1:4200"     // Alternativa localhost
             )
                .WithHeaders("Content-Type", "Authorization", "X-Requested-With")
                .WithMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+               // Expõe headers de rate limiting para o cliente
                .WithExposedHeaders("Retry-After", "X-Rate-Limit-Limit", "X-Rate-Limit-Remaining", "X-Rate-Limit-Reset")
+               // Essencial para cookies de refresh token
                .AllowCredentials();
     });
 });
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
+// ==============================================================================
+// 7. SWAGGER / OPENAPI
+// ==============================================================================
+// Documentação interativa da API disponível em /swagger em desenvolvimento.
+// Inclui suporte para autenticação JWT Bearer.
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
@@ -173,7 +268,12 @@ builder.Services.AddSwaggerGen(options =>
 
 var app = builder.Build();
 
-// Inserts Seed & Auto-apply migrations on startup (avoid in tests)
+// ==============================================================================
+// MIGRAÇÕES AUTOMÁTICAS
+// ==============================================================================
+// Aplica migrações pendentes ao iniciar (excepto em ambiente de testes).
+// Garante que a base de dados está atualizada com o modelo de dados.
+
 if (!app.Environment.IsEnvironment("Testing"))
 {
     using var scope = app.Services.CreateScope();
@@ -182,14 +282,12 @@ if (!app.Environment.IsEnvironment("Testing"))
     try
     {
         db.Database.Migrate();
-        //SeedData.Initialize(services);   
-}
-
-
+        // SeedData.Initialize(services); // Descomente para dados iniciais
+    }
     catch (SqliteException ex)
     {
-        // SQLite can throw if migrations are applied against an existing DB schema in some test scenarios.
-        // Ignore the specific "table already exists" error so integration tests that reuse an SQLite DB file don't fail.
+        // SQLite pode falhar se tabelas já existem (cenários de teste).
+        // Ignora erros "table already exists" para permitir reutilização de BD.
         if (ex.SqliteErrorCode == 1 && ex.Message?.Contains("already exists", StringComparison.OrdinalIgnoreCase) == true)
         {
             Console.WriteLine($"Ignored Sqlite migration error: {ex.Message}");
@@ -201,30 +299,55 @@ if (!app.Environment.IsEnvironment("Testing"))
     }
 }
 
-// Configure the HTTP request pipeline.
+// ==============================================================================
+// 8. PIPELINE DE MIDDLEWARE
+// ==============================================================================
+// Ordem dos middleware é importante!
+// 1. Swagger (apenas desenvolvimento)
+// 2. HTTPS Redirection (não em produção - handled por reverse proxy)
+// 3. Routing
+// 4. CORS
+// 5. Rate Limiting
+// 6. Authentication
+// 7. Authorization
+// 8. Controllers
+
+// Swagger UI disponível em /swagger (apenas desenvolvimento)
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
+// HTTPS e página de erro detalhada (não em produção)
 if (!app.Environment.IsProduction())
 {
     app.UseHttpsRedirection();
     app.UseDeveloperExceptionPage();
 }
 
+// Roteamento de pedidos
 app.UseRouting();
 
+// CORS deve vir antes de Authentication
 app.UseCors("spa");
 
+// Rate limiting por IP
 app.UseIpRateLimiting();
 
+// Autenticação JWT Bearer
 app.UseAuthentication();
+
+// Autorização baseada em políticas/claims
 app.UseAuthorization();
 
+// Mapeia controladores da API
 app.MapControllers();
 
+// Inicia a aplicação
 app.Run();
 
+// ==============================================================================
+// Declaração parcial para suporte a testes de integração (WebApplicationFactory)
+// ==============================================================================
 public partial class Program { }

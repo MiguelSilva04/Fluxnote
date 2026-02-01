@@ -16,6 +16,51 @@ using System.Threading.Tasks;
 
 namespace Fluxnote.Backend.Controllers;
 
+/// <summary>
+/// Controlador responsável pela autenticação e gestão de utilizadores.
+/// Implementa registo, login, refresh de tokens, gestão de perfil e sessões.
+/// </summary>
+/// <remarks>
+/// <b>Rota Base:</b> api/auth
+///
+/// <b>Endpoints Públicos (sem autenticação):</b>
+/// <list type="table">
+///     <listheader>
+///         <term>Método</term>
+///         <description>Rota e Descrição</description>
+///     </listheader>
+///     <item><term>POST</term><description>/register - Registo de novo utilizador (rate limit: 3/hora)</description></item>
+///     <item><term>POST</term><description>/login - Autenticação (rate limit: 5/15min)</description></item>
+///     <item><term>POST</term><description>/refresh - Renovação de access token (rate limit: 10/min)</description></item>
+///     <item><term>POST</term><description>/logout - Terminar sessão atual</description></item>
+///     <item><term>POST</term><description>/logout-all - Terminar todas as sessões</description></item>
+///     <item><term>GET</term><description>/confirm-email - Confirmar endereço de email</description></item>
+/// </list>
+///
+/// <b>Endpoints Autenticados (JWT obrigatório):</b>
+/// <list type="table">
+///     <listheader>
+///         <term>Método</term>
+///         <description>Rota e Descrição</description>
+///     </listheader>
+///     <item><term>GET</term><description>/users/me - Obter perfil do utilizador atual</description></item>
+///     <item><term>GET</term><description>/users/check-username/{username} - Verificar disponibilidade de username</description></item>
+///     <item><term>PUT</term><description>/users/me - Atualizar perfil</description></item>
+///     <item><term>PUT</term><description>/users/me/password - Alterar password</description></item>
+/// </list>
+///
+/// <b>Mecanismos de Segurança:</b>
+/// <list type="bullet">
+///     <item><description>JWT com expiração de 15 minutos (configurável)</description></item>
+///     <item><description>Refresh token com rotação (token único por uso)</description></item>
+///     <item><description>Deteção de reutilização de tokens (revoga sessão inteira)</description></item>
+///     <item><description>Timeout de inatividade: 7 dias</description></item>
+///     <item><description>Expiração absoluta: 7-30 dias (conforme RememberMe)</description></item>
+///     <item><description>Rate limiting por IP em endpoints sensíveis</description></item>
+///     <item><description>Bloqueio de conta após 5 tentativas falhadas em 15 minutos</description></item>
+///     <item><description>Mensagens genéricas para prevenir enumeração de utilizadores</description></item>
+/// </list>
+/// </remarks>
 [ApiController]
 [Route("api/auth")]
 public class AuthController : ControllerBase
@@ -28,9 +73,16 @@ public class AuthController : ControllerBase
     private readonly IEmailSender _emailSender;
     private readonly IConfiguration _configuration;
 
+    /// <summary>Duração padrão do access token em minutos.</summary>
     private const int AccessTokenMinutesDefault = 15;
+    /// <summary>Dias de inatividade máxima antes de expirar sessão (sliding window).</summary>
     private const int RefreshSlidingDaysDefault = 7;
+    /// <summary>Dias máximos absolutos de duração de sessão.</summary>
     private const int RefreshAbsoluteDaysDefault = 30;
+
+    /// <summary>
+    /// Construtor com injeção de dependências.
+    /// </summary>
     public AuthController(
         UserManager<User> userManager,
         SignInManager<User> signInManager,
@@ -49,11 +101,35 @@ public class AuthController : ControllerBase
         _tokenService = tokenService;
         _env = env;
     }
-    // -------------------------
-    // REGISTER
-    // - 409 se email já existe
-    // - 400 se validação/Identity falhar
-    // -------------------------
+    /// <summary>
+    /// Regista um novo utilizador no sistema.
+    /// </summary>
+    /// <param name="request">Dados de registo: Email, Password, FullName.</param>
+    /// <returns>
+    /// <list type="bullet">
+    ///     <item><b>200 OK:</b> Registo bem-sucedido, email de confirmação enviado.</item>
+    ///     <item><b>400 Bad Request:</b> Validação falhou (password fraca, dados inválidos).</item>
+    ///     <item><b>409 Conflict:</b> Email já registado no sistema.</item>
+    /// </list>
+    /// </returns>
+    /// <remarks>
+    /// <b>Rate Limit:</b> 3 pedidos por hora por IP.<br/>
+    /// <b>Fluxo:</b>
+    /// <list type="number">
+    ///     <item><description>Valida unicidade do email</description></item>
+    ///     <item><description>Cria utilizador com AccountStatus.PendingEmailConfirmation</description></item>
+    ///     <item><description>Gera token de confirmação de email</description></item>
+    ///     <item><description>Envia email com link de confirmação</description></item>
+    /// </list>
+    /// <b>Requisitos de Password:</b>
+    /// <list type="bullet">
+    ///     <item><description>Mínimo 8 caracteres</description></item>
+    ///     <item><description>1 letra maiúscula</description></item>
+    ///     <item><description>1 letra minúscula</description></item>
+    ///     <item><description>1 dígito</description></item>
+    ///     <item><description>1 caractere especial</description></item>
+    /// </list>
+    /// </remarks>
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterRequest request)
     {
@@ -107,17 +183,36 @@ public class AuthController : ControllerBase
     }
 
 
-    // -------------------------
-    // LOGIN
-    // Status codes:
-    // - 401: credenciais inválidas
-    // - 403: conta não confirmada / não activa
-    // - 423: locked out (opcional mas explícito)
-    // Sem leaks desnecessários (mensagem genérica em 401)
-    // Sliding+cap:
-    // - idleDays (sempre) vem de config Auth:RefreshIdleDays (default 7)
-    // - absoluteDays depende de rememberMe (7 vs 30) e é guardado por sessão
-    // -------------------------
+    /// <summary>
+    /// Autentica um utilizador e inicia uma sessão.
+    /// </summary>
+    /// <param name="request">Credenciais: Email, Password, RememberMe (opcional).</param>
+    /// <returns>
+    /// <list type="bullet">
+    ///     <item><b>200 OK:</b> Login bem-sucedido. Retorna AccessToken e define cookie de refresh.</item>
+    ///     <item><b>401 Unauthorized:</b> Credenciais inválidas (mensagem genérica por segurança).</item>
+    ///     <item><b>403 Forbidden:</b> Conta não confirmada ou inativa.</item>
+    ///     <item><b>423 Locked:</b> Conta bloqueada por excesso de tentativas falhadas.</item>
+    /// </list>
+    /// </returns>
+    /// <remarks>
+    /// <b>Rate Limit:</b> 5 pedidos por 15 minutos por IP.<br/>
+    /// <b>Política de Sessão (Sliding + Absolute):</b>
+    /// <list type="bullet">
+    ///     <item><description><b>IdleDays (7):</b> Sessão expira após X dias sem uso</description></item>
+    ///     <item><description><b>AbsoluteDays:</b> 7 dias (normal) ou 30 dias (com RememberMe)</description></item>
+    ///     <item><description>ExpiresAt = mínimo entre (LastUsedAt + IdleDays) e (SessionStartedAt + AbsoluteDays)</description></item>
+    /// </list>
+    /// <b>Resposta:</b>
+    /// <code>
+    /// {
+    ///     "accessToken": "eyJhbGciOiJIUzI1NiIs...",
+    ///     "expiresInSeconds": 900
+    /// }
+    /// </code>
+    /// <b>Cookie:</b> fluxnote_rt (HttpOnly, Secure em produção, SameSite=Lax)<br/>
+    /// <b>Bloqueio:</b> 5 tentativas falhadas em 15 minutos bloqueia a conta temporariamente.
+    /// </remarks>
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginRequest request)
     {
@@ -216,6 +311,34 @@ public class AuthController : ControllerBase
         });
     }
 
+    /// <summary>
+    /// Obtém o perfil completo do utilizador autenticado.
+    /// </summary>
+    /// <returns>
+    /// <list type="bullet">
+    ///     <item><b>200 OK:</b> Perfil do utilizador (UserProfile).</item>
+    ///     <item><b>401 Unauthorized:</b> Token inválido ou expirado.</item>
+    /// </list>
+    /// </returns>
+    /// <remarks>
+    /// <b>Autenticação:</b> JWT Bearer obrigatório.<br/>
+    /// <b>Resposta (UserProfile):</b>
+    /// <code>
+    /// {
+    ///     "id": "guid",
+    ///     "email": "user@example.com",
+    ///     "fullName": "Nome Completo",
+    ///     "userName": "username",
+    ///     "profilePictureUrl": "https://...",
+    ///     "location": "Lisboa, Portugal",
+    ///     "phoneNumber": "+351...",
+    ///     "bio": "Descrição",
+    ///     "timezone": "Europe/Lisbon",
+    ///     "createdAt": "2024-01-01T00:00:00Z",
+    ///     "usernameChangesRemaining": 3
+    /// }
+    /// </code>
+    /// </remarks>
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [HttpGet("users/me")]
     public async Task<IActionResult> Me()
@@ -252,6 +375,26 @@ public class AuthController : ControllerBase
         return Ok(profile);
     }
 
+    /// <summary>
+    /// Verifica se um username está disponível para uso.
+    /// </summary>
+    /// <param name="username">Username a verificar (3-30 caracteres, alfanumérico + underscore).</param>
+    /// <returns>
+    /// <list type="bullet">
+    ///     <item><b>200 OK:</b> { available: true/false, message: "..." }</item>
+    ///     <item><b>400 Bad Request:</b> Formato de username inválido.</item>
+    ///     <item><b>401 Unauthorized:</b> Token inválido.</item>
+    /// </list>
+    /// </returns>
+    /// <remarks>
+    /// <b>Autenticação:</b> JWT Bearer obrigatório.<br/>
+    /// <b>Validações:</b>
+    /// <list type="bullet">
+    ///     <item><description>3-30 caracteres de comprimento</description></item>
+    ///     <item><description>Apenas letras, números e underscore (_)</description></item>
+    ///     <item><description>Não pode estar em uso por outro utilizador</description></item>
+    /// </list>
+    /// </remarks>
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [HttpGet("users/check-username/{username}")]
     public async Task<IActionResult> CheckUsernameAvailability(string username)
@@ -294,11 +437,31 @@ public class AuthController : ControllerBase
         return Math.Max(0, maxChangesPerMonth - user.UsernameChangesThisMonth);
     }
 
-    // -------------------------
-    // UPDATE PROFILE
-    // - Atualiza nome, avatar, localização, telefone, bio, timezone, username
-    // - Username pode ser alterado no máximo 3 vezes por mês
-    // -------------------------
+    /// <summary>
+    /// Atualiza o perfil do utilizador autenticado.
+    /// </summary>
+    /// <param name="request">Campos a atualizar (todos opcionais).</param>
+    /// <returns>
+    /// <list type="bullet">
+    ///     <item><b>200 OK:</b> Perfil atualizado (UserProfile).</item>
+    ///     <item><b>400 Bad Request:</b> Limite de alterações de username atingido ou username já em uso.</item>
+    ///     <item><b>401 Unauthorized:</b> Token inválido.</item>
+    /// </list>
+    /// </returns>
+    /// <remarks>
+    /// <b>Autenticação:</b> JWT Bearer obrigatório.<br/>
+    /// <b>Campos Atualizáveis:</b>
+    /// <list type="bullet">
+    ///     <item><description>FullName - Nome completo</description></item>
+    ///     <item><description>ProfilePictureUrl - URL da foto de perfil</description></item>
+    ///     <item><description>Location - Localização</description></item>
+    ///     <item><description>PhoneNumber - Número de telefone</description></item>
+    ///     <item><description>UserName - Username (máx. 3 alterações/mês)</description></item>
+    ///     <item><description>Bio - Biografia</description></item>
+    ///     <item><description>Timezone - Fuso horário</description></item>
+    /// </list>
+    /// <b>Limite de Username:</b> Máximo 3 alterações por mês. Contador reseta automaticamente.
+    /// </remarks>
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [HttpPut("users/me")]
     public async Task<IActionResult> UpdateProfile([FromBody] UpdateProfileRequest request)
@@ -401,11 +564,31 @@ public class AuthController : ControllerBase
         return Ok(profile);
     }
 
-    // -------------------------
-    // CHANGE PASSWORD
-    // - Requer password atual para segurança
-    // - Aplica requisitos do Identity
-    // -------------------------
+    /// <summary>
+    /// Altera a password do utilizador autenticado.
+    /// </summary>
+    /// <param name="request">CurrentPassword, NewPassword, ConfirmPassword.</param>
+    /// <returns>
+    /// <list type="bullet">
+    ///     <item><b>200 OK:</b> Password alterada com sucesso.</item>
+    ///     <item><b>400 Bad Request:</b> Password atual incorreta, nova password não cumpre requisitos, ou conta OAuth.</item>
+    ///     <item><b>401 Unauthorized:</b> Token inválido.</item>
+    /// </list>
+    /// </returns>
+    /// <remarks>
+    /// <b>Autenticação:</b> JWT Bearer obrigatório.<br/>
+    /// <b>Restrições:</b>
+    /// <list type="bullet">
+    ///     <item><description>Apenas disponível para contas com AuthProvider.Local</description></item>
+    ///     <item><description>Requer password atual correta para segurança</description></item>
+    ///     <item><description>Nova password deve cumprir requisitos do Identity</description></item>
+    /// </list>
+    /// <b>Requisitos de Password:</b>
+    /// <list type="bullet">
+    ///     <item><description>Mínimo 8 caracteres</description></item>
+    ///     <item><description>1 letra maiúscula, 1 minúscula, 1 dígito, 1 especial</description></item>
+    /// </list>
+    /// </remarks>
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [HttpPut("users/me/password")]
     public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest request)
@@ -456,16 +639,38 @@ public class AuthController : ControllerBase
         return Ok(new { message = "Password changed successfully." });
     }
 
-    // -------------------------
-    // REFRESH
-    // Status codes:
-    // - 401: sem cookie / inválido / expirado / revogado / idle / cap / user inválido
-    // Reuse detection:
-    // - token revogado reapareceu -> revogar sessão toda e 401
-    // Sliding+cap:
-    // - newExpiresAt = min(now+idleDays, sessionStart+absoluteDays)
-    // - idleDays e absoluteDays vêm do token guardado (por sessão) para respeitar rememberMe
-    // -------------------------
+    /// <summary>
+    /// Renova o access token usando o refresh token do cookie.
+    /// </summary>
+    /// <returns>
+    /// <list type="bullet">
+    ///     <item><b>200 OK:</b> Novo access token e refresh token rotacionado.</item>
+    ///     <item><b>401 Unauthorized:</b> Sem cookie, token inválido/expirado/revogado, ou reutilização detetada.</item>
+    /// </list>
+    /// </returns>
+    /// <remarks>
+    /// <b>Rate Limit:</b> 10 pedidos por minuto por IP.<br/>
+    /// <b>Mecanismo de Rotação:</b>
+    /// <list type="number">
+    ///     <item><description>Valida refresh token do cookie</description></item>
+    ///     <item><description>Verifica se não está revogado, expirado, ou em idle timeout</description></item>
+    ///     <item><description>Revoga token atual</description></item>
+    ///     <item><description>Gera novo refresh token</description></item>
+    ///     <item><description>Calcula nova expiração: min(agora+idleDays, sessionStart+absoluteDays)</description></item>
+    ///     <item><description>Define novo cookie</description></item>
+    ///     <item><description>Retorna novo access token</description></item>
+    /// </list>
+    /// <b>Deteção de Reutilização:</b><br/>
+    /// Se um token já revogado for usado novamente, toda a sessão é revogada por segurança
+    /// (indica possível roubo de token).<br/>
+    /// <b>Verificações Adicionais:</b>
+    /// <list type="bullet">
+    ///     <item><description>Email deve estar confirmado</description></item>
+    ///     <item><description>AccountStatus deve ser Active</description></item>
+    ///     <item><description>Timeout de inatividade (idleDays)</description></item>
+    ///     <item><description>Expiração absoluta (absoluteDays desde início da sessão)</description></item>
+    /// </list>
+    /// </remarks>
     [HttpPost("refresh")]
     public async Task<IActionResult> Refresh()
     {
@@ -577,6 +782,28 @@ public class AuthController : ControllerBase
         });
     }
 
+    /// <summary>
+    /// Confirma o endereço de email de um utilizador.
+    /// </summary>
+    /// <param name="userId">ID do utilizador (recebido no link de confirmação).</param>
+    /// <param name="token">Token de confirmação codificado em Base64Url.</param>
+    /// <returns>
+    /// <list type="bullet">
+    ///     <item><b>200 OK:</b> Email confirmado com sucesso. Conta ativada.</item>
+    ///     <item><b>409 Conflict:</b> UserID inválido, token inválido, ou confirmação falhou.</item>
+    /// </list>
+    /// </returns>
+    /// <remarks>
+    /// <b>Fluxo:</b>
+    /// <list type="number">
+    ///     <item><description>Valida existência do utilizador</description></item>
+    ///     <item><description>Verifica se email já foi confirmado</description></item>
+    ///     <item><description>Descodifica token de Base64Url</description></item>
+    ///     <item><description>Confirma email via Identity</description></item>
+    ///     <item><description>Atualiza AccountStatus para Active</description></item>
+    /// </list>
+    /// <b>Nota:</b> Este endpoint é chamado pelo frontend quando o utilizador clica no link do email.
+    /// </remarks>
     [HttpGet("confirm-email")]
     public async Task<IActionResult> ConfirmEmail([FromQuery] string userId, [FromQuery] string token)
     {
@@ -644,6 +871,21 @@ public class AuthController : ControllerBase
             });
     }
 
+    /// <summary>
+    /// [DESENVOLVIMENTO] Obtém o último link de confirmação enviado para um email.
+    /// </summary>
+    /// <param name="email">Email para consultar.</param>
+    /// <param name="store">Serviço de armazenamento de emails de dev.</param>
+    /// <returns>
+    /// <list type="bullet">
+    ///     <item><b>200 OK:</b> Link de confirmação encontrado.</item>
+    ///     <item><b>404 Not Found:</b> Endpoint não disponível em produção ou link não encontrado.</item>
+    /// </list>
+    /// </returns>
+    /// <remarks>
+    /// <b>⚠️ APENAS DISPONÍVEL EM AMBIENTE DE DESENVOLVIMENTO</b><br/>
+    /// Útil para testes automatizados e debug do fluxo de confirmação de email.
+    /// </remarks>
     [HttpGet("dev/last-confirmation-link")]
     public IActionResult DevLastConfirmationLink([FromQuery] string email, [FromServices] IDevEmailStore store)
     {
@@ -656,12 +898,33 @@ public class AuthController : ControllerBase
         return Ok(new { confirmationLink = link });
     }
 
+    /// <summary>
+    /// Termina a sessão atual do utilizador.
+    /// </summary>
+    /// <returns><b>200 OK:</b> Logout bem-sucedido. Cookie removido.</returns>
+    /// <remarks>
+    /// Revoga apenas o refresh token da sessão atual.<br/>
+    /// Outras sessões do utilizador permanecem ativas.
+    /// </remarks>
     [HttpPost("logout")]
     public Task<IActionResult> Logout() => LogoutCore(revokeAll: false);
 
+    /// <summary>
+    /// Termina todas as sessões do utilizador.
+    /// </summary>
+    /// <returns><b>200 OK:</b> Logout de todas as sessões bem-sucedido.</returns>
+    /// <remarks>
+    /// Revoga todos os refresh tokens ativos do utilizador.<br/>
+    /// Força re-autenticação em todos os dispositivos.<br/>
+    /// Útil em caso de suspeita de comprometimento de conta.
+    /// </remarks>
     [HttpPost("logout-all")]
     public Task<IActionResult> LogoutAll() => LogoutCore(revokeAll: true);
 
+    /// <summary>
+    /// Lógica comum para logout (sessão única ou todas).
+    /// </summary>
+    /// <param name="revokeAll">True para revogar todas as sessões, false para apenas a atual.</param>
     private async Task<IActionResult> LogoutCore(bool revokeAll)
     {
         var cookieName = _configuration["Auth:RefreshCookieName"] ?? "fluxnote_rt";
