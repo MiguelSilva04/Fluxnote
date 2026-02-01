@@ -62,7 +62,7 @@ import { DocumentDto, TeamGet } from '../../../core/models';
               (click)="selectTeamFilter(null)"
               [class]="'px-4 py-2 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ' + (selectedTeamFilter() === null ? 'border-[#155347] text-[#155347]' : 'border-transparent text-gray-600 hover:text-gray-900')"
             >
-              All Documents
+              All Teams
             </button>
             <!-- Team tabs -->
             @if (isLoadingTeamTabs()) {
