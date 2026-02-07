@@ -101,5 +101,16 @@ namespace Fluxnote.Backend.Dtos.Teams
 
         /// <summary>ID do utilizador que criou o documento.</summary>
         public string CreatedById { get; set; } = string.Empty;
+
+        /// <summary>Lista de permissões do documento (apenas para Owner/TeamAdmin).</summary>
+        public List<DocumentPermissionSummaryDto> Permissions { get; set; } = new();
+    }
+
+    public class DocumentPermissionSummaryDto
+    {
+        public int Id { get; set; }
+        public int TeamMemberId { get; set; }
+        public string MemberName { get; set; } = string.Empty;
+        public int DocumentRole { get; set; } // 0=Viewer, 1=Editor
     }
 }

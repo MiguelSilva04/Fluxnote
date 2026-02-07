@@ -7,7 +7,7 @@
     </div>
   }
   @else if (selectedTeam()) {
-    <div class="max-w-4xl">
+    <div class="max-w-5xl">
 
       <!-- Header -->
       <div class="flex items-center gap-4 mb-8">
@@ -36,33 +36,202 @@
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
         <!-- Members Section -->
-        <div class="lg:col-span-2">
+        <div class="lg:col-span-2 space-y-6">
           <app-card>
             <app-card-content customClass="p-6">
               <div class="flex items-center justify-between mb-6">
                 <h2 class="text-lg font-bold text-gray-900">Team Members</h2>
               </div>
 
-              <div class="space-y-4">
+              <div class="space-y-3">
                 @for (member of selectedTeam()?.members ?? []; track member?.id ?? member?.email) {
                   <div class="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                    <div>
-                      <p class="text-sm font-medium text-gray-900">
-                        {{ member?.name }}
-                      </p>
-                      <p class="text-xs text-gray-500">
-                        {{ member.email }}
-                      </p>
+                    <div class="flex items-center gap-3">
+                      <div class="h-8 w-8 rounded-full bg-gray-200 text-gray-700 flex items-center justify-center text-xs font-bold">
+                        {{ getInitials(member?.name ?? '') }}
+                      </div>
+                      <div>
+                        <p class="text-sm font-medium text-gray-900">
+                          {{ member?.name }}
+                        </p>
+                        <p class="text-xs text-gray-500">
+                          {{ member.email }}
+                        </p>
+                      </div>
                     </div>
 
-                    <app-badge variant="outline">
-                      {{ roleNames[member.role] }}
-                    </app-badge>                    
+                    <div class="flex items-center gap-2">
+                      <!-- Owner can change roles (except their own) -->
+                      @if (isOwner() && member.role !== 2) {
+                        <select
+                          [ngModel]="member.role"
+                          (ngModelChange)="onTeamRoleChange(member, $event)"
+                          class="text-xs border border-gray-300 rounded-md px-2 py-1 bg-white focus:outline-none focus:ring-1 focus:ring-[#155347]"
+                        >
+                          <option [ngValue]="0">Member</option>
+                          <option [ngValue]="1">Team Admin</option>
+                        </select>
+                      } @else {
+                        <app-badge variant="outline">
+                          {{ roleNames[member.role] }}
+                        </app-badge>
+                      }
+
+                      <!-- Remove member button -->
+                      @if (canRemoveMember(member)) {
+                        <button
+                          (click)="removeMember(member)"
+                          class="p-1 text-gray-400 hover:text-red-500 transition-colors"
+                          title="Remove member"
+                        >
+                          <lucide-icon name="x" class="h-4 w-4"></lucide-icon>
+                        </button>
+                      }
+                    </div>
                   </div>
                 }
               </div>
             </app-card-content>
           </app-card>
+
+          <!-- Document Permissions Panels (only for Owner/TeamAdmin) -->
+          @if (isOwnerOrAdmin() && visibleDocuments().length) {
+            <app-card>
+              <app-card-content customClass="p-6">
+                <h2 class="text-lg font-bold text-gray-900 mb-4">Document Permissions</h2>
+
+                <div class="space-y-3">
+                  @for (doc of visibleDocuments(); track doc.id) {
+                    <div class="border border-gray-200 rounded-lg overflow-hidden">
+                      <!-- Document Header (clickable to expand) -->
+                      <div
+                        (click)="toggleDocPanel(doc.id)"
+                        class="flex items-center justify-between p-4 cursor-pointer hover:bg-gray-50 transition-colors"
+                      >
+                        <div class="flex items-center gap-2">
+                          <lucide-icon name="file-text" class="h-4 w-4 text-gray-500"></lucide-icon>
+                          <span class="text-sm font-medium text-gray-900">{{ doc.title }}</span>
+                          @if (doc.permissions?.length) {
+                            <span class="text-xs text-gray-400">({{ doc.permissions!.length }} members)</span>
+                          }
+                        </div>
+                        <div class="flex items-center gap-2">
+                          @if (isCurrentUserMember()) {
+                            <button
+                              (click)="openDocument(doc.id); $event.stopPropagation()"
+                              class="text-xs text-[#155347] hover:underline"
+                            >
+                              Open
+                            </button>
+                          }
+                          <lucide-icon
+                            [name]="isDocExpanded(doc.id) ? 'chevron-up' : 'chevron-down'"
+                            class="h-4 w-4 text-gray-400"
+                          ></lucide-icon>
+                        </div>
+                      </div>
+
+                      <!-- Expanded: Member permissions list -->
+                      @if (isDocExpanded(doc.id)) {
+                        <div class="border-t border-gray-200 p-4 bg-gray-50">
+
+                          <!-- Existing permissions -->
+                          @if (doc.permissions?.length) {
+                            <div class="space-y-2 mb-3">
+                              @for (perm of doc.permissions; track perm.id) {
+                                <div class="flex items-center justify-between py-2 px-3 bg-white rounded border border-gray-100">
+                                  <div class="flex items-center gap-2">
+                                    <div class="h-6 w-6 rounded-full bg-gray-200 text-gray-600 flex items-center justify-center text-[10px] font-bold">
+                                      {{ getInitials(perm.memberName) }}
+                                    </div>
+                                    <span class="text-sm text-gray-700">{{ perm.memberName }}</span>
+                                  </div>
+                                  <div class="flex items-center gap-2">
+                                    @if (canChangeDocRole(perm)) {
+                                      <select
+                                        [ngModel]="perm.documentRole"
+                                        (ngModelChange)="onDocRoleChange(perm, $event)"
+                                        class="text-xs border border-gray-300 rounded-md px-2 py-1 bg-white focus:outline-none focus:ring-1 focus:ring-[#155347]"
+                                      >
+                                        <option [ngValue]="0">Viewer</option>
+                                        <option [ngValue]="1">Editor</option>
+                                      </select>
+                                    } @else {
+                                      <app-badge variant="outline">
+                                        {{ docRoleNames[perm.documentRole] }}
+                                      </app-badge>
+                                    }
+                                    @if (canRemoveDocPermission(perm)) {
+                                      <button
+                                        (click)="removeDocPermission(doc.id, perm)"
+                                        class="p-1 text-gray-400 hover:text-red-500 transition-colors"
+                                        title="Remove access"
+                                      >
+                                        <lucide-icon name="x" class="h-3.5 w-3.5"></lucide-icon>
+                                      </button>
+                                    }
+                                  </div>
+                                </div>
+                              }
+                            </div>
+                          } @else {
+                            <p class="text-xs text-gray-500 mb-3">No members have explicit access to this document yet.</p>
+                          }
+
+                          <!-- Add Member Form -->
+                          @if (addMemberDocId() === doc.id) {
+                            <div class="flex items-center gap-2 p-3 bg-white rounded border border-gray-200">
+                              <select
+                                [ngModel]="addMemberSelectedId()"
+                                (ngModelChange)="addMemberSelectedId.set($event)"
+                                class="text-xs border border-gray-300 rounded-md px-2 py-1 bg-white flex-1 focus:outline-none focus:ring-1 focus:ring-[#155347]"
+                              >
+                                <option [ngValue]="null" disabled>Select member...</option>
+                                @for (m of getAddableMembers(doc); track m.id) {
+                                  <option [ngValue]="m.id">{{ m.name }}</option>
+                                }
+                              </select>
+                              <select
+                                [ngModel]="addMemberSelectedRole()"
+                                (ngModelChange)="addMemberSelectedRole.set($event)"
+                                class="text-xs border border-gray-300 rounded-md px-2 py-1 bg-white focus:outline-none focus:ring-1 focus:ring-[#155347]"
+                              >
+                                <option [ngValue]="0">Viewer</option>
+                                <option [ngValue]="1">Editor</option>
+                              </select>
+                              <button
+                                (click)="confirmAddMember()"
+                                [disabled]="!addMemberSelectedId()"
+                                class="px-3 py-1 text-xs font-medium text-white bg-[#155347] rounded-md hover:bg-[#0e3d33] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                              >
+                                Add
+                              </button>
+                              <button
+                                (click)="closeAddMemberForm()"
+                                class="p-1 text-gray-400 hover:text-gray-600 transition-colors"
+                              >
+                                <lucide-icon name="x" class="h-4 w-4"></lucide-icon>
+                              </button>
+                            </div>
+                          } @else {
+                            @if (getAddableMembers(doc).length > 0) {
+                              <button
+                                (click)="openAddMemberForm(doc.id)"
+                                class="flex items-center gap-1 text-xs text-[#155347] hover:text-[#0e3d33] font-medium transition-colors"
+                              >
+                                <lucide-icon name="plus" class="h-3.5 w-3.5"></lucide-icon>
+                                Add Member
+                              </button>
+                            }
+                          }
+                        </div>
+                      }
+                    </div>
+                  }
+                </div>
+              </app-card-content>
+            </app-card>
+          }
         </div>
 
         <!-- Stats Section -->
@@ -97,15 +266,15 @@
             </app-card-content>
           </app-card>
 
-          <!-- Documents Section -->
+          <!-- Documents Quick List -->
           <app-card>
             <app-card-content customClass="p-6">
               <h3 class="text-sm font-semibold text-gray-900 mb-4">Documents</h3>
 
               <div class="space-y-2">
-                @if (selectedTeam()?.documents) {
-                  @for (doc of selectedTeam()!.documents; track doc.id) {
-                    <div 
+                @if (visibleDocuments().length) {
+                  @for (doc of visibleDocuments(); track doc.id) {
+                    <div
                       (click)="openDocument(doc.id)"
                       class="p-2 border-b text-sm cursor-pointer hover:bg-gray-50 rounded"
                     >

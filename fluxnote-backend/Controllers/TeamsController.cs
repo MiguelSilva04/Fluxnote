@@ -154,15 +154,20 @@ namespace Fluxnote.Backend.Controllers
                 });
             }
 
-            var team = await _context.Team
+            var teamQuery = _context.Team
                 .Include(t => t.Members)
                 .Include(t => t.Documents.Where(d => !d.IsDeleted))
-                .FirstOrDefaultAsync(t => t.Id == id);
+                    .ThenInclude(d => d.Permissions)
+                        .ThenInclude(p => p.TeamMember);
+
+            var team = await teamQuery.FirstOrDefaultAsync(t => t.Id == id);
 
             if (team == null)
             {
                 return NotFound(new { message = "Team not found." });
             }
+
+            var isOwnerOrAdmin = membership.Role == TeamRole.Owner || membership.Role == TeamRole.TeamAdmin;
 
             var dto = new TeamDto
             {
@@ -187,7 +192,16 @@ namespace Fluxnote.Backend.Controllers
                     Id = d.Id,
                     Title = d.Title,
                     UpdatedAt = d.UpdatedAt,
-                    CreatedById = d.CreatedById
+                    CreatedById = d.CreatedById,
+                    Permissions = isOwnerOrAdmin
+                        ? d.Permissions.Select(p => new DocumentPermissionSummaryDto
+                        {
+                            Id = p.Id,
+                            TeamMemberId = p.TeamMemberId,
+                            MemberName = p.TeamMember.Name,
+                            DocumentRole = (int)p.Role
+                        }).ToList()
+                        : new List<DocumentPermissionSummaryDto>()
                 }).ToList()
             };
 

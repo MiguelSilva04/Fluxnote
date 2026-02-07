@@ -3,7 +3,7 @@ import { Team, TeamGet, TeamMember, TeamMemberToPost, TeamToPost } from '../mode
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import {AuthService } from './auth.service';
-import { Subject } from 'rxjs';
+import { catchError, Observable, of, Subject, tap, throwError } from 'rxjs';
 
 
 
@@ -210,6 +210,22 @@ export class TeamService {
    */
   deleteTeam(id: number) {
     return this.http.delete(`/api/teams/${id}`);
+  }
+
+  updateMemberRole(memberId: number, role: number): Observable<void> {
+    return this.http.put<void>(`/api/teamMembers/${memberId}`, { role }).pipe(
+      tap(() => {
+        console.log('Member role updated successfully');
+      }),
+      catchError((err) => {
+        console.error('Error updating member role:', err);
+        return throwError(() => new Error('Error updating member role'));
+      })
+    );
+  }
+
+  removeMember(memberId: number): Observable<void> {
+    return this.http.delete<void>(`/api/teamMembers/${memberId}`);
   }
 
   /* updateTeam(id: number, updates: Partial<Team>, http: HttpClient): void {

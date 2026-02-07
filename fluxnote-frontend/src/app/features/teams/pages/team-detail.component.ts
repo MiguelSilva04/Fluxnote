@@ -1,21 +1,20 @@
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
 import { DashboardLayoutComponent } from '../../../layout/dashboard-layout/dashboard-layout.component';
 import { ButtonComponent, CardComponent, CardContentComponent, BadgeComponent, ModalComponent } from '../../../shared/components/ui';
-import { TeamService } from '../../../core/services';
-import { TeamGet } from '../../../core/models';
+import { TeamService, DocumentPermissionService, AuthService } from '../../../core/services';
+import { ToastService } from '../../../shared/services/toast.service';
+import { TeamMemberToPost, TeamDocument, DocumentPermissionSummary } from '../../../core/models';
 
-/**
- * Componente responsável por apresentar os detalhes de uma equipa específica.
- * Obtém o ID da equipa através da rota e carrega os dados associados.
- */
 @Component({
   selector: 'app-team-detail',
   standalone: true,
   imports: [
     CommonModule,
+    FormsModule,
     LucideAngularModule,
     DashboardLayoutComponent,
     ButtonComponent,
@@ -27,73 +26,45 @@ import { TeamGet } from '../../../core/models';
   templateUrl: `./team-detail.component.html`
 })
 export class TeamDetailComponent {
-  /**
-   * Router para navegação entre rotas.
-   */
   private router = inject(Router);
-
-  /**
-   * ActivatedRoute para acesso aos parâmetros da rota atual.
-   */
   private route = inject(ActivatedRoute);
-
-  /**
-   * Serviço responsável pela gestão de equipas.
-   */
   private teamService = inject(TeamService);
+  private docPermissionService = inject(DocumentPermissionService);
+  private authService = inject(AuthService);
+  private toastService = inject(ToastService);
 
-  /**
-   * Signal que contém a equipa atualmente selecionada.
-   */
   selectedTeam = this.teamService.selectedTeam;
 
-  /**
-   * Mapeamento de IDs de papéis para nomes legíveis.
-   */
   roleNames: { [key: number]: string } = {
     0: 'Member',
     1: 'Team Admin',
     2: 'Owner'
   };
-  
+
+  docRoleNames: { [key: number]: string } = {
+    0: 'Viewer',
+    1: 'Editor'
+  };
+
   loading = signal(true);
-  
-  /** Signal para controlar a abertura do modal de delete */
   isDeleteModalOpen = signal(false);
-  
-  /** Signal para indicar se está a eliminar */
   isDeleting = signal(false);
 
-  /* members = [
-    { id: 1, name: 'Alex Morgan', email: 'alex.morgan@fluxnote.com', role: 'Owner', initials: 'AM', color: '#155347' },
-    { id: 2, name: 'Sarah Kim', email: 'sarah.kim@fluxnote.com', role: 'Team Admin', initials: 'SK', color: '#3B82F6' },
-    { id: 3, name: 'John Doe', email: 'john.doe@fluxnote.com', role: 'Editor', initials: 'JD', color: '#8B5CF6' },
-    { id: 4, name: 'Maria Santos', email: 'maria.santos@fluxnote.com', role: 'Viewer', initials: 'MS', color: '#EC4899' }
-  ];
+  /** Track which document panels are expanded */
+  expandedDocs = signal<Set<number>>(new Set());
 
-  recentActivity = [
-    { id: 1, action: 'Sarah Kim edited "Project Plan"', time: '2 hours ago' },
-    { id: 2, action: 'John Doe added a comment', time: '4 hours ago' },
-    { id: 3, action: 'Alex Morgan shared a document', time: 'Yesterday' }
-  ]; */
+  /** State for the add member to document form */
+  addMemberDocId = signal<number | null>(null);
+  addMemberSelectedId = signal<number | null>(null);
+  addMemberSelectedRole = signal<number>(0);
 
-  /**
-   * Método de ciclo de vida chamado na inicialização do componente.
-   * Subscreve às mudanças de parâmetro da rota para recarregar quando o ID muda.
-   */
   ngOnInit(): void {
-    // Subscreve às mudanças de parâmetro para recarregar quando navega entre equipas
     this.route.params.subscribe(params => {
       const teamId = Number(params['id']);
       this.loadTeam(teamId);
     });
   }
 
-  /**
-   * Gera as iniciais de um nome.
-   * @param name Nome completo
-   * @returns Iniciais do nome (máximo 2 letras)
-   */
   getInitials(name: string): string {
     if (!name) return '';
     return name
@@ -101,65 +72,44 @@ export class TeamDetailComponent {
       .filter(word => word.length > 0)
       .map(word => word[0].toUpperCase())
       .join('')
-      .slice(0, 2); // opcional: limita a 2 letras
+      .slice(0, 2);
   }
 
-  /**
-   * Carrega os dados da equipa a partir do serviço.
-   * @param teamId ID da equipa
-   */
   loadTeam(teamId: number) {
     this.loading.set(true);
-    this.selectedTeam.set(null); // limpa a equipa anterior
-    
+    this.selectedTeam.set(null);
+
     this.teamService.getTeamById(teamId).subscribe({
       next: (team) => {
-        // Update local state or handle response
         this.selectedTeam.set(team);
         this.loading.set(false);
-        //console.log(team);
       },
       error: (err) => {
         console.error(err);
         this.loading.set(false);
-        // Redireciona para dashboard se a equipa não existir ou não tiver acesso
         this.router.navigate(['/dashboard']);
       }
     });
   }
 
-  /**
-   * Navega de volta para a lista de equipas.
-   */
   goBack(): void {
     this.router.navigate(['/teams']);
   }
 
-  /**
-   * Abre o editor de um documento.
-   * @param docId ID do documento
-   */
   openDocument(docId: number): void {
     this.router.navigate(['/editor', docId]);
   }
 
-  /**
-   * Abre o modal de confirmação para eliminar a equipa.
-   */
+  // --- Delete Team ---
+
   openDeleteModal(): void {
     this.isDeleteModalOpen.set(true);
   }
 
-  /**
-   * Fecha o modal de confirmação.
-   */
   closeDeleteModal(): void {
     this.isDeleteModalOpen.set(false);
   }
 
-  /**
-   * Confirma e elimina a equipa.
-   */
   confirmDeleteTeam(): void {
     const team = this.selectedTeam();
     if (!team) return;
@@ -176,5 +126,281 @@ export class TeamDetailComponent {
         this.isDeleting.set(false);
       }
     });
+  }
+
+  // --- Team Role Management ---
+
+  isOwner(): boolean {
+    return this.selectedTeam()?.currentUserRole === 2;
+  }
+
+  isOwnerOrAdmin(): boolean {
+    const role = this.selectedTeam()?.currentUserRole;
+    return role === 2 || role === 1;
+  }
+
+  isTeamAdmin(): boolean {
+    return this.selectedTeam()?.currentUserRole === 1;
+  }
+
+  isCurrentUserMember(): boolean {
+    const userId = this.authService.currentUser()?.id;
+    const team = this.selectedTeam();
+    if (!userId || !team) return false;
+    return team.members?.some(m => m.userId === userId) ?? false;
+  }
+
+  private getCurrentUserTeamMemberId(): number | null {
+    const userId = this.authService.currentUser()?.id;
+    const team = this.selectedTeam();
+    if (!userId || !team) return null;
+    const member = team.members?.find(m => m.userId === userId);
+    return member?.id ?? null;
+  }
+
+  // verifica se o utilizador pode editar um documento numa equipa
+  canEditDocument(doc: TeamDocument): boolean {
+    const myRole = this.selectedTeam()?.currentUserRole;
+    if (myRole === 2) {
+      return true;
+    }
+    if (myRole === 1) {
+      const myMemberId = this.getCurrentUserTeamMemberId();
+      if (!myMemberId) return false;
+      return doc.permissions?.some(p => p.teamMemberId === myMemberId) ?? false;
+    }
+    return false;
+  }
+
+  private getMemberRoleById(teamMemberId: number): number | null {
+    const team = this.selectedTeam();
+    if (!team) return null;
+    const member = team.members?.find(m => m.id === teamMemberId);
+    return member?.role ?? null;
+  }
+
+  isPermissionOwner(permission: DocumentPermissionSummary): boolean {
+    return this.getMemberRoleById(permission.teamMemberId) === 2;
+  }
+
+  canChangeDocRole(permission: DocumentPermissionSummary): boolean {
+    if (this.isOwner()) return true;
+    if (this.isTeamAdmin()) return !this.isPermissionOwner(permission);
+    return false;
+  }
+
+  canRemoveDocPermission(permission: DocumentPermissionSummary): boolean {
+    if (this.isOwner()) return true;
+    if (this.isTeamAdmin()) return !this.isPermissionOwner(permission);
+    return false;
+  }
+
+  onTeamRoleChange(member: TeamMemberToPost, newRole: number): void {
+    this.teamService.updateMemberRole(member.id!, newRole).subscribe({
+      next: () => {
+        this.toastService.success('Role updated successfully.');
+        // Update local state
+        const team = this.selectedTeam();
+        if (team) {
+          const updated = {
+            ...team,
+            members: team.members.map(m =>
+              m.id === member.id ? { ...m, role: newRole } : m
+            )
+          };
+          this.selectedTeam.set(updated);
+        }
+      },
+      error: (err) => {
+        console.error('Error updating member role:', err);
+        this.toastService.error('Failed to update role. Please try again.');
+      }
+    });
+  }
+
+  canRemoveMember(member: TeamMemberToPost): boolean {
+    const myRole = this.selectedTeam()?.currentUserRole;
+    if (myRole === 2) {
+      // Owner can remove anyone except themselves
+      return member.role !== 2;
+    }
+    if (myRole === 1) {
+      // TeamAdmin can remove only Members
+      return member.role === 0;
+    }
+    return false;
+  }
+
+  removeMember(member: TeamMemberToPost): void {
+    if (!member.id) return;
+    this.teamService.removeMember(member.id).subscribe({
+      next: () => {
+        const team = this.selectedTeam();
+        if (team) {
+          const updated = {
+            ...team,
+            members: team.members.filter(m => m.id !== member.id)
+          };
+          this.selectedTeam.set(updated);
+        }
+      },
+      error: (err) => {
+        console.error('Error removing member:', err);
+      }
+    });
+  }
+
+  // --- Document Panel ---
+
+  toggleDocPanel(docId: number): void {
+    const current = new Set(this.expandedDocs());
+    if (current.has(docId)) {
+      current.delete(docId);
+    } else {
+      current.add(docId);
+    }
+    this.expandedDocs.set(current);
+  }
+
+  isDocExpanded(docId: number): boolean {
+    return this.expandedDocs().has(docId);
+  }
+
+  // --- Document Permission Management ---
+
+  onDocRoleChange(permission: DocumentPermissionSummary, newRole: number): void {
+    this.docPermissionService.updatePermission(permission.id, newRole).subscribe({
+      next: () => {
+        this.toastService.success('Document role updated successfully.');
+        // Update local state
+        const team = this.selectedTeam();
+        if (team) {
+          const updated = {
+            ...team,
+            documents: team.documents.map(doc => ({
+              ...doc,
+              permissions: doc.permissions?.map(p =>
+                p.id === permission.id ? { ...p, documentRole: newRole } : p
+              )
+            }))
+          };
+          this.selectedTeam.set(updated);
+        }
+      },
+      error: (err) => {
+        console.error('Error updating document permission:', err);
+        this.toastService.error('Failed to update document role. Please try again.');
+      }
+    });
+  }
+
+  removeDocPermission(docId: number, permission: DocumentPermissionSummary): void {
+    this.docPermissionService.removePermission(permission.id).subscribe({
+      next: () => {
+        const team = this.selectedTeam();
+        if (team) {
+          const updated = {
+            ...team,
+            documents: team.documents.map(doc => {
+              if (doc.id === docId) {
+                return {
+                  ...doc,
+                  permissions: doc.permissions?.filter(p => p.id !== permission.id)
+                };
+              }
+              return doc;
+            })
+          };
+          this.selectedTeam.set(updated);
+        }
+      },
+      error: (err) => {
+        console.error('Error removing document permission:', err);
+      }
+    });
+  }
+
+  /** Get members that can be added to a document (Members without existing permission) */
+  getAddableMembers(doc: TeamDocument): TeamMemberToPost[] {
+    const team = this.selectedTeam();
+    if (!team) return [];
+
+    const existingMemberIds = new Set(doc.permissions?.map(p => p.teamMemberId) ?? []);
+
+    return team.members.filter(m =>
+      m.role === 0 && // Only regular Members (not Owner/TeamAdmin)
+      m.id != null &&
+      !existingMemberIds.has(m.id)
+    );
+  }
+
+  openAddMemberForm(docId: number): void {
+    this.addMemberDocId.set(docId);
+    this.addMemberSelectedId.set(null);
+    this.addMemberSelectedRole.set(0); // Default: Viewer
+  }
+
+  closeAddMemberForm(): void {
+    this.addMemberDocId.set(null);
+  }
+
+  confirmAddMember(): void {
+    const docId = this.addMemberDocId();
+    const memberId = this.addMemberSelectedId();
+    const role = this.addMemberSelectedRole();
+
+    if (!docId || !memberId) return;
+
+    this.docPermissionService.addPermission({
+      documentId: docId,
+      teamMemberId: memberId,
+      role: role
+    }).subscribe({
+      next: (newPermission) => {
+        // Find the member name for local state update
+        const team = this.selectedTeam();
+        if (team) {
+          const member = team.members.find(m => m.id === memberId);
+          const permSummary: DocumentPermissionSummary = {
+            id: newPermission.id,
+            teamMemberId: memberId,
+            memberName: member?.name ?? '',
+            documentRole: role
+          };
+
+          const updated = {
+            ...team,
+            documents: team.documents.map(doc => {
+              if (doc.id === docId) {
+                return {
+                  ...doc,
+                  permissions: [...(doc.permissions ?? []), permSummary]
+                };
+              }
+              return doc;
+            })
+          };
+          this.selectedTeam.set(updated);
+        }
+        this.closeAddMemberForm();
+      },
+      error: (err) => {
+        console.error('Error adding document permission:', err);
+      }
+    });
+  }
+
+  visibleDocuments(): TeamDocument[] {
+    const team = this.selectedTeam();
+    if (!team) return [];
+    if (this.isOwner()) return team.documents ?? [];
+    if (this.isTeamAdmin()) {
+      const myMemberId = this.getCurrentUserTeamMemberId();
+      if (!myMemberId) return [];
+      return team.documents?.filter(doc =>
+        doc.permissions?.some(p => p.teamMemberId === myMemberId)
+      ) ?? [];
+    }
+    return team.documents ?? [];
   }
 }
