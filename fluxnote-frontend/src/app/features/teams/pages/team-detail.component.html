@@ -94,8 +94,8 @@
             </app-card-content>
           </app-card>
 
-          <!-- Document Permissions Panels (only for Owner/TeamAdmin) -->
-          @if (isOwnerOrAdmin() && visibleDocuments().length) {
+          <!-- Document Permissions Panels -->
+          @if (visibleDocuments().length) {
             <app-card>
               <app-card-content customClass="p-6">
                 <h2 class="text-lg font-bold text-gray-900 mb-4">Document Permissions</h2>
@@ -111,8 +111,8 @@
                         <div class="flex items-center gap-2">
                           <lucide-icon name="file-text" class="h-4 w-4 text-gray-500"></lucide-icon>
                           <span class="text-sm font-medium text-gray-900">{{ doc.title }}</span>
-                          @if (doc.permissions?.length) {
-                            <span class="text-xs text-gray-400">({{ doc.permissions!.length }} members)</span>
+                          @if (getDocPermissionsForView(doc).length) {
+                            <span class="text-xs text-gray-400">({{ getDocPermissionsForView(doc).length }} members)</span>
                           }
                         </div>
                         <div class="flex items-center gap-2">
@@ -136,9 +136,9 @@
                         <div class="border-t border-gray-200 p-4 bg-gray-50">
 
                           <!-- Existing permissions -->
-                          @if (doc.permissions?.length) {
+                          @if (getDocPermissionsForView(doc).length) {
                             <div class="space-y-2 mb-3">
-                              @for (perm of doc.permissions; track perm.id) {
+                              @for (perm of getDocPermissionsForView(doc); track perm.id ?? perm.teamMemberId) {
                                 <div class="flex items-center justify-between py-2 px-3 bg-white rounded border border-gray-100">
                                   <div class="flex items-center gap-2">
                                     <div class="h-6 w-6 rounded-full bg-gray-200 text-gray-600 flex items-center justify-center text-[10px] font-bold">
@@ -179,7 +179,7 @@
                           }
 
                           <!-- Add Member Form -->
-                          @if (addMemberDocId() === doc.id) {
+                          @if (canManageDocPermissions() && addMemberDocId() === doc.id) {
                             <div class="flex items-center gap-2 p-3 bg-white rounded border border-gray-200">
                               <select
                                 [ngModel]="addMemberSelectedId()"
@@ -214,7 +214,7 @@
                               </button>
                             </div>
                           } @else {
-                            @if (getAddableMembers(doc).length > 0) {
+                            @if (canManageDocPermissions() && getAddableMembers(doc).length > 0) {
                               <button
                                 (click)="openAddMemberForm(doc.id)"
                                 class="flex items-center gap-1 text-xs text-[#155347] hover:text-[#0e3d33] font-medium transition-colors"

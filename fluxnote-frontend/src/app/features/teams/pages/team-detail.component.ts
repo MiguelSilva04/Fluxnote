@@ -143,6 +143,10 @@ export class TeamDetailComponent {
     return this.selectedTeam()?.currentUserRole === 1;
   }
 
+  canManageDocPermissions(): boolean {
+    return this.isOwnerOrAdmin();
+  }
+
   isCurrentUserMember(): boolean {
     const userId = this.authService.currentUser()?.id;
     const team = this.selectedTeam();
@@ -156,6 +160,28 @@ export class TeamDetailComponent {
     if (!userId || !team) return null;
     const member = team.members?.find(m => m.userId === userId);
     return member?.id ?? null;
+  }
+
+  hasDocumentPermission(doc: TeamDocument): boolean {
+    const myMemberId = this.getCurrentUserTeamMemberId();
+    if (!myMemberId) return false;
+    return doc.permissions?.some(p => p.teamMemberId === myMemberId) ?? false;
+  }
+
+  getDocPermissionsForView(doc: TeamDocument): DocumentPermissionSummary[] {
+    const permissions = doc.permissions ?? [];
+    if (permissions.length > 0) return permissions;
+    if (this.isOwnerOrAdmin()) return permissions;
+    const team = this.selectedTeam();
+    if (!team) return [];
+    return team.members
+      .filter(m => m.id != null)
+      .map(m => ({
+        id: -m.id!,
+        teamMemberId: m.id!,
+        memberName: m.name,
+        documentRole: 0
+      }));
   }
 
   // verifica se o utilizador pode editar um documento numa equipa
@@ -185,13 +211,19 @@ export class TeamDetailComponent {
 
   canChangeDocRole(permission: DocumentPermissionSummary): boolean {
     if (this.isOwner()) return true;
-    if (this.isTeamAdmin()) return !this.isPermissionOwner(permission);
+    if (this.isTeamAdmin()) {
+      const memberRole = this.getMemberRoleById(permission.teamMemberId);
+      return memberRole === 0; // TeamAdmin can only manage Member roles
+    }
     return false;
   }
 
   canRemoveDocPermission(permission: DocumentPermissionSummary): boolean {
     if (this.isOwner()) return true;
-    if (this.isTeamAdmin()) return !this.isPermissionOwner(permission);
+    if (this.isTeamAdmin()) {
+      const memberRole = this.getMemberRoleById(permission.teamMemberId);
+      return memberRole === 0; // TeamAdmin can only manage Member roles
+    }
     return false;
   }
 
@@ -328,7 +360,7 @@ export class TeamDetailComponent {
     const existingMemberIds = new Set(doc.permissions?.map(p => p.teamMemberId) ?? []);
 
     return team.members.filter(m =>
-      m.role === 0 && // Only regular Members (not Owner/TeamAdmin)
+      m.role !== 2 && // Allow Member + Team Admin; exclude Owner
       m.id != null &&
       !existingMemberIds.has(m.id)
     );
@@ -394,13 +426,10 @@ export class TeamDetailComponent {
     const team = this.selectedTeam();
     if (!team) return [];
     if (this.isOwner()) return team.documents ?? [];
-    if (this.isTeamAdmin()) {
-      const myMemberId = this.getCurrentUserTeamMemberId();
-      if (!myMemberId) return [];
-      return team.documents?.filter(doc =>
-        doc.permissions?.some(p => p.teamMemberId === myMemberId)
-      ) ?? [];
-    }
-    return team.documents ?? [];
+    return team.documents?.filter(doc => {
+      const permissions = doc.permissions ?? [];
+      if (permissions.length === 0) return true;
+      return this.hasDocumentPermission(doc);
+    }) ?? [];
   }
 }
