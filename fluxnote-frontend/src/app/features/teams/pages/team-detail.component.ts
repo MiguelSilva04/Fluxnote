@@ -329,6 +329,7 @@ export class TeamDetailComponent {
   removeDocPermission(docId: number, permission: DocumentPermissionSummary): void {
     this.docPermissionService.removePermission(permission.id).subscribe({
       next: () => {
+        this.toastService.success('User removed from document.');
         const team = this.selectedTeam();
         if (team) {
           const updated = {
@@ -348,6 +349,7 @@ export class TeamDetailComponent {
       },
       error: (err) => {
         console.error('Error removing document permission:', err);
+        this.toastService.error('Failed to remove user from document. Please try again.');
       }
     });
   }
@@ -389,6 +391,7 @@ export class TeamDetailComponent {
       role: role
     }).subscribe({
       next: (newPermission) => {
+        this.toastService.success('User added to document.');
         // Find the member name for local state update
         const team = this.selectedTeam();
         if (team) {
@@ -418,6 +421,7 @@ export class TeamDetailComponent {
       },
       error: (err) => {
         console.error('Error adding document permission:', err);
+        this.toastService.error('Failed to add user to document. Please try again.');
       }
     });
   }
