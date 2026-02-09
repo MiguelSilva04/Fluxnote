@@ -216,7 +216,7 @@ export class TeamDetailComponent {
   }
 
   canChangeDocRole(permission: DocumentPermissionSummary): boolean {
-    if (this.isOwner()) return true;
+    if (this.isOwner()) return !this.isPermissionOwner(permission);
     if (this.isTeamAdmin()) {
       const memberRole = this.getMemberRoleById(permission.teamMemberId);
       return memberRole === 0; // TeamAdmin can only manage Member roles
@@ -225,7 +225,7 @@ export class TeamDetailComponent {
   }
 
   canRemoveDocPermission(permission: DocumentPermissionSummary): boolean {
-    if (this.isOwner()) return true;
+    if (this.isOwner()) return !this.isPermissionOwner(permission);
     if (this.isTeamAdmin()) {
       const memberRole = this.getMemberRoleById(permission.teamMemberId);
       return memberRole === 0; // TeamAdmin can only manage Member roles
