@@ -484,8 +484,8 @@ namespace Fluxnote.Backend.Controllers
             {
                 teamMember = existingMember;
 
-                // Se ja e Owner ou TeamAdmin, nao precisa de DocumentPermission
-                if (teamMember.Role == TeamRole.Owner || teamMember.Role == TeamRole.TeamAdmin)
+                // Se ja e Owner, nao precisa de DocumentPermission
+                if (teamMember.Role == TeamRole.Owner)
                 {
                     return BadRequest(new
                     {

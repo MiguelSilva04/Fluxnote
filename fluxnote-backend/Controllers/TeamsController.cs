@@ -201,7 +201,15 @@ namespace Fluxnote.Backend.Controllers
                             MemberName = p.TeamMember.Name,
                             DocumentRole = (int)p.Role
                         }).ToList()
-                        : new List<DocumentPermissionSummaryDto>()
+                        : (d.Permissions.Any(p => p.TeamMemberId == membership.Id)
+                            ? d.Permissions.Select(p => new DocumentPermissionSummaryDto
+                            {
+                                Id = p.Id,
+                                TeamMemberId = p.TeamMemberId,
+                                MemberName = p.TeamMember.Name,
+                                DocumentRole = (int)p.Role
+                            }).ToList()
+                            : new List<DocumentPermissionSummaryDto>())
                 }).ToList()
             };
 

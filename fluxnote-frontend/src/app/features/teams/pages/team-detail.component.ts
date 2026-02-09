@@ -73,6 +73,11 @@ export class TeamDetailComponent {
   /** Accessible document ids for regular members */
   memberAccessibleDocIds = signal<Set<number> | null>(null);
 
+  /** State for the add member to document form */
+  addMemberDocId = signal<number | null>(null);
+  addMemberSelectedId = signal<number | null>(null);
+  addMemberSelectedRole = signal<number>(0);
+
   ngOnInit(): void {
     this.route.params.subscribe(params => {
       const teamId = Number(params['id']);
@@ -201,19 +206,7 @@ export class TeamDetailComponent {
   }
 
   getDocPermissionsForView(doc: TeamDocument): DocumentPermissionSummary[] {
-    const permissions = doc.permissions ?? [];
-    if (permissions.length > 0) return permissions;
-    if (this.isOwnerOrAdmin()) return permissions;
-    const team = this.selectedTeam();
-    if (!team) return [];
-    return team.members
-      .filter(m => m.id != null)
-      .map(m => ({
-        id: -m.id!,
-        teamMemberId: m.id!,
-        memberName: m.name,
-        documentRole: 0
-      }));
+    return doc.permissions ?? [];
   }
 
   // verifica se o utilizador pode editar um documento numa equipa
@@ -436,6 +429,78 @@ export class TeamDetailComponent {
     const accessible = this.memberAccessibleDocIds();
     if (!accessible) return [];
     return team.documents?.filter(doc => accessible.has(doc.id)) ?? [];
+  }
+
+  /** Get members that can be added to a document (Members without existing permission) */
+  getAddableMembers(doc: TeamDocument): TeamMemberToPost[] {
+    const team = this.selectedTeam();
+    if (!team) return [];
+
+    const existingMemberIds = new Set(doc.permissions?.map(p => p.teamMemberId) ?? []);
+
+    return team.members.filter(m =>
+      m.role !== 2 && // exclude Owner
+      m.id != null &&
+      !existingMemberIds.has(m.id)
+    );
+  }
+
+  openAddMemberForm(docId: number): void {
+    this.addMemberDocId.set(docId);
+    this.addMemberSelectedId.set(null);
+    this.addMemberSelectedRole.set(0); // Default: Viewer
+  }
+
+  closeAddMemberForm(): void {
+    this.addMemberDocId.set(null);
+  }
+
+  confirmAddMember(): void {
+    const docId = this.addMemberDocId();
+    const memberId = this.addMemberSelectedId();
+    const role = this.addMemberSelectedRole();
+
+    if (!docId || !memberId) return;
+
+    this.docPermissionService.addPermission({
+      documentId: docId,
+      teamMemberId: memberId,
+      role: role
+    }).subscribe({
+      next: (newPermission) => {
+        this.toastService.success('User added to document.');
+        // Find the member name for local state update
+        const team = this.selectedTeam();
+        if (team) {
+          const member = team.members.find(m => m.id === memberId);
+          const permSummary: DocumentPermissionSummary = {
+            id: newPermission.id,
+            teamMemberId: memberId,
+            memberName: member?.name ?? '',
+            documentRole: role
+          };
+
+          const updated = {
+            ...team,
+            documents: team.documents.map(doc => {
+              if (doc.id === docId) {
+                return {
+                  ...doc,
+                  permissions: [...(doc.permissions ?? []), permSummary]
+                };
+              }
+              return doc;
+            })
+          };
+          this.selectedTeam.set(updated);
+        }
+        this.closeAddMemberForm();
+      },
+      error: (err) => {
+        console.error('Error adding document permission:', err);
+        this.toastService.error('Failed to add user to document. Please try again.');
+      }
+    });
   }
 
   /**

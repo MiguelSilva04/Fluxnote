@@ -187,6 +187,52 @@
                             <p class="text-xs text-gray-500 mb-3">No members have explicit access to this document yet.</p>
                           }
 
+                          <!-- Add Member Form -->
+                          @if (canManageDocPermissions() && addMemberDocId() === doc.id) {
+                            <div class="flex items-center gap-2 p-3 bg-white rounded border border-gray-200">
+                              <select
+                                [ngModel]="addMemberSelectedId()"
+                                (ngModelChange)="addMemberSelectedId.set($event)"
+                                class="text-xs border border-gray-300 rounded-md px-2 py-1 bg-white flex-1 focus:outline-none focus:ring-1 focus:ring-[#155347]"
+                              >
+                                <option [ngValue]="null" disabled>Select member...</option>
+                                @for (m of getAddableMembers(doc); track m.id) {
+                                  <option [ngValue]="m.id">{{ m.name }}</option>
+                                }
+                              </select>
+                              <select
+                                [ngModel]="addMemberSelectedRole()"
+                                (ngModelChange)="addMemberSelectedRole.set($event)"
+                                class="text-xs border border-gray-300 rounded-md px-2 py-1 bg-white focus:outline-none focus:ring-1 focus:ring-[#155347]"
+                              >
+                                <option [ngValue]="0">Viewer</option>
+                                <option [ngValue]="1">Editor</option>
+                              </select>
+                              <button
+                                (click)="confirmAddMember()"
+                                [disabled]="!addMemberSelectedId()"
+                                class="px-3 py-1 text-xs font-medium text-white bg-[#155347] rounded-md hover:bg-[#0e3d33] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                              >
+                                Add
+                              </button>
+                              <button
+                                (click)="closeAddMemberForm()"
+                                class="p-1 text-gray-400 hover:text-gray-600 transition-colors"
+                              >
+                                <lucide-icon name="x" class="h-4 w-4"></lucide-icon>
+                              </button>
+                            </div>
+                          } @else {
+                            @if (canManageDocPermissions() && getAddableMembers(doc).length > 0) {
+                              <button
+                                (click)="openAddMemberForm(doc.id)"
+                                class="flex items-center gap-1 text-xs text-[#155347] hover:text-[#0e3d33] font-medium transition-colors"
+                              >
+                                <lucide-icon name="plus" class="h-3.5 w-3.5"></lucide-icon>
+                                Add Member
+                              </button>
+                            }
+                          }
                         </div>
                       }
                     </div>
