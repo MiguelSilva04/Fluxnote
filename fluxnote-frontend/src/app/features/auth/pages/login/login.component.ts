@@ -1,7 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
 import { AuthService } from '../../../../core/services';
 import { ButtonComponent, InputComponent, CardComponent, CardContentComponent } from '../../../../shared/components/ui';
@@ -132,6 +132,7 @@ import { ToastService } from '../../../../shared/services/toast.service';
 export class LoginComponent {
   private authService = inject(AuthService);
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
   private toastService = inject(ToastService);
 
   showPassword = signal(false);
@@ -147,7 +148,12 @@ export class LoginComponent {
 
     if (result.success) {
       this.toastService.success('Login successful!');
-      this.router.navigate(['/dashboard']);
+      const returnUrl = this.route.snapshot.queryParams['returnUrl'];
+      if (returnUrl) {
+        this.router.navigateByUrl(returnUrl);
+      } else {
+        this.router.navigate(['/dashboard']);
+      }
     } else {
       // mostra erros do backend usando o toast service
       if (result.errors && result.errors.length > 0) {

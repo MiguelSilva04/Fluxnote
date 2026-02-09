@@ -5,9 +5,9 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
 import { DashboardLayoutComponent } from '../../../layout/dashboard-layout/dashboard-layout.component';
 import { ButtonComponent, CardComponent, CardContentComponent, BadgeComponent, ModalComponent } from '../../../shared/components/ui';
-import { TeamService, DocumentPermissionService, AuthService } from '../../../core/services';
+import { TeamService, DocumentPermissionService, AuthService, DocumentInviteService } from '../../../core/services';
 import { ToastService } from '../../../shared/services/toast.service';
-import { TeamMemberToPost, TeamDocument, DocumentPermissionSummary } from '../../../core/models';
+import { TeamMemberToPost, TeamDocument, DocumentPermissionSummary, DocumentInviteDto } from '../../../core/models';
 
 @Component({
   selector: 'app-team-detail',
@@ -32,6 +32,16 @@ export class TeamDetailComponent {
   private docPermissionService = inject(DocumentPermissionService);
   private authService = inject(AuthService);
   private toastService = inject(ToastService);
+
+  private inviteService = inject(DocumentInviteService);
+
+  shareDocId = signal<number | null>(null);
+  shareRole = signal<number>(0); // 0=Viewer, 1=Editor
+  shareExpirationDays = signal<number>(7);
+  shareGeneratedUrl = signal<string | null>(null);
+  shareLoading = signal(false);
+  shareCopied = signal(false);
+  documentInvites = signal<DocumentInviteDto[]>([]);
 
   selectedTeam = this.teamService.selectedTeam;
 
@@ -481,5 +491,79 @@ export class TeamDetailComponent {
       if (permissions.length === 0) return true;
       return this.hasDocumentPermission(doc);
     }) ?? [];
+  }
+
+  /**
+   * Convidar utilizadores para um documento
+   */
+  openShareModal(docId: number): void {
+    this.shareDocId.set(docId);
+    this.shareRole.set(0);
+    this.shareExpirationDays.set(7);
+    this.shareGeneratedUrl.set(null);
+    this.shareCopied.set(false);
+    this.loadDocumentInvites(docId);
+  }
+
+  closeShareModal(): void {
+    this.shareDocId.set(null);
+    this.shareGeneratedUrl.set(null);
+    this.documentInvites.set([]);
+  }
+
+  generateInviteLink(): void {
+    const docId = this.shareDocId();
+    if (!docId) return;
+
+    this.shareLoading.set(true);
+    this.inviteService.createInvite({
+      documentId: docId,
+      role: this.shareRole(),
+      expirationDays: this.shareExpirationDays()
+    }).subscribe({
+      next: (invite) => {
+        this.shareGeneratedUrl.set(invite.inviteUrl);
+        this.shareLoading.set(false);
+        this.shareCopied.set(false);
+        // Recarregar lista de convites
+        this.loadDocumentInvites(docId);
+      },
+      error: (err) => {
+        console.error('Error creating invite:', err);
+        this.toastService.error('Erro ao criar convite.');
+        this.shareLoading.set(false);
+      }
+    });
+  }
+
+  copyInviteLink(): void {
+    const url = this.shareGeneratedUrl();
+    if (!url) return;
+
+    navigator.clipboard.writeText(url).then(() => {
+      this.shareCopied.set(true);
+      this.toastService.success('Link copiado!');
+      setTimeout(() => this.shareCopied.set(false), 3000);
+    });
+  }
+
+  loadDocumentInvites(docId: number): void {
+    this.inviteService.getInvitesByDocument(docId).subscribe({
+      next: (invites) => this.documentInvites.set(invites),
+      error: () => this.documentInvites.set([])
+    });
+  }
+
+  revokeInvite(inviteId: number): void {
+    this.inviteService.revokeInvite(inviteId).subscribe({
+      next: () => {
+        this.toastService.success('Convite revogado.');
+        const docId = this.shareDocId();
+        if (docId) this.loadDocumentInvites(docId);
+      },
+      error: () => {
+        this.toastService.error('Erro ao revogar convite.');
+      }
+    });
   }
 }

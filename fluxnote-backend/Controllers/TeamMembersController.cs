@@ -22,6 +22,66 @@ namespace Fluxnote.Backend.Controllers
         }
 
         /// <summary>
+        /// Cria um novo TeamMember.
+        /// Usado principalmente para criar o Owner inicial da equipa.
+        /// </summary>
+        [HttpPost]
+        public async Task<ActionResult<TeamMember>> PostTeamMember([FromBody] CreateTeamMemberRequest request)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId is null)
+                return Unauthorized(new { message = "User not authenticated." });
+
+            if (request.TeamId == null)
+                return BadRequest(new { message = "TeamId is required." });
+
+            var team = await _context.Team
+                .Include(t => t.Members)
+                .FirstOrDefaultAsync(t => t.Id == request.TeamId.Value);
+
+            if (team == null)
+                return NotFound(new { message = "Team not found." });
+
+            // Check if this user is already a member of the team
+            var existingMember = team.Members.FirstOrDefault(m => m.UserId == request.UserId);
+            if (existingMember != null)
+            {
+                return BadRequest(new { message = "User is already a team member." });
+            }
+
+            var callerIsOwner = team.Members.Any(m => m.UserId == userId && m.Role == TeamRole.Owner);
+            var isFirstMember = team.Members.Count == 0;
+            var creatingSelfAsOwner = isFirstMember && request.UserId == userId && request.Role == (int)TeamRole.Owner;
+
+            if (!callerIsOwner && !creatingSelfAsOwner)
+            {
+                return StatusCode(StatusCodes.Status403Forbidden, new
+                {
+                    message = "Permission denied.",
+                    errors = new[] { "Only the Owner can add team members." }
+                });
+            }
+
+            if (request.Role == (int)TeamRole.Owner && team.Members.Any(m => m.Role == TeamRole.Owner))
+            {
+                return BadRequest(new { message = "Team already has an Owner." });
+            }
+
+            var teamMember = new TeamMember
+            {
+                Name = request.Name ?? string.Empty,
+                Role = (TeamRole)request.Role,
+                TeamId = request.TeamId,
+                UserId = request.UserId
+            };
+
+            _context.TeamMember.Add(teamMember);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction(nameof(PutTeamMember), new { id = teamMember.Id }, teamMember);
+        }
+
+        /// <summary>
         /// Atualiza o papel (TeamRole) de um membro de equipa.
         /// Apenas o Owner pode alterar roles.
         /// </summary>
@@ -181,5 +241,14 @@ namespace Fluxnote.Backend.Controllers
     public class UpdateTeamMemberRoleRequest
     {
         public int Role { get; set; }
+    }
+
+    public class CreateTeamMemberRequest
+    {
+        public string? Name { get; set; }
+        public int Role { get; set; }
+        public int? TeamId { get; set; }
+        public string? UserId { get; set; }
+        public string? Email { get; set; }
     }
 }
