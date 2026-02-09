@@ -3,10 +3,12 @@ using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Web;
 using Fluxnote.Backend.Contracts.Auth;
+using Fluxnote.Backend.Data;
 using Fluxnote.Backend.Dtos.Auth;
 using Fluxnote.Backend.Models;
 using Fluxnote.Backend.Tests.Fakes;
 using Fluxnote.Backend.Tests.Infrastructure;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
@@ -24,169 +26,199 @@ namespace Fluxnote.Backend.Tests.TeamTesting
         }
 
         [Fact]
-        public async Task GetTeamMembers_ReturnsOk()
+        public async Task PostTeamMember_CreatesOwnerAsFirstMember()
         {
-            var response = await _client.GetAsync("/api/teammembers");
-
-            response.EnsureSuccessStatusCode();
-            var members = await response.Content.ReadFromJsonAsync<List<TeamMember>>();
-
-            Assert.NotNull(members);
-        }
-
-        [Fact]
-        public async Task PostTeamMember_CreatesMember()
-        {
-            // Arrange - Create user and team first (teams require auth)
-            var email = $"member-post-{Guid.NewGuid()}@test.com";
+            var email = $"member-post-owner-{Guid.NewGuid()}@test.com";
             await CreateAndConfirmUserAsync(email, "Teste1234!");
             var token = await LoginAndGetTokenAsync(email, "Teste1234!");
             var authClient = CreateAuthenticatedClient(token);
 
-            var team = new { Name = "Team for Member Test" };
+            var team = new { Name = "Team for Owner Member Test" };
             var teamResponse = await authClient.PostAsJsonAsync("/api/teams", team);
+            teamResponse.EnsureSuccessStatusCode();
             var createdTeam = await teamResponse.Content.ReadFromJsonAsync<Team>();
 
-            var member = new
+            var userId = await GetUserIdAsync(email);
+            var memberRequest = new
             {
-                Name = "user teste",
-                Role = 0,
-                TeamId = createdTeam!.Id
+                Name = "Owner User",
+                Role = (int)TeamRole.Owner,
+                TeamId = createdTeam!.Id,
+                UserId = userId
             };
 
-            // Act
-            var response = await _client.PostAsJsonAsync("/api/teammembers", member);
+            var response = await authClient.PostAsJsonAsync("/api/teammembers", memberRequest);
 
-            // Assert
             Assert.Equal(HttpStatusCode.Created, response.StatusCode);
 
             var created = await response.Content.ReadFromJsonAsync<TeamMember>();
             Assert.NotNull(created);
-            Assert.Equal("user teste", created!.Name);
+            Assert.Equal("Owner User", created!.Name);
+            Assert.Equal(TeamRole.Owner, created.Role);
+            Assert.Equal(createdTeam.Id, created.TeamId);
+            Assert.Equal(userId, created.UserId);
+
+            await authClient.DeleteAsync($"/api/teammembers/{created.Id}");
+            await authClient.DeleteAsync($"/api/teams/{createdTeam.Id}");
+        }
+
+        [Fact]
+        public async Task PostTeamMember_AsOwner_CreatesMember()
+        {
+            var ownerEmail = $"member-post-owner2-{Guid.NewGuid()}@test.com";
+            var memberEmail = $"member-post-member-{Guid.NewGuid()}@test.com";
+
+            await CreateAndConfirmUserAsync(ownerEmail, "Teste1234!");
+            await CreateAndConfirmUserAsync(memberEmail, "Teste1234!");
+
+            var ownerToken = await LoginAndGetTokenAsync(ownerEmail, "Teste1234!");
+            var ownerClient = CreateAuthenticatedClient(ownerToken);
+
+            var team = new { Name = "Team for Member Create Test" };
+            var teamResponse = await ownerClient.PostAsJsonAsync("/api/teams", team);
+            teamResponse.EnsureSuccessStatusCode();
+            var createdTeam = await teamResponse.Content.ReadFromJsonAsync<Team>();
+
+            var ownerUserId = await GetUserIdAsync(ownerEmail);
+            var ownerMemberRequest = new
+            {
+                Name = "Owner User",
+                Role = (int)TeamRole.Owner,
+                TeamId = createdTeam!.Id,
+                UserId = ownerUserId
+            };
+            var ownerMemberResponse = await ownerClient.PostAsJsonAsync("/api/teammembers", ownerMemberRequest);
+            ownerMemberResponse.EnsureSuccessStatusCode();
+
+            var memberUserId = await GetUserIdAsync(memberEmail);
+            var memberRequest = new
+            {
+                Name = "Regular Member",
+                Role = (int)TeamRole.Member,
+                TeamId = createdTeam.Id,
+                UserId = memberUserId
+            };
+
+            var response = await ownerClient.PostAsJsonAsync("/api/teammembers", memberRequest);
+
+            Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+
+            var created = await response.Content.ReadFromJsonAsync<TeamMember>();
+            Assert.NotNull(created);
+            Assert.Equal("Regular Member", created!.Name);
             Assert.Equal(TeamRole.Member, created.Role);
             Assert.Equal(createdTeam.Id, created.TeamId);
+            Assert.Equal(memberUserId, created.UserId);
 
-            // Cleanup
-            await _client.DeleteAsync($"/api/teammembers/{created.Id}");
-            await authClient.DeleteAsync($"/api/teams/{createdTeam.Id}");
+            await ownerClient.DeleteAsync($"/api/teammembers/{created.Id}");
+            await ownerClient.DeleteAsync($"/api/teams/{createdTeam.Id}");
         }
 
         [Fact]
-        public async Task GetTeamMemberById_ReturnsMember()
+        public async Task PutTeamMember_UpdatesMemberRole()
         {
-            // Arrange - Create user and team first
-            var email = $"member-getbyid-{Guid.NewGuid()}@test.com";
-            await CreateAndConfirmUserAsync(email, "Teste1234!");
-            var token = await LoginAndGetTokenAsync(email, "Teste1234!");
-            var authClient = CreateAuthenticatedClient(token);
+            var ownerEmail = $"member-put-owner-{Guid.NewGuid()}@test.com";
+            var memberEmail = $"member-put-member-{Guid.NewGuid()}@test.com";
 
-            var team = new { Name = "Team for GetById Test" };
-            var teamResponse = await authClient.PostAsJsonAsync("/api/teams", team);
-            var createdTeam = await teamResponse.Content.ReadFromJsonAsync<Team>();
+            await CreateAndConfirmUserAsync(ownerEmail, "Teste1234!");
+            await CreateAndConfirmUserAsync(memberEmail, "Teste1234!");
 
-            var member = new
-            {
-                Name = "GetById User",
-                Role = (int)TeamRole.TeamAdmin,
-                TeamId = createdTeam!.Id
-            };
-
-            var postResponse = await _client.PostAsJsonAsync("/api/teammembers", member);
-            var created = await postResponse.Content.ReadFromJsonAsync<TeamMember>();
-
-            // Act
-            var response = await _client.GetAsync($"/api/teammembers/{created!.Id}");
-
-            // Assert
-            response.EnsureSuccessStatusCode();
-            var fetched = await response.Content.ReadFromJsonAsync<TeamMember>();
-
-            Assert.NotNull(fetched);
-            Assert.Equal(created.Id, fetched!.Id);
-            Assert.Equal("GetById User", fetched.Name);
-
-            // Cleanup
-            await _client.DeleteAsync($"/api/teammembers/{created.Id}");
-            await authClient.DeleteAsync($"/api/teams/{createdTeam.Id}");
-        }
-
-        [Fact]
-        public async Task PutTeamMember_UpdatesMember()
-        {
-            // Arrange - Create user and team first
-            var email = $"member-put-{Guid.NewGuid()}@test.com";
-            await CreateAndConfirmUserAsync(email, "Teste1234!");
-            var token = await LoginAndGetTokenAsync(email, "Teste1234!");
-            var authClient = CreateAuthenticatedClient(token);
+            var ownerToken = await LoginAndGetTokenAsync(ownerEmail, "Teste1234!");
+            var ownerClient = CreateAuthenticatedClient(ownerToken);
 
             var team = new { Name = "Team for Put Test" };
-            var teamResponse = await authClient.PostAsJsonAsync("/api/teams", team);
+            var teamResponse = await ownerClient.PostAsJsonAsync("/api/teams", team);
+            teamResponse.EnsureSuccessStatusCode();
             var createdTeam = await teamResponse.Content.ReadFromJsonAsync<Team>();
 
-            var member = new
+            var ownerUserId = await GetUserIdAsync(ownerEmail);
+            var ownerMemberRequest = new
             {
-                Name = "Old Name",
-                Role = (int)TeamRole.Member,
-                TeamId = createdTeam!.Id
+                Name = "Owner User",
+                Role = (int)TeamRole.Owner,
+                TeamId = createdTeam!.Id,
+                UserId = ownerUserId
             };
+            var ownerMemberResponse = await ownerClient.PostAsJsonAsync("/api/teammembers", ownerMemberRequest);
+            ownerMemberResponse.EnsureSuccessStatusCode();
 
-            var postResponse = await _client.PostAsJsonAsync("/api/teammembers", member);
+            var memberUserId = await GetUserIdAsync(memberEmail);
+            var memberRequest = new
+            {
+                Name = "Member User",
+                Role = (int)TeamRole.Member,
+                TeamId = createdTeam.Id,
+                UserId = memberUserId
+            };
+            var postResponse = await ownerClient.PostAsJsonAsync("/api/teammembers", memberRequest);
+            postResponse.EnsureSuccessStatusCode();
             var created = await postResponse.Content.ReadFromJsonAsync<TeamMember>();
 
-            created!.Name = "Updated Name";
-            created.Role = TeamRole.Owner;
+            var updateRequest = new { role = (int)TeamRole.TeamAdmin };
+            var putResponse = await ownerClient.PutAsJsonAsync($"/api/teammembers/{created!.Id}", updateRequest);
 
-            // Act
-            var putResponse = await _client.PutAsJsonAsync($"/api/teammembers/{created.Id}", created);
-
-            // Assert
             Assert.Equal(HttpStatusCode.NoContent, putResponse.StatusCode);
 
-            var getResponse = await _client.GetAsync($"/api/teammembers/{created.Id}");
-            var updated = await getResponse.Content.ReadFromJsonAsync<TeamMember>();
+            using var scope = _factory.Services.CreateScope();
+            var db = scope.ServiceProvider.GetRequiredService<FluxnoteServerContext>();
+            var updated = await db.TeamMember.FindAsync(created.Id);
+            Assert.NotNull(updated);
+            Assert.Equal(TeamRole.TeamAdmin, updated!.Role);
 
-            Assert.Equal("Updated Name", updated!.Name);
-            Assert.Equal(TeamRole.Owner, updated.Role);
-
-            // Cleanup
-            await _client.DeleteAsync($"/api/teammembers/{created.Id}");
-            await authClient.DeleteAsync($"/api/teams/{createdTeam.Id}");
+            await ownerClient.DeleteAsync($"/api/teammembers/{created.Id}");
+            await ownerClient.DeleteAsync($"/api/teams/{createdTeam.Id}");
         }
 
         [Fact]
         public async Task DeleteTeamMember_RemovesMember()
         {
-            // Arrange - Create user and team first
-            var email = $"member-delete-{Guid.NewGuid()}@test.com";
-            await CreateAndConfirmUserAsync(email, "Teste1234!");
-            var token = await LoginAndGetTokenAsync(email, "Teste1234!");
-            var authClient = CreateAuthenticatedClient(token);
+            var ownerEmail = $"member-delete-owner-{Guid.NewGuid()}@test.com";
+            var memberEmail = $"member-delete-member-{Guid.NewGuid()}@test.com";
+
+            await CreateAndConfirmUserAsync(ownerEmail, "Teste1234!");
+            await CreateAndConfirmUserAsync(memberEmail, "Teste1234!");
+
+            var ownerToken = await LoginAndGetTokenAsync(ownerEmail, "Teste1234!");
+            var ownerClient = CreateAuthenticatedClient(ownerToken);
 
             var team = new { Name = "Team for Delete Test" };
-            var teamResponse = await authClient.PostAsJsonAsync("/api/teams", team);
+            var teamResponse = await ownerClient.PostAsJsonAsync("/api/teams", team);
+            teamResponse.EnsureSuccessStatusCode();
             var createdTeam = await teamResponse.Content.ReadFromJsonAsync<Team>();
 
-            var member = new
+            var ownerUserId = await GetUserIdAsync(ownerEmail);
+            var ownerMemberRequest = new
+            {
+                Name = "Owner User",
+                Role = (int)TeamRole.Owner,
+                TeamId = createdTeam!.Id,
+                UserId = ownerUserId
+            };
+            var ownerMemberResponse = await ownerClient.PostAsJsonAsync("/api/teammembers", ownerMemberRequest);
+            ownerMemberResponse.EnsureSuccessStatusCode();
+
+            var memberUserId = await GetUserIdAsync(memberEmail);
+            var memberRequest = new
             {
                 Name = "To Delete",
                 Role = (int)TeamRole.Member,
-                TeamId = createdTeam!.Id
+                TeamId = createdTeam.Id,
+                UserId = memberUserId
             };
-
-            var postResponse = await _client.PostAsJsonAsync("/api/teammembers", member);
+            var postResponse = await ownerClient.PostAsJsonAsync("/api/teammembers", memberRequest);
+            postResponse.EnsureSuccessStatusCode();
             var created = await postResponse.Content.ReadFromJsonAsync<TeamMember>();
 
-            // Act
-            var deleteResponse = await _client.DeleteAsync($"/api/teammembers/{created!.Id}");
+            var deleteResponse = await ownerClient.DeleteAsync($"/api/teammembers/{created!.Id}");
 
-            // Assert
             Assert.Equal(HttpStatusCode.NoContent, deleteResponse.StatusCode);
 
-            var getResponse = await _client.GetAsync($"/api/teammembers/{created.Id}");
-            Assert.Equal(HttpStatusCode.NotFound, getResponse.StatusCode);
+            using var scope = _factory.Services.CreateScope();
+            var db = scope.ServiceProvider.GetRequiredService<FluxnoteServerContext>();
+            var deleted = await db.TeamMember.FindAsync(created.Id);
+            Assert.Null(deleted);
 
-            // Cleanup
-            await authClient.DeleteAsync($"/api/teams/{createdTeam!.Id}");
+            await ownerClient.DeleteAsync($"/api/teams/{createdTeam!.Id}");
         }
 
         // ==================== HELPER METHODS ====================
@@ -237,6 +269,14 @@ namespace Fluxnote.Backend.Tests.TeamTesting
             var client = _factory.CreateClient();
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
             return client;
+        }
+
+        private async Task<string> GetUserIdAsync(string email)
+        {
+            using var scope = _factory.Services.CreateScope();
+            var db = scope.ServiceProvider.GetRequiredService<FluxnoteServerContext>();
+            var user = await db.Users.FirstOrDefaultAsync(u => u.Email == email);
+            return user?.Id ?? "";
         }
     }
 }
