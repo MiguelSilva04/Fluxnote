@@ -49,6 +49,12 @@ export class TeamDetailComponent {
   loading = signal(true);
   isDeleteModalOpen = signal(false);
   isDeleting = signal(false);
+  isRemoveMemberModalOpen = signal(false);
+  isRemovingMember = signal(false);
+  memberToRemove = signal<TeamMemberToPost | null>(null);
+  isRemoveDocPermissionModalOpen = signal(false);
+  isRemovingDocPermission = signal(false);
+  docPermissionToRemove = signal<{ docId: number; permission: DocumentPermissionSummary } | null>(null);
 
   /** Track which document panels are expanded */
   expandedDocs = signal<Set<number>>(new Set());
@@ -265,19 +271,42 @@ export class TeamDetailComponent {
 
   removeMember(member: TeamMemberToPost): void {
     if (!member.id) return;
+    this.memberToRemove.set(member);
+    this.isRemoveMemberModalOpen.set(true);
+  }
+
+  closeRemoveMemberModal(): void {
+    this.isRemoveMemberModalOpen.set(false);
+    this.memberToRemove.set(null);
+  }
+
+  confirmRemoveMember(): void {
+    const member = this.memberToRemove();
+    if (!member?.id) return;
+    this.isRemovingMember.set(true);
     this.teamService.removeMember(member.id).subscribe({
       next: () => {
+        this.toastService.success('Member removed from team.');
         const team = this.selectedTeam();
         if (team) {
           const updated = {
             ...team,
-            members: team.members.filter(m => m.id !== member.id)
+            members: team.members.filter(m => m.id !== member.id),
+            documents: team.documents.map(doc => ({
+              ...doc,
+              permissions: doc.permissions?.filter(p => p.teamMemberId !== member.id)
+            }))
           };
           this.selectedTeam.set(updated);
         }
+        this.isRemovingMember.set(false);
+        this.closeRemoveMemberModal();
       },
       error: (err) => {
         console.error('Error removing member:', err);
+        this.isRemovingMember.set(false);
+        this.closeRemoveMemberModal();
+        this.toastService.error('Failed to remove member. Please try again.');
       }
     });
   }
@@ -327,7 +356,20 @@ export class TeamDetailComponent {
   }
 
   removeDocPermission(docId: number, permission: DocumentPermissionSummary): void {
-    this.docPermissionService.removePermission(permission.id).subscribe({
+    this.docPermissionToRemove.set({ docId, permission });
+    this.isRemoveDocPermissionModalOpen.set(true);
+  }
+
+  closeRemoveDocPermissionModal(): void {
+    this.isRemoveDocPermissionModalOpen.set(false);
+    this.docPermissionToRemove.set(null);
+  }
+
+  confirmRemoveDocPermission(): void {
+    const target = this.docPermissionToRemove();
+    if (!target) return;
+    this.isRemovingDocPermission.set(true);
+    this.docPermissionService.removePermission(target.permission.id).subscribe({
       next: () => {
         this.toastService.success('User removed from document.');
         const team = this.selectedTeam();
@@ -335,10 +377,10 @@ export class TeamDetailComponent {
           const updated = {
             ...team,
             documents: team.documents.map(doc => {
-              if (doc.id === docId) {
+              if (doc.id === target.docId) {
                 return {
                   ...doc,
-                  permissions: doc.permissions?.filter(p => p.id !== permission.id)
+                  permissions: doc.permissions?.filter(p => p.id !== target.permission.id)
                 };
               }
               return doc;
@@ -346,9 +388,13 @@ export class TeamDetailComponent {
           };
           this.selectedTeam.set(updated);
         }
+        this.isRemovingDocPermission.set(false);
+        this.closeRemoveDocPermissionModal();
       },
       error: (err) => {
         console.error('Error removing document permission:', err);
+        this.isRemovingDocPermission.set(false);
+        this.closeRemoveDocPermissionModal();
         this.toastService.error('Failed to remove user from document. Please try again.');
       }
     });

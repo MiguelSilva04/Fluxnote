@@ -121,13 +121,23 @@ namespace Fluxnote.Backend.Controllers
                 return NotFound(new { message = "Team member not found in this team." });
             }
 
-            // Não adicionar permissão a Owner/TeamAdmin (já têm acesso implícito)
-            if (targetMember.Role == TeamRole.Owner || targetMember.Role == TeamRole.TeamAdmin)
+            // Não adicionar permissão a Owner
+            if (targetMember.Role == TeamRole.Owner)
             {
                 return BadRequest(new
                 {
                     message = "Invalid operation.",
-                    errors = new[] { "Owner and Team Admin already have implicit access to all documents." }
+                    errors = new[] { "Owner already has implicit access to all documents." }
+                });
+            }
+
+            // TeamAdmin só pode receber permissão explícita se o caller for Owner
+            if (targetMember.Role == TeamRole.TeamAdmin && callerMember.Role != TeamRole.Owner)
+            {
+                return BadRequest(new
+                {
+                    message = "Invalid operation.",
+                    errors = new[] { "Only the Owner can add permissions for a Team Admin." }
                 });
             }
 

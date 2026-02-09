@@ -137,9 +137,9 @@
 
                           <!-- Existing permissions -->
                           @if (getDocPermissionsForView(doc).length) {
-                            <div class="space-y-2 mb-3">
+                            <div class="divide-y divide-gray-100 mb-3">
                               @for (perm of getDocPermissionsForView(doc); track perm.id ?? perm.teamMemberId) {
-                                <div class="flex items-center justify-between py-2 px-3 bg-white rounded border border-gray-100">
+                                <div class="flex items-center justify-between py-3 px-1">
                                   <div class="flex items-center gap-2">
                                     <div class="h-6 w-6 rounded-full bg-gray-200 text-gray-600 flex items-center justify-center text-[10px] font-bold">
                                       {{ getInitials(perm.memberName) }}
@@ -281,6 +281,10 @@
                       {{ doc.title }}
                     </div>
                   }
+                } @else {
+                  <p class="text-xs text-gray-500">
+                    You don't have access to any document on this team.
+                  </p>
                 }
               </div>
 
@@ -349,6 +353,92 @@
           Deleting...
         } @else {
           Delete Team
+        }
+      </app-button>
+    </div>
+  </app-modal>
+
+  <!-- Remove Team Member Modal -->
+  <app-modal
+    [isOpen]="isRemoveMemberModalOpen()"
+    title="Remove Member"
+    maxWidth="sm"
+    [hasFooter]="true"
+    (onClose)="closeRemoveMemberModal()"
+  >
+    <div class="space-y-4">
+      <div class="flex items-center justify-center w-12 h-12 mx-auto bg-red-100 rounded-full">
+        <lucide-icon name="triangle-alert" class="h-6 w-6 text-red-600"></lucide-icon>
+      </div>
+      <p class="text-center text-gray-600">
+        Are you sure you want to remove
+        <strong>{{ memberToRemove()?.name }}</strong>
+        from this team?
+      </p>
+    </div>
+
+    <div footer class="flex gap-3">
+      <app-button
+        variant="outline"
+        (onClick)="closeRemoveMemberModal()"
+        customClass="flex-1"
+        [disabled]="isRemovingMember()"
+      >
+        Cancel
+      </app-button>
+      <app-button
+        (onClick)="confirmRemoveMember()"
+        customClass="flex-1 bg-red-600 hover:bg-red-700 text-white"
+        [disabled]="isRemovingMember()"
+      >
+        @if (isRemovingMember()) {
+          <lucide-icon name="loader-circle" class="h-4 w-4 animate-spin mr-2"></lucide-icon>
+          Removing...
+        } @else {
+          Remove Member
+        }
+      </app-button>
+    </div>
+  </app-modal>
+
+  <!-- Remove Document Permission Modal -->
+  <app-modal
+    [isOpen]="isRemoveDocPermissionModalOpen()"
+    title="Remove Access"
+    maxWidth="sm"
+    [hasFooter]="true"
+    (onClose)="closeRemoveDocPermissionModal()"
+  >
+    <div class="space-y-4">
+      <div class="flex items-center justify-center w-12 h-12 mx-auto bg-red-100 rounded-full">
+        <lucide-icon name="triangle-alert" class="h-6 w-6 text-red-600"></lucide-icon>
+      </div>
+      <p class="text-center text-gray-600">
+        Are you sure you want to remove
+        <strong>{{ docPermissionToRemove()?.permission?.memberName }}</strong>
+        from this document?
+      </p>
+    </div>
+
+    <div footer class="flex gap-3">
+      <app-button
+        variant="outline"
+        (onClick)="closeRemoveDocPermissionModal()"
+        customClass="flex-1"
+        [disabled]="isRemovingDocPermission()"
+      >
+        Cancel
+      </app-button>
+      <app-button
+        (onClick)="confirmRemoveDocPermission()"
+        customClass="flex-1 bg-red-600 hover:bg-red-700 text-white"
+        [disabled]="isRemovingDocPermission()"
+      >
+        @if (isRemovingDocPermission()) {
+          <lucide-icon name="loader-circle" class="h-4 w-4 animate-spin mr-2"></lucide-icon>
+          Removing...
+        } @else {
+          Remove Access
         }
       </app-button>
     </div>
