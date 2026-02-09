@@ -5,7 +5,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
 import { DashboardLayoutComponent } from '../../../layout/dashboard-layout/dashboard-layout.component';
 import { ButtonComponent, CardComponent, CardContentComponent, BadgeComponent, ModalComponent } from '../../../shared/components/ui';
-import { TeamService, DocumentPermissionService, AuthService, DocumentInviteService } from '../../../core/services';
+import { TeamService, DocumentPermissionService, AuthService, DocumentInviteService, DocumentService } from '../../../core/services';
 import { ToastService } from '../../../shared/services/toast.service';
 import { TeamMemberToPost, TeamDocument, DocumentPermissionSummary, DocumentInviteDto } from '../../../core/models';
 
@@ -32,6 +32,7 @@ export class TeamDetailComponent {
   private docPermissionService = inject(DocumentPermissionService);
   private authService = inject(AuthService);
   private toastService = inject(ToastService);
+  private documentService = inject(DocumentService);
 
   private inviteService = inject(DocumentInviteService);
 
@@ -69,10 +70,8 @@ export class TeamDetailComponent {
   /** Track which document panels are expanded */
   expandedDocs = signal<Set<number>>(new Set());
 
-  /** State for the add member to document form */
-  addMemberDocId = signal<number | null>(null);
-  addMemberSelectedId = signal<number | null>(null);
-  addMemberSelectedRole = signal<number>(0);
+  /** Accessible document ids for regular members */
+  memberAccessibleDocIds = signal<Set<number> | null>(null);
 
   ngOnInit(): void {
     this.route.params.subscribe(params => {
@@ -98,12 +97,29 @@ export class TeamDetailComponent {
     this.teamService.getTeamById(teamId).subscribe({
       next: (team) => {
         this.selectedTeam.set(team);
+        this.refreshMemberAccessibleDocs(team.id);
         this.loading.set(false);
       },
       error: (err) => {
         console.error(err);
         this.loading.set(false);
         this.router.navigate(['/dashboard']);
+      }
+    });
+  }
+
+  private refreshMemberAccessibleDocs(teamId: number): void {
+    if (this.isOwnerOrAdmin()) {
+      this.memberAccessibleDocIds.set(null);
+      return;
+    }
+
+    this.documentService.getDocuments({ teamId }).subscribe({
+      next: (docs) => {
+        this.memberAccessibleDocIds.set(new Set(docs.map(d => d.id)));
+      },
+      error: () => {
+        this.memberAccessibleDocIds.set(new Set());
       }
     });
   }
@@ -410,87 +426,16 @@ export class TeamDetailComponent {
     });
   }
 
-  /** Get members that can be added to a document (Members without existing permission) */
-  getAddableMembers(doc: TeamDocument): TeamMemberToPost[] {
-    const team = this.selectedTeam();
-    if (!team) return [];
-
-    const existingMemberIds = new Set(doc.permissions?.map(p => p.teamMemberId) ?? []);
-
-    return team.members.filter(m =>
-      m.role !== 2 && // Allow Member + Team Admin; exclude Owner
-      m.id != null &&
-      !existingMemberIds.has(m.id)
-    );
-  }
-
-  openAddMemberForm(docId: number): void {
-    this.addMemberDocId.set(docId);
-    this.addMemberSelectedId.set(null);
-    this.addMemberSelectedRole.set(0); // Default: Viewer
-  }
-
-  closeAddMemberForm(): void {
-    this.addMemberDocId.set(null);
-  }
-
-  confirmAddMember(): void {
-    const docId = this.addMemberDocId();
-    const memberId = this.addMemberSelectedId();
-    const role = this.addMemberSelectedRole();
-
-    if (!docId || !memberId) return;
-
-    this.docPermissionService.addPermission({
-      documentId: docId,
-      teamMemberId: memberId,
-      role: role
-    }).subscribe({
-      next: (newPermission) => {
-        this.toastService.success('User added to document.');
-        // Find the member name for local state update
-        const team = this.selectedTeam();
-        if (team) {
-          const member = team.members.find(m => m.id === memberId);
-          const permSummary: DocumentPermissionSummary = {
-            id: newPermission.id,
-            teamMemberId: memberId,
-            memberName: member?.name ?? '',
-            documentRole: role
-          };
-
-          const updated = {
-            ...team,
-            documents: team.documents.map(doc => {
-              if (doc.id === docId) {
-                return {
-                  ...doc,
-                  permissions: [...(doc.permissions ?? []), permSummary]
-                };
-              }
-              return doc;
-            })
-          };
-          this.selectedTeam.set(updated);
-        }
-        this.closeAddMemberForm();
-      },
-      error: (err) => {
-        console.error('Error adding document permission:', err);
-        this.toastService.error('Failed to add user to document. Please try again.');
-      }
-    });
-  }
-
   visibleDocuments(): TeamDocument[] {
     const team = this.selectedTeam();
     if (!team) return [];
     if (this.isOwner()) return team.documents ?? [];
-    return team.documents?.filter(doc => {
-      const permissions = doc.permissions ?? [];
-      if (permissions.length === 0) return true;
-      return this.hasDocumentPermission(doc);
-    }) ?? [];
+    if (this.isTeamAdmin()) {
+      return team.documents?.filter(doc => this.hasDocumentPermission(doc)) ?? [];
+    }
+    const accessible = this.memberAccessibleDocIds();
+    if (!accessible) return [];
+    return team.documents?.filter(doc => accessible.has(doc.id)) ?? [];
   }
 
   /**
