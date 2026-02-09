@@ -17,14 +17,22 @@ import { DocumentInviteDto, AcceptInviteResponse } from '../../../core/models';
     CardContentComponent
   ],
   template: `
-    <div class="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center p-4">
+    <div class="min-h-screen bg-[#f5f7f6] flex items-center justify-center p-6">
       <div class="w-full max-w-md">
+        <div class="text-center mb-6">
+          <div class="mx-auto h-12 w-12 rounded-full bg-[#155347] text-white flex items-center justify-center">
+            <lucide-icon name="file-text" class="h-6 w-6"></lucide-icon>
+          </div>
+          <h1 class="mt-4 text-xl font-bold text-gray-900">Document Invite</h1>
+          <p class="text-sm text-gray-500">Access your team document in seconds.</p>
+        </div>
+
         @if (loading()) {
           <app-card>
             <app-card-content>
-              <div class="text-center py-8">
-                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600 mx-auto mb-4"></div>
-                <p class="text-gray-500">A carregar convite...</p>
+              <div class="flex flex-col items-center justify-center py-8 gap-3">
+                <lucide-icon name="loader-circle" class="h-8 w-8 text-[#155347] animate-spin"></lucide-icon>
+                <p class="text-sm text-gray-500">Loading invite...</p>
               </div>
             </app-card-content>
           </app-card>
@@ -34,10 +42,10 @@ import { DocumentInviteDto, AcceptInviteResponse } from '../../../core/models';
           <app-card>
             <app-card-content>
               <div class="text-center py-8">
-                <lucide-icon name="alert-circle" class="h-12 w-12 text-red-500 mx-auto mb-4"></lucide-icon>
-                <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">Convite Invalido</h2>
-                <p class="text-gray-500 mb-6">{{ error() }}</p>
-                <app-button (click)="goToDashboard()">Ir para o Dashboard</app-button>
+                <lucide-icon name="circle-alert" class="h-10 w-10 text-red-500 mx-auto mb-4"></lucide-icon>
+                <h2 class="text-lg font-semibold text-gray-900 mb-2">Invite Not Available</h2>
+                <p class="text-sm text-gray-500 mb-6">{{ error() }}</p>
+                <app-button (click)="goToDashboard()">Go to Dashboard</app-button>
               </div>
             </app-card-content>
           </app-card>
@@ -46,26 +54,31 @@ import { DocumentInviteDto, AcceptInviteResponse } from '../../../core/models';
         @if (invite() && !accepted() && !error()) {
           <app-card>
             <app-card-content>
-              <div class="text-center py-6">
-                <lucide-icon name="file-text" class="h-12 w-12 text-emerald-600 mx-auto mb-4"></lucide-icon>
-                <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                  Foste convidado para um documento
-                </h2>
-                <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 mb-6 text-left">
-                  <div class="mb-3">
-                    <span class="text-sm text-gray-500">Documento</span>
-                    <p class="font-medium text-gray-900 dark:text-white">{{ invite()!.documentTitle }}</p>
-                  </div>
-                  <div class="mb-3">
-                    <span class="text-sm text-gray-500">Equipa</span>
-                    <p class="font-medium text-gray-900 dark:text-white">{{ invite()!.teamName }}</p>
-                  </div>
-                  <div class="mb-3">
-                    <span class="text-sm text-gray-500">Convidado por</span>
-                    <p class="font-medium text-gray-900 dark:text-white">{{ invite()!.createdByName }}</p>
+              <div class="py-6">
+                <div class="flex items-start gap-3 mb-5">
+                  <div class="h-10 w-10 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center">
+                    <lucide-icon name="mail" class="h-5 w-5"></lucide-icon>
                   </div>
                   <div>
-                    <span class="text-sm text-gray-500">Permissao</span>
+                    <h2 class="text-lg font-semibold text-gray-900">You’ve been invited</h2>
+                    <p class="text-sm text-gray-500">Join the document below.</p>
+                  </div>
+                </div>
+                <div class="bg-gray-50 rounded-lg p-4 mb-6 text-left space-y-3">
+                  <div>
+                    <span class="text-xs text-gray-500">Document</span>
+                    <p class="font-medium text-gray-900">{{ invite()!.documentTitle }}</p>
+                  </div>
+                  <div>
+                    <span class="text-xs text-gray-500">Team</span>
+                    <p class="font-medium text-gray-900">{{ invite()!.teamName }}</p>
+                  </div>
+                  <div>
+                    <span class="text-xs text-gray-500">Invited by</span>
+                    <p class="font-medium text-gray-900">{{ invite()!.createdByName }}</p>
+                  </div>
+                  <div>
+                    <span class="text-xs text-gray-500">Access</span>
                     <p class="font-medium" [class]="invite()!.role === 1 ? 'text-emerald-600' : 'text-blue-600'">
                       {{ invite()!.role === 1 ? 'Editor' : 'Viewer' }}
                     </p>
@@ -75,7 +88,7 @@ import { DocumentInviteDto, AcceptInviteResponse } from '../../../core/models';
                   (click)="accept()"
                   [disabled]="accepting()"
                   class="w-full">
-                  {{ accepting() ? 'A aceitar...' : 'Aceitar Convite' }}
+                  {{ accepting() ? 'Accepting...' : 'Accept Invite' }}
                 </app-button>
               </div>
             </app-card-content>
@@ -86,18 +99,18 @@ import { DocumentInviteDto, AcceptInviteResponse } from '../../../core/models';
           <app-card>
             <app-card-content>
               <div class="text-center py-8">
-                <lucide-icon name="check-circle" class="h-12 w-12 text-emerald-600 mx-auto mb-4"></lucide-icon>
-                <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">Convite Aceite!</h2>
-                <p class="text-gray-500 mb-2">
-                  Agora tens acesso ao documento <strong>{{ acceptResult()!.documentTitle }}</strong>
+                <lucide-icon name="badge-check" class="h-10 w-10 text-emerald-600 mx-auto mb-4"></lucide-icon>
+                <h2 class="text-lg font-semibold text-gray-900 mb-2">Invite accepted</h2>
+                <p class="text-sm text-gray-500 mb-2">
+                  You now have access to <strong>{{ acceptResult()!.documentTitle }}</strong>
                 </p>
-                <p class="text-gray-500 mb-6">
-                  na equipa <strong>{{ acceptResult()!.teamName }}</strong>
-                  como <strong>{{ acceptResult()!.documentRole === 1 ? 'Editor' : 'Viewer' }}</strong>.
+                <p class="text-sm text-gray-500 mb-6">
+                  in <strong>{{ acceptResult()!.teamName }}</strong> as
+                  <strong>{{ acceptResult()!.documentRole === 1 ? 'Editor' : 'Viewer' }}</strong>.
                 </p>
                 <div class="flex gap-3 justify-center">
-                  <app-button (click)="goToDocument()">Abrir Documento</app-button>
-                  <app-button variant="outline" (click)="goToTeam()">Ver Equipa</app-button>
+                  <app-button (click)="goToDocument()">Open Document</app-button>
+                  <app-button variant="outline" (click)="goToTeam()">View Team</app-button>
                 </div>
               </div>
             </app-card-content>

@@ -4,8 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
 import { ButtonComponent, BadgeComponent, WorkInProgressComponent } from '../../shared/components/ui';
-import { DocumentService } from '../../core/services';
-import { Collaborator, Version, Comment, AISuggestion } from '../../core/models';
+import { DocumentService, DocumentInviteService } from '../../core/services';
+import { Collaborator, Version, Comment, AISuggestion, DocumentInviteDto } from '../../core/models';
 import { TextEditorComponent } from './components/text-editor.component';
 
 // TODO: BACKEND INTEGRATION - Adicionar import do HttpClient quando necessário
@@ -82,6 +82,40 @@ import { TextEditorComponent } from './components/text-editor.component';
             <lucide-icon leftIcon name="message-square" class="h-4 w-4"></lucide-icon>
             Comments
           </app-button>
+          @if (pendingInvites().length > 0) {
+            <div class="relative">
+              <button
+                (click)="toggleInvitesPanel()"
+                class="inline-flex items-center gap-2 px-3 py-1.5 text-xs font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-full transition-colors"
+                title="Pending invites"
+              >
+                <lucide-icon name="user-plus" class="h-3.5 w-3.5 text-gray-600"></lucide-icon>
+                Invites
+                <span class="ml-1 inline-flex items-center justify-center h-5 min-w-5 px-1.5 rounded-full bg-[#155347] text-white text-[10px]">
+                  {{ pendingInvites().length }}
+                </span>
+              </button>
+              @if (showInvitesPanel()) {
+                <div class="absolute right-0 mt-2 w-64 bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden z-10">
+                  <div class="px-3 py-2 text-xs font-medium text-gray-500 bg-gray-50">
+                    Pending invites
+                  </div>
+                  <div class="divide-y divide-gray-100">
+                    @for (inv of pendingInvites(); track inv.id) {
+                      <div class="px-3 py-2 text-sm">
+                        <div class="font-medium text-gray-900">
+                          {{ inv.role === 1 ? 'Editor' : 'Viewer' }} invite
+                        </div>
+                        <div class="text-xs text-gray-500">
+                          Expires {{ inv.expiresAt | date:'MMM d, y' }}
+                        </div>
+                      </div>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+          }
           <app-button variant="outline" size="sm" [leftIcon]="true" (onClick)="showWipModal.set(true)">
             <lucide-icon leftIcon name="share-2" class="h-4 w-4"></lucide-icon>
             Share
@@ -433,6 +467,7 @@ export class DocumentEditorComponent implements OnInit {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private documentService = inject(DocumentService);
+  private inviteService = inject(DocumentInviteService);
   private location = inject(Location);
   
   // ID do documento atual
@@ -466,6 +501,9 @@ export class DocumentEditorComponent implements OnInit {
   // TODO: Implementar colaboração em tempo real
   collaborators: Collaborator[] = [];
 
+  documentInvites = signal<DocumentInviteDto[]>([]);
+  showInvitesPanel = signal(false);
+
   versions: Version[] = this.documentService.getVersions();
   comments: Comment[] = this.documentService.getComments();
   aiSuggestions: AISuggestion[] = this.documentService.getAISuggestions();
@@ -495,6 +533,7 @@ export class DocumentEditorComponent implements OnInit {
         this.lastEdited.set(new Date(doc.updatedAt));
         this.lastEditedText.set(this.formatLastEdited(new Date(doc.updatedAt)));
         this.isLoading.set(false);
+        this.loadDocumentInvites(doc.id);
       },
       error: (err) => {
         console.error('Error loading document:', err);
@@ -502,6 +541,27 @@ export class DocumentEditorComponent implements OnInit {
         this.isLoading.set(false);
         // Redirecionar para dashboard após delay
         setTimeout(() => this.router.navigate(['/dashboard']), 2000);
+      }
+    });
+  }
+
+  pendingInvites(): DocumentInviteDto[] {
+    return this.documentInvites().filter(inv => !inv.isUsed);
+  }
+
+  toggleInvitesPanel(): void {
+    this.showInvitesPanel.set(!this.showInvitesPanel());
+  }
+
+  private loadDocumentInvites(docId: number): void {
+    this.inviteService.getInvitesByDocument(docId).subscribe({
+      next: (invites) => {
+        this.documentInvites.set(invites);
+      },
+      error: () => {
+        // Hide panel for non-owners/admins or in case of errors
+        this.documentInvites.set([]);
+        this.showInvitesPanel.set(false);
       }
     });
   }
