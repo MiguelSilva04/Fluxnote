@@ -12,7 +12,7 @@ import { DocumentInviteDto } from '../../../core/models';
   template: `
     <app-modal
       [isOpen]="isOpen"
-      title="Partilhar Documento"
+      title="Share Document"
       maxWidth="md"
       (onClose)="close.emit()"
     >
@@ -20,31 +20,31 @@ import { DocumentInviteDto } from '../../../core/models';
         <!-- Role Selection -->
         <div>
           <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            Permissao a atribuir
+            Permission to assign
           </label>
           <select
             [ngModel]="role"
             (ngModelChange)="roleChange.emit($event)"
             class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white text-gray-900 text-sm focus:outline-none focus:ring-1 focus:ring-[#155347]">
-            <option [ngValue]="0">Viewer (apenas leitura)</option>
-            <option [ngValue]="1">Editor (leitura e escrita)</option>
+            <option [ngValue]="0">Viewer (only reading)</option>
+            <option [ngValue]="1">Editor (reading and writing)</option>
           </select>
         </div>
 
         <!-- Expiration Selection -->
         <div>
           <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            Expira em
+            Expires in
           </label>
           <select
             [ngModel]="expirationDays"
             (ngModelChange)="expirationDaysChange.emit($event)"
             class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white text-gray-900 text-sm focus:outline-none focus:ring-1 focus:ring-[#155347]">
-            <option [ngValue]="1">1 dia</option>
-            <option [ngValue]="3">3 dias</option>
-            <option [ngValue]="7">7 dias</option>
-            <option [ngValue]="14">14 dias</option>
-            <option [ngValue]="30">30 dias</option>
+            <option [ngValue]="1">1 day</option>
+            <option [ngValue]="3">3 days</option>
+            <option [ngValue]="7">7 days</option>
+            <option [ngValue]="14">14 days</option>
+            <option [ngValue]="30">30 days</option>
           </select>
         </div>
 
@@ -53,14 +53,14 @@ import { DocumentInviteDto } from '../../../core/models';
           (click)="generateInvite.emit()"
           [disabled]="loading"
           class="w-full px-4 py-2 text-sm font-medium text-white bg-[#155347] rounded-lg hover:bg-[#0e3d33] disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
-          {{ loading ? 'A gerar...' : 'Gerar Link de Convite' }}
+          {{ loading ? 'Generating...' : 'Generate Invite Link' }}
         </button>
 
         <!-- Generated Link -->
         @if (generatedUrl) {
           <div class="p-3 bg-gray-50 rounded-lg">
             <label class="block text-sm font-medium text-gray-700 mb-1">
-              Link de Convite
+              Invite Link
             </label>
             <div class="flex gap-2">
               <input
@@ -72,7 +72,7 @@ import { DocumentInviteDto } from '../../../core/models';
                 (click)="copyInvite.emit()"
                 class="px-3 py-2 text-sm font-medium rounded-lg transition-colors"
                 [class]="copied ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 hover:bg-gray-200 text-gray-700'">
-                {{ copied ? 'Copiado!' : 'Copiar' }}
+                {{ copied ? 'Copied!' : 'Copy' }}
               </button>
             </div>
           </div>
