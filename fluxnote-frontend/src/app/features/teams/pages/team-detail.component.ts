@@ -5,6 +5,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
 import { DashboardLayoutComponent } from '../../../layout/dashboard-layout/dashboard-layout.component';
 import { ButtonComponent, CardComponent, CardContentComponent, BadgeComponent, ModalComponent } from '../../../shared/components/ui';
+import { DocumentShareModalComponent } from '../../../shared/components/document-share-modal/document-share-modal.component';
 import { TeamService, DocumentPermissionService, AuthService, DocumentInviteService, DocumentService } from '../../../core/services';
 import { ToastService } from '../../../shared/services/toast.service';
 import { TeamMemberToPost, TeamDocument, DocumentPermissionSummary, DocumentInviteDto } from '../../../core/models';
@@ -21,7 +22,8 @@ import { TeamMemberToPost, TeamDocument, DocumentPermissionSummary, DocumentInvi
     CardComponent,
     CardContentComponent,
     BadgeComponent,
-    ModalComponent
+    ModalComponent,
+    DocumentShareModalComponent
   ],
   templateUrl: `./team-detail.component.html`
 })
@@ -535,12 +537,12 @@ export class TeamDetailComponent {
         this.shareGeneratedUrl.set(invite.inviteUrl);
         this.shareLoading.set(false);
         this.shareCopied.set(false);
-        // Recarregar lista de convites
+        // Reload list of invites
         this.loadDocumentInvites(docId);
       },
       error: (err) => {
         console.error('Error creating invite:', err);
-        this.toastService.error('Erro ao criar convite.');
+        this.toastService.error('Error creating invite.');
         this.shareLoading.set(false);
       }
     });
@@ -552,7 +554,7 @@ export class TeamDetailComponent {
 
     navigator.clipboard.writeText(url).then(() => {
       this.shareCopied.set(true);
-      this.toastService.success('Link copiado!');
+      this.toastService.success('Link copied!');
       setTimeout(() => this.shareCopied.set(false), 3000);
     });
   }
@@ -567,12 +569,12 @@ export class TeamDetailComponent {
   revokeInvite(inviteId: number): void {
     this.inviteService.revokeInvite(inviteId).subscribe({
       next: () => {
-        this.toastService.success('Convite revogado.');
+        this.toastService.success('Invite revoked.');
         const docId = this.shareDocId();
         if (docId) this.loadDocumentInvites(docId);
       },
       error: () => {
-        this.toastService.error('Erro ao revogar convite.');
+        this.toastService.error('Error revoking invite.');
       }
     });
   }

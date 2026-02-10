@@ -1,4 +1,5 @@
 using Fluxnote.Backend.Data;
+using Fluxnote.Backend.Dtos.Teams;
 using Fluxnote.Backend.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -231,24 +232,5 @@ namespace Fluxnote.Backend.Controllers
 
             return NoContent();
         }
-
-        private bool TeamMemberExists(int id)
-        {
-            return _context.TeamMember.Any(e => e.Id == id);
-        }
-    }
-
-    public class UpdateTeamMemberRoleRequest
-    {
-        public int Role { get; set; }
-    }
-
-    public class CreateTeamMemberRequest
-    {
-        public string? Name { get; set; }
-        public int Role { get; set; }
-        public int? TeamId { get; set; }
-        public string? UserId { get; set; }
-        public string? Email { get; set; }
     }
 }
