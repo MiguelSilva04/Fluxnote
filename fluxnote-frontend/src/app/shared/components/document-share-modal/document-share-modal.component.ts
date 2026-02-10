@@ -81,9 +81,16 @@ import { DocumentInviteDto } from '../../../core/models';
         <!-- Active Invites List -->
         @if (invites && invites!.length > 0) {
           <div>
-            <h4 class="text-sm font-medium text-gray-700 mb-2">
-              Convites Ativos ({{ invites.length }})
-            </h4>
+            <div class="flex items-center justify-between mb-2">
+              <h4 class="text-sm font-medium text-gray-700">
+                Convites Ativos ({{ invites.length }})
+              </h4>
+              <button
+                (click)="clearInvites.emit()"
+                class="text-xs font-medium text-gray-500 hover:text-gray-700">
+                Clear used
+              </button>
+            </div>
             <div class="space-y-2">
               @for (inv of invites; track inv.id) {
                 <div class="flex items-center justify-between p-2 bg-gray-50 rounded-lg text-sm">
@@ -98,13 +105,20 @@ import { DocumentInviteDto } from '../../../core/models';
                       <span class="text-orange-500">Usado</span>
                     }
                   </div>
-                  @if (!inv.isUsed) {
-                    <button
-                      (click)="revokeInvite.emit(inv.id)"
-                      class="text-red-500 hover:text-red-700 text-xs font-medium">
-                      Revogar
-                    </button>
-                  }
+                  <div class="flex items-center gap-2">
+                    @if (!inv.isUsed) {
+                      <button
+                        (click)="viewInvite.emit(inv.inviteUrl)"
+                        class="text-xs font-medium text-gray-700 hover:text-gray-900">
+                        View link
+                      </button>
+                      <button
+                        (click)="revokeInvite.emit(inv.id)"
+                        class="text-red-500 hover:text-red-700 text-xs font-medium">
+                        Revogar
+                      </button>
+                    }
+                  </div>
                 </div>
               }
             </div>
@@ -129,4 +143,6 @@ export class DocumentShareModalComponent {
   @Output() generateInvite = new EventEmitter<void>();
   @Output() copyInvite = new EventEmitter<void>();
   @Output() revokeInvite = new EventEmitter<number>();
+  @Output() clearInvites = new EventEmitter<void>();
+  @Output() viewInvite = new EventEmitter<string>();
 }

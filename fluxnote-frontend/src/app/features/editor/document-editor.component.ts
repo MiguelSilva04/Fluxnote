@@ -104,13 +104,20 @@ import { TextEditorComponent } from './components/text-editor.component';
                   </div>
                   <div class="divide-y divide-gray-100">
                     @for (inv of pendingInvites(); track inv.id) {
-                      <div class="px-3 py-2 text-sm">
-                        <div class="font-medium text-gray-900">
-                          {{ inv.role === 1 ? 'Editor' : 'Viewer' }} invite
+                      <div class="px-3 py-2 text-sm flex items-center justify-between">
+                        <div>
+                          <div class="font-medium text-gray-900">
+                            {{ inv.role === 1 ? 'Editor' : 'Viewer' }} invite
+                          </div>
+                          <div class="text-xs text-gray-500">
+                            Expires {{ inv.expiresAt | date:'MMM d, y' }}
+                          </div>
                         </div>
-                        <div class="text-xs text-gray-500">
-                          Expires {{ inv.expiresAt | date:'MMM d, y' }}
-                        </div>
+                        <button
+                          (click)="shareGeneratedUrl.set(inv.inviteUrl); shareCopied.set(false); openShareModal()"
+                          class="text-xs font-medium text-gray-700 hover:text-gray-900">
+                          View link
+                        </button>
                       </div>
                     }
                   </div>
@@ -344,6 +351,8 @@ import { TextEditorComponent } from './components/text-editor.component';
           (generateInvite)="generateInviteLink()"
           (copyInvite)="copyInviteLink()"
           (revokeInvite)="revokeInvite($event)"
+          (clearInvites)="clearUsedInvites()"
+          (viewInvite)="shareGeneratedUrl.set($event); shareCopied.set(false)"
         />
       }
 
@@ -548,6 +557,29 @@ export class DocumentEditorComponent implements OnInit {
       error: (err) => {
         console.error('Error revoking invite:', err);
       }
+    });
+  }
+
+  clearUsedInvites(): void {
+    const usedInvites = this.documentInvites().filter(inv => inv.isUsed);
+    if (usedInvites.length === 0) return;
+
+    let completed = 0;
+    usedInvites.forEach(inv => {
+      this.inviteService.revokeInvite(inv.id).subscribe({
+        next: () => {
+          completed += 1;
+          if (completed === usedInvites.length && this.documentId) {
+            this.loadDocumentInvites(this.documentId);
+          }
+        },
+        error: () => {
+          completed += 1;
+          if (completed === usedInvites.length && this.documentId) {
+            this.loadDocumentInvites(this.documentId);
+          }
+        }
+      });
     });
   }
 

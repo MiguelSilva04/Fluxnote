@@ -578,4 +578,38 @@ export class TeamDetailComponent {
       }
     });
   }
+
+  clearInvitesList(): void {
+    const usedInvites = this.documentInvites().filter(inv => inv.isUsed);
+    if (usedInvites.length === 0) return;
+
+    let completed = 0;
+    let hadError = false;
+    usedInvites.forEach(inv => {
+      this.inviteService.revokeInvite(inv.id).subscribe({
+        next: () => {
+          completed += 1;
+          if (completed === usedInvites.length) {
+            const docId = this.shareDocId();
+            if (docId) this.loadDocumentInvites(docId);
+            if (!hadError) this.toastService.success('Used invites cleared.');
+          }
+        },
+        error: () => {
+          hadError = true;
+          completed += 1;
+          if (completed === usedInvites.length) {
+            const docId = this.shareDocId();
+            if (docId) this.loadDocumentInvites(docId);
+            this.toastService.error('Failed to clear some invites.');
+          }
+        }
+      });
+    });
+  }
+
+  viewInviteLink(url: string): void {
+    this.shareGeneratedUrl.set(url);
+    this.shareCopied.set(false);
+  }
 }
