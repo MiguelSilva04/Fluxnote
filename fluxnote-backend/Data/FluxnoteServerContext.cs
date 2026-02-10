@@ -71,6 +71,11 @@ namespace Fluxnote.Backend.Data
         public DbSet<Fluxnote.Backend.Models.DocumentPermission> DocumentPermission { get; set; } = default!;
 
         /// <summary>
+        /// DbSet para convites de documentos (permite gerir convites pendentes e aceites).
+        /// </summary>
+        public DbSet<Fluxnote.Backend.Models.DocumentInvite> DocumentInvite { get; set; } = default!;
+
+        /// <summary>
         /// DbSet para refresh tokens de autenticação.
         /// </summary>
         public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
@@ -137,6 +142,28 @@ namespace Fluxnote.Backend.Data
                 // Índices para performance
                 entity.HasIndex(dp => dp.DocumentId);
                 entity.HasIndex(dp => dp.TeamMemberId);
+            });
+
+            builder.Entity<DocumentInvite>(entity =>
+            {
+                // Index unico no Token
+                entity.HasIndex(di => di.Token).IsUnique();
+
+                // Relacao com Document (cascade delete - se documento for apagado, convites tambem)
+                entity.HasOne(di => di.Document)
+                      .WithMany()
+                      .HasForeignKey(di => di.DocumentId)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+                // Relacao com TeamMember (restrict delete - nao apagar convite se membro for removido)
+                entity.HasOne(di => di.CreatedBy)
+                      .WithMany()
+                      .HasForeignKey(di => di.CreatedByTeamMemberId)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                // Indices para performance
+                entity.HasIndex(di => di.DocumentId);
+                entity.HasIndex(di => di.ExpiresAt);
             });
 
             // Configuração específica para SQL Server (SQLite usa BLOB por defeito)

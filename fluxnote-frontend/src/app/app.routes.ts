@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { authGuard, guestGuard, pendingEmailGuard } from './core/services/auth.guard';
+import { authGuard, guestGuard, pendingEmailGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
   // Landing page routes  dashboard
@@ -118,6 +118,11 @@ export const routes: Routes = [
     canActivate: [authGuard],
     loadComponent: () =>
       import('./features/teams/pages/team-detail.component').then((m) => m.TeamDetailComponent),
+  },
+  {
+    path: 'invite/:token',
+    loadComponent: () =>
+      import('./features/invites/pages/accept-invite.component').then((m) => m.AcceptInviteComponent),
   },
   {
     path: 'trash',

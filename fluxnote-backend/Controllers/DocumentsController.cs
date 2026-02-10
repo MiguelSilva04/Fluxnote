@@ -110,8 +110,8 @@ namespace Fluxnote.Backend.Controllers
             }
 
             var userTeamIds = userTeamMembers.Select(m => m.TeamId).ToList();
-            var ownerTeamIds = userTeamMembers
-                .Where(m => m.Role == TeamRole.Owner)
+            var adminOrOwnerTeamIds = userTeamMembers
+                .Where(m => m.Role == TeamRole.Owner || m.Role == TeamRole.TeamAdmin)
                 .Select(m => m.TeamId)
                 .ToList();
 
@@ -153,7 +153,7 @@ namespace Fluxnote.Backend.Controllers
                     continue;
 
                 // Owners e TeamAdmins veem todos os documentos da equipa
-                if (ownerTeamIds.Contains(doc.TeamId))
+                if (adminOrOwnerTeamIds.Contains(doc.TeamId))
                 {
                     accessibleDocuments.Add(doc);
                 }

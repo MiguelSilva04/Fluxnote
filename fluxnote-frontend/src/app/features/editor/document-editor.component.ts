@@ -4,8 +4,9 @@ import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
 import { ButtonComponent, BadgeComponent, WorkInProgressComponent } from '../../shared/components/ui';
-import { DocumentService } from '../../core/services';
-import { Collaborator, Version, Comment, AISuggestion } from '../../core/models';
+import { DocumentShareModalComponent } from '../../shared/components/document-share-modal/document-share-modal.component';
+import { DocumentService, DocumentInviteService } from '../../core/services';
+import { Collaborator, Version, Comment, AISuggestion, DocumentInviteDto } from '../../core/models';
 import { TextEditorComponent } from './components/text-editor.component';
 
 // TODO: BACKEND INTEGRATION - Adicionar import do HttpClient quando necessário
@@ -23,6 +24,7 @@ import { TextEditorComponent } from './components/text-editor.component';
     BadgeComponent,
     TextEditorComponent,
     WorkInProgressComponent,
+    DocumentShareModalComponent,
   ],
   template: `
     <div class="min-h-screen bg-gray-50 flex flex-col relative">
@@ -82,7 +84,48 @@ import { TextEditorComponent } from './components/text-editor.component';
             <lucide-icon leftIcon name="message-square" class="h-4 w-4"></lucide-icon>
             Comments
           </app-button>
-          <app-button variant="outline" size="sm" [leftIcon]="true" (onClick)="showWipModal.set(true)">
+          @if (pendingInvites().length > 0) {
+            <div class="relative">
+              <button
+                (click)="toggleInvitesPanel()"
+                class="inline-flex items-center gap-2 px-3 py-1.5 text-xs font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-full transition-colors"
+                title="Pending invites"
+              >
+                <lucide-icon name="user-plus" class="h-3.5 w-3.5 text-gray-600"></lucide-icon>
+                Invites
+                <span class="ml-1 inline-flex items-center justify-center h-5 min-w-5 px-1.5 rounded-full bg-[#155347] text-white text-[10px]">
+                  {{ pendingInvites().length }}
+                </span>
+              </button>
+              @if (showInvitesPanel()) {
+                <div class="absolute right-0 mt-2 w-64 bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden z-10">
+                  <div class="px-3 py-2 text-xs font-medium text-gray-500 bg-gray-50">
+                    Pending invites
+                  </div>
+                  <div class="divide-y divide-gray-100">
+                    @for (inv of pendingInvites(); track inv.id) {
+                      <div class="px-3 py-2 text-sm flex items-center justify-between">
+                        <div>
+                          <div class="font-medium text-gray-900">
+                            {{ inv.role === 1 ? 'Editor' : 'Viewer' }} invite
+                          </div>
+                          <div class="text-xs text-gray-500">
+                            Expires {{ inv.expiresAt | date:'MMM d, y' }}
+                          </div>
+                        </div>
+                        <button
+                          (click)="copyInviteUrl(inv.id, inv.inviteUrl)"
+                          class="text-xs font-medium text-gray-700 hover:text-gray-900">
+                          {{ lastCopiedInviteId() === inv.id ? 'Copied!' : 'Copy link' }}
+                        </button>
+                      </div>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+          }
+          <app-button variant="outline" size="sm" [leftIcon]="true" (onClick)="openShareModal()">
             <lucide-icon leftIcon name="share-2" class="h-4 w-4"></lucide-icon>
             Share
           </app-button>
@@ -293,85 +336,24 @@ import { TextEditorComponent } from './components/text-editor.component';
         }
       </div>
 
-      <!-- Share Modal -->
       @if (showShareModal()) {
-        <div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden">
-            <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
-              <h2 class="text-lg font-bold text-gray-900">Share Document</h2>
-              <button (click)="showShareModal.set(false)" class="p-1 hover:bg-gray-100 rounded">
-                <lucide-icon name="x" class="h-5 w-5 text-gray-500"></lucide-icon>
-              </button>
-            </div>
-
-            <div class="p-6 space-y-6 overflow-y-auto max-h-[calc(90vh-140px)]">
-              <!-- Invite People -->
-              <div>
-                <h3 class="text-sm font-semibold text-gray-900 mb-3">Invite People</h3>
-                <div class="flex gap-2">
-                  <div class="flex-1 relative">
-                    <lucide-icon name="mail" class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400"></lucide-icon>
-                    <input
-                      type="text"
-                      placeholder="Enter email addresses"
-                      class="w-full h-10 pl-10 pr-4 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#155347] text-sm"
-                    />
-                  </div>
-                  <select class="h-10 px-3 rounded-lg border border-gray-300 text-sm bg-white">
-                    <option>Editor</option>
-                    <option>Viewer</option>
-                  </select>
-                  <app-button customClass="bg-[#155347] hover:bg-[#0d3d31]">Add</app-button>
-                </div>
-              </div>
-
-              <!-- Shareable Link -->
-              <div>
-                <h3 class="text-sm font-semibold text-gray-900 mb-3">Shareable Link</h3>
-                <div class="flex gap-2">
-                  <div class="flex-1 relative">
-                    <lucide-icon name="globe" class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400"></lucide-icon>
-                    <input
-                      type="text"
-                      value="https://fluxnote.app/docs/doc-123456789/share"
-                      readonly
-                      class="w-full h-10 pl-10 pr-4 rounded-lg border border-gray-300 bg-gray-50 text-sm"
-                    />
-                  </div>
-                  <app-button variant="outline" [leftIcon]="true">
-                    <lucide-icon leftIcon name="copy" class="h-4 w-4"></lucide-icon>
-                    Copy
-                  </app-button>
-                </div>
-              </div>
-
-              <!-- People with Access -->
-              <div>
-                <h3 class="text-sm font-semibold text-gray-900 mb-3">People with Access</h3>
-                <div class="space-y-2">
-                  <div class="flex items-center justify-between p-3 border border-gray-200 rounded-lg">
-                    <div class="flex items-center gap-3">
-                      <div class="h-8 w-8 rounded-full bg-[#155347] text-white flex items-center justify-center text-xs font-medium">
-                        AM
-                      </div>
-                      <div>
-                        <p class="text-sm font-medium text-gray-900">Alex Morgan (You)</p>
-                        <p class="text-xs text-gray-500">alex.morgan&#64;fluxnote.com</p>
-                      </div>
-                    </div>
-                    <span class="text-sm text-gray-500">Owner</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="px-6 py-4 bg-gray-50 border-t border-gray-100 flex justify-end">
-              <app-button (onClick)="showShareModal.set(false)" customClass="bg-[#155347] hover:bg-[#0d3d31]">
-                Done
-              </app-button>
-            </div>
-          </div>
-        </div>
+        <app-document-share-modal
+          [isOpen]="true"
+          [role]="shareRole()"
+          [expirationDays]="shareExpirationDays()"
+          [generatedUrl]="shareGeneratedUrl()"
+          [loading]="shareLoading()"
+          [copied]="shareCopied()"
+          [invites]="documentInvites()"
+          (close)="closeShareModal()"
+          (roleChange)="shareRole.set($event)"
+          (expirationDaysChange)="shareExpirationDays.set($event)"
+          (generateInvite)="generateInviteLink()"
+          (copyInvite)="copyInviteLink()"
+          (revokeInvite)="revokeInvite($event)"
+          (clearInvites)="clearUsedInvites()"
+          (viewInvite)="shareGeneratedUrl.set($event); shareCopied.set(false)"
+        />
       }
 
       <!-- Restore Version Modal -->
@@ -433,6 +415,7 @@ export class DocumentEditorComponent implements OnInit {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private documentService = inject(DocumentService);
+  private inviteService = inject(DocumentInviteService);
   private location = inject(Location);
   
   // ID do documento atual
@@ -466,6 +449,15 @@ export class DocumentEditorComponent implements OnInit {
   // TODO: Implementar colaboração em tempo real
   collaborators: Collaborator[] = [];
 
+  shareRole = signal<number>(0); // 0=Viewer, 1=Editor
+  shareExpirationDays = signal<number>(7);
+  shareGeneratedUrl = signal<string | null>(null);
+  shareLoading = signal(false);
+  shareCopied = signal(false);
+  documentInvites = signal<DocumentInviteDto[]>([]);
+  showInvitesPanel = signal(false);
+  lastCopiedInviteId = signal<number | null>(null);
+
   versions: Version[] = this.documentService.getVersions();
   comments: Comment[] = this.documentService.getComments();
   aiSuggestions: AISuggestion[] = this.documentService.getAISuggestions();
@@ -495,6 +487,7 @@ export class DocumentEditorComponent implements OnInit {
         this.lastEdited.set(new Date(doc.updatedAt));
         this.lastEditedText.set(this.formatLastEdited(new Date(doc.updatedAt)));
         this.isLoading.set(false);
+        this.loadDocumentInvites(doc.id);
       },
       error: (err) => {
         console.error('Error loading document:', err);
@@ -502,6 +495,121 @@ export class DocumentEditorComponent implements OnInit {
         this.isLoading.set(false);
         // Redirecionar para dashboard após delay
         setTimeout(() => this.router.navigate(['/dashboard']), 2000);
+      }
+    });
+  }
+
+  pendingInvites(): DocumentInviteDto[] {
+    return this.documentInvites().filter(inv => !inv.isUsed);
+  }
+
+  openShareModal(): void {
+    if (!this.documentId) return;
+    this.shareRole.set(0);
+    this.shareExpirationDays.set(7);
+    this.shareGeneratedUrl.set(null);
+    this.shareCopied.set(false);
+    this.showShareModal.set(true);
+    this.loadDocumentInvites(this.documentId);
+  }
+
+  closeShareModal(): void {
+    this.showShareModal.set(false);
+    this.shareGeneratedUrl.set(null);
+  }
+
+  generateInviteLink(): void {
+    if (!this.documentId) return;
+
+    this.shareLoading.set(true);
+    this.inviteService.createInvite({
+      documentId: this.documentId,
+      role: this.shareRole(),
+      expirationDays: this.shareExpirationDays()
+    }).subscribe({
+      next: (invite) => {
+        this.shareGeneratedUrl.set(invite.inviteUrl);
+        this.shareLoading.set(false);
+        this.shareCopied.set(false);
+        this.loadDocumentInvites(this.documentId!);
+      },
+      error: (err) => {
+        console.error('Error creating invite:', err);
+        this.shareLoading.set(false);
+      }
+    });
+  }
+
+  copyInviteLink(): void {
+    const url = this.shareGeneratedUrl();
+    if (!url) return;
+
+    navigator.clipboard.writeText(url).then(() => {
+      this.shareCopied.set(true);
+      setTimeout(() => this.shareCopied.set(false), 3000);
+    });
+  }
+
+  revokeInvite(inviteId: number): void {
+    this.inviteService.revokeInvite(inviteId).subscribe({
+      next: () => {
+        if (this.documentId) this.loadDocumentInvites(this.documentId);
+      },
+      error: (err) => {
+        console.error('Error revoking invite:', err);
+      }
+    });
+  }
+
+  clearUsedInvites(): void {
+    const usedInvites = this.documentInvites().filter(inv => inv.isUsed);
+    if (usedInvites.length === 0) return;
+
+    let completed = 0;
+    usedInvites.forEach(inv => {
+      this.inviteService.revokeInvite(inv.id).subscribe({
+        next: () => {
+          completed += 1;
+          if (completed === usedInvites.length && this.documentId) {
+            this.loadDocumentInvites(this.documentId);
+          }
+        },
+        error: () => {
+          completed += 1;
+          if (completed === usedInvites.length && this.documentId) {
+            this.loadDocumentInvites(this.documentId);
+          }
+        }
+      });
+    });
+  }
+
+  copyInviteUrl(inviteId: number, url: string): void {
+    if (!url) return;
+    window.navigator.clipboard.writeText(url).catch(() => {
+      console.error('Failed to copy invite link.');
+    });
+    this.lastCopiedInviteId.set(inviteId);
+    setTimeout(() => {
+      if (this.lastCopiedInviteId() === inviteId) {
+        this.lastCopiedInviteId.set(null);
+      }
+    }, 1000);
+  }
+
+  toggleInvitesPanel(): void {
+    this.showInvitesPanel.set(!this.showInvitesPanel());
+  }
+
+  private loadDocumentInvites(docId: number): void {
+    this.inviteService.getInvitesByDocument(docId).subscribe({
+      next: (invites) => {
+        this.documentInvites.set(invites);
+      },
+      error: () => {
+        // Hide panel for non-owners/admins or in case of errors
+        this.documentInvites.set([]);
+        this.showInvitesPanel.set(false);
       }
     });
   }

@@ -33,6 +33,14 @@ export interface TeamDocument {
   title: string;
   updatedAt?: string;
   createdById?: string;
+  permissions?: DocumentPermissionSummary[];
+}
+
+export interface DocumentPermissionSummary {
+  id: number;
+  teamMemberId: number;
+  memberName: string;
+  documentRole: number; // 0=Viewer, 1=Editor
 }
 
 export interface TeamMember {

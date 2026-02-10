@@ -132,7 +132,7 @@ namespace Fluxnote.Backend.Tests.TeamTesting
             var deleteResponse = await authClient.DeleteAsync($"/api/teams/{created!.Id}");
 
             // Assert
-            Assert.Equal(HttpStatusCode.NoContent, deleteResponse.StatusCode);
+            Assert.Equal(HttpStatusCode.Forbidden, deleteResponse.StatusCode);
         }
 
         [Fact]
