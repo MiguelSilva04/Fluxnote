@@ -115,7 +115,7 @@ import { DocumentInviteDto } from '../../../core/models';
                       <button
                         (click)="revokeInvite.emit(inv.id)"
                         class="text-red-500 hover:text-red-700 text-xs font-medium">
-                        Revogar
+                        Revoke
                       </button>
                     }
                   </div>
