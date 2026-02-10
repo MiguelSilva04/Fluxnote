@@ -83,7 +83,7 @@ import { DocumentInviteDto } from '../../../core/models';
           <div>
             <div class="flex items-center justify-between mb-2">
               <h4 class="text-sm font-medium text-gray-700">
-                Convites Ativos ({{ invites.length }})
+                Active Invites ({{ invites.length }})
               </h4>
               <button
                 (click)="clearInvites.emit()"
