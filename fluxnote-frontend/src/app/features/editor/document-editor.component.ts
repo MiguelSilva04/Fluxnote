@@ -114,9 +114,9 @@ import { TextEditorComponent } from './components/text-editor.component';
                           </div>
                         </div>
                         <button
-                          (click)="shareGeneratedUrl.set(inv.inviteUrl); shareCopied.set(false); openShareModal()"
+                          (click)="copyInviteUrl(inv.id, inv.inviteUrl)"
                           class="text-xs font-medium text-gray-700 hover:text-gray-900">
-                          View link
+                          {{ lastCopiedInviteId() === inv.id ? 'Copied!' : 'Copy link' }}
                         </button>
                       </div>
                     }
@@ -456,6 +456,7 @@ export class DocumentEditorComponent implements OnInit {
   shareCopied = signal(false);
   documentInvites = signal<DocumentInviteDto[]>([]);
   showInvitesPanel = signal(false);
+  lastCopiedInviteId = signal<number | null>(null);
 
   versions: Version[] = this.documentService.getVersions();
   comments: Comment[] = this.documentService.getComments();
@@ -581,6 +582,19 @@ export class DocumentEditorComponent implements OnInit {
         }
       });
     });
+  }
+
+  copyInviteUrl(inviteId: number, url: string): void {
+    if (!url) return;
+    window.navigator.clipboard.writeText(url).catch(() => {
+      console.error('Failed to copy invite link.');
+    });
+    this.lastCopiedInviteId.set(inviteId);
+    setTimeout(() => {
+      if (this.lastCopiedInviteId() === inviteId) {
+        this.lastCopiedInviteId.set(null);
+      }
+    }, 1000);
   }
 
   toggleInvitesPanel(): void {
