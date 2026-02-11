@@ -114,13 +114,13 @@ namespace Fluxnote.Backend.Controllers
             }
 
             var userTeamIds = userTeamMembers.Select(m => m.TeamId).ToList();
-            var adminOrOwnerTeamIds = userTeamMembers
-                .Where(m => m.Role == TeamRole.Owner || m.Role == TeamRole.TeamAdmin)
+            var ownerTeamIds = userTeamMembers
+                .Where(m => m.Role == TeamRole.Owner)
                 .Select(m => m.TeamId)
                 .ToList();
 
             // Query base: documentos das equipas do utilizador, não eliminados
-            // Futuramente: Buscar apenas documentos em que exista um registo DocumentPermission com o TeamMemberID e DocumentID exceto se for Owner ou TeamAdmin
+            // Owner faz bypass às verificações de DocumentPermission, apesar de ser criado um DocumentPermission para consistência, o acesso é garantido pelo TeamRole
             var query = _context.Document
                 .Include(d => d.Team)
                 .Include(d => d.CreatedBy)
@@ -156,8 +156,8 @@ namespace Fluxnote.Backend.Controllers
                 if (userTeamMember == null)
                     continue;
 
-                // Owners e TeamAdmins veem todos os documentos da equipa
-                if (adminOrOwnerTeamIds.Contains(doc.TeamId))
+                // Owners ve todos os documentos da equipa
+                if (ownerTeamIds.Contains(doc.TeamId))
                 {
                     accessibleDocuments.Add(doc);
                 }
@@ -560,9 +560,9 @@ namespace Fluxnote.Backend.Controllers
                 });
             }
 
-            // Verificar acesso (Owner/Admin ou com DocumentPermission)
-            bool isOwnerOrAdmin = userTeamMember.Role == TeamRole.Owner || userTeamMember.Role == TeamRole.TeamAdmin;
-            if (!isOwnerOrAdmin)
+            // Verificar acesso (apenas Owner faz bypass, restantes precisam DocumentPermission)
+            bool isOwner = userTeamMember.Role == TeamRole.Owner;
+            if (!isOwner)
             {
                 var hasPermission = await _context.DocumentPermission
                     .AnyAsync(dp => dp.TeamMemberId == userTeamMember.Id && dp.DocumentId == document.Id);
@@ -652,12 +652,12 @@ namespace Fluxnote.Backend.Controllers
                 });
             }
 
-            // Verificar se é Owner ou TeamAdmin (bypass à DocumentRole - podem sempre editar)
-            bool isOwnerOrAdmin = userTeamMember.Role == TeamRole.Owner || userTeamMember.Role == TeamRole.TeamAdmin;
-            bool hasAccess = isOwnerOrAdmin;
-            string effectiveRole = isOwnerOrAdmin ? "Editor" : "Viewer";
+            // Owner faz bypass à DocumentRole (pode sempre editar)
+            bool isOwner = userTeamMember.Role == TeamRole.Owner;
+            bool hasAccess = isOwner;
+            string effectiveRole = isOwner ? "Editor" : "Viewer";
 
-            // Se não for Owner/Admin, verificar DocumentPermission
+            // Se não for Owner, verificar DocumentPermission (inclui TeamAdmins)
             if (!hasAccess)
             {
                 var permission = await _context.DocumentPermission
@@ -750,12 +750,12 @@ namespace Fluxnote.Backend.Controllers
                 });
             }
 
-            // Verificar se é Owner ou TeamAdmin (bypass à DocumentRole - podem sempre editar)
-            bool isOwnerOrAdmin = userTeamMember.Role == TeamRole.Owner || userTeamMember.Role == TeamRole.TeamAdmin;
-            bool canEdit = isOwnerOrAdmin;
-            string effectiveRole = isOwnerOrAdmin ? "Editor" : "Viewer";
+            // Owner faz bypass à DocumentRole (pode sempre editar)
+            bool isOwner = userTeamMember.Role == TeamRole.Owner;
+            bool canEdit = isOwner;
+            string effectiveRole = isOwner ? "Editor" : "Viewer";
 
-            // Se não for Owner/Admin, verificar se tem DocumentPermission com Role = Editor
+            // Se não for Owner, verificar se tem DocumentPermission com Role = Editor (inclui TeamAdmins)
             if (!canEdit)
             {
                 var permission = await _context.DocumentPermission

@@ -40,6 +40,7 @@ export interface DocumentPermissionSummary {
   id: number;
   teamMemberId: number;
   memberName: string;
+  memberRole: number; // TeamRole: 0=Member, 1=TeamAdmin, 2=Owner
   documentRole: number; // 0=Viewer, 1=Editor
 }
 

@@ -61,18 +61,31 @@ export class TeamsComponent {
   searchQuery = signal('');
 
   /**
+   * Signal para armazenar o filtro de role selecionado.
+   * null = sem filtro (todas as roles)
+   */
+  roleFilter = signal<number | null>(null);
+
+  /**
    * Lista filtrada de equipas com base no termo de pesquisa.
    * Filtra por nome da equipa e nome dos membros.
    */
   filteredTeams = computed(() => {
     const teams = this.teams();
     const query = this.searchQuery().toLowerCase().trim();
+    const role = this.roleFilter();
     
-    if (!teams || !query) {
-      return teams;
-    }
-    
+    if (!teams) return teams;
+
     return teams.filter(team => {
+      // Filtro por role
+      if (role !== null && team.currentUserRole !== role) {
+        return false;
+      }
+
+      // Sem pesquisa de texto -> inclui
+      if (!query) return true;
+
       // Pesquisa no nome da equipa
       if (team.name.toLowerCase().includes(query)) {
         return true;

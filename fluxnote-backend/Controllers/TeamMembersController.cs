@@ -151,6 +151,21 @@ namespace Fluxnote.Backend.Controllers
             }
 
             targetMember.Role = (TeamRole)request.Role;
+
+            // Se promovido a TeamAdmin, atualizar todas as DocumentPermissions para Editor
+            if ((TeamRole)request.Role == TeamRole.TeamAdmin)
+            {
+                var permissions = await _context.DocumentPermission
+                    .Where(dp => dp.TeamMemberId == targetMember.Id && dp.Role != DocumentRole.Editor)
+                    .ToListAsync();
+
+                foreach (var perm in permissions)
+                {
+                    perm.Role = DocumentRole.Editor;
+                    perm.UpdatedAt = DateTime.UtcNow;
+                }
+            }
+
             await _context.SaveChangesAsync();
 
             return NoContent();

@@ -356,11 +356,16 @@ namespace Fluxnote.Backend.Controllers
             }
 
             // Criar DocumentPermission com a role definida no convite
+            // TeamAdmin recebe sempre Editor, independentemente da role do convite
+            var effectiveRole = teamMember.Role == TeamRole.TeamAdmin
+                ? DocumentRole.Editor
+                : invite.Role;
+
             var permission = new DocumentPermission
             {
                 DocumentId = invite.DocumentId,
                 TeamMemberId = teamMember.Id,
-                Role = invite.Role,
+                Role = effectiveRole,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             };
@@ -378,7 +383,7 @@ namespace Fluxnote.Backend.Controllers
                 DocumentId = invite.DocumentId,
                 DocumentTitle = invite.Document.Title,
                 TeamName = invite.Document.Team.Name,
-                DocumentRole = (int)invite.Role
+                DocumentRole = (int)effectiveRole
             };
 
             return Ok(response);

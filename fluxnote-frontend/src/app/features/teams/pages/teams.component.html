@@ -14,12 +14,15 @@
               class="h-10 pl-10 pr-4 rounded-lg border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-[#155347] focus:border-transparent text-sm w-64"
             />
           </div>
-          <select class="h-10 px-4 rounded-lg border border-gray-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[#155347]">
-            <option>Filter by Role</option>
-            <option>Owner</option>
-            <option>Team Admin</option>
-            <option>Member</option>
-            <option>Viewer</option>
+          <select
+            [ngModel]="roleFilter()"
+            (ngModelChange)="roleFilter.set($event)"
+            class="h-10 px-4 rounded-lg border border-gray-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[#155347]"
+          >
+            <option [ngValue]="null">All Roles</option>
+            <option [ngValue]="2">Owner</option>
+            <option [ngValue]="1">Team Admin</option>
+            <option [ngValue]="0">Member</option>
           </select>
           <app-button (onClick)="isCreateModalOpen.set(true)" [leftIcon]="true">
             <lucide-icon leftIcon name="plus" class="h-4 w-4"></lucide-icon>
@@ -236,7 +239,7 @@
               <lucide-icon name="search-x" class="h-12 w-12 text-gray-300"></lucide-icon>
               <div class="text-center">
                 <p class="text-gray-600 font-medium">No teams found</p>
-                <p class="text-gray-400 text-sm">Try searching with different keywords</p>
+                <p class="text-gray-400 text-sm">Try searching with different roles</p>
               </div>
             </div>
           }
