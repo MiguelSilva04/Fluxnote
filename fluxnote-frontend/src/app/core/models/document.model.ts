@@ -29,6 +29,7 @@ export interface DocumentDetailDto {
   isDeleted: boolean;
   content?: string; // Y.Doc em Base64
   plainText?: string;
+  role?: string; // "Editor" | "Viewer"
 }
 
 /**

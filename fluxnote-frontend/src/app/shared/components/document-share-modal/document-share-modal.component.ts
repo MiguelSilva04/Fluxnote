@@ -2,13 +2,13 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { LucideAngularModule } from 'lucide-angular';
-import { ButtonComponent, ModalComponent } from '../ui';
+import { ModalComponent } from '../ui';
 import { DocumentInviteDto } from '../../../core/models';
 
 @Component({
   selector: 'app-document-share-modal',
   standalone: true,
-  imports: [CommonModule, FormsModule, LucideAngularModule, ButtonComponent, ModalComponent],
+  imports: [CommonModule, FormsModule, LucideAngularModule, ModalComponent],
   template: `
     <app-modal
       [isOpen]="isOpen"
@@ -79,7 +79,7 @@ import { DocumentInviteDto } from '../../../core/models';
         }
 
         <!-- Active Invites List -->
-        @if (invites && invites!.length > 0) {
+        @if (invites.length > 0) {
           <div>
             <div class="flex items-center justify-between mb-2">
               <h4 class="text-sm font-medium text-gray-700">
@@ -102,7 +102,7 @@ import { DocumentInviteDto } from '../../../core/models';
                     </span>
                     @if (inv.isUsed) {
                       <span class="text-gray-400 mx-1">&middot;</span>
-                      <span class="text-orange-500">Usado</span>
+                      <span class="text-orange-500">Used</span>
                     }
                   </div>
                   <div class="flex items-center gap-2">

@@ -1,4 +1,4 @@
-import { Component, inject, signal, ViewChild, OnInit } from '@angular/core';
+import { Component, inject, signal, ViewChild, OnInit, computed } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -9,7 +9,6 @@ import { DocumentService, DocumentInviteService } from '../../core/services';
 import { Collaborator, Version, Comment, AISuggestion, DocumentInviteDto } from '../../core/models';
 import { TextEditorComponent } from './components/text-editor.component';
 
-// TODO: BACKEND INTEGRATION - Adicionar import do HttpClient quando necessário
 // import { HttpClient } from '@angular/common/http';
 // import { Observable, catchError, of } from 'rxjs';
 
@@ -49,41 +48,57 @@ import { TextEditorComponent } from './components/text-editor.component';
           </button>
           <div class="flex-1">
             <!-- Editable Title -->
-            @if (isEditingTitle()) {
-              <input
-                #titleInput
-                type="text"
-                [(ngModel)]="documentTitle"
-                (blur)="saveTitle()"
-                (keydown.enter)="saveTitle()"
-                (keydown.escape)="cancelTitleEdit()"
-                class="text-lg font-bold text-gray-900 bg-transparent border-b-2 border-[#155347] focus:outline-none w-full max-w-md"
-              />
+            @if (canEdit()) {
+              @if (isEditingTitle()) {
+                <input
+                  #titleInput
+                  type="text"
+                  [(ngModel)]="documentTitle"
+                  (blur)="saveTitle()"
+                  (keydown.enter)="saveTitle()"
+                  (keydown.escape)="cancelTitleEdit()"
+                  class="text-lg font-bold text-gray-900 bg-transparent border-b-2 border-[#155347] focus:outline-none w-full max-w-md"
+                />
+              } @else {
+                <h1
+                  (click)="startEditingTitle()"
+                  class="text-lg font-bold text-gray-900 cursor-pointer hover:text-[#155347] transition-colors"
+                  title="Click to edit title"
+                >
+                  {{ documentTitle }}
+                </h1>
+              }
             } @else {
-              <h1
-                (click)="startEditingTitle()"
-                class="text-lg font-bold text-gray-900 cursor-pointer hover:text-[#155347] transition-colors"
-                title="Click to edit title"
-              >
+              <h1 class="text-lg font-bold text-gray-900">
                 {{ documentTitle }}
               </h1>
             }
-            <p class="text-xs text-gray-500">{{ lastEditedText() }}</p>
+            <div class="flex items-center gap-2">
+              <p class="text-xs text-gray-500">{{ lastEditedText() }}</p>
+              @if (!canEdit()) {
+                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-700">
+                  <lucide-icon name="eye" class="h-3 w-3"></lucide-icon>
+                  View only
+                </span>
+              }
+            </div>
           </div>
         </div>
         <div class="flex items-center gap-2">
-          <app-button variant="outline" size="sm" [leftIcon]="true" (onClick)="showWipModal.set(true)">
-            <lucide-icon leftIcon name="sparkles" class="h-4 w-4"></lucide-icon>
-            AI Assistant
-          </app-button>
-          <app-button variant="outline" size="sm" [leftIcon]="true" (onClick)="showWipModal.set(true)">
-            <lucide-icon leftIcon name="clock" class="h-4 w-4"></lucide-icon>
-            History
-          </app-button>
-          <app-button variant="outline" size="sm" [leftIcon]="true" (onClick)="showWipModal.set(true)">
-            <lucide-icon leftIcon name="message-square" class="h-4 w-4"></lucide-icon>
-            Comments
-          </app-button>
+          @if (canEdit()) {
+            <app-button variant="outline" size="sm" [leftIcon]="true" (onClick)="showWipModal.set(true)">
+              <lucide-icon leftIcon name="sparkles" class="h-4 w-4"></lucide-icon>
+              AI Assistant
+            </app-button>
+            <app-button variant="outline" size="sm" [leftIcon]="true" (onClick)="showWipModal.set(true)">
+              <lucide-icon leftIcon name="clock" class="h-4 w-4"></lucide-icon>
+              History
+            </app-button>
+            <app-button variant="outline" size="sm" [leftIcon]="true" (onClick)="showWipModal.set(true)">
+              <lucide-icon leftIcon name="message-square" class="h-4 w-4"></lucide-icon>
+              Comments
+            </app-button>
+          }
           @if (pendingInvites().length > 0) {
             <div class="relative">
               <button
@@ -125,10 +140,12 @@ import { TextEditorComponent } from './components/text-editor.component';
               }
             </div>
           }
-          <app-button variant="outline" size="sm" [leftIcon]="true" (onClick)="openShareModal()">
-            <lucide-icon leftIcon name="share-2" class="h-4 w-4"></lucide-icon>
-            Share
-          </app-button>
+          @if (canEdit()) {
+            <app-button variant="outline" size="sm" [leftIcon]="true" (onClick)="openShareModal()">
+              <lucide-icon leftIcon name="share-2" class="h-4 w-4"></lucide-icon>
+              Share
+            </app-button>
+          }
           <button class="p-2 hover:bg-gray-100 rounded-lg">
             <lucide-icon name="ellipsis-vertical" class="h-5 w-5 text-gray-600"></lucide-icon>
           </button>
@@ -143,6 +160,7 @@ import { TextEditorComponent } from './components/text-editor.component';
             [initialContent]="initialContent"
             placeholder="Start writing your document..."
             [autoSaveDelay]="2000"
+            [editable]="canEdit()"
             (contentChange)="onContentChange($event)"
             (save)="onSave($event)"
           />
@@ -446,6 +464,11 @@ export class DocumentEditorComponent implements OnInit {
   // Conteúdo inicial do editor (carregado do backend)
   initialContent = '';
 
+  // Role efetiva do utilizador neste documento ("Editor" ou "Viewer")
+  // Team Owners/Admins recebem "Editor" via bypass no backend
+  documentRole = signal<string>('Viewer');
+  canEdit = computed(() => this.documentRole() === 'Editor');
+
   // TODO: Implementar colaboração em tempo real
   collaborators: Collaborator[] = [];
 
@@ -486,6 +509,7 @@ export class DocumentEditorComponent implements OnInit {
         this.initialContent = doc.content || '';
         this.lastEdited.set(new Date(doc.updatedAt));
         this.lastEditedText.set(this.formatLastEdited(new Date(doc.updatedAt)));
+        this.documentRole.set(doc.role || 'Viewer');
         this.isLoading.set(false);
         this.loadDocumentInvites(doc.id);
       },
@@ -629,6 +653,7 @@ export class DocumentEditorComponent implements OnInit {
   }
 
   startEditingTitle(): void {
+    if (!this.canEdit()) return;
     this.originalTitle = this.documentTitle;
     this.isEditingTitle.set(true);
     setTimeout(() => {
@@ -680,6 +705,7 @@ export class DocumentEditorComponent implements OnInit {
   }
 
   onSave(content: string): void {
+    if (!this.canEdit()) return;
     if (!this.documentId) {
       console.warn('Cannot save: Document ID is missing');
       this.editor.setSaveStatus('error');

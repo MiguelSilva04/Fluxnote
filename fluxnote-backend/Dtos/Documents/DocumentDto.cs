@@ -99,5 +99,15 @@ namespace Fluxnote.Backend.Dtos.Documents
         /// Usado para pesquisa full-text e previews.
         /// </remarks>
         public string? PlainText { get; set; }
+
+        /// <summary>
+        /// Role efetiva do utilizador neste documento.
+        /// </summary>
+        /// <remarks>
+        /// Valores possíveis: "Editor", "Viewer".
+        /// Team Owners e TeamAdmins recebem sempre "Editor" (bypass à DocumentRole).
+        /// Members recebem o valor do seu DocumentPermission (Editor ou Viewer).
+        /// </remarks>
+        public string Role { get; set; } = "Viewer";
     }
 }

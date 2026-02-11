@@ -64,6 +64,7 @@ export class TextEditorComponent implements OnInit, AfterViewInit, OnDestroy {
   initialContent = input<string>('');
   placeholder = input<string>('Start writing...');
   autoSaveDelay = input<number>(2000);
+  editable = input<boolean>(true);
 
   contentChange = output<string>();
   save = output<string>();
@@ -84,6 +85,9 @@ export class TextEditorComponent implements OnInit, AfterViewInit, OnDestroy {
     this.contentChange$
       .pipe(debounceTime(this.autoSaveDelay()), takeUntil(this.destroy$))
       .subscribe((content) => {
+        if (!this.editable()) {
+          return;
+        }
         this.triggerSave(content);
       });
   }
@@ -125,6 +129,11 @@ export class TextEditorComponent implements OnInit, AfterViewInit, OnDestroy {
       this.quill.root.innerHTML = this.initialContent();
     }
 
+    // Define modo read-only baseado no input editable
+    if (!this.editable()) {
+      this.quill.enable(false);
+    }
+
     this.quill.on('text-change', () => {
       this.triggerContentChange();
       this.saveStatus.set('idle');
@@ -144,6 +153,11 @@ export class TextEditorComponent implements OnInit, AfterViewInit, OnDestroy {
     this.quill.root.addEventListener(
       'drop',
       (e: DragEvent) => {
+        if (!this.editable()) {
+          e.preventDefault();
+          e.stopImmediatePropagation();
+          return;
+        }
         const files = e.dataTransfer?.files;
         if (files && files.length > 0) {
           const file = files[0];
@@ -157,10 +171,10 @@ export class TextEditorComponent implements OnInit, AfterViewInit, OnDestroy {
       true
     );
 
-    // Handler de clique em imagem para manipulação
+    // Handler de clique em imagem para manipulação (apenas para editores)
     this.quill.root.addEventListener('click', (e: MouseEvent) => {
       const target = e.target as HTMLElement;
-      if (target.tagName === 'IMG') {
+      if (target.tagName === 'IMG' && this.editable()) {
         e.preventDefault();
         this.selectImage(target as HTMLImageElement);
       } else {
