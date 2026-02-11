@@ -221,10 +221,12 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("spa", policy =>
     {
-        policy.WithOrigins(
-            "http://localhost:4200",    // Frontend Angular desenvolvimento
-            "http://127.0.0.1:4200"     // Alternativa localhost
-            )
+        // Permite qualquer origem na porta 4200 (LAN, localhost, etc.)
+        policy.SetIsOriginAllowed(origin =>
+               {
+                   var uri = new Uri(origin);
+                   return uri.Port == 4200 || uri.Port == 80;
+               })
                .WithHeaders("Content-Type", "Authorization", "X-Requested-With")
                .WithMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                // Expõe headers de rate limiting para o cliente

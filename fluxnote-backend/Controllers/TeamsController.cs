@@ -79,8 +79,8 @@ namespace Fluxnote.Backend.Controllers
 
             // Obter equipas onde o utilizador é membro (incluindo a role)
             var userTeamMemberships = await _context.TeamMember
-                .Where(m => m.UserId == userId)
-                .ToDictionaryAsync(m => m.TeamId, m => (int)m.Role);
+                .Where(m => m.UserId == userId && m.TeamId != null)
+                .ToDictionaryAsync(m => m.TeamId!.Value, m => (int)m.Role);
 
             var teams = await _context.Team
                 .Include(t => t.Members)

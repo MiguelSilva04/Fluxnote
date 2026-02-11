@@ -108,7 +108,7 @@ namespace Fluxnote.Backend.Controllers
             _context.DocumentInvite.Add(invite);
             await _context.SaveChangesAsync();
 
-            var frontendUrl = _configuration["Frontend:Url"] ?? "http://localhost:4200";
+            var frontendUrl = GetFrontendUrl();
 
             var dto = new DocumentInviteDto
             {
@@ -160,7 +160,7 @@ namespace Fluxnote.Backend.Controllers
                 });
             }
 
-            var frontendUrl = _configuration["Frontend:Url"] ?? "http://localhost:4200";
+            var frontendUrl = GetFrontendUrl();
 
             var invites = await _context.DocumentInvite
                 .Include(di => di.CreatedBy)
@@ -235,7 +235,7 @@ namespace Fluxnote.Backend.Controllers
                 });
             }
 
-            var frontendUrl = _configuration["Frontend:Url"] ?? "http://localhost:4200";
+            var frontendUrl = GetFrontendUrl();
 
             var dto = new DocumentInviteDto
             {
@@ -424,6 +424,18 @@ namespace Fluxnote.Backend.Controllers
             await _context.SaveChangesAsync();
 
             return NoContent();
+        }
+
+        /// <summary>
+        /// Deteta automaticamente o URL do frontend a partir do header Origin do pedido,
+        /// com fallback para a configuração ou localhost.
+        /// </summary>
+        private string GetFrontendUrl()
+        {
+            var origin = Request.Headers.Origin.FirstOrDefault();
+            return !string.IsNullOrEmpty(origin)
+                ? origin.TrimEnd('/')
+                : _configuration["Frontend:Url"] ?? "http://localhost:4200";
         }
     }
 }
