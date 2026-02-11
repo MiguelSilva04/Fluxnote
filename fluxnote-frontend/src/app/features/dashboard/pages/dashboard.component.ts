@@ -345,7 +345,7 @@ import { DocumentDto, TeamGet } from '../../../core/models';
             <lucide-icon name="copy" class="h-6 w-6 text-blue-600"></lucide-icon>
           </div>
           <p class="text-gray-600">
-            Are you sure you want to duplicate this document? A new copy will be created with "(Copy)" appended to the title.
+            Are you sure you want to duplicate this document? A new copy will be created with "(Copy)" next to the title.
           </p>
         </div>
         <div footer class="flex gap-3 w-full justify-center">
