@@ -155,6 +155,26 @@ export class DocumentService {
     );
   }
 
+  /**
+   * Duplica um documento existente
+   * @param id ID do documento a duplicar
+   * @returns Observable com o documento duplicado
+   */
+  duplicateDocument(id: number): Observable<DocumentDto> {
+    return this.http.post<DocumentDto>(`/api/documents/${id}/duplicate`, {}).pipe(
+      tap({
+        next: (doc) => {
+          // Adiciona o novo documento à lista local
+          this._documents.update(docs => [doc, ...docs]);
+        }
+      }),
+      catchError(error => {
+        console.error('Error duplicating document:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
   // ===============================
   // Métodos da Lixeira (Trash)
   // ===============================

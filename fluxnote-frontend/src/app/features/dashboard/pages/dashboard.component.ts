@@ -139,6 +139,13 @@ import { DocumentDto, TeamGet } from '../../../core/models';
                         @if (openDocumentMenu() === doc.id) {
                           <div class="absolute right-0 top-8 bg-white rounded-lg shadow-lg border border-gray-200 py-1 min-w-[140px] z-10">
                             <button
+                              (click)="handleDuplicateDocument($event, doc.id)"
+                              class="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                            >
+                              <lucide-icon name="copy" class="h-4 w-4"></lucide-icon>
+                              Duplicate
+                            </button>
+                            <button
                               (click)="handleDeleteDocument($event, doc.id)"
                               class="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
                             >
@@ -324,6 +331,34 @@ import { DocumentDto, TeamGet } from '../../../core/models';
           </app-button>
         </div>
       </app-modal>
+
+      <!-- Duplicate Confirmation Modal -->
+      <app-modal
+        [isOpen]="isDuplicateModalOpen()"
+        title="Duplicate Document"
+        (onClose)="closeDuplicateModal()"
+        [hasFooter]="true"
+        maxWidth="sm"
+      >
+        <div class="text-center">
+          <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 mb-4">
+            <lucide-icon name="copy" class="h-6 w-6 text-blue-600"></lucide-icon>
+          </div>
+          <p class="text-gray-600">
+            Are you sure you want to duplicate this document? A new copy will be created with "(Copy)" appended to the title.
+          </p>
+        </div>
+        <div footer class="flex gap-3 w-full justify-center">
+          <app-button variant="ghost" customClass="flex-1 max-w-[120px]" (onClick)="closeDuplicateModal()">Cancel</app-button>
+          <app-button 
+            customClass="flex-1 max-w-[120px] bg-[#155347] hover:bg-[#0d3d31]" 
+            (onClick)="confirmDuplicate()"
+            [isLoading]="isDuplicating()"
+          >
+            Duplicate
+          </app-button>
+        </div>
+      </app-modal>
     </app-dashboard-layout>
   `
 })
@@ -350,6 +385,11 @@ export class DashboardComponent implements OnInit {
   isDeleteModalOpen = signal(false);
   documentToDelete = signal<number | null>(null);
   isDeleting = signal(false);
+
+  // Duplicate modal state
+  isDuplicateModalOpen = signal(false);
+  documentToDuplicate = signal<number | null>(null);
+  isDuplicating = signal(false);
 
   // Loading states
   isLoading = this.documentService.isLoading;
@@ -532,6 +572,35 @@ export class DashboardComponent implements OnInit {
         this.isDeleting.set(false);
         console.error('Error deleting document:', err);
         // Poderia mostrar um toast de erro aqui
+      }
+    });
+  }
+
+  handleDuplicateDocument(event: Event, docId: number): void {
+    event.stopPropagation();
+    this.openDocumentMenu.set(null);
+    this.documentToDuplicate.set(docId);
+    this.isDuplicateModalOpen.set(true);
+  }
+
+  closeDuplicateModal(): void {
+    this.isDuplicateModalOpen.set(false);
+    this.documentToDuplicate.set(null);
+  }
+
+  confirmDuplicate(): void {
+    const docId = this.documentToDuplicate();
+    if (!docId) return;
+
+    this.isDuplicating.set(true);
+    this.documentService.duplicateDocument(docId).subscribe({
+      next: (doc) => {
+        this.isDuplicating.set(false);
+        this.closeDuplicateModal();
+      },
+      error: (err) => {
+        this.isDuplicating.set(false);
+        console.error('Error duplicating document:', err);
       }
     });
   }
