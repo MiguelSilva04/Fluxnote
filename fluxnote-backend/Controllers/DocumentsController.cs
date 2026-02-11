@@ -1,6 +1,7 @@
 using Fluxnote.Backend.Data;
 using Fluxnote.Backend.Dtos.Documents;
 using Fluxnote.Backend.Models;
+using Fluxnote.Backend.Services.AI;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -54,6 +55,7 @@ namespace Fluxnote.Backend.Controllers
     {
         private readonly FluxnoteServerContext _context;
         private readonly UserManager<User> _userManager;
+        private readonly IAIService _aiService;
 
         /// <summary>
         /// Limite de documentos para o plano Free.
@@ -65,10 +67,12 @@ namespace Fluxnote.Backend.Controllers
         /// </summary>
         /// <param name="context">Contexto da base de dados.</param>
         /// <param name="userManager">Gestor de utilizadores do Identity.</param>
-        public DocumentsController(FluxnoteServerContext context, UserManager<User> userManager)
+        /// <param name="aiService">Serviço de IA generativa.</param>
+        public DocumentsController(FluxnoteServerContext context, UserManager<User> userManager, IAIService aiService)
         {
             _context = context;
             _userManager = userManager;
+            _aiService = aiService;
         }
 
         /// <summary>
@@ -514,6 +518,92 @@ namespace Fluxnote.Backend.Controllers
             };
 
             return CreatedAtAction(nameof(GetDocument), new { id = duplicatedDocument.Id }, dto);
+        }
+
+        /// <summary>
+        /// Gera um resumo do documento usando IA (Google Gemini).
+        /// </summary>
+        /// <param name="id">ID do documento.</param>
+        /// <returns>
+        /// <list type="bullet">
+        ///     <item><b>200 OK:</b> Resumo gerado com sucesso.</item>
+        ///     <item><b>400 Bad Request:</b> Documento sem conteúdo.</item>
+        ///     <item><b>401 Unauthorized:</b> Token inválido.</item>
+        ///     <item><b>403 Forbidden:</b> Sem acesso ao documento.</item>
+        ///     <item><b>404 Not Found:</b> Documento não encontrado.</item>
+        ///     <item><b>500 Internal Server Error:</b> Erro no serviço de IA.</item>
+        /// </list>
+        /// </returns>
+        [HttpPost("{id}/summary")]
+        public async Task<ActionResult> GenerateSummary(int id)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId is null)
+                return Unauthorized(new { message = "User not authenticated." });
+
+            var document = await _context.Document
+                .FirstOrDefaultAsync(d => d.Id == id && !d.IsDeleted);
+
+            if (document is null)
+                return NotFound(new { message = "Document not found." });
+
+            // Verificar que o utilizador é membro da equipa
+            var userTeamMember = await _context.TeamMember
+                .FirstOrDefaultAsync(m => m.TeamId == document.TeamId && m.UserId == userId);
+
+            if (userTeamMember == null)
+            {
+                return StatusCode(StatusCodes.Status403Forbidden, new
+                {
+                    message = "Permission denied.",
+                    errors = new[] { "You are not a member of this team." }
+                });
+            }
+
+            // Verificar acesso (Owner/Admin ou com DocumentPermission)
+            bool isOwnerOrAdmin = userTeamMember.Role == TeamRole.Owner || userTeamMember.Role == TeamRole.TeamAdmin;
+            if (!isOwnerOrAdmin)
+            {
+                var hasPermission = await _context.DocumentPermission
+                    .AnyAsync(dp => dp.TeamMemberId == userTeamMember.Id && dp.DocumentId == document.Id);
+
+                if (!hasPermission)
+                {
+                    return StatusCode(StatusCodes.Status403Forbidden, new
+                    {
+                        message = "Permission denied.",
+                        errors = new[] { "You don't have access to this document." }
+                    });
+                }
+            }
+
+            // Verificar se o documento tem conteúdo
+            if (string.IsNullOrWhiteSpace(document.PlainText))
+            {
+                return BadRequest(new { message = "The document has no content to summarize." });
+            }
+
+            try
+            {
+                var summary = await _aiService.GenerateSummaryAsync(document.PlainText);
+                return Ok(new { summary });
+            }
+            catch (InvalidOperationException ex)
+            {
+                // Rate limit da API Gemini
+                return StatusCode(StatusCodes.Status429TooManyRequests, new
+                {
+                    message = ex.Message
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    message = "Failed to generate summary.",
+                    errors = new[] { ex.Message }
+                });
+            }
         }
 
         /// <summary>

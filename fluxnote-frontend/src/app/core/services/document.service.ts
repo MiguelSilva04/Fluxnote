@@ -175,6 +175,20 @@ export class DocumentService {
     );
   }
 
+  /**
+   * Gera um resumo do documento usando IA
+   * @param id ID do documento
+   * @returns Observable com o resumo gerado
+   */
+  generateSummary(id: number): Observable<{ summary: string }> {
+    return this.http.post<{ summary: string }>(`/api/documents/${id}/summary`, {}).pipe(
+      catchError(error => {
+        console.error('Error generating summary:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
   // ===============================
   // Métodos da Lixeira (Trash)
   // ===============================

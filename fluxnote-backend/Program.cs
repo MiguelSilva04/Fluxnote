@@ -31,6 +31,7 @@ using Fluxnote.Backend.Models;
 using Fluxnote.Backend.Services.Auth;
 using Fluxnote.Backend.Services.Authorization;
 using Fluxnote.Backend.Services.Email;
+using Fluxnote.Backend.Services.AI;
 using Fluxnote.Backend.Validators;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -134,6 +135,15 @@ builder.Services.AddScoped<TeamAutorizationService>();
 
 // Serviço de geração e validação de tokens JWT
 builder.Services.AddScoped<TokenService>();
+
+// ==============================================================================
+// 6. SERVIÇO DE IA (Google Gemini)
+// ==============================================================================
+// Free tier: 15 RPM, 1M tokens/dia com gemini-2.0-flash.
+// Local: ApiKey lida de user-secrets (dotnet user-secrets set "Gemini:ApiKey" "...")
+// Docker: ApiKey lida de variável de ambiente Gemini__ApiKey (definida no .env)
+builder.Services.Configure<GeminiOptions>(builder.Configuration.GetSection("Gemini"));
+builder.Services.AddHttpClient<IAIService, GeminiAIService>();
 
 // ==============================================================================
 // 5. ASP.NET CORE IDENTITY

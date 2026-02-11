@@ -27,6 +27,7 @@ services:
       - ASPNETCORE_ENVIRONMENT=Production
       - ConnectionStrings__FluxnoteServerContext=Server=db;Database=FluxnoteDb;User Id=sa;Password=FluxNote@2024!;TrustServerCertificate=True;
       - Jwt__Key=${JWT_KEY}
+      - Gemini__ApiKey=${GEMINI_API_KEY}
     env_file:
       - .env
     ports:
