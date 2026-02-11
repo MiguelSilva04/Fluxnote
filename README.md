@@ -43,5 +43,24 @@ Para executar o projeto através do Docker, seguir os seguintes passos **na raiz
    GEMINI_API_KEY=COLAR_GEMINI_KEY_AQUI
    ```
 
-2. Correr `docker compose down`
-3. Correr `docker compose up --build`
+### Ambiente de Desenvolvimento (DEV)
+
+```powershell
+# Subir containers DEV
+docker compose -p fluxnote up
+
+# Parar containers DEV
+docker compose -p fluxnote down
+
+```
+
+### Ambiente de Produção (PROD)
+
+```powershell
+# Subir containers PROD
+docker compose -p fluxnote-prod -f docker-compose.prod.yml up
+
+# Parar containers PROD
+docker compose -p fluxnote-prod -f docker-compose.prod.yml down
+
+```
