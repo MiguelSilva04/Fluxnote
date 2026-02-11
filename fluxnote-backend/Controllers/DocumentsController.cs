@@ -446,14 +446,22 @@ namespace Fluxnote.Backend.Controllers
                 });
             }
 
-            // Verificar se é Owner ou TeamAdmin (têm acesso total)
-            bool hasAccess = userTeamMember.Role == TeamRole.Owner || userTeamMember.Role == TeamRole.TeamAdmin;
+            // Verificar se é Owner ou TeamAdmin (bypass à DocumentRole - podem sempre editar)
+            bool isOwnerOrAdmin = userTeamMember.Role == TeamRole.Owner || userTeamMember.Role == TeamRole.TeamAdmin;
+            bool hasAccess = isOwnerOrAdmin;
+            string effectiveRole = isOwnerOrAdmin ? "Editor" : "Viewer";
 
             // Se não for Owner/Admin, verificar DocumentPermission
             if (!hasAccess)
             {
-                hasAccess = await _context.DocumentPermission
-                    .AnyAsync(dp => dp.TeamMemberId == userTeamMember.Id && dp.DocumentId == document.Id);
+                var permission = await _context.DocumentPermission
+                    .FirstOrDefaultAsync(dp => dp.TeamMemberId == userTeamMember.Id && dp.DocumentId == document.Id);
+
+                if (permission != null)
+                {
+                    hasAccess = true;
+                    effectiveRole = permission.Role == DocumentRole.Editor ? "Editor" : "Viewer";
+                }
             }
 
             if (!hasAccess)
@@ -477,7 +485,8 @@ namespace Fluxnote.Backend.Controllers
                 UpdatedAt = document.UpdatedAt,
                 IsDeleted = document.IsDeleted,
                 Content = document.Content != null ? System.Text.Encoding.UTF8.GetString(document.Content) : null,
-                PlainText = document.PlainText
+                PlainText = document.PlainText,
+                Role = effectiveRole
             };
 
             return Ok(dto);
@@ -535,8 +544,10 @@ namespace Fluxnote.Backend.Controllers
                 });
             }
 
-            // Verificar se é Owner ou TeamAdmin (podem editar)
-            bool canEdit = userTeamMember.Role == TeamRole.Owner || userTeamMember.Role == TeamRole.TeamAdmin;
+            // Verificar se é Owner ou TeamAdmin (bypass à DocumentRole - podem sempre editar)
+            bool isOwnerOrAdmin = userTeamMember.Role == TeamRole.Owner || userTeamMember.Role == TeamRole.TeamAdmin;
+            bool canEdit = isOwnerOrAdmin;
+            string effectiveRole = isOwnerOrAdmin ? "Editor" : "Viewer";
 
             // Se não for Owner/Admin, verificar se tem DocumentPermission com Role = Editor
             if (!canEdit)
@@ -544,7 +555,11 @@ namespace Fluxnote.Backend.Controllers
                 var permission = await _context.DocumentPermission
                     .FirstOrDefaultAsync(dp => dp.TeamMemberId == userTeamMember.Id && dp.DocumentId == document.Id);
 
-                canEdit = permission != null && permission.Role == DocumentRole.Editor;
+                if (permission != null)
+                {
+                    effectiveRole = permission.Role == DocumentRole.Editor ? "Editor" : "Viewer";
+                    canEdit = permission.Role == DocumentRole.Editor;
+                }
             }
 
             if (!canEdit)
@@ -588,7 +603,8 @@ namespace Fluxnote.Backend.Controllers
                 UpdatedAt = document.UpdatedAt,
                 IsDeleted = document.IsDeleted,
                 Content = document.Content != null ? System.Text.Encoding.UTF8.GetString(document.Content) : null,
-                PlainText = document.PlainText
+                PlainText = document.PlainText,
+                Role = effectiveRole
             };
 
             return Ok(dto);
