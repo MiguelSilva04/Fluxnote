@@ -123,6 +123,21 @@ export class TeamsComponent {
   isDeleting = signal(false);
 
   /**
+   * Signal que controla a visibilidade do modal de duplicate.
+   */
+  isDuplicateModalOpen = signal(false);
+
+  /**
+   * ID do documento a duplicar.
+   */
+  documentToDuplicate = signal<number | null>(null);
+
+  /**
+   * Signal que controla o estado de loading do duplicate.
+   */
+  isDuplicating = signal(false);
+
+  /**
    * Nome da nova equipa a ser criada.
    */
   newTeamName = '';
@@ -242,6 +257,46 @@ export class TeamsComponent {
       error: (err) => {
         this.isDeleting.set(false);
         console.error('Error deleting document:', err);
+      }
+    });
+  }
+
+  /**
+   * Abre o modal de confirmação de duplicação.
+   */
+  handleDuplicateDocument(event: Event, docId: number): void {
+    event.stopPropagation();
+    this.openDocumentMenu.set(null);
+    this.documentToDuplicate.set(docId);
+    this.isDuplicateModalOpen.set(true);
+  }
+
+  /**
+   * Fecha o modal de confirmação de duplicate.
+   */
+  closeDuplicateModal(): void {
+    this.isDuplicateModalOpen.set(false);
+    this.documentToDuplicate.set(null);
+  }
+
+  /**
+   * Confirma e executa a duplicação do documento.
+   */
+  confirmDuplicate(): void {
+    const docId = this.documentToDuplicate();
+    if (!docId) return;
+
+    this.isDuplicating.set(true);
+    this.documentService.duplicateDocument(docId).subscribe({
+      next: (doc) => {
+        this.isDuplicating.set(false);
+        this.closeDuplicateModal();
+        // Navegar para o novo documento duplicado
+        this.router.navigate(['/editor', doc.id]);
+      },
+      error: (err) => {
+        this.isDuplicating.set(false);
+        console.error('Error duplicating document:', err);
       }
     });
   }

@@ -401,6 +401,122 @@ namespace Fluxnote.Backend.Controllers
         }
 
         /// <summary>
+        /// Duplica um documento existente.
+        /// </summary>
+        /// <param name="id">ID do documento a duplicar.</param>
+        /// <returns>
+        /// <list type="bullet">
+        ///     <item><b>201 Created:</b> Documento duplicado com sucesso (DocumentDto).</item>
+        ///     <item><b>400 Bad Request:</b> Limite de documentos atingido.</item>
+        ///     <item><b>401 Unauthorized:</b> Token inválido.</item>
+        ///     <item><b>403 Forbidden:</b> Utilizador não é Owner da equipa.</item>
+        ///     <item><b>404 Not Found:</b> Documento não encontrado.</item>
+        /// </list>
+        /// </returns>
+        /// <remarks>
+        /// <b>Comportamento:</b>
+        /// <list type="bullet">
+        ///     <item><description>Cria cópia do documento com título "[Original] (Copy)"</description></item>
+        ///     <item><description>Copia conteúdo e plainText</description></item>
+        ///     <item><description>NÃO copia DocumentPermissions (cópia limpa)</description></item>
+        ///     <item><description>Cria DocumentPermission apenas para o Owner</description></item>
+        /// </list>
+        /// <b>Permissão:</b> Apenas o Owner da equipa pode duplicar documentos.
+        /// </remarks>
+        [HttpPost("{id}/duplicate")]
+        public async Task<ActionResult<DocumentDto>> DuplicateDocument(int id)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId is null)
+                return Unauthorized(new { message = "User not authenticated." });
+
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user is null)
+                return Unauthorized(new { message = "User not found." });
+
+            // Obter o documento original
+            var originalDocument = await _context.Document
+                .Include(d => d.Team)
+                    .ThenInclude(t => t.Members)
+                .FirstOrDefaultAsync(d => d.Id == id && !d.IsDeleted);
+
+            if (originalDocument is null)
+            {
+                return NotFound(new { message = "Document not found." });
+            }
+
+            // Verificar se o utilizador é Owner da equipa
+            var ownerTeamMember = originalDocument.Team.Members
+                .FirstOrDefault(m => m.UserId == userId && m.Role == TeamRole.Owner);
+
+            if (ownerTeamMember == null)
+            {
+                return StatusCode(StatusCodes.Status403Forbidden, new
+                {
+                    message = "Permission denied.",
+                    errors = new[] { "Only the team Owner can duplicate documents." }
+                });
+            }
+
+            // Validar limite de documentos (Free = 10)
+            var userDocumentCount = await _context.Document
+                .CountAsync(d => d.CreatedById == userId && !d.IsDeleted);
+
+            if (userDocumentCount >= FreeDocumentLimit)
+            {
+                return BadRequest(new
+                {
+                    message = "Document limit reached.",
+                    errors = new[] { $"Free plan allows up to {FreeDocumentLimit} documents." }
+                });
+            }
+
+            var now = DateTime.UtcNow;
+            var duplicatedDocument = new Document
+            {
+                Title = $"{originalDocument.Title} (Copy)",
+                TeamId = originalDocument.TeamId,
+                Content = originalDocument.Content,
+                PlainText = originalDocument.PlainText,
+                CreatedAt = now,
+                UpdatedAt = now,
+                CreatedById = userId,
+                IsDeleted = false
+            };
+
+            _context.Document.Add(duplicatedDocument);
+            await _context.SaveChangesAsync();
+
+            // Criar DocumentPermission apenas para o Owner
+            var documentPermission = new DocumentPermission
+            {
+                TeamMemberId = ownerTeamMember.Id,
+                DocumentId = duplicatedDocument.Id,
+                Role = DocumentRole.Editor,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+
+            _context.DocumentPermission.Add(documentPermission);
+            await _context.SaveChangesAsync();
+
+            var dto = new DocumentDto
+            {
+                Id = duplicatedDocument.Id,
+                Title = duplicatedDocument.Title,
+                TeamId = duplicatedDocument.TeamId,
+                TeamName = originalDocument.Team.Name,
+                CreatedById = duplicatedDocument.CreatedById,
+                CreatedByName = user.FullName ?? user.Email ?? "",
+                CreatedAt = duplicatedDocument.CreatedAt,
+                UpdatedAt = duplicatedDocument.UpdatedAt,
+                IsDeleted = duplicatedDocument.IsDeleted
+            };
+
+            return CreatedAtAction(nameof(GetDocument), new { id = duplicatedDocument.Id }, dto);
+        }
+
+        /// <summary>
         /// Obtém os detalhes completos de um documento, incluindo conteúdo.
         /// </summary>
         /// <param name="id">ID do documento.</param>
