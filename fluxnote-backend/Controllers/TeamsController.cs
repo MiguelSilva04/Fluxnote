@@ -79,8 +79,8 @@ namespace Fluxnote.Backend.Controllers
 
             // Obter equipas onde o utilizador é membro (incluindo a role)
             var userTeamMemberships = await _context.TeamMember
-                .Where(m => m.UserId == userId)
-                .ToDictionaryAsync(m => m.TeamId, m => (int)m.Role);
+                .Where(m => m.UserId == userId && m.TeamId != null)
+                .ToDictionaryAsync(m => m.TeamId!.Value, m => (int)m.Role);
 
             var teams = await _context.Team
                 .Include(t => t.Members)
@@ -167,7 +167,7 @@ namespace Fluxnote.Backend.Controllers
                 return NotFound(new { message = "Team not found." });
             }
 
-            var isOwnerOrAdmin = membership.Role == TeamRole.Owner || membership.Role == TeamRole.TeamAdmin;
+            var isOwner = membership.Role == TeamRole.Owner;
 
             var dto = new TeamDto
             {
@@ -193,12 +193,14 @@ namespace Fluxnote.Backend.Controllers
                     Title = d.Title,
                     UpdatedAt = d.UpdatedAt,
                     CreatedById = d.CreatedById,
-                    Permissions = isOwnerOrAdmin
+                    // Apenas Owner vê todos os documentos; TeamAdmin e Member precisam de DocumentPermission
+                    Permissions = isOwner
                         ? d.Permissions.Select(p => new DocumentPermissionSummaryDto
                         {
                             Id = p.Id,
                             TeamMemberId = p.TeamMemberId,
                             MemberName = p.TeamMember.Name,
+                            MemberRole = (int)p.TeamMember.Role,
                             DocumentRole = (int)p.Role
                         }).ToList()
                         : (d.Permissions.Any(p => p.TeamMemberId == membership.Id)
@@ -207,6 +209,7 @@ namespace Fluxnote.Backend.Controllers
                                 Id = p.Id,
                                 TeamMemberId = p.TeamMemberId,
                                 MemberName = p.TeamMember.Name,
+                                MemberRole = (int)p.TeamMember.Role,
                                 DocumentRole = (int)p.Role
                             }).ToList()
                             : new List<DocumentPermissionSummaryDto>())
@@ -220,42 +223,85 @@ namespace Fluxnote.Backend.Controllers
         /// Atualiza os dados de uma equipa.
         /// </summary>
         /// <param name="id">ID da equipa.</param>
-        /// <param name="team">Objeto Team com dados atualizados.</param>
+        /// <param name="request">Dados a atualizar (nome, opcionalmente OwnerId).</param>
         /// <returns>
         /// <list type="bullet">
         ///     <item><b>204 No Content:</b> Equipa atualizada com sucesso.</item>
-        ///     <item><b>400 Bad Request:</b> ID não corresponde ao objeto.</item>
+        ///     <item><b>400 Bad Request:</b> Dados inválidos.</item>
+        ///     <item><b>401 Unauthorized:</b> Token inválido.</item>
+        ///     <item><b>403 Forbidden:</b> Sem permissão para atualizar.</item>
         ///     <item><b>404 Not Found:</b> Equipa não encontrada.</item>
         /// </list>
         /// </returns>
-        /// <remarks>
-        /// <b>⚠️ Nota:</b> Este endpoint necessita de validação de permissões adicionais.
-        /// </remarks>
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutTeam(int id, Team team)
+        public async Task<IActionResult> PutTeam(int id, UpdateTeamRequest request)
         {
-            if (id != team.Id)
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId is null)
+                return Unauthorized(new { message = "User not authenticated." });
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            if (string.IsNullOrWhiteSpace(request.Name))
+                return BadRequest(new { message = "Team name cannot be empty." });
+
+            var team = await _context.Team
+                .Include(t => t.Members)
+                .FirstOrDefaultAsync(t => t.Id == id);
+
+            if (team == null)
+                return NotFound(new { message = "Team not found." });
+
+            // Verificar se o utilizador é membro da equipa
+            var membership = team.Members.FirstOrDefault(m => m.UserId == userId);
+            if (membership == null)
             {
-                return BadRequest();
+                return StatusCode(StatusCodes.Status403Forbidden, new
+                {
+                    message = "Permission denied.",
+                    errors = new[] { "You are not a member of this team." }
+                });
             }
 
-            _context.Entry(team).State = EntityState.Modified;
+            // Apenas Owner ou TeamAdmin podem atualizar a equipa
+            if (membership.Role != TeamRole.Owner && membership.Role != TeamRole.TeamAdmin)
+            {
+                return StatusCode(StatusCodes.Status403Forbidden, new
+                {
+                    message = "Permission denied.",
+                    errors = new[] { "Only the team owner or admin can update the team." }
+                });
+            }
 
-            try
+            // Atualizar campos permitidos
+            team.Name = request.Name.Trim();
+            team.UpdatedAt = DateTime.UtcNow;
+
+            // Permitir definir OwnerId (usado no fluxo de criação)
+            if (request.OwnerId.HasValue)
             {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!TeamExists(id))
+                // Apenas Owner pode alterar o OwnerId
+                if (membership.Role != TeamRole.Owner && team.OwnerId != 0)
                 {
-                    return NotFound();
+                    return StatusCode(StatusCodes.Status403Forbidden, new
+                    {
+                        message = "Permission denied.",
+                        errors = new[] { "Only the team owner can change the owner." }
+                    });
                 }
-                else
+
+                // Verificar que o novo owner é um membro válido da equipa
+                var newOwner = team.Members.FirstOrDefault(m => m.Id == request.OwnerId.Value);
+                if (newOwner == null)
                 {
-                    throw;
+                    return BadRequest(new { message = "The specified owner is not a member of the team." });
                 }
+
+                team.OwnerId = request.OwnerId.Value;
             }
+
+            await _context.SaveChangesAsync();
 
             return NoContent();
         }
@@ -263,10 +309,12 @@ namespace Fluxnote.Backend.Controllers
         /// <summary>
         /// Cria uma nova equipa.
         /// </summary>
-        /// <param name="team">Dados da equipa a criar.</param>
+        /// <param name="request">Dados da equipa a criar (nome).</param>
         /// <returns>
         /// <list type="bullet">
         ///     <item><b>201 Created:</b> Equipa criada com sucesso.</item>
+        ///     <item><b>400 Bad Request:</b> Dados inválidos.</item>
+        ///     <item><b>401 Unauthorized:</b> Token inválido.</item>
         /// </list>
         /// </returns>
         /// <remarks>
@@ -274,8 +322,26 @@ namespace Fluxnote.Backend.Controllers
         /// DocumentsController quando um documento é criado sem especificar equipa.
         /// </remarks>
         [HttpPost]
-        public async Task<ActionResult<Team>> PostTeam(Team team)
+        public async Task<ActionResult<Team>> PostTeam(CreateTeamRequest request)
         {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId is null)
+                return Unauthorized(new { message = "User not authenticated." });
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            if (string.IsNullOrWhiteSpace(request.Name))
+                return BadRequest(new { message = "Team name cannot be empty." });
+
+            var team = new Team
+            {
+                Name = request.Name.Trim(),
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow,
+                IsActive = true
+            };
+
             _context.Team.Add(team);
             await _context.SaveChangesAsync();
 
@@ -293,13 +359,13 @@ namespace Fluxnote.Backend.Controllers
         /// </list>
         /// </returns>
         /// <remarks>
-        /// <b>⚠️ OPERAÇÃO DESTRUTIVA - Eliminação em Cascata:</b>
+        /// <b>OPERAÇÃO DESTRUTIVA - Eliminação em Cascata:</b>
         /// <list type="bullet">
         ///     <item><description>Todos os TeamMember da equipa são removidos</description></item>
         ///     <item><description>Todos os Document da equipa são removidos</description></item>
         ///     <item><description>A equipa é removida</description></item>
         /// </list>
-        /// <b>⚠️ Nota:</b> Este endpoint necessita de validação de permissões (apenas Owner deveria poder eliminar).
+        /// <b>Nota:</b> Este endpoint necessita de validação de permissões (apenas Owner deveria poder eliminar).
         /// </remarks>
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteTeam(int id)
@@ -327,7 +393,24 @@ namespace Fluxnote.Backend.Controllers
                 });
             }
 
-            // Remove primeiro todos os membros da equipa
+            // Remove DocumentPermissions e DocumentInvites associados aos documentos da equipa
+            var documentIds = team.Documents.Select(d => d.Id).ToList();
+            if (documentIds.Any())
+            {
+                var permissions = await _context.DocumentPermission
+                    .Where(p => documentIds.Contains(p.DocumentId))
+                    .ToListAsync();
+                if (permissions.Any())
+                    _context.DocumentPermission.RemoveRange(permissions);
+
+                var invites = await _context.DocumentInvite
+                    .Where(i => documentIds.Contains(i.DocumentId))
+                    .ToListAsync();
+                if (invites.Any())
+                    _context.DocumentInvite.RemoveRange(invites);
+            }
+
+            // Remove todos os membros da equipa
             if (team.Members != null && team.Members.Any())
             {
                 _context.TeamMember.RemoveRange(team.Members);

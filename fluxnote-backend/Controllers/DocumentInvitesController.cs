@@ -108,7 +108,7 @@ namespace Fluxnote.Backend.Controllers
             _context.DocumentInvite.Add(invite);
             await _context.SaveChangesAsync();
 
-            var frontendUrl = _configuration["Frontend:Url"] ?? "http://localhost:4200";
+            var frontendUrl = GetFrontendUrl();
 
             var dto = new DocumentInviteDto
             {
@@ -160,7 +160,7 @@ namespace Fluxnote.Backend.Controllers
                 });
             }
 
-            var frontendUrl = _configuration["Frontend:Url"] ?? "http://localhost:4200";
+            var frontendUrl = GetFrontendUrl();
 
             var invites = await _context.DocumentInvite
                 .Include(di => di.CreatedBy)
@@ -235,7 +235,7 @@ namespace Fluxnote.Backend.Controllers
                 });
             }
 
-            var frontendUrl = _configuration["Frontend:Url"] ?? "http://localhost:4200";
+            var frontendUrl = GetFrontendUrl();
 
             var dto = new DocumentInviteDto
             {
@@ -356,11 +356,16 @@ namespace Fluxnote.Backend.Controllers
             }
 
             // Criar DocumentPermission com a role definida no convite
+            // TeamAdmin recebe sempre Editor, independentemente da role do convite
+            var effectiveRole = teamMember.Role == TeamRole.TeamAdmin
+                ? DocumentRole.Editor
+                : invite.Role;
+
             var permission = new DocumentPermission
             {
                 DocumentId = invite.DocumentId,
                 TeamMemberId = teamMember.Id,
-                Role = invite.Role,
+                Role = effectiveRole,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             };
@@ -378,7 +383,7 @@ namespace Fluxnote.Backend.Controllers
                 DocumentId = invite.DocumentId,
                 DocumentTitle = invite.Document.Title,
                 TeamName = invite.Document.Team.Name,
-                DocumentRole = (int)invite.Role
+                DocumentRole = (int)effectiveRole
             };
 
             return Ok(response);
@@ -419,6 +424,18 @@ namespace Fluxnote.Backend.Controllers
             await _context.SaveChangesAsync();
 
             return NoContent();
+        }
+
+        /// <summary>
+        /// Deteta automaticamente o URL do frontend a partir do header Origin do pedido,
+        /// com fallback para a configuração ou localhost.
+        /// </summary>
+        private string GetFrontendUrl()
+        {
+            var origin = Request.Headers.Origin.FirstOrDefault();
+            return !string.IsNullOrEmpty(origin)
+                ? origin.TrimEnd('/')
+                : _configuration["Frontend:Url"] ?? "http://localhost:4200";
         }
     }
 }

@@ -168,8 +168,12 @@ public class AuthController : ControllerBase
         var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
         var tokenEncoded = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
 
-        // em produção deve apontar para o frontend; em dev mantém fallback
-        var frontendBaseUrl = _configuration["Frontend:BaseUrl"] ?? "http://localhost:4200";
+        // Deteta automaticamente o URL do frontend a partir do header Origin do pedido,
+        // com fallback para a configuração ou localhost.
+        var origin = Request.Headers.Origin.FirstOrDefault();
+        var frontendBaseUrl = !string.IsNullOrEmpty(origin)
+            ? origin.TrimEnd('/')
+            : _configuration["Frontend:BaseUrl"] ?? _configuration["Frontend:Url"] ?? "http://localhost:4200";
         var confirmationLink =
             $"{frontendBaseUrl}/confirm-email?userId={Uri.EscapeDataString(user.Id)}&token={Uri.EscapeDataString(tokenEncoded)}";
 

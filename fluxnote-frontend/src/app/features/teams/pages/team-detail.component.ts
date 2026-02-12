@@ -237,6 +237,8 @@ export class TeamDetailComponent {
   }
 
   canChangeDocRole(permission: DocumentPermissionSummary): boolean {
+    // Não se pode alterar a role de um TeamAdmin (são sempre Editor)
+    if (permission.memberRole === 1) return false;
     if (this.isOwner()) return !this.isPermissionOwner(permission);
     if (this.isTeamAdmin()) {
       const memberRole = this.getMemberRoleById(permission.teamMemberId);
@@ -258,16 +260,10 @@ export class TeamDetailComponent {
     this.teamService.updateMemberRole(member.id!, newRole).subscribe({
       next: () => {
         this.toastService.success('Role updated successfully.');
-        // Update local state
+        // Recarregar equipa para atualizar documentos e permissões
         const team = this.selectedTeam();
         if (team) {
-          const updated = {
-            ...team,
-            members: team.members.map(m =>
-              m.id === member.id ? { ...m, role: newRole } : m
-            )
-          };
-          this.selectedTeam.set(updated);
+          this.loadTeam(team.id);
         }
       },
       error: (err) => {
@@ -425,6 +421,7 @@ export class TeamDetailComponent {
     const team = this.selectedTeam();
     if (!team) return [];
     if (this.isOwner()) return team.documents ?? [];
+    // TeamAdmin e Member: apenas documentos com DocumentPermission
     if (this.isTeamAdmin()) {
       return team.documents?.filter(doc => this.hasDocumentPermission(doc)) ?? [];
     }
@@ -457,12 +454,28 @@ export class TeamDetailComponent {
     this.addMemberDocId.set(null);
   }
 
+  /** Check if the selected member in add-member form is a TeamAdmin */
+  isSelectedMemberAdmin(): boolean {
+    const memberId = this.addMemberSelectedId();
+    if (!memberId) return false;
+    const team = this.selectedTeam();
+    const member = team?.members?.find(m => m.id === memberId);
+    return member?.role === 1; // TeamAdmin
+  }
+
   confirmAddMember(): void {
     const docId = this.addMemberDocId();
     const memberId = this.addMemberSelectedId();
-    const role = this.addMemberSelectedRole();
+    let role = this.addMemberSelectedRole();
 
     if (!docId || !memberId) return;
+
+    // TeamAdmin é sempre Editor
+    const team = this.selectedTeam();
+    const member = team?.members?.find(m => m.id === memberId);
+    if (member?.role === 1) {
+      role = 1; // Editor
+    }
 
     this.docPermissionService.addPermission({
       documentId: docId,
@@ -472,13 +485,12 @@ export class TeamDetailComponent {
       next: (newPermission) => {
         this.toastService.success('User added to document.');
         // Find the member name for local state update
-        const team = this.selectedTeam();
         if (team) {
-          const member = team.members.find(m => m.id === memberId);
           const permSummary: DocumentPermissionSummary = {
             id: newPermission.id,
             teamMemberId: memberId,
             memberName: member?.name ?? '',
+            memberRole: member?.role ?? 0,
             documentRole: role
           };
 

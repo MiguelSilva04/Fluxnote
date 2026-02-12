@@ -154,6 +154,9 @@
                                       {{ getInitials(perm.memberName) }}
                                     </div>
                                     <span class="text-sm text-gray-700">{{ perm.memberName }}</span>
+                                    @if (perm.memberRole === 1) {
+                                      <span class="text-[10px] font-medium bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded-full">Team Admin</span>
+                                    }
                                   </div>
                                   <div class="flex items-center gap-2">
                                     @if (canChangeDocRole(perm)) {
@@ -197,17 +200,21 @@
                               >
                                 <option [ngValue]="null" disabled>Select member...</option>
                                 @for (m of getAddableMembers(doc); track m.id) {
-                                  <option [ngValue]="m.id">{{ m.name }}</option>
+                                  <option [ngValue]="m.id">{{ m.name }}{{ m.role === 1 ? ' (Team Admin)' : '' }}</option>
                                 }
                               </select>
-                              <select
-                                [ngModel]="addMemberSelectedRole()"
-                                (ngModelChange)="addMemberSelectedRole.set($event)"
-                                class="text-xs border border-gray-300 rounded-md px-2 py-1 bg-white focus:outline-none focus:ring-1 focus:ring-[#155347]"
-                              >
-                                <option [ngValue]="0">Viewer</option>
-                                <option [ngValue]="1">Editor</option>
-                              </select>
+                              @if (isSelectedMemberAdmin()) {
+                                <span class="text-xs font-medium text-gray-500 bg-gray-100 px-2 py-1 rounded-md">Editor</span>
+                              } @else {
+                                <select
+                                  [ngModel]="addMemberSelectedRole()"
+                                  (ngModelChange)="addMemberSelectedRole.set($event)"
+                                  class="text-xs border border-gray-300 rounded-md px-2 py-1 bg-white focus:outline-none focus:ring-1 focus:ring-[#155347]"
+                                >
+                                  <option [ngValue]="0">Viewer</option>
+                                  <option [ngValue]="1">Editor</option>
+                                </select>
+                              }
                               <button
                                 (click)="confirmAddMember()"
                                 [disabled]="!addMemberSelectedId()"

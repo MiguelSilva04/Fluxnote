@@ -86,9 +86,9 @@ import { TextEditorComponent } from './components/text-editor.component';
         </div>
         <div class="flex items-center gap-2">
           @if (canEdit()) {
-            <app-button variant="outline" size="sm" [leftIcon]="true" (onClick)="showWipModal.set(true)">
+            <app-button variant="outline" size="sm" [leftIcon]="true" (onClick)="toggleAIPanel()">
               <lucide-icon leftIcon name="sparkles" class="h-4 w-4"></lucide-icon>
-              AI Assistant
+              AI Assistance
             </app-button>
             <app-button variant="outline" size="sm" [leftIcon]="true" (onClick)="showWipModal.set(true)">
               <lucide-icon leftIcon name="clock" class="h-4 w-4"></lucide-icon>
@@ -170,7 +170,10 @@ import { TextEditorComponent } from './components/text-editor.component';
         @if (showAIPanel()) {
           <aside class="w-80 bg-white border-l border-gray-200 flex flex-col shadow-xl">
             <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-              <h3 class="text-lg font-bold text-gray-900">AI Assistant</h3>
+              <div class="flex items-center gap-2">
+                <lucide-icon name="sparkles" class="h-5 w-5 text-[#155347]"></lucide-icon>
+                <h3 class="text-lg font-bold text-gray-900">AI Assistance</h3>
+              </div>
               <button (click)="showAIPanel.set(false)" class="p-1 hover:bg-gray-100 rounded">
                 <lucide-icon name="x" class="h-5 w-5 text-gray-500"></lucide-icon>
               </button>
@@ -178,74 +181,30 @@ import { TextEditorComponent } from './components/text-editor.component';
 
             <div class="flex-1 overflow-y-auto p-6">
               <div class="mb-6">
-                <h4 class="text-sm font-semibold text-gray-900 mb-3">Quick Actions</h4>
+                <h4 class="text-sm font-semibold text-gray-900 mb-3">Actions</h4>
                 <div class="space-y-2">
-                  @for (suggestion of aiSuggestions; track suggestion.id) {
-                    <button
-                      (click)="handleAIAction(suggestion.id)"
-                      [disabled]="aiGenerating()"
-                      class="w-full p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-left disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      <div class="flex items-start gap-3">
-                        <span class="text-2xl">{{ suggestion.icon }}</span>
-                        <div class="flex-1 min-w-0">
-                          <p class="text-sm font-medium text-gray-900 mb-1">{{ suggestion.title }}</p>
-                          <p class="text-xs text-gray-500">{{ suggestion.description }}</p>
-                        </div>
+
+                  <!-- Generate Summary (functional) -->
+                  <button
+                    (click)="generateSummary()"
+                    [disabled]="summaryLoading()"
+                    class="w-full p-4 border border-gray-200 rounded-lg hover:bg-purple-50 hover:border-purple-300 transition-colors text-left disabled:opacity-50 disabled:cursor-not-allowed group"
+                  >
+                    <div class="flex items-start gap-3">
+                      <div class="w-9 h-9 rounded-lg bg-purple-100 flex items-center justify-center shrink-0 group-hover:bg-purple-200 transition-colors">
+                        <lucide-icon name="file-text" class="h-5 w-5 text-purple-600"></lucide-icon>
                       </div>
-                    </button>
-                  }
-                </div>
-              </div>
-
-              @if (aiGenerating()) {
-                <div class="p-4 bg-blue-50 border border-blue-200 rounded-lg mb-6">
-                  <div class="flex items-center gap-3">
-                    <lucide-icon name="loader-circle" class="h-5 w-5 text-blue-600 animate-spin"></lucide-icon>
-                    <p class="text-sm text-blue-900">Generating suggestion...</p>
-                  </div>
-                </div>
-              }
-
-              <div class="mb-6">
-                <h4 class="text-sm font-semibold text-gray-900 mb-3">AI Suggestions</h4>
-                <div class="space-y-3">
-                  <div class="p-3 bg-green-50 border border-green-200 rounded-lg">
-                    <p class="text-xs font-medium text-green-900 mb-1">Original:</p>
-                    <p class="text-xs text-green-800 mb-2">The data shows an increase.</p>
-                    <p class="text-xs font-medium text-green-900 mb-1">Suggestion:</p>
-                    <p class="text-xs text-green-800 mb-3">
-                      The analysis reveals a substantial 15% growth, indicating positive market trends.
-                    </p>
-                    <div class="flex gap-2">
-                      <app-button size="sm" customClass="text-xs h-7 bg-green-600 hover:bg-green-700">Accept</app-button>
-                      <app-button size="sm" variant="outline" customClass="text-xs h-7">Reject</app-button>
+                      <div class="flex-1 min-w-0">
+                        <p class="text-sm font-medium text-gray-900 mb-0.5">Generate Summary</p>
+                        <p class="text-xs text-gray-500">Get a concise AI-generated summary of this document</p>
+                      </div>
                     </div>
-                  </div>
+                  </button>
+
                 </div>
               </div>
 
-              <div class="p-4 bg-gray-50 rounded-lg mb-4">
-                <p class="text-xs text-gray-600 mb-2">AI Credits Remaining:</p>
-                <div class="flex items-center justify-between">
-                  <div class="flex-1 bg-gray-200 rounded-full h-2 mr-3">
-                    <div class="bg-[#155347] h-2 rounded-full" style="width: 75%"></div>
-                  </div>
-                  <span class="text-xs font-bold text-gray-900">15/20</span>
-                </div>
-              </div>
-
-              <app-button
-                variant="outline"
-                customClass="w-full border-2 border-dashed border-gray-300 hover:border-[#155347] hover:bg-[#e8f0ee]"
-                [leftIcon]="true"
-              >
-                <lucide-icon leftIcon name="upload" class="h-4 w-4"></lucide-icon>
-                Upload Context
-              </app-button>
-              <p class="text-xs text-gray-500 text-center mt-2">
-                Upload documents to provide additional context for AI
-              </p>
+              
             </div>
           </aside>
         }
@@ -422,6 +381,57 @@ import { TextEditorComponent } from './components/text-editor.component';
       }
       } <!-- End of @else (loading) -->
 
+      <!-- AI Summary Modal -->
+      @if (showSummaryModal()) {
+        <div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div class="bg-white rounded-xl shadow-2xl w-full max-w-lg">
+            <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <lucide-icon name="sparkles" class="h-5 w-5 text-purple-600"></lucide-icon>
+                <h2 class="text-lg font-bold text-gray-900">AI Summary</h2>
+              </div>
+              <button (click)="closeSummaryModal()" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
+            </div>
+
+            <div class="p-6">
+              @if (summaryLoading()) {
+                <div class="flex flex-col items-center justify-center py-8 gap-3">
+                  <lucide-icon name="loader-circle" class="h-8 w-8 text-purple-600 animate-spin"></lucide-icon>
+                  <p class="text-gray-600 text-sm">Generating summary...</p>
+                </div>
+              } @else if (summaryError()) {
+                <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+                  <div class="flex items-center gap-2 text-red-700 mb-1">
+                    <lucide-icon name="circle-alert" class="h-5 w-5"></lucide-icon>
+                    <span class="font-medium">Error</span>
+                  </div>
+                  <p class="text-sm text-red-600">{{ summaryError() }}</p>
+                </div>
+              } @else {
+                <div class="bg-purple-50 border border-purple-200 rounded-lg p-4">
+                  <p class="text-gray-800 text-sm leading-relaxed whitespace-pre-wrap">{{ summaryResult() }}</p>
+                </div>
+              }
+            </div>
+
+            <div class="px-6 py-4 bg-gray-50 border-t border-gray-100 flex justify-end gap-3 rounded-b-xl">
+              @if (!summaryLoading() && !summaryError()) {
+                <app-button variant="outline" size="sm" (onClick)="copySummary()">
+                  @if (summaryCopied()) {
+                    <lucide-icon name="check" class="h-4 w-4 mr-1 text-green-600"></lucide-icon>
+                    Copied!
+                  } @else {
+                    <lucide-icon name="clipboard" class="h-4 w-4 mr-1"></lucide-icon>
+                    Copy
+                  }
+                </app-button>
+              }
+              <app-button variant="ghost" (onClick)="closeSummaryModal()">Close</app-button>
+            </div>
+          </div>
+        </div>
+      }
+
       <!-- Work in Progress Modal -->
       <app-work-in-progress [show]="showWipModal()" (close)="showWipModal.set(false)" />
     </div>
@@ -454,6 +464,13 @@ export class DocumentEditorComponent implements OnInit {
   selectedVersions = signal<number[]>([]);
   aiGenerating = signal(false);
   restoreConfirmed = false;
+
+  // AI Summary
+  showSummaryModal = signal(false);
+  summaryResult = signal('');
+  summaryLoading = signal(false);
+  summaryError = signal<string | null>(null);
+  summaryCopied = signal(false);
 
   // Document state
   documentTitle = '';
@@ -776,6 +793,45 @@ export class DocumentEditorComponent implements OnInit {
       this.closeRestoreModal();
       // Handle restore logic
     }
+  }
+
+  generateSummary(): void {
+    if (!this.documentId) return;
+
+    this.showAIPanel.set(false);
+    this.summaryResult.set('');
+    this.summaryError.set(null);
+    this.summaryLoading.set(true);
+    this.summaryCopied.set(false);
+    this.showSummaryModal.set(true);
+
+    this.documentService.generateSummary(this.documentId).subscribe({
+      next: (res) => {
+        this.summaryResult.set(res.summary);
+        this.summaryLoading.set(false);
+      },
+      error: (err) => {
+        console.error('Error generating summary:', err);
+        this.summaryError.set(
+          err.error?.message || 'Failed to generate summary. Please try again.'
+        );
+        this.summaryLoading.set(false);
+      }
+    });
+  }
+
+  closeSummaryModal(): void {
+    this.showSummaryModal.set(false);
+  }
+
+  copySummary(): void {
+    const text = this.summaryResult();
+    if (!text) return;
+
+    navigator.clipboard.writeText(text).then(() => {
+      this.summaryCopied.set(true);
+      setTimeout(() => this.summaryCopied.set(false), 3000);
+    });
   }
 
   handleAIAction(actionId: number): void {

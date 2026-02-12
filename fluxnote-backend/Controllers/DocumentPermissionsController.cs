@@ -154,11 +154,16 @@ namespace Fluxnote.Backend.Controllers
                 });
             }
 
+            // TeamAdmin recebe sempre Editor (não pode ser Viewer)
+            var effectiveRole = targetMember.Role == TeamRole.TeamAdmin
+                ? DocumentRole.Editor
+                : (DocumentRole)request.Role;
+
             var permission = new DocumentPermission
             {
                 DocumentId = request.DocumentId,
                 TeamMemberId = request.TeamMemberId,
-                Role = (DocumentRole)request.Role,
+                Role = effectiveRole,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             };
@@ -237,6 +242,16 @@ namespace Fluxnote.Backend.Controllers
                 {
                     message = "Permission denied.",
                     errors = new[] { "A Team Admin cannot modify permissions of an Owner or another Team Admin." }
+                });
+            }
+
+            // Não é possível alterar a role de um TeamAdmin (sempre Editor)
+            if (permission.TeamMember.Role == TeamRole.TeamAdmin)
+            {
+                return BadRequest(new
+                {
+                    message = "Invalid operation.",
+                    errors = new[] { "Team Admin document role cannot be changed. They are always Editor." }
                 });
             }
 
