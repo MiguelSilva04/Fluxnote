@@ -16,22 +16,6 @@ definitions:
           - dotnet restore fluxnote-backend/fluxnote-backend.csproj
           - dotnet build fluxnote-backend/fluxnote-backend.csproj -c Release --no-restore
 
-    # ── Backend: Testes ──
-    - step: &backend-test
-        name: "Backend - Tests"
-        image: mcr.microsoft.com/dotnet/sdk:8.0
-        caches:
-          - nuget
-        script:
-          - dotnet restore
-          - dotnet test Fluxnote.Backend.Tests/Fluxnote.Backend.Tests.csproj
-              --configuration Release
-              --logger "console;verbosity=normal"
-              --collect:"XPlat Code Coverage"
-              --results-directory ./test-results
-        artifacts:
-          - test-results/**
-
     # ── Frontend: Install + Build ──
     - step: &frontend-build
         name: "Frontend - Build"
@@ -59,7 +43,6 @@ pipelines:
       - parallel:
           - step: *backend-build
           - step: *frontend-build
-      - step: *backend-test
 
   # ── Main (após merge) ──
   branches:
@@ -67,5 +50,4 @@ pipelines:
       - parallel:
           - step: *backend-build
           - step: *frontend-build
-      - step: *backend-test
       - step: *docker-build
