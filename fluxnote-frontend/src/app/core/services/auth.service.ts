@@ -352,11 +352,6 @@ export class AuthService {
 
       return true;
     } catch (error: any) {
-      // Rate limit - não fazer logout, apenas falhar silenciosamente
-      if (error.status === 429) {
-        console.warn('Refresh rate limit exceeded');
-        return false;
-      }
       this.logout();
       return false;
     }

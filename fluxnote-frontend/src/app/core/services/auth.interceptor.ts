@@ -77,7 +77,6 @@ export class AuthInterceptor implements HttpInterceptor {
         }));
       }),
       catchError((refreshError) => {
-        // erro durante o refresh, propagar
         return throwError(() => refreshError);
       })
     );
