@@ -558,10 +558,15 @@ public class AuthController : ControllerBase
         var availableProviders = new[] { "Google", "Microsoft" }
             .Where(p => !logins.Any(l => l.LoginProvider.Equals(p, StringComparison.OrdinalIgnoreCase)));
 
+        var hasPassword = await _userManager.HasPasswordAsync(user);
+        var unlinkLastExternalDeletesAccount = !hasPassword && logins.Count == 1;
+
         return Ok(new
         {
             linkedProviders,
-            availableProviders
+            availableProviders,
+            hasPassword,
+            unlinkLastExternalDeletesAccount
         });
     }
 
@@ -680,14 +685,6 @@ public class AuthController : ControllerBase
         var hasPassword = await _userManager.HasPasswordAsync(user);
         var logins = await _userManager.GetLoginsAsync(user);
 
-        if (!hasPassword && logins.Count <= 1)
-        {
-            return BadRequest(new
-            {
-                error = "Cannot remove the only authentication method. Set a password first."
-            });
-        }
-
         var login = logins.FirstOrDefault(l =>
             l.LoginProvider.Equals(provider, StringComparison.OrdinalIgnoreCase));
 
@@ -696,13 +693,82 @@ public class AuthController : ControllerBase
             return NotFound(new { error = "Provider is not linked to this account." });
         }
 
+        // If this is the only auth method, unlinking removes account by design.
+        if (!hasPassword && logins.Count == 1)
+        {
+            var userRefreshTokens = await _db.RefreshTokens
+                .Where(rt => rt.UserId == user.Id && rt.RevokedAt == null)
+                .ToListAsync();
+
+            var now = DateTime.UtcNow;
+            foreach (var token in userRefreshTokens)
+            {
+                token.RevokedAt = now;
+            }
+
+            var deleteResult = await _userManager.DeleteAsync(user);
+            if (deleteResult.Succeeded)
+            {
+                await _db.SaveChangesAsync();
+                ClearRefreshCookie();
+
+                return Ok(new
+                {
+                    message = "External provider unlinked and account deleted because it was the only login method.",
+                    accountDeleted = true
+                });
+            }
+
+            // Fallback for users with related data (e.g., created documents with restrict-delete FK):
+            // perform logical deletion and unlink external provider.
+            var removeLoginResult = await _userManager.RemoveLoginAsync(user, login.LoginProvider, login.ProviderKey);
+            if (!removeLoginResult.Succeeded)
+            {
+                return BadRequest(new { errors = removeLoginResult.Errors.Select(e => e.Description) });
+            }
+
+            var deletedSuffix = Guid.NewGuid().ToString("N")[..12];
+            user.UserName = $"deleted_{deletedSuffix}";
+            user.Email = $"deleted_{deletedSuffix}@deleted.local";
+            user.FullName = "Deleted User";
+            user.ProfilePictureUrl = null;
+            user.PhoneNumber = null;
+            user.Bio = null;
+            user.Timezone = null;
+            user.Location = null;
+            user.EmailConfirmed = false;
+            user.AccountStatus = AccountStatus.Blocked;
+            user.LockoutEnabled = true;
+            user.LockoutEnd = DateTimeOffset.MaxValue;
+            user.UpdatedAt = DateTime.UtcNow;
+
+            var updateResult = await _userManager.UpdateAsync(user);
+            if (!updateResult.Succeeded)
+            {
+                return BadRequest(new { errors = updateResult.Errors.Select(e => e.Description) });
+            }
+
+            await _db.SaveChangesAsync();
+            ClearRefreshCookie();
+
+            return Ok(new
+            {
+                message = "External provider unlinked and account logically deleted because it was the only login method.",
+                accountDeleted = true
+            });
+        }
+
         var result = await _userManager.RemoveLoginAsync(user, login.LoginProvider, login.ProviderKey);
         if (!result.Succeeded)
         {
             return BadRequest(new { errors = result.Errors.Select(e => e.Description) });
         }
 
-        return Ok(new { message = $"Provider {provider} unlinked successfully." });
+        return Ok(new
+        {
+            message = $"Provider {provider} unlinked successfully.",
+            accountDeleted = false
+        });
     }
 
     /// <summary>

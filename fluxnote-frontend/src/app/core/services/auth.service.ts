@@ -110,6 +110,13 @@ export interface ExternalLoginsResponse {
     providerKey: string;
   }>;
   availableProviders: string[];
+  hasPassword: boolean;
+  unlinkLastExternalDeletesAccount: boolean;
+}
+
+export interface UnlinkExternalLoginResponse {
+  message: string;
+  accountDeleted: boolean;
 }
 
 /**
@@ -900,6 +907,26 @@ export class AuthService {
 
       return await firstValueFrom(
         this.http.get<ExternalLoginsResponse>(`${this.baseUrl}/external-logins`, {
+          headers: { Authorization: `Bearer ${token}` }
+        })
+      );
+    } catch {
+      return null;
+    }
+  }
+
+  /**
+   * remove a associação de um provider externo à conta autenticada.
+   */
+  async unlinkExternalLogin(provider: ExternalAuthProvider): Promise<UnlinkExternalLoginResponse | null> {
+    try {
+      const token = this.getAccessToken();
+      if (!token) {
+        return null;
+      }
+
+      return await firstValueFrom(
+        this.http.delete<UnlinkExternalLoginResponse>(`${this.baseUrl}/unlink-external/${provider}`, {
           headers: { Authorization: `Bearer ${token}` }
         })
       );
