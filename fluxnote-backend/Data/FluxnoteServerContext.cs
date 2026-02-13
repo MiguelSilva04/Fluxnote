@@ -65,6 +65,11 @@ namespace Fluxnote.Backend.Data
         public DbSet<Fluxnote.Backend.Models.TeamMember> TeamMember { get; set; } = default!;
 
         /// <summary>
+        /// DbSet para convites de equipas (permite gerir convites pendentes e aceites).
+        /// </summary>
+        public DbSet<Fluxnote.Backend.Models.TeamInvite> TeamInvite { get; set; } = default!;
+
+        /// <summary>
         /// DbSet para documentos colaborativos.
         /// </summary>
         public DbSet<Fluxnote.Backend.Models.Document> Document { get; set; } = default!;
