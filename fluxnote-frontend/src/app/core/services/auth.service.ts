@@ -54,6 +54,9 @@ export interface TokenResponse {
 
 export type ExternalAuthProvider = 'google' | 'microsoft';
 
+/**
+ * resultado do processamento do callback OAuth no frontend.
+ */
 export interface ExternalCallbackResult {
   success: boolean;
   error?: string;
@@ -97,6 +100,9 @@ export interface ApiResult {
   errors?: string[];
 }
 
+/**
+ * providers externos ligados e disponíveis para o utilizador autenticado.
+ */
 export interface ExternalLoginsResponse {
   linkedProviders: Array<{
     provider: string;
@@ -224,6 +230,12 @@ export class AuthService {
    */
   constructor(private router: Router, private http: HttpClient) { }
 
+  /**
+   * inicia autenticação externa e redireciona o browser para o backend.
+   *
+   * @param provider - provider OAuth (google/microsoft)
+   * @param returnUrl - rota opcional para retorno após autenticação
+   */
   externalLogin(provider: ExternalAuthProvider, returnUrl?: string): void {
     const params = new URLSearchParams();
     if (returnUrl) {
@@ -235,6 +247,13 @@ export class AuthService {
     window.location.assign(url);
   }
 
+  /**
+   * processa o fragmento retornado no callback OAuth.
+   * atualiza token/sessão quando receber `access_token`.
+   *
+   * @param fragment - hash da URL de callback
+   * @returns objeto com estado de sucesso, erro e returnUrl opcional
+   */
   async handleExternalCallback(fragment = window.location.hash): Promise<ExternalCallbackResult> {
     const hash = fragment.startsWith('#') ? fragment.substring(1) : fragment;
     const params = new URLSearchParams(hash);
@@ -867,6 +886,11 @@ export class AuthService {
     }
   }
 
+  /**
+   * obtém os providers OAuth ligados à conta autenticada.
+   *
+   * @returns providers ligados/disponíveis ou null em caso de erro/autenticação ausente
+   */
   async getExternalLogins(): Promise<ExternalLoginsResponse | null> {
     try {
       const token = this.getAccessToken();

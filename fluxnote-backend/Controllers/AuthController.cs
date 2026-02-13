@@ -318,6 +318,17 @@ public class AuthController : ControllerBase
         });
     }
 
+    /// <summary>
+    /// Inicia o fluxo OAuth para um provider externo (Google/Microsoft).
+    /// </summary>
+    /// <param name="provider">Provider externo: <c>google</c> ou <c>microsoft</c>.</param>
+    /// <param name="returnUrl">Rota opcional do frontend para onde redirecionar após login.</param>
+    /// <returns>
+    /// <list type="bullet">
+    ///     <item><b>302 Redirect:</b> Redireciona para a página de consentimento do provider.</item>
+    ///     <item><b>400 Bad Request:</b> Provider inválido.</item>
+    /// </list>
+    /// </returns>
     [HttpGet("external-login/{provider}")]
     [AllowAnonymous]
     public IActionResult ExternalLogin(string provider, [FromQuery] string? returnUrl = null)
@@ -337,6 +348,24 @@ public class AuthController : ControllerBase
         return Challenge(properties, authScheme);
     }
 
+    /// <summary>
+    /// Callback OAuth chamado pelo provider após autenticação externa.
+    /// </summary>
+    /// <param name="returnUrl">Rota opcional para redirecionamento no frontend.</param>
+    /// <param name="remoteError">Erro retornado pelo provider (se existir).</param>
+    /// <returns>
+    /// <list type="bullet">
+    ///     <item><b>302 Redirect:</b> Para callback/error page do frontend.</item>
+    /// </list>
+    /// </returns>
+    /// <remarks>
+    /// Fluxo principal:
+    /// <list type="number">
+    ///     <item><description>Lê claims do provider externo.</description></item>
+    ///     <item><description>Faz sign-in de login externo existente, ou vincula por email, ou cria conta nova.</description></item>
+    ///     <item><description>Gera access token + refresh cookie e redireciona para o frontend.</description></item>
+    /// </list>
+    /// </remarks>
     [HttpGet("external-callback")]
     [AllowAnonymous]
     public async Task<IActionResult> ExternalLoginCallback([FromQuery] string? returnUrl = null, [FromQuery] string? remoteError = null)
@@ -493,6 +522,15 @@ public class AuthController : ControllerBase
         return Redirect($"{frontendCallbackUrl}#{fragment}");
     }
 
+    /// <summary>
+    /// Obtém os providers externos ligados à conta autenticada.
+    /// </summary>
+    /// <returns>
+    /// <list type="bullet">
+    ///     <item><b>200 OK:</b> Providers ligados e disponíveis.</item>
+    ///     <item><b>401 Unauthorized:</b> Token inválido.</item>
+    /// </list>
+    /// </returns>
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [HttpGet("external-logins")]
     public async Task<IActionResult> GetExternalLogins()
@@ -527,6 +565,17 @@ public class AuthController : ControllerBase
         });
     }
 
+    /// <summary>
+    /// Inicia o fluxo de vinculação de um provider externo à conta atual.
+    /// </summary>
+    /// <param name="provider">Provider externo: <c>google</c> ou <c>microsoft</c>.</param>
+    /// <returns>
+    /// <list type="bullet">
+    ///     <item><b>302 Redirect:</b> Para challenge OAuth do provider.</item>
+    ///     <item><b>400 Bad Request:</b> Provider inválido.</item>
+    ///     <item><b>401 Unauthorized:</b> Token inválido.</item>
+    /// </list>
+    /// </returns>
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [HttpPost("link-external/{provider}")]
     public IActionResult LinkExternalLogin(string provider)
@@ -548,6 +597,12 @@ public class AuthController : ControllerBase
         return Challenge(properties, authScheme);
     }
 
+    /// <summary>
+    /// Callback do fluxo de vinculação de provider externo.
+    /// </summary>
+    /// <param name="linkUserId">ID do utilizador para concluir a ligação.</param>
+    /// <param name="remoteError">Erro retornado pelo provider (se existir).</param>
+    /// <returns>Redireciona para callback/error page do frontend.</returns>
     [HttpGet("link-external-callback")]
     [AllowAnonymous]
     public async Task<IActionResult> LinkExternalLoginCallback([FromQuery] string? linkUserId = null, [FromQuery] string? remoteError = null)
@@ -594,6 +649,18 @@ public class AuthController : ControllerBase
         return Redirect($"{frontendCallbackUrl}#{fragment}");
     }
 
+    /// <summary>
+    /// Remove a vinculação de um provider externo da conta autenticada.
+    /// </summary>
+    /// <param name="provider">Provider a remover.</param>
+    /// <returns>
+    /// <list type="bullet">
+    ///     <item><b>200 OK:</b> Provider removido.</item>
+    ///     <item><b>400 Bad Request:</b> Tentativa de remover último método de autenticação.</item>
+    ///     <item><b>401 Unauthorized:</b> Token inválido.</item>
+    ///     <item><b>404 Not Found:</b> Provider não está ligado.</item>
+    /// </list>
+    /// </returns>
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [HttpDelete("unlink-external/{provider}")]
     public async Task<IActionResult> UnlinkExternalLogin(string provider)
@@ -966,6 +1033,17 @@ public class AuthController : ControllerBase
         return Ok(new { message = "Password changed successfully." });
     }
 
+    /// <summary>
+    /// Define password para utilizadores que só tinham login externo (sem password local).
+    /// </summary>
+    /// <param name="request">Nova password.</param>
+    /// <returns>
+    /// <list type="bullet">
+    ///     <item><b>200 OK:</b> Password definida com sucesso.</item>
+    ///     <item><b>400 Bad Request:</b> Utilizador já possui password ou password inválida.</item>
+    ///     <item><b>401 Unauthorized:</b> Token inválido.</item>
+    /// </list>
+    /// </returns>
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [HttpPost("set-password")]
     public async Task<IActionResult> SetPassword([FromBody] SetPasswordRequest request)
@@ -1344,6 +1422,9 @@ public class AuthController : ControllerBase
         await _db.SaveChangesAsync();
     }
 
+    /// <summary>
+    /// Redireciona para a página de erro do frontend com parâmetros de erro OAuth.
+    /// </summary>
     private IActionResult RedirectExternalError(string frontendErrorUrl, string error, string? errorDescription = null)
     {
         var queryParams = new Dictionary<string, string?>
@@ -1359,6 +1440,9 @@ public class AuthController : ControllerBase
         return Redirect(QueryHelpers.AddQueryString(frontendErrorUrl, queryParams));
     }
 
+    /// <summary>
+    /// Resolve o nome do esquema ASP.NET Authentication para um provider externo.
+    /// </summary>
     private static string? ResolveAuthScheme(string provider)
     {
         return provider.ToLowerInvariant() switch
@@ -1369,6 +1453,9 @@ public class AuthController : ControllerBase
         };
     }
 
+    /// <summary>
+    /// Converte o nome do provider externo para o enum de persistência <see cref="AuthProvider"/>.
+    /// </summary>
     private static AuthProvider ResolveAuthProvider(string provider)
     {
         return provider.ToLowerInvariant() switch
@@ -1379,6 +1466,9 @@ public class AuthController : ControllerBase
         };
     }
 
+    /// <summary>
+    /// Extrai URL de avatar das claims retornadas por providers externos.
+    /// </summary>
     private static string? ExtractProfilePicture(ClaimsPrincipal principal)
     {
         return principal.FindFirstValue("picture")
@@ -1386,6 +1476,9 @@ public class AuthController : ControllerBase
             ?? principal.FindFirstValue("photo");
     }
 
+    /// <summary>
+    /// Gera um username único e estável com base no email do utilizador.
+    /// </summary>
     private async Task<string> GenerateUniqueUsernameAsync(string email)
     {
         var baseUsername = email.Split('@')[0];

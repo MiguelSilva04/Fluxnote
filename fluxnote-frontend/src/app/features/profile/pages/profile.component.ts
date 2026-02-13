@@ -233,10 +233,17 @@ import { AuthService } from '../../../core/services';
                       </svg>
                       <div>
                         <p class="text-sm font-medium text-gray-900">Google</p>
-                        <p class="text-xs text-gray-500">Not connected</p>
+                        <p class="text-xs text-gray-500">{{ googleConnected() ? 'Connected' : 'Not connected' }}</p>
                       </div>
                     </div>
-                    <app-button variant="outline" size="sm" (click)="showWipModal.set(true)">Connect</app-button>
+                    <app-button
+                      variant="outline"
+                      size="sm"
+                      [disabled]="isCheckingExternalAccounts() || googleConnected()"
+                      (click)="connectGoogle()"
+                    >
+                      {{ googleConnected() ? 'Connected' : 'Connect' }}
+                    </app-button>
                   </div>
                   <div class="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
                     <div class="flex items-center gap-3">
@@ -249,10 +256,17 @@ import { AuthService } from '../../../core/services';
                       </svg>
                       <div>
                         <p class="text-sm font-medium text-gray-900">Microsoft</p>
-                        <p class="text-xs text-gray-500">Not connected</p>
+                        <p class="text-xs text-gray-500">{{ microsoftConnected() ? 'Connected' : 'Not connected' }}</p>
                       </div>
                     </div>
-                    <app-button variant="outline" size="sm" (click)="showWipModal.set(true)">Connect</app-button>
+                    <app-button
+                      variant="outline"
+                      size="sm"
+                      [disabled]="isCheckingExternalAccounts() || microsoftConnected()"
+                      (click)="connectMicrosoft()"
+                    >
+                      {{ microsoftConnected() ? 'Connected' : 'Connect' }}
+                    </app-button>
                   </div>
                 </div>
               </app-card-content>
@@ -609,6 +623,9 @@ export class ProfileComponent {
   showConfirmModal = signal(false);
   showPasswordConfirmModal = signal(false);
   showWipModal = signal(false);
+  isCheckingExternalAccounts = signal(false);
+  googleConnected = signal(false);
+  microsoftConnected = signal(false);
   showLogoutModal = signal(false);
   showLogoutAllModal = signal(false);
   avatarUrl = '';
@@ -645,9 +662,17 @@ export class ProfileComponent {
     // Initialize form with user data reactively
     effect(() => {
       const user = this.user();
-      if (user && !this.originalData.fullName) {
+      if (!user) {
+        this.googleConnected.set(false);
+        this.microsoftConnected.set(false);
+        return;
+      }
+
+      if (!this.originalData.fullName) {
         this.initializeForm(user);
       }
+
+      void this.loadExternalAccounts();
     });
   }
 
@@ -927,6 +952,36 @@ export class ProfileComponent {
     }
 
     this.isChangingPassword.set(false);
+  }
+
+  async connectGoogle(): Promise<void> {
+    if (this.googleConnected()) {
+      return;
+    }
+
+    // O callback OAuth devolve para /profile para atualizar o estado visual da ligação.
+    this.authService.externalLogin('google', '/profile');
+  }
+
+  connectMicrosoft(): void {
+    if (this.microsoftConnected()) {
+      return;
+    }
+
+    this.showWipModal.set(true);
+  }
+
+  private async loadExternalAccounts(): Promise<void> {
+    this.isCheckingExternalAccounts.set(true);
+
+    const data = await this.authService.getExternalLogins();
+    if (data) {
+      const linked = new Set(data.linkedProviders.map(p => p.provider.toLowerCase()));
+      this.googleConnected.set(linked.has('google'));
+      this.microsoftConnected.set(linked.has('microsoft'));
+    }
+
+    this.isCheckingExternalAccounts.set(false);
   }
 
   // Utility methods
