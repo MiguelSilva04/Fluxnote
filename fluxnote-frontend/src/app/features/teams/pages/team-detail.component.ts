@@ -8,6 +8,8 @@ import { ButtonComponent, CardComponent, CardContentComponent, BadgeComponent, M
 import { DocumentShareModalComponent } from '../../../shared/components/document-share-modal/document-share-modal.component';
 import { TeamService, DocumentPermissionService, AuthService, DocumentInviteService, DocumentService } from '../../../core/services';
 import { ToastService } from '../../../shared/services/toast.service';
+import { TourService } from '../../../shared/services/tour.service';
+import { TourStep } from '../../../shared/components/ui/tour/tour.models';
 import { TeamMemberToPost, TeamDocument, DocumentPermissionSummary, DocumentInviteDto } from '../../../core/models';
 
 @Component({
@@ -37,6 +39,7 @@ export class TeamDetailComponent {
   private documentService = inject(DocumentService);
 
   private inviteService = inject(DocumentInviteService);
+  private tourService = inject(TourService);
 
   shareDocId = signal<number | null>(null);
   shareRole = signal<number>(0); // 0=Viewer, 1=Editor
@@ -623,5 +626,73 @@ export class TeamDetailComponent {
   viewInviteLink(url: string): void {
     this.shareGeneratedUrl.set(url);
     this.shareCopied.set(false);
+  }
+
+  startTour(): void {
+    const steps: TourStep[] = [
+      {
+        targetSelector: '[data-tour="team-members-section"]',
+        title: 'Team Members',
+        description:
+          'Here you can see all the members of this team, their roles and manage their access.',
+        position: 'right',
+      },
+      {
+        targetSelector: '[data-tour="member-role"]',
+        title: 'Team Roles',
+        description:
+          'Each member has a role: Owner has full permissions over the team; Team Admin can add/remove members, is an Editor on all documents they belong to, and can share documents and change other members\' roles; Member has basic access to assigned documents only.',
+        position: 'left',
+      },
+      {
+        targetSelector: '[data-tour="doc-permissions-section"]',
+        title: 'Document Permissions',
+        description:
+          'This section shows per-document permissions. Expand any document to see which members have access and their role (Viewer or Editor).',
+        position: 'right',
+      },
+    ];
+
+    // Passo do botão Share - apenas para Owner ou Team Admin
+    if (this.isOwnerOrAdmin() && this.visibleDocuments().length > 0) {
+      const firstDoc = this.visibleDocuments()[0];
+      steps.push(
+        {
+          targetSelector: '[data-tour="share-btn"]',
+          title: 'Share Button',
+          description:
+            'Clicking this button allows you to generate shareable links for this document, where you can set the role and expiration date.',
+          position: 'bottom',
+        },
+        { 
+          title: 'Share Documents',
+          screenPosition: 'top',
+          description:
+            'Choose a role (Viewer/Editor) and an expiration date, then share the generated link with the person you want to invite.',
+          position: 'bottom',
+          onActivate: () => {
+            if (firstDoc) {
+              this.openShareModal(firstDoc.id);
+            }
+          },
+          onDeactivate: () => {
+            this.closeShareModal();
+          },
+        },
+      );
+    }
+
+    // Passo da Danger Zone - apenas para Owner
+    if (this.isOwner()) {
+      steps.push({
+        targetSelector: '[data-tour="danger-zone"]',
+        title: 'Delete Team',
+        description:
+          'As the Owner, you can permanently delete this team. This will remove all documents and members - this action cannot be undone.',
+        position: 'left',
+      });
+    }
+
+    this.tourService.start(steps);
   }
 }

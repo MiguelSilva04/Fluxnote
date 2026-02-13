@@ -3,11 +3,12 @@ import { NavigationEnd, NavigationStart, Router, RouterOutlet } from '@angular/r
 import { CommonModule } from '@angular/common';
 import { AuthService } from './core/services/auth.service';
 import { ToastComponent } from './shared/components/ui/toast/toast.component';
+import { TourOverlayComponent } from './shared/components/ui/tour/tour-overlay.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, ToastComponent, CommonModule],
+  imports: [RouterOutlet, ToastComponent, TourOverlayComponent, CommonModule],
   template: `
     <!-- Loading bar durante navegação -->
     @if (isNavigating()) {
@@ -17,6 +18,7 @@ import { ToastComponent } from './shared/components/ui/toast/toast.component';
     }
     <router-outlet></router-outlet>
     <app-toast></app-toast>
+    <app-tour-overlay></app-tour-overlay>
   `,
   styles: [`
     @keyframes loading-bar {

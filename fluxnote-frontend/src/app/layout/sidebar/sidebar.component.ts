@@ -20,6 +20,7 @@ import { ModalComponent, ButtonComponent } from '../../shared/components/ui';
           routerLink="/dashboard"
           routerLinkActive="bg-[#e8f0ee] text-[#155347]"
           [routerLinkActiveOptions]="{ exact: true }"
+          data-tour="sidebar-dashboard"
           class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors text-gray-600 hover:bg-gray-50 hover:text-gray-900"
         >
           <lucide-icon name="layout-dashboard" class="h-5 w-5"></lucide-icon>
@@ -28,7 +29,7 @@ import { ModalComponent, ButtonComponent } from '../../shared/components/ui';
         <a
           routerLink="/teams"
           routerLinkActive="bg-[#e8f0ee] text-[#155347]"
-
+          data-tour="sidebar-teams"
           class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors text-gray-600 hover:bg-gray-50 hover:text-gray-900"
         >
           <lucide-icon name="users" class="h-5 w-5"></lucide-icon>
@@ -44,6 +45,7 @@ import { ModalComponent, ButtonComponent } from '../../shared/components/ui';
         </a>
         <a
           routerLink="/profile"
+          data-tour="sidebar-profile"
           routerLinkActive="bg-[#e8f0ee] text-[#155347]"
           class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors text-gray-600 hover:bg-gray-50 hover:text-gray-900"
         >

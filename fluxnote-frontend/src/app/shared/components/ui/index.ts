@@ -4,3 +4,5 @@ export { InputComponent } from './input/input.component';
 export { ModalComponent } from './modal/modal.component';
 export { BadgeComponent } from './badge/badge.component';
 export { WorkInProgressComponent } from './wip/work-in-progress.component';
+export { TourOverlayComponent } from './tour/tour-overlay.component';
+export type { TourStep, TourConfig, TourPosition, ScreenPosition } from './tour/tour.models';

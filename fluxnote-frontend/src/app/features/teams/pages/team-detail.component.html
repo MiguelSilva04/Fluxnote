@@ -37,7 +37,7 @@
 
         <!-- Members Section -->
         <div class="lg:col-span-2 space-y-6">
-          <app-card>
+          <app-card data-tour="team-members-section">
             <app-card-content customClass="p-6">
               <div class="flex items-center justify-between mb-6">
                 <h2 class="text-lg font-bold text-gray-900">Team Members</h2>
@@ -60,7 +60,7 @@
                       </div>
                     </div>
 
-                    <div class="flex items-center gap-2">
+                    <div class="flex items-center gap-2" data-tour="member-role">
                       <!-- Owner can change roles (except their own) -->
                       @if (isOwner() && member.role !== 2) {
                         <select
@@ -96,7 +96,7 @@
 
           <!-- Document Permissions Panels -->
           @if (visibleDocuments().length) {
-            <app-card>
+            <app-card data-tour="doc-permissions-section">
               <app-card-content customClass="p-6">
                 <h2 class="text-lg font-bold text-gray-900 mb-4">Document Permissions</h2>
 
@@ -118,6 +118,7 @@
                         <div class="flex items-center gap-2">
                           @if (isOwnerOrAdmin()) {
                             <button
+                              data-tour="share-btn"
                               (click)="openShareModal(doc.id); $event.stopPropagation()"
                               class="inline-flex items-center gap-1 text-xs text-emerald-700 bg-emerald-50 hover:bg-emerald-100 px-2 py-1 rounded-md font-medium transition-colors"
                             >
@@ -309,7 +310,7 @@
 
           <!-- Delete Team Section - Only visible for Owners -->
           @if (selectedTeam()?.currentUserRole === 2) {
-            <app-card>
+            <app-card data-tour="danger-zone">
               <app-card-content customClass="p-6">
                 <h3 class="text-sm font-semibold text-gray-900 mb-4">Danger Zone</h3>
                 <p class="text-xs text-gray-500 mb-4">
@@ -330,6 +331,17 @@
 
       </div>
     </div>
+  }
+
+  <!-- Botão flutuante do tour -->
+  @if (selectedTeam()) {
+    <button
+      (click)="startTour()"
+      class="fixed bottom-6 right-6 z-50 h-12 w-12 rounded-full bg-[#155347] text-white shadow-lg hover:bg-[#0d3d31] transition-all hover:scale-105 flex items-center justify-center"
+      aria-label="Start guided tour"
+    >
+      <lucide-icon name="badge-question-mark" [size]="22"></lucide-icon>
+    </button>
   }
 
   <!-- Delete Team Modal -->

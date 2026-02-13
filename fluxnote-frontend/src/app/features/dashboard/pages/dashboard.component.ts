@@ -6,6 +6,8 @@ import { LucideAngularModule } from 'lucide-angular';
 import { DashboardLayoutComponent } from '../../../layout/dashboard-layout/dashboard-layout.component';
 import { ButtonComponent, CardComponent, CardContentComponent, BadgeComponent, ModalComponent } from '../../../shared/components/ui';
 import { DocumentService, TeamService, AuthService } from '../../../core/services';
+import { TourService } from '../../../shared/services/tour.service';
+import { TourStep } from '../../../shared/components/ui/tour/tour.models';
 import { DocumentDto, TeamGet } from '../../../core/models';
 
 @Component({
@@ -24,12 +26,12 @@ import { DocumentDto, TeamGet } from '../../../core/models';
   ],
   template: `
     <app-dashboard-layout>
-      <div class="flex items-center justify-between mb-8">
+      <div data-tour="documents-section" class="flex items-center justify-between mb-8">
         <div>
           <h1 class="text-3xl font-bold text-gray-900 mb-2">My Documents</h1>
           <p class="text-gray-600">Manage and organize your documents</p>
         </div>
-        <app-button (onClick)="openCreateDocumentModal()" [leftIcon]="true" customClass="bg-[#155347] hover:bg-[#0d3d31]">
+        <app-button data-tour="create-document-btn" (onClick)="openCreateDocumentModal()" [leftIcon]="true" customClass="bg-[#155347] hover:bg-[#0d3d31]">
           <lucide-icon leftIcon name="plus" class="h-4 w-4"></lucide-icon>
           New Document
         </app-button>
@@ -56,7 +58,7 @@ import { DocumentDto, TeamGet } from '../../../core/models';
       <!-- Tabs -->
       @if (!isLoading()) {
         <div class="flex items-center justify-between mb-6">
-          <div class="flex gap-1 border-b border-gray-200 overflow-x-auto">
+          <div data-tour="team-filter-tabs" class="flex gap-1 border-b border-gray-200 overflow-x-auto">
             <!-- All Documents tab -->
             <button
               (click)="selectTeamFilter(null)"
@@ -304,6 +306,15 @@ import { DocumentDto, TeamGet } from '../../../core/models';
         </div>
       }
 
+      <!-- Botão flutuante do tour -->
+      <button
+        (click)="startTour()"
+        class="fixed bottom-6 right-6 z-50 h-12 w-12 rounded-full bg-[#155347] text-white shadow-lg hover:bg-[#0d3d31] transition-all hover:scale-105 flex items-center justify-center"
+        aria-label="Iniciar tour guiado"
+      >
+        <lucide-icon name="badge-question-mark" [size]="22"></lucide-icon>
+      </button>
+
       <!-- Delete Confirmation Modal -->
       <app-modal
         [isOpen]="isDeleteModalOpen()"
@@ -367,6 +378,7 @@ export class DashboardComponent implements OnInit {
   private documentService = inject(DocumentService);
   private teamService = inject(TeamService);
   private authService = inject(AuthService);
+  private tourService = inject(TourService);
 
   // View state
   viewMode = signal<'grid' | 'list'>('grid');
@@ -603,6 +615,66 @@ export class DashboardComponent implements OnInit {
         console.error('Error duplicating document:', err);
       }
     });
+  }
+
+  startTour(): void {
+    const steps: TourStep[] = [
+    {
+      targetSelector: '[data-tour="documents-section"]',
+      title: 'Your Documents',
+      description:
+        'Welcome to FluxNote! This is your Dashboard, where you can view and manage all your documents.',
+      position: 'bottom',
+    },
+    {
+      targetSelector: '[data-tour="create-document-btn"]',
+      title: 'Create a New Document',
+      description:
+        'Click here to create a new document. You can assign it to an existing team or create a new team on the spot.',
+      position: 'bottom',
+    },
+    {
+      targetSelector: '[data-tour="team-filter-tabs"]',
+      title: 'Filter by Team',
+      description:
+        'Use these tabs to filter your documents by team. Select "All Teams" to see everything.',
+      position: 'bottom',
+    },
+    {
+      targetSelector: '[data-tour="sidebar-teams"]',
+      title: 'Teams Section',
+      description:
+        'Go to the Teams page to view all your teams, create new ones and manage their members.',
+      position: 'right',
+            onActivate: () => {
+        this.router.navigate(['/teams']);
+      }
+    }
+  ];
+    if (this.userTeams().length > 0) {
+      steps.push({
+      targetSelector: '[data-tour="team-details"]',
+      title: 'Team Details',
+      description:
+        'Inside each team, you can access Team Details to manage members, assign Team Roles (Owner, Admin, Member) and configure Document Roles (per-document permissions).',
+      position: 'right',
+    },);
+    }
+
+    steps.push(
+      {
+        targetSelector: '[data-tour="sidebar-profile"]',
+        title: 'Your Profile',
+        description:
+          'Visit your Profile to update your personal information and manage your account settings.',
+        position: 'bottom',
+        onActivate: () => {
+          this.router.navigate(['/profile']);
+        }
+      }
+    );
+
+    this.tourService.start(steps);
   }
 
   formatDate(dateString: string): string {
