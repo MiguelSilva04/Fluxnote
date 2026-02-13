@@ -71,6 +71,20 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'auth/external-callback',
+    loadComponent: () =>
+      import('./features/auth/pages/external-callback/external-callback.component').then(
+        (m) => m.ExternalCallbackComponent
+      ),
+  },
+  {
+    path: 'auth/external-error',
+    loadComponent: () =>
+      import('./features/auth/pages/external-error/external-error.component').then(
+        (m) => m.ExternalErrorComponent
+      ),
+  },
+  {
     path: 'login',
     canActivate: [guestGuard],
     loadComponent: () =>

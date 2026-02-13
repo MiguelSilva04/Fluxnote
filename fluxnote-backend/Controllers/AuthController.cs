@@ -4,7 +4,10 @@ using Fluxnote.Backend.Dtos.Auth;
 using Fluxnote.Backend.Models;
 using Fluxnote.Backend.Services.Auth;
 using Fluxnote.Backend.Services.Email;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authentication.MicrosoftAccount;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -315,6 +318,326 @@ public class AuthController : ControllerBase
         });
     }
 
+    [HttpGet("external-login/{provider}")]
+    [AllowAnonymous]
+    public IActionResult ExternalLogin(string provider, [FromQuery] string? returnUrl = null)
+    {
+        var authScheme = ResolveAuthScheme(provider);
+        if (authScheme is null)
+        {
+            return BadRequest(new
+            {
+                error = "Provider not supported.",
+                supportedProviders = new[] { "google", "microsoft" }
+            });
+        }
+
+        var redirectUrl = Url.Action(nameof(ExternalLoginCallback), "Auth", new { returnUrl });
+        var properties = _signInManager.ConfigureExternalAuthenticationProperties(authScheme, redirectUrl!);
+        return Challenge(properties, authScheme);
+    }
+
+    [HttpGet("external-callback")]
+    [AllowAnonymous]
+    public async Task<IActionResult> ExternalLoginCallback([FromQuery] string? returnUrl = null, [FromQuery] string? remoteError = null)
+    {
+        var frontendCallbackUrl = _configuration["Authentication:ExternalCallbackUrl"] ?? "http://localhost:4200/auth/external-callback";
+        var frontendErrorUrl = _configuration["Authentication:ExternalErrorUrl"] ?? "http://localhost:4200/auth/external-error";
+
+        if (!string.IsNullOrWhiteSpace(remoteError))
+        {
+            return RedirectExternalError(frontendErrorUrl, "external_provider_error", remoteError);
+        }
+
+        var info = await _signInManager.GetExternalLoginInfoAsync();
+        if (info is null)
+        {
+            return RedirectExternalError(frontendErrorUrl, "external_login_failed");
+        }
+
+        var email = info.Principal.FindFirstValue(ClaimTypes.Email) ?? info.Principal.FindFirstValue("email");
+        if (string.IsNullOrWhiteSpace(email))
+        {
+            return RedirectExternalError(frontendErrorUrl, "email_not_provided");
+        }
+
+        var fullName = info.Principal.FindFirstValue(ClaimTypes.Name);
+        var profilePicture = ExtractProfilePicture(info.Principal);
+        var authProvider = ResolveAuthProvider(info.LoginProvider);
+
+        var signInResult = await _signInManager.ExternalLoginSignInAsync(
+            info.LoginProvider,
+            info.ProviderKey,
+            isPersistent: false,
+            bypassTwoFactor: true);
+
+        User? user;
+
+        if (signInResult.Succeeded)
+        {
+            user = await _userManager.FindByLoginAsync(info.LoginProvider, info.ProviderKey);
+            if (user is null)
+            {
+                return RedirectExternalError(frontendErrorUrl, "external_login_failed");
+            }
+        }
+        else
+        {
+            user = await _userManager.FindByEmailAsync(email);
+
+            if (user is not null)
+            {
+                var addLoginResult = await _userManager.AddLoginAsync(user, info);
+                if (!addLoginResult.Succeeded)
+                {
+                    var errors = string.Join(", ", addLoginResult.Errors.Select(e => e.Description));
+                    return RedirectExternalError(frontendErrorUrl, "link_external_failed", errors);
+                }
+            }
+            else
+            {
+                user = new User
+                {
+                    UserName = await GenerateUniqueUsernameAsync(email),
+                    Email = email,
+                    FullName = fullName,
+                    ProfilePictureUrl = profilePicture,
+                    EmailConfirmed = true,
+                    AccountStatus = AccountStatus.Active,
+                    AuthProvider = authProvider,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                };
+
+                var createResult = await _userManager.CreateAsync(user);
+                if (!createResult.Succeeded)
+                {
+                    var errors = string.Join(", ", createResult.Errors.Select(e => e.Description));
+                    return RedirectExternalError(frontendErrorUrl, "create_user_failed", errors);
+                }
+
+                var addLoginResult = await _userManager.AddLoginAsync(user, info);
+                if (!addLoginResult.Succeeded)
+                {
+                    await _userManager.DeleteAsync(user);
+                    var errors = string.Join(", ", addLoginResult.Errors.Select(e => e.Description));
+                    return RedirectExternalError(frontendErrorUrl, "link_external_failed", errors);
+                }
+            }
+        }
+
+        if (!user.EmailConfirmed || user.AccountStatus == AccountStatus.PendingEmailConfirmation)
+        {
+            user.EmailConfirmed = true;
+            user.AccountStatus = AccountStatus.Active;
+            user.UpdatedAt = DateTime.UtcNow;
+            await _userManager.UpdateAsync(user);
+        }
+
+        if (user.AccountStatus is AccountStatus.Suspended or AccountStatus.Blocked)
+        {
+            return RedirectExternalError(frontendErrorUrl, "account_not_active");
+        }
+
+        if (!string.IsNullOrWhiteSpace(fullName) && string.IsNullOrWhiteSpace(user.FullName))
+        {
+            user.FullName = fullName;
+        }
+        if (!string.IsNullOrWhiteSpace(profilePicture) && string.IsNullOrWhiteSpace(user.ProfilePictureUrl))
+        {
+            user.ProfilePictureUrl = profilePicture;
+        }
+        user.UpdatedAt = DateTime.UtcNow;
+        await _userManager.UpdateAsync(user);
+
+        var accessToken = _tokenService.CreateAccessToken(user);
+
+        var now = DateTime.UtcNow;
+        var idleDays = int.Parse(_configuration["Auth:RefreshIdleDays"] ?? "7");
+        var absoluteDays = int.Parse(_configuration["Auth:RefreshAbsoluteDaysRememberMe"] ?? "30");
+        var sessionStartedAt = now;
+        var absoluteExpiresAt = sessionStartedAt.AddDays(absoluteDays);
+        var expiresAt = Min(now.AddDays(idleDays), absoluteExpiresAt);
+
+        var refreshPlain = TokenService.GenerateRefreshTokenPlain();
+        var refreshHash = TokenService.HashRefreshToken(refreshPlain);
+
+        _db.RefreshTokens.Add(new RefreshToken
+        {
+            TokenHash = refreshHash,
+            UserId = user.Id,
+            SessionId = Guid.NewGuid().ToString(),
+            SessionStartedAt = sessionStartedAt,
+            LastUsedAt = now,
+            ExpiresAt = expiresAt,
+            AbsoluteDays = absoluteDays,
+            IdleDays = idleDays,
+            CreatedAt = now,
+            CreatedByIp = HttpContext.Connection.RemoteIpAddress?.ToString()
+        });
+
+        await _db.SaveChangesAsync();
+        SetRefreshCookie(refreshPlain, expiresAt);
+
+        var fragmentParams = new Dictionary<string, string?>
+        {
+            ["access_token"] = accessToken
+        };
+
+        if (!string.IsNullOrWhiteSpace(returnUrl))
+        {
+            fragmentParams["returnUrl"] = returnUrl;
+        }
+
+        var fragment = (QueryString.Create(fragmentParams).Value ?? string.Empty).TrimStart('?');
+        return Redirect($"{frontendCallbackUrl}#{fragment}");
+    }
+
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [HttpGet("external-logins")]
+    public async Task<IActionResult> GetExternalLogins()
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (userId is null)
+        {
+            return Unauthorized(new { message = "Invalid claims for obtaining user id." });
+        }
+
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user is null)
+        {
+            return Unauthorized(new { message = "User not found." });
+        }
+
+        var logins = await _userManager.GetLoginsAsync(user);
+        var linkedProviders = logins.Select(l => new
+        {
+            provider = l.LoginProvider,
+            providerDisplayName = l.ProviderDisplayName,
+            providerKey = l.ProviderKey
+        });
+
+        var availableProviders = new[] { "Google", "Microsoft" }
+            .Where(p => !logins.Any(l => l.LoginProvider.Equals(p, StringComparison.OrdinalIgnoreCase)));
+
+        return Ok(new
+        {
+            linkedProviders,
+            availableProviders
+        });
+    }
+
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [HttpPost("link-external/{provider}")]
+    public IActionResult LinkExternalLogin(string provider)
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (userId is null)
+        {
+            return Unauthorized(new { message = "Invalid claims for obtaining user id." });
+        }
+
+        var authScheme = ResolveAuthScheme(provider);
+        if (authScheme is null)
+        {
+            return BadRequest(new { error = "Provider not supported." });
+        }
+
+        var redirectUrl = Url.Action(nameof(LinkExternalLoginCallback), "Auth", new { linkUserId = userId });
+        var properties = _signInManager.ConfigureExternalAuthenticationProperties(authScheme, redirectUrl!, userId);
+        return Challenge(properties, authScheme);
+    }
+
+    [HttpGet("link-external-callback")]
+    [AllowAnonymous]
+    public async Task<IActionResult> LinkExternalLoginCallback([FromQuery] string? linkUserId = null, [FromQuery] string? remoteError = null)
+    {
+        var frontendCallbackUrl = _configuration["Authentication:ExternalCallbackUrl"] ?? "http://localhost:4200/auth/external-callback";
+        var frontendErrorUrl = _configuration["Authentication:ExternalErrorUrl"] ?? "http://localhost:4200/auth/external-error";
+
+        if (!string.IsNullOrWhiteSpace(remoteError))
+        {
+            return RedirectExternalError(frontendErrorUrl, "external_provider_error", remoteError);
+        }
+
+        if (string.IsNullOrWhiteSpace(linkUserId))
+        {
+            return RedirectExternalError(frontendErrorUrl, "unauthorized");
+        }
+
+        var user = await _userManager.FindByIdAsync(linkUserId);
+        if (user is null)
+        {
+            return RedirectExternalError(frontendErrorUrl, "unauthorized");
+        }
+
+        var info = await _signInManager.GetExternalLoginInfoAsync(linkUserId);
+        if (info is null)
+        {
+            return RedirectExternalError(frontendErrorUrl, "external_login_failed");
+        }
+
+        var existingUser = await _userManager.FindByLoginAsync(info.LoginProvider, info.ProviderKey);
+        if (existingUser is not null && existingUser.Id != user.Id)
+        {
+            return RedirectExternalError(frontendErrorUrl, "provider_already_linked");
+        }
+
+        var result = await _userManager.AddLoginAsync(user, info);
+        if (!result.Succeeded)
+        {
+            var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+            return RedirectExternalError(frontendErrorUrl, "link_external_failed", errors);
+        }
+
+        var fragment = (QueryString.Create("linked", info.LoginProvider.ToLowerInvariant()).Value ?? string.Empty).TrimStart('?');
+        return Redirect($"{frontendCallbackUrl}#{fragment}");
+    }
+
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [HttpDelete("unlink-external/{provider}")]
+    public async Task<IActionResult> UnlinkExternalLogin(string provider)
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (userId is null)
+        {
+            return Unauthorized(new { message = "Invalid claims for obtaining user id." });
+        }
+
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user is null)
+        {
+            return Unauthorized(new { message = "User not found." });
+        }
+
+        var hasPassword = await _userManager.HasPasswordAsync(user);
+        var logins = await _userManager.GetLoginsAsync(user);
+
+        if (!hasPassword && logins.Count <= 1)
+        {
+            return BadRequest(new
+            {
+                error = "Cannot remove the only authentication method. Set a password first."
+            });
+        }
+
+        var login = logins.FirstOrDefault(l =>
+            l.LoginProvider.Equals(provider, StringComparison.OrdinalIgnoreCase));
+
+        if (login is null)
+        {
+            return NotFound(new { error = "Provider is not linked to this account." });
+        }
+
+        var result = await _userManager.RemoveLoginAsync(user, login.LoginProvider, login.ProviderKey);
+        if (!result.Succeeded)
+        {
+            return BadRequest(new { errors = result.Errors.Select(e => e.Description) });
+        }
+
+        return Ok(new { message = $"Provider {provider} unlinked successfully." });
+    }
+
     /// <summary>
     /// Obtém o perfil completo do utilizador autenticado.
     /// </summary>
@@ -605,13 +928,13 @@ public class AuthController : ControllerBase
         if (user is null)
             return Unauthorized(new { message = "User not found." });
 
-        // verifica se o utilizador usa autenticação local
-        if (user.AuthProvider != AuthProvider.Local)
+        var hasPassword = await _userManager.HasPasswordAsync(user);
+        if (!hasPassword)
         {
             return BadRequest(new
             {
                 message = "Cannot change password.",
-                errors = new[] { "Password change is only available for accounts using email/password authentication." }
+                errors = new[] { "This account does not have a password yet. Use /api/auth/set-password first." }
             });
         }
 
@@ -641,6 +964,38 @@ public class AuthController : ControllerBase
         await _userManager.UpdateAsync(user);
 
         return Ok(new { message = "Password changed successfully." });
+    }
+
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [HttpPost("set-password")]
+    public async Task<IActionResult> SetPassword([FromBody] SetPasswordRequest request)
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (userId is null)
+            return Unauthorized(new { message = "Invalid claims for obtaining user id." });
+
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user is null)
+            return Unauthorized(new { message = "User not found." });
+
+        if (await _userManager.HasPasswordAsync(user))
+        {
+            return BadRequest(new
+            {
+                message = "User already has a password. Use /api/auth/users/me/password instead."
+            });
+        }
+
+        var result = await _userManager.AddPasswordAsync(user, request.NewPassword);
+        if (!result.Succeeded)
+        {
+            return BadRequest(new { errors = result.Errors.Select(e => e.Description) });
+        }
+
+        user.UpdatedAt = DateTime.UtcNow;
+        await _userManager.UpdateAsync(user);
+
+        return Ok(new { message = "Password set successfully." });
     }
 
     /// <summary>
@@ -949,7 +1304,7 @@ public class AuthController : ControllerBase
         {
             if (revokeAll)
             {
-                await RevokeSessionAsync(stored.UserId, stored.SessionId, now);
+                await RevokeAllUserSessionsAsync(stored.UserId, now);
             }
             else
             {
@@ -968,6 +1323,18 @@ public class AuthController : ControllerBase
     {
         // revoga quaisquer refresh tokens activos desta sessão
         var tokens = await _db.RefreshTokens
+            .Where(rt => rt.UserId == userId && rt.SessionId == sessionId && rt.RevokedAt == null && rt.ExpiresAt > now)
+            .ToListAsync();
+
+        foreach (var t in tokens)
+            t.RevokedAt = now;
+
+        await _db.SaveChangesAsync();
+    }
+
+    private async Task RevokeAllUserSessionsAsync(string userId, DateTime now)
+    {
+        var tokens = await _db.RefreshTokens
             .Where(rt => rt.UserId == userId && rt.RevokedAt == null && rt.ExpiresAt > now)
             .ToListAsync();
 
@@ -976,6 +1343,75 @@ public class AuthController : ControllerBase
 
         await _db.SaveChangesAsync();
     }
+
+    private IActionResult RedirectExternalError(string frontendErrorUrl, string error, string? errorDescription = null)
+    {
+        var queryParams = new Dictionary<string, string?>
+        {
+            ["error"] = error
+        };
+
+        if (!string.IsNullOrWhiteSpace(errorDescription))
+        {
+            queryParams["error_description"] = errorDescription;
+        }
+
+        return Redirect(QueryHelpers.AddQueryString(frontendErrorUrl, queryParams));
+    }
+
+    private static string? ResolveAuthScheme(string provider)
+    {
+        return provider.ToLowerInvariant() switch
+        {
+            "google" => GoogleDefaults.AuthenticationScheme,
+            "microsoft" => MicrosoftAccountDefaults.AuthenticationScheme,
+            _ => null
+        };
+    }
+
+    private static AuthProvider ResolveAuthProvider(string provider)
+    {
+        return provider.ToLowerInvariant() switch
+        {
+            "google" => AuthProvider.Google,
+            "microsoft" => AuthProvider.Microsoft,
+            _ => AuthProvider.Local
+        };
+    }
+
+    private static string? ExtractProfilePicture(ClaimsPrincipal principal)
+    {
+        return principal.FindFirstValue("picture")
+            ?? principal.FindFirstValue("urn:google:picture")
+            ?? principal.FindFirstValue("photo");
+    }
+
+    private async Task<string> GenerateUniqueUsernameAsync(string email)
+    {
+        var baseUsername = email.Split('@')[0];
+        baseUsername = new string(baseUsername.Where(c => char.IsLetterOrDigit(c) || c == '_').ToArray());
+
+        if (baseUsername.Length < 3)
+        {
+            baseUsername = $"user_{baseUsername}";
+        }
+
+        if (baseUsername.Length > 25)
+        {
+            baseUsername = baseUsername[..25];
+        }
+
+        var candidate = baseUsername;
+        var counter = 1;
+        while (await _userManager.FindByNameAsync(candidate) is not null)
+        {
+            candidate = $"{baseUsername}{counter}";
+            counter++;
+        }
+
+        return candidate;
+    }
+
     private static DateTime Min(DateTime a, DateTime b) => a <= b ? a : b;
 
     private void ClearRefreshCookie()

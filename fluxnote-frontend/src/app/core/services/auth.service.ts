@@ -52,6 +52,15 @@ export interface TokenResponse {
   expiresInSeconds: number;
 }
 
+export type ExternalAuthProvider = 'google' | 'microsoft';
+
+export interface ExternalCallbackResult {
+  success: boolean;
+  error?: string;
+  returnUrl?: string;
+  linked?: string;
+}
+
 export interface UserProfile {
   id: string;
   email: string;
@@ -86,6 +95,15 @@ export interface ApiResult {
   success: boolean;
   message?: string;
   errors?: string[];
+}
+
+export interface ExternalLoginsResponse {
+  linkedProviders: Array<{
+    provider: string;
+    providerDisplayName?: string;
+    providerKey: string;
+  }>;
+  availableProviders: string[];
 }
 
 /**
@@ -205,6 +223,45 @@ export class AuthService {
    * @param http - cliente HTTP do Angular para realizar requisições ao backend
    */
   constructor(private router: Router, private http: HttpClient) { }
+
+  externalLogin(provider: ExternalAuthProvider, returnUrl?: string): void {
+    const params = new URLSearchParams();
+    if (returnUrl) {
+      params.set('returnUrl', returnUrl);
+    }
+
+    const query = params.toString();
+    const url = `${this.baseUrl}/external-login/${provider}${query ? `?${query}` : ''}`;
+    window.location.assign(url);
+  }
+
+  async handleExternalCallback(fragment = window.location.hash): Promise<ExternalCallbackResult> {
+    const hash = fragment.startsWith('#') ? fragment.substring(1) : fragment;
+    const params = new URLSearchParams(hash);
+
+    const error = params.get('error');
+    const errorDescription = params.get('error_description');
+    if (error) {
+      return { success: false, error: errorDescription || error };
+    }
+
+    const linked = params.get('linked');
+    if (linked) {
+      return { success: true, linked };
+    }
+
+    const accessToken = params.get('access_token');
+    if (!accessToken) {
+      return { success: false, error: 'No token received from external provider.' };
+    }
+
+    this._accessToken.set(accessToken);
+    this._status.set('authenticated');
+    await this.loadUserProfile();
+
+    const returnUrl = params.get('returnUrl') ?? undefined;
+    return { success: true, returnUrl };
+  }
 
   /**
    * formata um tempo em segundos para uma string legível com minutos e segundos.
@@ -807,6 +864,23 @@ export class AuthService {
         available: false,
         message: errorBody.message || 'Failed to check username availability.'
       };
+    }
+  }
+
+  async getExternalLogins(): Promise<ExternalLoginsResponse | null> {
+    try {
+      const token = this.getAccessToken();
+      if (!token) {
+        return null;
+      }
+
+      return await firstValueFrom(
+        this.http.get<ExternalLoginsResponse>(`${this.baseUrl}/external-logins`, {
+          headers: { Authorization: `Bearer ${token}` }
+        })
+      );
+    } catch {
+      return null;
     }
   }
 

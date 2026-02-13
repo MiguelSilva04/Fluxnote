@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace fluxnotebackend.Migrations
 {
     /// <inheritdoc />
-    public partial class AddDocumentPermission : Migration
+    public partial class initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -276,6 +276,38 @@ namespace fluxnotebackend.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "DocumentInvite",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Token = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    DocumentId = table.Column<int>(type: "int", nullable: false),
+                    CreatedByTeamMemberId = table.Column<int>(type: "int", nullable: false),
+                    Role = table.Column<int>(type: "int", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ExpiresAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    IsRevoked = table.Column<bool>(type: "bit", nullable: false),
+                    UsedByUserId = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_DocumentInvite", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_DocumentInvite_Document_DocumentId",
+                        column: x => x.DocumentId,
+                        principalTable: "Document",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_DocumentInvite_TeamMember_CreatedByTeamMemberId",
+                        column: x => x.CreatedByTeamMemberId,
+                        principalTable: "TeamMember",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "DocumentPermission",
                 columns: table => new
                 {
@@ -359,6 +391,27 @@ namespace fluxnotebackend.Migrations
                 column: "TeamId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_DocumentInvite_CreatedByTeamMemberId",
+                table: "DocumentInvite",
+                column: "CreatedByTeamMemberId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_DocumentInvite_DocumentId",
+                table: "DocumentInvite",
+                column: "DocumentId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_DocumentInvite_ExpiresAt",
+                table: "DocumentInvite",
+                column: "ExpiresAt");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_DocumentInvite_Token",
+                table: "DocumentInvite",
+                column: "Token",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_DocumentPermission_DocumentId",
                 table: "DocumentPermission",
                 column: "DocumentId");
@@ -413,6 +466,9 @@ namespace fluxnotebackend.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetUserTokens");
+
+            migrationBuilder.DropTable(
+                name: "DocumentInvite");
 
             migrationBuilder.DropTable(
                 name: "DocumentPermission");
