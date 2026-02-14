@@ -114,7 +114,7 @@ namespace Fluxnote.Backend.Tests.Requirements
 
             var acceptResponse = await inviteeClient.PostAsJsonAsync($"/api/document-invites/{invite!.Token}/accept", new { });
             acceptResponse.EnsureSuccessStatusCode();
-            var acceptResult = await acceptResponse.Content.ReadFromJsonAsync<AcceptInviteResponseDto>();
+            var acceptResult = await acceptResponse.Content.ReadFromJsonAsync<AcceptDocumentInviteResponseDto>();
 
             Assert.NotNull(acceptResult);
             Assert.Equal(document.Id, acceptResult!.DocumentId);

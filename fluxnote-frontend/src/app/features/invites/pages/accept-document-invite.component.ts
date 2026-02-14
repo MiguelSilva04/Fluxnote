@@ -4,7 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
 import { ButtonComponent, CardComponent, CardContentComponent } from '../../../shared/components/ui';
 import { DocumentInviteService, AuthService } from '../../../core/services';
-import { DocumentInviteDto, AcceptInviteResponse } from '../../../core/models';
+import { DocumentInviteDto, AcceptDocumentInviteResponse } from '../../../core/models';
 
 @Component({
   selector: 'app-accept-invite',
@@ -73,10 +73,12 @@ import { DocumentInviteDto, AcceptInviteResponse } from '../../../core/models';
                     <span class="text-xs text-gray-500">Team</span>
                     <p class="font-medium text-gray-900">{{ invite()!.teamName }}</p>
                   </div>
+                  @if(invite()?.createdByName){
                   <div>
                     <span class="text-xs text-gray-500">Invited by</span>
                     <p class="font-medium text-gray-900">{{ invite()!.createdByName }}</p>
                   </div>
+                  }
                   <div>
                     <span class="text-xs text-gray-500">Access</span>
                     <p class="font-medium" [class]="invite()!.role === 1 ? 'text-emerald-600' : 'text-blue-600'">
@@ -120,7 +122,7 @@ import { DocumentInviteDto, AcceptInviteResponse } from '../../../core/models';
     </div>
   `
 })
-export class AcceptInviteComponent implements OnInit {
+export class AcceptDocumentInviteComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private inviteService = inject(DocumentInviteService);
@@ -131,7 +133,7 @@ export class AcceptInviteComponent implements OnInit {
   invite = signal<DocumentInviteDto | null>(null);
   accepting = signal(false);
   accepted = signal(false);
-  acceptResult = signal<AcceptInviteResponse | null>(null);
+  acceptResult = signal<AcceptDocumentInviteResponse | null>(null);
 
   ngOnInit(): void {
     // verificar se esta autenticado

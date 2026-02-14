@@ -134,9 +134,14 @@ export const routes: Routes = [
       import('./features/teams/pages/team-detail.component').then((m) => m.TeamDetailComponent),
   },
   {
-    path: 'invite/:token',
+    path: 'document-invite/:token',
     loadComponent: () =>
-      import('./features/invites/pages/accept-invite.component').then((m) => m.AcceptInviteComponent),
+      import('./features/invites/pages/accept-document-invite.component').then((m) => m.AcceptDocumentInviteComponent),
+  },
+  {
+    path: 'team-invite/:token',
+    loadComponent: () =>
+      import('./features/invites/pages/accept-team-invite.component').then((m) => m.AcceptTeamInviteComponent),
   },
   {
     path: 'trash',

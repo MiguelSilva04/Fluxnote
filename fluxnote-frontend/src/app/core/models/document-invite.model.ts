@@ -28,7 +28,7 @@ export interface DocumentInviteDto {
 /**
  * Resposta ao aceitar um convite
  */
-export interface AcceptInviteResponse {
+export interface AcceptDocumentInviteResponse {
     teamId: number;
     documentId: number;
     documentTitle: string;

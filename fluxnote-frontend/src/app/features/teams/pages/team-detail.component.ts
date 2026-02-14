@@ -6,11 +6,12 @@ import { LucideAngularModule } from 'lucide-angular';
 import { DashboardLayoutComponent } from '../../../layout/dashboard-layout/dashboard-layout.component';
 import { ButtonComponent, CardComponent, CardContentComponent, BadgeComponent, ModalComponent } from '../../../shared/components/ui';
 import { DocumentShareModalComponent } from '../../../shared/components/document-share-modal/document-share-modal.component';
-import { TeamService, DocumentPermissionService, AuthService, DocumentInviteService, DocumentService } from '../../../core/services';
+import { TeamShareModalComponent } from '../../../shared/components/team-share-modal/team-share-modal.component';
+import { TeamService, DocumentPermissionService, AuthService, DocumentInviteService, DocumentService, TeamInviteService } from '../../../core/services';
 import { ToastService } from '../../../shared/services/toast.service';
 import { TourService } from '../../../shared/services/tour.service';
 import { TourStep } from '../../../shared/components/ui/tour/tour.models';
-import { TeamMemberToPost, TeamDocument, DocumentPermissionSummary, DocumentInviteDto } from '../../../core/models';
+import { TeamMemberToPost, TeamDocument, DocumentPermissionSummary, DocumentInviteDto, TeamInviteDto } from '../../../core/models';
 
 @Component({
   selector: 'app-team-detail',
@@ -25,7 +26,8 @@ import { TeamMemberToPost, TeamDocument, DocumentPermissionSummary, DocumentInvi
     CardContentComponent,
     BadgeComponent,
     ModalComponent,
-    DocumentShareModalComponent
+    DocumentShareModalComponent,
+    TeamShareModalComponent
   ],
   templateUrl: `./team-detail.component.html`
 })
@@ -38,7 +40,8 @@ export class TeamDetailComponent {
   private toastService = inject(ToastService);
   private documentService = inject(DocumentService);
 
-  private inviteService = inject(DocumentInviteService);
+  private documentInviteService = inject(DocumentInviteService);
+  private teamInviteService = inject(TeamInviteService);
   private tourService = inject(TourService);
 
   shareDocId = signal<number | null>(null);
@@ -48,6 +51,10 @@ export class TeamDetailComponent {
   shareLoading = signal(false);
   shareCopied = signal(false);
   documentInvites = signal<DocumentInviteDto[]>([]);
+  
+  shareTeamId = signal<number | null>(null);
+  shareTeamOpen = signal(false);
+  teamInvites = signal<TeamInviteDto[]>([]);
 
   selectedTeam = this.teamService.selectedTeam;
 
@@ -86,6 +93,7 @@ export class TeamDetailComponent {
   ngOnInit(): void {
     this.route.params.subscribe(params => {
       const teamId = Number(params['id']);
+      this.shareTeamId.set(teamId);
       this.loadTeam(teamId);
     });
   }
@@ -523,7 +531,7 @@ export class TeamDetailComponent {
   /**
    * Convidar utilizadores para um documento
    */
-  openShareModal(docId: number): void {
+  openDocumentShareModal(docId: number): void {
     this.shareDocId.set(docId);
     this.shareRole.set(0);
     this.shareExpirationDays.set(7);
@@ -532,18 +540,18 @@ export class TeamDetailComponent {
     this.loadDocumentInvites(docId);
   }
 
-  closeShareModal(): void {
+  closeDocumentShareModal(): void {
     this.shareDocId.set(null);
     this.shareGeneratedUrl.set(null);
     this.documentInvites.set([]);
   }
 
-  generateInviteLink(): void {
+  generateDocumentInviteLink(): void {
     const docId = this.shareDocId();
     if (!docId) return;
 
     this.shareLoading.set(true);
-    this.inviteService.createInvite({
+    this.documentInviteService.createInvite({
       documentId: docId,
       role: this.shareRole(),
       expirationDays: this.shareExpirationDays()
@@ -575,14 +583,14 @@ export class TeamDetailComponent {
   }
 
   loadDocumentInvites(docId: number): void {
-    this.inviteService.getInvitesByDocument(docId).subscribe({
+    this.documentInviteService.getInvitesByDocument(docId).subscribe({
       next: (invites) => this.documentInvites.set(invites),
       error: () => this.documentInvites.set([])
     });
   }
 
-  revokeInvite(inviteId: number): void {
-    this.inviteService.revokeInvite(inviteId).subscribe({
+  revokeDocumentInvite(inviteId: number): void {
+    this.documentInviteService.revokeInvite(inviteId).subscribe({
       next: () => {
         this.toastService.success('Invite revoked.');
         const docId = this.shareDocId();
@@ -594,14 +602,14 @@ export class TeamDetailComponent {
     });
   }
 
-  clearInvitesList(): void {
+  clearDocumentInvitesList(): void {
     const usedInvites = this.documentInvites().filter(inv => inv.isUsed);
     if (usedInvites.length === 0) return;
 
     let completed = 0;
     let hadError = false;
     usedInvites.forEach(inv => {
-      this.inviteService.revokeInvite(inv.id).subscribe({
+      this.documentInviteService.revokeInvite(inv.id).subscribe({
         next: () => {
           completed += 1;
           if (completed === usedInvites.length) {
@@ -626,6 +634,100 @@ export class TeamDetailComponent {
   viewInviteLink(url: string): void {
     this.shareGeneratedUrl.set(url);
     this.shareCopied.set(false);
+  }
+
+  /**
+   * Convidar utilizadores para a equipa
+   */
+  openTeamShareModal(): void {
+    const teamId = this.shareTeamId();
+    //console.log(teamId);
+    if (!teamId) return;
+    this.shareTeamOpen.set(true);
+    this.shareExpirationDays.set(7);
+    this.shareGeneratedUrl.set(null);
+    this.shareCopied.set(false);
+    this.loadTeamInvites(teamId);
+  }
+
+  closeTeamShareModal(): void {
+    this.shareGeneratedUrl.set(null);
+    this.shareTeamOpen.set(false);
+    this.teamInvites.set([]);
+  }
+
+  generateTeamInviteLink(): void {
+    const teamId = this.shareTeamId();
+    if (!teamId) return;
+
+    this.shareLoading.set(true);
+    this.teamInviteService.createInvite({
+      teamId: teamId,
+      expirationDays: this.shareExpirationDays()
+    }).subscribe({
+      next: (invite) => {
+        this.shareGeneratedUrl.set(invite.inviteUrl);
+        this.shareLoading.set(false);
+        this.shareCopied.set(false);
+        // Reload list of invites
+        this.loadTeamInvites(teamId);
+      },
+      error: (err) => {
+        console.error('Error creating invite:', err);
+        this.toastService.error('Error creating invite.');
+        this.shareLoading.set(false);
+      }
+    });
+  }
+
+
+  loadTeamInvites(teamId: number): void {
+    this.teamInviteService.getInvitesByTeam(teamId).subscribe({
+      next: (invites) => this.teamInvites.set(invites),
+      error: () => this.teamInvites.set([])
+    });
+  }
+
+  revokeTeamInvite(inviteId: number): void {
+    this.teamInviteService.revokeInvite(inviteId).subscribe({
+      next: () => {
+        this.toastService.success('Invite revoked.');
+        const teamId = this.shareTeamId();
+        if (teamId) this.loadTeamInvites(teamId);
+      },
+      error: () => {
+        this.toastService.error('Error revoking invite.');
+      }
+    });
+  }
+
+  clearTeamInvitesList(): void {
+    const usedInvites = this.teamInvites().filter(inv => inv.isUsed);
+    if (usedInvites.length === 0) return;
+
+    let completed = 0;
+    let hadError = false;
+    usedInvites.forEach(inv => {
+      this.teamInviteService.revokeInvite(inv.id).subscribe({
+        next: () => {
+          completed += 1;
+          if (completed === usedInvites.length) {
+            const teamId = this.shareTeamId();
+            if (teamId) this.loadTeamInvites(teamId);
+            if (!hadError) this.toastService.success('Used invites cleared.');
+          }
+        },
+        error: () => {
+          hadError = true;
+          completed += 1;
+          if (completed === usedInvites.length) {
+            const teamId = this.shareTeamId();
+            if (teamId) this.loadTeamInvites(teamId);
+            this.toastService.error('Failed to clear some invites.');
+          }
+        }
+      });
+    });
   }
 
   startTour(): void {
@@ -672,11 +774,11 @@ export class TeamDetailComponent {
           position: 'bottom',
           onActivate: () => {
             if (firstDoc) {
-              this.openShareModal(firstDoc.id);
+              this.openDocumentShareModal(firstDoc.id);
             }
           },
           onDeactivate: () => {
-            this.closeShareModal();
+            this.closeDocumentShareModal();
           },
         },
       );

@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace fluxnotebackend.Migrations
 {
     /// <inheritdoc />
-    public partial class initial : Migration
+    public partial class aaa : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -283,11 +283,7 @@ namespace fluxnotebackend.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Token = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     DocumentId = table.Column<int>(type: "int", nullable: false),
-<<<<<<<< HEAD:fluxnote-backend/Migrations/20260214161828_initial.cs
                     CreatedByTeamMemberId = table.Column<int>(type: "int", nullable: true),
-========
-                    CreatedByTeamMemberId = table.Column<int>(type: "int", nullable: false),
->>>>>>>> origin/main:fluxnote-backend/Migrations/20260213145409_initial.cs
                     Role = table.Column<int>(type: "int", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     ExpiresAt = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -308,11 +304,7 @@ namespace fluxnotebackend.Migrations
                         column: x => x.CreatedByTeamMemberId,
                         principalTable: "TeamMember",
                         principalColumn: "Id",
-<<<<<<<< HEAD:fluxnote-backend/Migrations/20260214161828_initial.cs
                         onDelete: ReferentialAction.SetNull);
-========
-                        onDelete: ReferentialAction.Restrict);
->>>>>>>> origin/main:fluxnote-backend/Migrations/20260213145409_initial.cs
                 });
 
             migrationBuilder.CreateTable(

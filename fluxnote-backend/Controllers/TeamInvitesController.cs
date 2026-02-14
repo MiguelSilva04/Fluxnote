@@ -1,5 +1,5 @@
 ﻿using Fluxnote.Backend.Data;
-using Fluxnote.Backend.Dtos.DocumentInvites;
+using Fluxnote.Backend.Dtos.TeamInvites;
 using Fluxnote.Backend.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -10,16 +10,16 @@ using System.Security.Claims;
 
 namespace Fluxnote.Backend.Controllers
 {
-    [Route("api/document-invites")]
+    [Route("api/team-invites")]
     [ApiController]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-    public class DocumentInvitesController : ControllerBase
+    public class TeamInvitesController : ControllerBase
     {
         private readonly FluxnoteServerContext _context;
         private readonly UserManager<User> _userManager;
         private readonly IConfiguration _configuration;
 
-        public DocumentInvitesController(
+        public TeamInvitesController(
             FluxnoteServerContext context,
             UserManager<User> userManager,
             IConfiguration configuration
@@ -35,21 +35,11 @@ namespace Fluxnote.Backend.Controllers
         /// Apenas Owner ou TeamAdmin podem criar convites.
         /// </summary>
         [HttpPost]
-        public async Task<ActionResult<DocumentInviteDto>> CreateInvite([FromBody] CreateDocumentInviteRequest request)
+        public async Task<ActionResult<TeamInviteDto>> CreateInvite([FromBody] CreateTeamInviteRequest request)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userId is null)
                 return new UnauthorizedObjectResult(new { message = "User not authenticated." });
-
-            // Verificar se o documento existe
-            if (request.Role != (int)DocumentRole.Viewer && request.Role != (int)DocumentRole.Editor)
-            {
-                return BadRequest(new
-                {
-                    message = "Invalid role.",
-                    errors = new[] { "Document role must be Viewer (0) or Editor (1)." }
-                });
-            }
 
             // Validar ExpirationDays
             if (request.ExpirationDays < 1 || request.ExpirationDays > 30)
@@ -61,16 +51,15 @@ namespace Fluxnote.Backend.Controllers
                 });
             }
 
-            var document = await _context.Document
-                    .Include(d => d.Team)
-                    .FirstOrDefaultAsync(d => d.Id == request.DocumentId && !d.IsDeleted);
+            var team = await _context.Team
+                    .FirstOrDefaultAsync(t => t.Id == request.TeamId);
 
-            if (document is null)
-                return NotFound(new { message = "Document Not Found!" });
+            if (team is null)
+                return NotFound(new { message = "Team Not Found!" });
 
             // Verifica se o caller é Owner ou TeamAdmin da equipa
             var callerMember = await _context.TeamMember
-                .FirstOrDefaultAsync(m => m.TeamId == document.TeamId && m.UserId == userId);
+                .FirstOrDefaultAsync(m => m.TeamId == team.Id && m.UserId == userId);
 
             if (callerMember == null)
             {
@@ -86,102 +75,93 @@ namespace Fluxnote.Backend.Controllers
                 return StatusCode(StatusCodes.Status403Forbidden, new
                 {
                     message = "Permission denied.",
-                    errors = new[] { "Only Owner or Team Admin can create document invites." }
+                    errors = new[] { "Only Owner or Team Admin can create team invites." }
                 });
             }
 
             // Gerar um token unico
             var token = Guid.NewGuid().ToString();
 
-            var invite = new DocumentInvite
+            var invite = new TeamInvite
             {
+                Team= team,
                 Token = token,
-                DocumentId = request.DocumentId,
                 CreatedByTeamMemberId = callerMember.Id,
-                Role = (DocumentRole)request.Role,
                 CreatedAt = DateTime.UtcNow,
                 ExpiresAt = DateTime.UtcNow.AddDays(request.ExpirationDays),
                 IsRevoked = false,
                 UsedByUserId = null
             };
 
-            _context.DocumentInvite.Add(invite);
+            _context.TeamInvite.Add(invite);
             await _context.SaveChangesAsync();
 
             var frontendUrl = GetFrontendUrl();
 
-            var dto = new DocumentInviteDto
+            var dto = new TeamInviteDto
             {
                 Id = invite.Id,
                 Token = invite.Token,
-                DocumentId = invite.DocumentId,
-                DocumentTitle = document.Title,
-                TeamId = document.TeamId,
-                TeamName = document.Team.Name,
+                TeamId = team.Id,
+                TeamName = team.Name,
                 CreatedByName = callerMember.Name,
-                Role = (int)invite.Role,
                 ExpiresAt = invite.ExpiresAt,
                 IsRevoked = invite.IsRevoked,
                 IsUsed = invite.UsedByUserId != null,
-                InviteUrl = $"{frontendUrl}/document-invite/{invite.Token}"
+                InviteUrl = $"{frontendUrl}/team-invite/{invite.Token}"
             };
 
             return CreatedAtAction(nameof(GetInviteInfo), new { token = invite.Token }, dto);
         }
 
         /// <summary>
-        /// Lista convites ativos de um documento.
+        /// Lista convites ativos de uma equipa.
         /// Apenas Owner ou TeamAdmin podem ver.
         /// </summary>
-        [HttpGet("by-document/{documentId}")]
-        public async Task<ActionResult<IEnumerable<DocumentInviteDto>>> GetByDocument(int documentId)
+        [HttpGet("by-team/{teamId}")]
+        public async Task<ActionResult<IEnumerable<TeamInviteDto>>> GetByTeam(int teamId)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userId is null)
                 return Unauthorized(new { message = "User not authenticated." });
 
-            var document = await _context.Document
-                .Include(d => d.Team)
-                .FirstOrDefaultAsync(d => d.Id == documentId);
+            var team = await _context.Team
+                .FirstOrDefaultAsync(t => t.Id == teamId);
 
-            if (document == null)
-                return NotFound(new { message = "Document not found." });
+            if (team == null)
+                return NotFound(new { message = "Team not found." });
 
             // Verificar que o caller e Owner ou TeamAdmin
             var callerMember = await _context.TeamMember
-                .FirstOrDefaultAsync(m => m.TeamId == document.TeamId && m.UserId == userId);
+                .FirstOrDefaultAsync(m => m.TeamId == team.Id && m.UserId == userId);
 
             if (callerMember == null || (callerMember.Role != TeamRole.Owner && callerMember.Role != TeamRole.TeamAdmin))
             {
                 return StatusCode(StatusCodes.Status403Forbidden, new
                 {
                     message = "Permission denied.",
-                    errors = new[] { "Only Owner or Team Admin can view document invites." }
+                    errors = new[] { "Only Owner or Team Admin can view team invites." }
                 });
             }
 
             var frontendUrl = GetFrontendUrl();
 
-            var invites = await _context.DocumentInvite
-                .Include(di => di.CreatedBy)
-                .Include(di => di.Document)
-                    .ThenInclude(d => d.Team)
-                .Where(di => di.DocumentId == documentId && !di.IsRevoked && di.ExpiresAt > DateTime.UtcNow)
-                .OrderByDescending(di => di.CreatedAt)
-                .Select(di => new DocumentInviteDto
+            var invites = await _context.TeamInvite
+                .Include(ti => ti.CreatedBy)
+                .Include(ti => ti.Team)
+                .Where(ti => ti.TeamId == teamId && !ti.IsRevoked && ti.ExpiresAt > DateTime.UtcNow)
+                .OrderByDescending(ti => ti.CreatedAt)
+                .Select(ti => new TeamInviteDto
                 {
-                    Id = di.Id,
-                    Token = di.Token,
-                    DocumentId = di.DocumentId,
-                    DocumentTitle = di.Document.Title,
-                    TeamId = di.Document.TeamId,
-                    TeamName = di.Document.Team.Name,
-                    CreatedByName = di.CreatedBy != null ? di.CreatedBy.Name : string.Empty,
-                    Role = (int)di.Role,
-                    ExpiresAt = di.ExpiresAt,
-                    IsRevoked = di.IsRevoked,
-                    IsUsed = di.UsedByUserId != null,
-                    InviteUrl = $"{frontendUrl}/document-invite/{di.Token}"
+                    Id = ti.Id,
+                    Token = ti.Token,
+                    TeamId = ti.TeamId,
+                    TeamName = ti.Team.Name,
+                    CreatedByName = ti.CreatedBy != null ? ti.CreatedBy.Name : string.Empty,
+                    ExpiresAt = ti.ExpiresAt,
+                    IsRevoked = ti.IsRevoked,
+                    IsUsed = ti.UsedByUserId != null,
+                    InviteUrl = $"{frontendUrl}/team-invite/{ti.Token}"
                 })
                 .ToListAsync();
 
@@ -193,17 +173,16 @@ namespace Fluxnote.Backend.Controllers
         /// Requer autenticação mas não precisa ser membro da equipa.
         /// </summary>
         [HttpGet("{token}/info")]
-        public async Task<ActionResult<DocumentInviteDto>> GetInviteInfo(string token)
+        public async Task<ActionResult<TeamInviteDto>> GetInviteInfo(string token)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userId is null)
                 return Unauthorized(new { message = "User not authenticated." });
 
-            var invite = await _context.DocumentInvite
-                .Include(di => di.Document)
-                    .ThenInclude(d => d.Team)
-                .Include(di => di.CreatedBy)
-                .FirstOrDefaultAsync(di => di.Token == token);
+            var invite = await _context.TeamInvite
+                .Include(ti => ti.Team)
+                .Include(ti => ti.CreatedBy)
+                .FirstOrDefaultAsync(ti => ti.Token == token);
 
             if (invite == null)
                 return NotFound(new { message = "Invite not found." });
@@ -237,30 +216,27 @@ namespace Fluxnote.Backend.Controllers
 
             var frontendUrl = GetFrontendUrl();
 
-            var dto = new DocumentInviteDto
+            var dto = new TeamInviteDto
             {
                 Id = invite.Id,
                 Token = invite.Token,
-                DocumentId = invite.DocumentId,
-                DocumentTitle = invite.Document.Title,
-                TeamId = invite.Document.TeamId,
-                TeamName = invite.Document.Team.Name,
+                TeamId = invite.TeamId,
+                TeamName = invite.Team.Name,
                 CreatedByName = invite.CreatedBy?.Name ?? string.Empty,
-                Role = (int)invite.Role,
                 ExpiresAt = invite.ExpiresAt,
                 IsRevoked = invite.IsRevoked,
                 IsUsed = false,
-                InviteUrl = $"{frontendUrl}/document-invite/{invite.Token}"
+                InviteUrl = $"{frontendUrl}/team-invite/{invite.Token}"
             };
 
             return Ok(dto);
         }
 
         /// <summary>
-        /// Aceita um convite. Cria TeamMember (se necessario) e DocumentPermission.
+        /// Aceita um convite. Cria TeamMember (se necessario).
         /// </summary>
         [HttpPost("{token}/accept")]
-        public async Task<ActionResult<AcceptDocumentInviteResponseDto>> AcceptInvite(string token)
+        public async Task<ActionResult<AcceptTeamInviteResponseDto>> AcceptInvite(string token)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userId is null)
@@ -270,10 +246,9 @@ namespace Fluxnote.Backend.Controllers
             if (user is null)
                 return Unauthorized(new { message = "User not found." });
 
-            var invite = await _context.DocumentInvite
-                .Include(di => di.Document)
-                    .ThenInclude(d => d.Team)
-                .FirstOrDefaultAsync(di => di.Token == token);
+            var invite = await _context.TeamInvite
+                .Include(ti => ti.Team)
+                .FirstOrDefaultAsync(ti => ti.Token == token);
 
             if (invite is null)
                 return NotFound(new { message = "Invite not found" });
@@ -305,7 +280,7 @@ namespace Fluxnote.Backend.Controllers
                 });
             }
 
-            var teamId = invite.Document.TeamId;
+            var teamId = invite.TeamId;
 
             var existingMember = await _context.TeamMember
                 .FirstOrDefaultAsync(m => m.TeamId == teamId && m.UserId == userId);
@@ -316,13 +291,13 @@ namespace Fluxnote.Backend.Controllers
             {
                 teamMember = existingMember;
 
-                // Se ja e Owner, nao precisa de DocumentPermission
+                // Se ja e Owner, nao precisa de TeamPermission
                 if (teamMember.Role == TeamRole.Owner)
                 {
                     return BadRequest(new
                     {
                         message = "Already has access.",
-                        errors = new[] { "You already have full access to all documents in this team." }
+                        errors = new[] { "You already have full access this team." }
                     });
                 }
             }
@@ -342,48 +317,22 @@ namespace Fluxnote.Backend.Controllers
                 await _context.SaveChangesAsync();
             }
 
-            // Verificar se ja tem DocumentPermission para este documento
-            var existingPermission = await _context.DocumentPermission
-                .FirstOrDefaultAsync(dp => dp.TeamMemberId == teamMember.Id && dp.DocumentId == invite.DocumentId);
-
-            if (existingPermission != null)
-            {
-                return BadRequest(new
-                {
-                    message = "Permission already exists.",
-                    errors = new[] { "You already have access to this document." }
-                });
-            }
-
-            // Criar DocumentPermission com a role definida no convite
+            
+            // Criar TeamPermission com a role definida no convite
             // TeamAdmin recebe sempre Editor, independentemente da role do convite
             var effectiveRole = teamMember.Role == TeamRole.TeamAdmin
-                ? DocumentRole.Editor
+                ? TeamRole.TeamAdmin
                 : invite.Role;
-
-            var permission = new DocumentPermission
-            {
-                DocumentId = invite.DocumentId,
-                TeamMemberId = teamMember.Id,
-                Role = effectiveRole,
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
-            };
-
-            _context.DocumentPermission.Add(permission);
 
             // Marcar convite como usado
             invite.UsedByUserId = userId;
 
             await _context.SaveChangesAsync();
 
-            var response = new AcceptDocumentInviteResponseDto
+            var response = new AcceptTeamInviteResponseDto
             {
                 TeamId = teamId,
-                DocumentId = invite.DocumentId,
-                DocumentTitle = invite.Document.Title,
-                TeamName = invite.Document.Team.Name,
-                DocumentRole = (int)effectiveRole
+                TeamName = invite.Team.Name
             };
 
             return Ok(response);
@@ -400,8 +349,8 @@ namespace Fluxnote.Backend.Controllers
             if (userId is null)
                 return Unauthorized(new { message = "User not authenticated." });
 
-            var invite = await _context.DocumentInvite
-                .Include(di => di.Document)
+            var invite = await _context.TeamInvite
+                .Include(di => di.Team)
                 .FirstOrDefaultAsync(di => di.Id == id);
 
             if (invite == null)
@@ -409,7 +358,7 @@ namespace Fluxnote.Backend.Controllers
 
             // Verificar que o caller e Owner ou TeamAdmin
             var callerMember = await _context.TeamMember
-                .FirstOrDefaultAsync(m => m.TeamId == invite.Document.TeamId && m.UserId == userId);
+                .FirstOrDefaultAsync(m => m.TeamId == invite.TeamId && m.UserId == userId);
 
             if (callerMember == null || (callerMember.Role != TeamRole.Owner && callerMember.Role != TeamRole.TeamAdmin))
             {

@@ -1,6 +1,6 @@
 ﻿namespace Fluxnote.Backend.Dtos.DocumentInvites
 {
-    public class AcceptInviteResponseDto
+    public class AcceptDocumentInviteResponseDto
     {
         /// <summary>
         /// Identificador do documento para o qual o convite foi aceito. 

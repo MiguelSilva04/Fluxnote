@@ -65,6 +65,11 @@ namespace Fluxnote.Backend.Data
         public DbSet<Fluxnote.Backend.Models.TeamMember> TeamMember { get; set; } = default!;
 
         /// <summary>
+        /// DbSet para convites de equipas (permite gerir convites pendentes e aceites).
+        /// </summary>
+        public DbSet<Fluxnote.Backend.Models.TeamInvite> TeamInvite { get; set; } = default!;
+
+        /// <summary>
         /// DbSet para documentos colaborativos.
         /// </summary>
         public DbSet<Fluxnote.Backend.Models.Document> Document { get; set; } = default!;
@@ -159,11 +164,33 @@ namespace Fluxnote.Backend.Data
                 entity.HasOne(di => di.CreatedBy)
                       .WithMany()
                       .HasForeignKey(di => di.CreatedByTeamMemberId)
-                      .OnDelete(DeleteBehavior.Restrict);
+                      .OnDelete(DeleteBehavior.SetNull);
 
                 // Indices para performance
                 entity.HasIndex(di => di.DocumentId);
                 entity.HasIndex(di => di.ExpiresAt);
+            });
+
+            builder.Entity<TeamInvite>(entity =>
+            {
+                // Index unico no Token
+                entity.HasIndex(ti => ti.Token).IsUnique();
+
+                //// Relacao com Team (cascade delete - se equipa for apagada, convites tambem)
+                //entity.HasOne(ti => ti.Team)
+                //      .WithMany()
+                //      .HasForeignKey(ti => ti.TeamId)
+                //      .OnDelete(DeleteBehavior.Cascade);
+
+                // Relacao com TeamMember (restrict delete - nao apagar convite se membro for removido)
+                entity.HasOne(ti => ti.CreatedBy)
+                      .WithMany()
+                      .HasForeignKey(ti => ti.CreatedByTeamMemberId)
+                      .OnDelete(DeleteBehavior.SetNull);
+
+                // Indices para performance
+                entity.HasIndex(ti => ti.TeamId);
+                entity.HasIndex(ti => ti.ExpiresAt);
             });
 
             // Configuração específica para SQL Server (SQLite usa BLOB por defeito)
