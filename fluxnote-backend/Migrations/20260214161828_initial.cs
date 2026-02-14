@@ -283,7 +283,7 @@ namespace fluxnotebackend.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Token = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     DocumentId = table.Column<int>(type: "int", nullable: false),
-                    CreatedByTeamMemberId = table.Column<int>(type: "int", nullable: false),
+                    CreatedByTeamMemberId = table.Column<int>(type: "int", nullable: true),
                     Role = table.Column<int>(type: "int", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     ExpiresAt = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -304,7 +304,7 @@ namespace fluxnotebackend.Migrations
                         column: x => x.CreatedByTeamMemberId,
                         principalTable: "TeamMember",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.SetNull);
                 });
 
             migrationBuilder.CreateTable(
@@ -332,6 +332,38 @@ namespace fluxnotebackend.Migrations
                         name: "FK_DocumentPermission_TeamMember_TeamMemberId",
                         column: x => x.TeamMemberId,
                         principalTable: "TeamMember",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "TeamInvite",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Token = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    TeamId = table.Column<int>(type: "int", nullable: false),
+                    CreatedByTeamMemberId = table.Column<int>(type: "int", nullable: true),
+                    Role = table.Column<int>(type: "int", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ExpiresAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    IsRevoked = table.Column<bool>(type: "bit", nullable: false),
+                    UsedByUserId = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TeamInvite", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_TeamInvite_TeamMember_CreatedByTeamMemberId",
+                        column: x => x.CreatedByTeamMemberId,
+                        principalTable: "TeamMember",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
+                    table.ForeignKey(
+                        name: "FK_TeamInvite_Team_TeamId",
+                        column: x => x.TeamId,
+                        principalTable: "Team",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -439,6 +471,27 @@ namespace fluxnotebackend.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_TeamInvite_CreatedByTeamMemberId",
+                table: "TeamInvite",
+                column: "CreatedByTeamMemberId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TeamInvite_ExpiresAt",
+                table: "TeamInvite",
+                column: "ExpiresAt");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TeamInvite_TeamId",
+                table: "TeamInvite",
+                column: "TeamId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TeamInvite_Token",
+                table: "TeamInvite",
+                column: "Token",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_TeamMember_TeamId",
                 table: "TeamMember",
                 column: "TeamId");
@@ -475,6 +528,9 @@ namespace fluxnotebackend.Migrations
 
             migrationBuilder.DropTable(
                 name: "RefreshTokens");
+
+            migrationBuilder.DropTable(
+                name: "TeamInvite");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");

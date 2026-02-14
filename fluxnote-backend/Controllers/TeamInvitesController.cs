@@ -10,7 +10,7 @@ using System.Security.Claims;
 
 namespace Fluxnote.Backend.Controllers
 {
-    [Route("api/document-invites")]
+    [Route("api/team-invites")]
     [ApiController]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class TeamInvitesController : ControllerBase
@@ -40,16 +40,6 @@ namespace Fluxnote.Backend.Controllers
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userId is null)
                 return new UnauthorizedObjectResult(new { message = "User not authenticated." });
-
-            // Verificar se o documento existe
-            if (request.Role != (int)TeamRole.Member && request.Role != (int)TeamRole.TeamAdmin)
-            {
-                return BadRequest(new
-                {
-                    message = "Invalid role.",
-                    errors = new[] { "Team role must be Member (0) or TeamMember (1)." }
-                });
-            }
 
             // Validar ExpirationDays
             if (request.ExpirationDays < 1 || request.ExpirationDays > 30)
@@ -94,9 +84,9 @@ namespace Fluxnote.Backend.Controllers
 
             var invite = new TeamInvite
             {
+                Team= team,
                 Token = token,
                 CreatedByTeamMemberId = callerMember.Id,
-                Role = (TeamRole)request.Role,
                 CreatedAt = DateTime.UtcNow,
                 ExpiresAt = DateTime.UtcNow.AddDays(request.ExpirationDays),
                 IsRevoked = false,
@@ -115,11 +105,10 @@ namespace Fluxnote.Backend.Controllers
                 TeamId = team.Id,
                 TeamName = team.Name,
                 CreatedByName = callerMember.Name,
-                Role = (int)invite.Role,
                 ExpiresAt = invite.ExpiresAt,
                 IsRevoked = invite.IsRevoked,
                 IsUsed = invite.UsedByUserId != null,
-                InviteUrl = $"{frontendUrl}/invite/{invite.Token}"
+                InviteUrl = $"{frontendUrl}/team-invite/{invite.Token}"
             };
 
             return CreatedAtAction(nameof(GetInviteInfo), new { token = invite.Token }, dto);
@@ -168,12 +157,11 @@ namespace Fluxnote.Backend.Controllers
                     Token = ti.Token,
                     TeamId = ti.TeamId,
                     TeamName = ti.Team.Name,
-                    CreatedByName = ti.CreatedBy.Name,
-                    Role = (int)ti.Role,
+                    CreatedByName = ti.CreatedBy != null ? ti.CreatedBy.Name : string.Empty,
                     ExpiresAt = ti.ExpiresAt,
                     IsRevoked = ti.IsRevoked,
                     IsUsed = ti.UsedByUserId != null,
-                    InviteUrl = $"{frontendUrl}/invite/{ti.Token}"
+                    InviteUrl = $"{frontendUrl}/team-invite/{ti.Token}"
                 })
                 .ToListAsync();
 
@@ -234,12 +222,11 @@ namespace Fluxnote.Backend.Controllers
                 Token = invite.Token,
                 TeamId = invite.TeamId,
                 TeamName = invite.Team.Name,
-                CreatedByName = invite.CreatedBy.Name,
-                Role = (int)invite.Role,
+                CreatedByName = invite.CreatedBy?.Name ?? string.Empty,
                 ExpiresAt = invite.ExpiresAt,
                 IsRevoked = invite.IsRevoked,
                 IsUsed = false,
-                InviteUrl = $"{frontendUrl}/invite/{invite.Token}"
+                InviteUrl = $"{frontendUrl}/team-invite/{invite.Token}"
             };
 
             return Ok(dto);
@@ -249,7 +236,7 @@ namespace Fluxnote.Backend.Controllers
         /// Aceita um convite. Cria TeamMember (se necessario).
         /// </summary>
         [HttpPost("{token}/accept")]
-        public async Task<ActionResult<AcceptInviteResponseDto>> AcceptInvite(string token)
+        public async Task<ActionResult<AcceptTeamInviteResponseDto>> AcceptInvite(string token)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userId is null)
@@ -342,11 +329,10 @@ namespace Fluxnote.Backend.Controllers
 
             await _context.SaveChangesAsync();
 
-            var response = new AcceptInviteResponseDto
+            var response = new AcceptTeamInviteResponseDto
             {
                 TeamId = teamId,
-                TeamName = invite.Team.Name,
-                TeamRole = (int)effectiveRole
+                TeamName = invite.Team.Name
             };
 
             return Ok(response);

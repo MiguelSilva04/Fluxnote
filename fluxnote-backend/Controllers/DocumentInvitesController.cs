@@ -123,7 +123,7 @@ namespace Fluxnote.Backend.Controllers
                 ExpiresAt = invite.ExpiresAt,
                 IsRevoked = invite.IsRevoked,
                 IsUsed = invite.UsedByUserId != null,
-                InviteUrl = $"{frontendUrl}/invite/{invite.Token}"
+                InviteUrl = $"{frontendUrl}/document-invite/{invite.Token}"
             };
 
             return CreatedAtAction(nameof(GetInviteInfo), new { token = invite.Token }, dto);
@@ -176,12 +176,12 @@ namespace Fluxnote.Backend.Controllers
                     DocumentTitle = di.Document.Title,
                     TeamId = di.Document.TeamId,
                     TeamName = di.Document.Team.Name,
-                    CreatedByName = di.CreatedBy.Name,
+                    CreatedByName = di.CreatedBy != null ? di.CreatedBy.Name : string.Empty,
                     Role = (int)di.Role,
                     ExpiresAt = di.ExpiresAt,
                     IsRevoked = di.IsRevoked,
                     IsUsed = di.UsedByUserId != null,
-                    InviteUrl = $"{frontendUrl}/invite/{di.Token}"
+                    InviteUrl = $"{frontendUrl}/document-invite/{di.Token}"
                 })
                 .ToListAsync();
 
@@ -245,12 +245,12 @@ namespace Fluxnote.Backend.Controllers
                 DocumentTitle = invite.Document.Title,
                 TeamId = invite.Document.TeamId,
                 TeamName = invite.Document.Team.Name,
-                CreatedByName = invite.CreatedBy.Name,
+                CreatedByName = invite.CreatedBy?.Name ?? string.Empty,
                 Role = (int)invite.Role,
                 ExpiresAt = invite.ExpiresAt,
                 IsRevoked = invite.IsRevoked,
                 IsUsed = false,
-                InviteUrl = $"{frontendUrl}/invite/{invite.Token}"
+                InviteUrl = $"{frontendUrl}/document-invite/{invite.Token}"
             };
 
             return Ok(dto);
@@ -260,7 +260,7 @@ namespace Fluxnote.Backend.Controllers
         /// Aceita um convite. Cria TeamMember (se necessario) e DocumentPermission.
         /// </summary>
         [HttpPost("{token}/accept")]
-        public async Task<ActionResult<AcceptInviteResponseDto>> AcceptInvite(string token)
+        public async Task<ActionResult<AcceptDocumentInviteResponseDto>> AcceptInvite(string token)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userId is null)
@@ -377,7 +377,7 @@ namespace Fluxnote.Backend.Controllers
 
             await _context.SaveChangesAsync();
 
-            var response = new AcceptInviteResponseDto
+            var response = new AcceptDocumentInviteResponseDto
             {
                 TeamId = teamId,
                 DocumentId = invite.DocumentId,

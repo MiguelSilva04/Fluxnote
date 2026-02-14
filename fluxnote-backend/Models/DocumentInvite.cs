@@ -19,8 +19,7 @@ public class DocumentInvite
     /// Foreign Keys
     /// </summary>
     public int DocumentId { get; set; }
-    [Required]
-    public int CreatedByTeamMemberId { get; set; }
+    public int? CreatedByTeamMemberId { get; set; }
 
     /// <summary>
     /// Role a atribuir ao convidado ao aceitar o convite
@@ -43,6 +42,6 @@ public class DocumentInvite
     /// Navigation properties
     /// </summary>
     public Document Document { get; set; } = null!;
-    public TeamMember CreatedBy { get; set; } = null!;
+    public TeamMember? CreatedBy { get; set; } = null!;
 }
 

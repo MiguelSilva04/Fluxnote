@@ -19,8 +19,7 @@ public class TeamInvite
     /// Foreign Keys
     /// </summary>
     public int TeamId { get; set; }
-    [Required]
-    public int CreatedByTeamMemberId { get; set; }
+    public int? CreatedByTeamMemberId { get; set; }
 
     /// <summary>
     /// Role a atribuir ao convidado ao aceitar o convite
@@ -43,6 +42,6 @@ public class TeamInvite
     /// Navigation properties
     /// </summary>
     public Team Team { get; set; } = null!;
-    public TeamMember CreatedBy { get; set; } = null!;
+    public TeamMember? CreatedBy { get; set; } = null!;
 }
 

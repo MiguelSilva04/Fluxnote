@@ -30,12 +30,6 @@
         /// </summary>
         public string CreatedByName { get; set; } = string.Empty;
         /// <summary>
-        /// Role a ser atribuído ao usuário convidado ao aceitar o convite.
-        /// 0 = Member, 1 = TeamAdmin, 2= Owner. Este campo é necessário para que o frontend 
-        /// saiba qual permissão atribuir ao usuário quando ele aceitar o convite.
-        /// </summary>
-        public int Role { get; set; }
-        /// <summary>
         /// Data e hora em que o convite foi criado. Este campo é útil 
         /// para exibir informações sobre quando o convite foi gerado e para fins de auditoria.
         /// </summary>
