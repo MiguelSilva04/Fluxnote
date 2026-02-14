@@ -46,7 +46,10 @@ export class ExternalCallbackComponent {
     }
 
     if (result.linked) {
-      const current = this.sanitizeReturnUrl(this.route.snapshot.queryParamMap.get('returnUrl')) ?? '/settings';
+      const current =
+        this.sanitizeReturnUrl(result.returnUrl) ??
+        this.sanitizeReturnUrl(this.route.snapshot.queryParamMap.get('returnUrl')) ??
+        '/settings';
       await this.router.navigateByUrl(current);
       return;
     }

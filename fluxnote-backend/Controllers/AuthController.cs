@@ -13,6 +13,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
@@ -331,7 +333,7 @@ public class AuthController : ControllerBase
     /// </returns>
     [HttpGet("external-login/{provider}")]
     [AllowAnonymous]
-    public IActionResult ExternalLogin(string provider, [FromQuery] string? returnUrl = null)
+    public async Task<IActionResult> ExternalLogin(string provider, [FromQuery] string? returnUrl = null)
     {
         var authScheme = ResolveAuthScheme(provider);
         if (authScheme is null)
@@ -343,6 +345,7 @@ public class AuthController : ControllerBase
             });
         }
 
+        await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
         var redirectUrl = Url.Action(nameof(ExternalLoginCallback), "Auth", new { returnUrl });
         var properties = _signInManager.ConfigureExternalAuthenticationProperties(authScheme, redirectUrl!);
         return Challenge(properties, authScheme);
@@ -559,7 +562,10 @@ public class AuthController : ControllerBase
             .Where(p => !logins.Any(l => l.LoginProvider.Equals(p, StringComparison.OrdinalIgnoreCase)));
 
         var hasPassword = await _userManager.HasPasswordAsync(user);
-        var unlinkLastExternalDeletesAccount = !hasPassword && logins.Count == 1;
+        var unlinkLastExternalDeletesAccount =
+            !hasPassword &&
+            logins.Count == 1 &&
+            user.AuthProvider != AuthProvider.Local;
 
         return Ok(new
         {
@@ -581,11 +587,12 @@ public class AuthController : ControllerBase
     ///     <item><b>401 Unauthorized:</b> Token inválido.</item>
     /// </list>
     /// </returns>
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [AllowAnonymous]
+    [HttpGet("link-external/{provider}")]
     [HttpPost("link-external/{provider}")]
-    public IActionResult LinkExternalLogin(string provider)
+    public async Task<IActionResult> LinkExternalLogin(string provider, [FromQuery] string? accessToken = null, [FromQuery] string? returnUrl = null)
     {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? ExtractUserIdFromAccessToken(accessToken);
         if (userId is null)
         {
             return Unauthorized(new { message = "Invalid claims for obtaining user id." });
@@ -597,7 +604,8 @@ public class AuthController : ControllerBase
             return BadRequest(new { error = "Provider not supported." });
         }
 
-        var redirectUrl = Url.Action(nameof(LinkExternalLoginCallback), "Auth", new { linkUserId = userId });
+        await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
+        var redirectUrl = Url.Action(nameof(LinkExternalLoginCallback), "Auth", new { linkUserId = userId, returnUrl });
         var properties = _signInManager.ConfigureExternalAuthenticationProperties(authScheme, redirectUrl!, userId);
         return Challenge(properties, authScheme);
     }
@@ -610,7 +618,7 @@ public class AuthController : ControllerBase
     /// <returns>Redireciona para callback/error page do frontend.</returns>
     [HttpGet("link-external-callback")]
     [AllowAnonymous]
-    public async Task<IActionResult> LinkExternalLoginCallback([FromQuery] string? linkUserId = null, [FromQuery] string? remoteError = null)
+    public async Task<IActionResult> LinkExternalLoginCallback([FromQuery] string? linkUserId = null, [FromQuery] string? returnUrl = null, [FromQuery] string? remoteError = null)
     {
         var frontendCallbackUrl = _configuration["Authentication:ExternalCallbackUrl"] ?? "http://localhost:4200/auth/external-callback";
         var frontendErrorUrl = _configuration["Authentication:ExternalErrorUrl"] ?? "http://localhost:4200/auth/external-error";
@@ -640,7 +648,10 @@ public class AuthController : ControllerBase
         var existingUser = await _userManager.FindByLoginAsync(info.LoginProvider, info.ProviderKey);
         if (existingUser is not null && existingUser.Id != user.Id)
         {
-            return RedirectExternalError(frontendErrorUrl, "provider_already_linked");
+            return RedirectExternalError(
+                frontendErrorUrl,
+                "provider_already_linked",
+                "Esta conta Google ja esta ligada a outro utilizador. Use outra conta Google ou inicie sessao nessa conta.");
         }
 
         var result = await _userManager.AddLoginAsync(user, info);
@@ -650,7 +661,17 @@ public class AuthController : ControllerBase
             return RedirectExternalError(frontendErrorUrl, "link_external_failed", errors);
         }
 
-        var fragment = (QueryString.Create("linked", info.LoginProvider.ToLowerInvariant()).Value ?? string.Empty).TrimStart('?');
+        var fragmentParams = new Dictionary<string, string?>
+        {
+            ["linked"] = info.LoginProvider.ToLowerInvariant()
+        };
+
+        if (!string.IsNullOrWhiteSpace(returnUrl))
+        {
+            fragmentParams["returnUrl"] = returnUrl;
+        }
+
+        var fragment = (QueryString.Create(fragmentParams).Value ?? string.Empty).TrimStart('?');
         return Redirect($"{frontendCallbackUrl}#{fragment}");
     }
 
@@ -693,8 +714,11 @@ public class AuthController : ControllerBase
             return NotFound(new { error = "Provider is not linked to this account." });
         }
 
-        // If this is the only auth method, unlinking removes account by design.
-        if (!hasPassword && logins.Count == 1)
+        var isOnlyLoginMethod = !hasPassword && logins.Count == 1;
+        var shouldDeleteAccountOnUnlink = isOnlyLoginMethod && user.AuthProvider != AuthProvider.Local;
+
+        // If this is an OAuth-only account and this is the only auth method, unlinking removes account by design.
+        if (shouldDeleteAccountOnUnlink)
         {
             var userRefreshTokens = await _db.RefreshTokens
                 .Where(rt => rt.UserId == user.Id && rt.RevokedAt == null)
@@ -755,6 +779,16 @@ public class AuthController : ControllerBase
             {
                 message = "External provider unlinked and account logically deleted because it was the only login method.",
                 accountDeleted = true
+            });
+        }
+
+        // Defensive guard: local accounts should never end up with zero login methods.
+        if (isOnlyLoginMethod)
+        {
+            return BadRequest(new
+            {
+                error = "Cannot unlink the only login method.",
+                message = "Set a password before disconnecting this external provider."
             });
         }
 
@@ -1517,6 +1551,49 @@ public class AuthController : ControllerBase
             "microsoft" => MicrosoftAccountDefaults.AuthenticationScheme,
             _ => null
         };
+    }
+
+    /// <summary>
+    /// Extrai o user id de um access token JWT válido enviado por query string.
+    /// </summary>
+    private string? ExtractUserIdFromAccessToken(string? accessToken)
+    {
+        if (string.IsNullOrWhiteSpace(accessToken))
+        {
+            return null;
+        }
+
+        var jwtKey = _configuration["Jwt:Key"];
+        var jwtIssuer = _configuration["Jwt:Issuer"];
+        var jwtAudience = _configuration["Jwt:Audience"];
+
+        if (string.IsNullOrWhiteSpace(jwtKey))
+        {
+            return null;
+        }
+
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var validationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = jwtIssuer,
+            ValidAudience = jwtAudience,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
+            ClockSkew = TimeSpan.FromSeconds(30)
+        };
+
+        try
+        {
+            var principal = tokenHandler.ValidateToken(accessToken, validationParameters, out _);
+            return principal.FindFirstValue(ClaimTypes.NameIdentifier);
+        }
+        catch
+        {
+            return null;
+        }
     }
 
     /// <summary>

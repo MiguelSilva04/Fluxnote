@@ -1009,8 +1009,8 @@ export class ProfileComponent {
       return;
     }
 
-    // O callback OAuth devolve para /profile para atualizar o estado visual da ligação.
-    this.authService.externalLogin('google', '/profile');
+    // Vincula Google à conta atual, sem trocar de utilizador autenticado.
+    this.authService.linkExternalLogin('google', '/profile');
   }
 
   async disconnectGoogle(): Promise<void> {

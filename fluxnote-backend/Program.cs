@@ -63,6 +63,10 @@ builder.Services.AddDbContext<FluxnoteServerContext>(options =>
 var jwtKey = builder.Configuration["Jwt:Key"];
 var jwtIssuer = builder.Configuration["Jwt:Issuer"];
 var jwtAudience = builder.Configuration["Jwt:Audience"];
+var googleClientId = builder.Configuration["Authentication:Google:ClientId"];
+var googleClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
+var microsoftClientId = builder.Configuration["Authentication:Microsoft:ClientId"];
+var microsoftClientSecret = builder.Configuration["Authentication:Microsoft:ClientSecret"];
 
 if (string.IsNullOrWhiteSpace(jwtKey))
     throw new InvalidOperationException("Jwt:Key missing (Jwt__Key).");
@@ -73,7 +77,7 @@ if (string.IsNullOrWhiteSpace(jwtKey))
 // - ValidateIssuer/Audience: Verifica se o token foi emitido por esta aplicação
 // - ValidateLifetime: Verifica se o token não expirou
 // - ClockSkew: Tolerância de 30 segundos para diferenças de relógio
-builder.Services
+var authenticationBuilder = builder.Services
     .AddAuthentication(options =>
     {
         options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -92,20 +96,27 @@ builder.Services
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
             ClockSkew = TimeSpan.FromSeconds(30)
         };
-    })
-    .AddGoogle(options =>
+    });
+
+if (!string.IsNullOrWhiteSpace(googleClientId) && !string.IsNullOrWhiteSpace(googleClientSecret))
+{
+    authenticationBuilder.AddGoogle(options =>
     {
-        options.ClientId = builder.Configuration["Authentication:Google:ClientId"] ?? string.Empty;
-        options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"] ?? string.Empty;
+        options.ClientId = googleClientId;
+        options.ClientSecret = googleClientSecret;
         options.CallbackPath = "/api/auth/google-callback";
         options.SignInScheme = IdentityConstants.ExternalScheme;
         options.SaveTokens = true;
         options.Scope.Add("openid");
-    })
-    .AddMicrosoftAccount(options =>
+    });
+}
+
+if (!string.IsNullOrWhiteSpace(microsoftClientId) && !string.IsNullOrWhiteSpace(microsoftClientSecret))
+{
+    authenticationBuilder.AddMicrosoftAccount(options =>
     {
-        options.ClientId = builder.Configuration["Authentication:Microsoft:ClientId"] ?? string.Empty;
-        options.ClientSecret = builder.Configuration["Authentication:Microsoft:ClientSecret"] ?? string.Empty;
+        options.ClientId = microsoftClientId;
+        options.ClientSecret = microsoftClientSecret;
         options.CallbackPath = "/api/auth/microsoft-callback";
         options.SignInScheme = IdentityConstants.ExternalScheme;
         options.SaveTokens = true;
@@ -113,6 +124,7 @@ builder.Services
         options.Scope.Add("email");
         options.Scope.Add("profile");
     });
+}
 
 // ==============================================================================
 // 3. RATE LIMITING (AspNetCoreRateLimit)

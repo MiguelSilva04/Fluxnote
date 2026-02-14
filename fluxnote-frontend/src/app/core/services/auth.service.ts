@@ -255,6 +255,30 @@ export class AuthService {
   }
 
   /**
+   * inicia o fluxo de vinculação de provider externo à conta já autenticada.
+   *
+   * @param provider - provider OAuth (google/microsoft)
+   * @param returnUrl - rota opcional para retorno após vinculação
+   */
+  linkExternalLogin(provider: ExternalAuthProvider, returnUrl?: string): void {
+    const accessToken = this.getAccessToken();
+    if (!accessToken) {
+      this.router.navigate(['/login']);
+      return;
+    }
+
+    const params = new URLSearchParams();
+    params.set('accessToken', accessToken);
+    if (returnUrl) {
+      params.set('returnUrl', returnUrl);
+    }
+
+    const query = params.toString();
+    const url = `${this.baseUrl}/link-external/${provider}${query ? `?${query}` : ''}`;
+    window.location.assign(url);
+  }
+
+  /**
    * processa o fragmento retornado no callback OAuth.
    * atualiza token/sessão quando receber `access_token`.
    *
@@ -273,7 +297,8 @@ export class AuthService {
 
     const linked = params.get('linked');
     if (linked) {
-      return { success: true, linked };
+      const returnUrl = params.get('returnUrl') ?? undefined;
+      return { success: true, linked, returnUrl };
     }
 
     const accessToken = params.get('access_token');
