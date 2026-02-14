@@ -189,7 +189,12 @@ namespace Fluxnote.Backend.Controllers
                 });
             }
 
-            // Os documentos ficam soltos (FolderId = null via SetNull no DbContext)
+            // Remover FolderId dos documentos manualmente (NoAction no DB para evitar ciclos de cascade)
+            foreach (var doc in folder.Documents)
+            {
+                doc.FolderId = null;
+            }
+
             _context.Folder.Remove(folder);
             await _context.SaveChangesAsync();
 

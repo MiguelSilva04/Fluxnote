@@ -561,7 +561,7 @@ namespace fluxnotebackend.Migrations
                     b.HasOne("Fluxnote.Backend.Models.Folder", "Folder")
                         .WithMany("Documents")
                         .HasForeignKey("FolderId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.HasOne("Fluxnote.Backend.Models.Team", "Team")
                         .WithMany("Documents")

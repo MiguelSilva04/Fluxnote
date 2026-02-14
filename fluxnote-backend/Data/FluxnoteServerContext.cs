@@ -182,11 +182,12 @@ namespace Fluxnote.Backend.Data
                       .HasForeignKey(f => f.CreatedById)
                       .OnDelete(DeleteBehavior.Restrict);
 
-                // Relação com Documents
+                // Relação com Documents (NoAction para evitar ciclos de cascade no SQL Server)
+                // O set-null é feito manualmente no FoldersController.DeleteFolder
                 entity.HasMany(f => f.Documents)
                       .WithOne(d => d.Folder)
                       .HasForeignKey(d => d.FolderId)
-                      .OnDelete(DeleteBehavior.SetNull);
+                      .OnDelete(DeleteBehavior.NoAction);
 
                 // Índices
                 entity.HasIndex(f => f.TeamId);

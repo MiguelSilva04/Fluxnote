@@ -302,7 +302,7 @@ namespace fluxnotebackend.Migrations
                         column: x => x.FolderId,
                         principalTable: "Folder",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.SetNull);
+                        onDelete: ReferentialAction.NoAction);
                     table.ForeignKey(
                         name: "FK_Document_Team_TeamId",
                         column: x => x.TeamId,

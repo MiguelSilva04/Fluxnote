@@ -434,6 +434,12 @@ namespace Fluxnote.Backend.Controllers
                     _context.DocumentInvite.RemoveRange(invites);
             }
 
+            // Limpar FolderId dos documentos antes de remover pastas (NoAction no DB)
+            foreach (var doc in team.Documents)
+            {
+                doc.FolderId = null;
+            }
+
             // Remove todas as pastas da equipa
             if (team.Folders != null && team.Folders.Any())
             {
