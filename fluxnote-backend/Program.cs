@@ -43,6 +43,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.HttpOverrides;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -398,6 +399,13 @@ if (!app.Environment.IsEnvironment("Testing"))
 // 6. Authentication
 // 7. Authorization
 // 8. Controllers
+
+// Forwarded Headers - necessário para Azure App Service (reverse proxy HTTPS -> HTTP)
+// Garante que o ASP.NET gera redirect URIs com HTTPS em produção
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+});
 
 // Swagger UI disponível em /swagger (apenas desenvolvimento)
 if (app.Environment.IsDevelopment())

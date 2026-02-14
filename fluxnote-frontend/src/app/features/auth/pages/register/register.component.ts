@@ -35,7 +35,7 @@ import { ToastService } from '../../../../shared/services/toast.service';
           <img src="assets/white_icon.png" alt="FluxNote" class="h-10 w-10" />
         </div>
         <h1 class="text-3xl font-bold text-gray-900">FluxNote</h1>
-        <p class="text-gray-500 mt-2">Create your account to get started</p>
+        <p class="text-gray-500 mt-2">Create your account to get started!</p>
       </div>
 
       <app-card customClass="w-full max-w-md shadow-xl border-0">
