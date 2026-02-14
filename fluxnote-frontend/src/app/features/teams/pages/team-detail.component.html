@@ -101,154 +101,232 @@
                 <h2 class="text-lg font-bold text-gray-900 mb-4">Document Permissions</h2>
 
                 <div class="space-y-3">
-                  @for (doc of visibleDocuments(); track doc.id) {
+                  <!-- Folders with documents -->
+                  @for (folder of getVisibleFolders(); track folder.id) {
                     <div class="border border-gray-200 rounded-lg overflow-hidden">
-                      <!-- Document Header (clickable to expand) -->
+                      <!-- Folder Header -->
                       <div
-                        (click)="toggleDocPanel(doc.id)"
-                        class="flex items-center justify-between p-4 cursor-pointer hover:bg-gray-50 transition-colors"
+                        (click)="togglePermFolder(folder.id)"
+                        class="flex items-center justify-between p-3 cursor-pointer hover:bg-gray-50 transition-colors bg-gray-50/50"
                       >
-                        <div class="flex items-center gap-2">
-                          <lucide-icon name="file-text" class="h-4 w-4 text-gray-500"></lucide-icon>
-                          <span class="text-sm font-medium text-gray-900">{{ doc.title }}</span>
-                          @if (getDocPermissionsForView(doc).length) {
-                            <span class="text-xs text-gray-400">({{ getDocPermissionsForView(doc).length }} members)</span>
-                          }
-                        </div>
-                        <div class="flex items-center gap-2">
-                          @if (isOwnerOrAdmin()) {
-                            <button
-                              data-tour="share-btn"
-                              (click)="openShareModal(doc.id); $event.stopPropagation()"
-                              class="inline-flex items-center gap-1 text-xs text-emerald-700 bg-emerald-50 hover:bg-emerald-100 px-2 py-1 rounded-md font-medium transition-colors"
-                            >
-                              <lucide-icon name="share-2" [size]="12"></lucide-icon>
-                              Share
-                            </button>
-                          }
-                          @if (isCurrentUserMember()) {
-                            <button
-                              (click)="openDocument(doc.id); $event.stopPropagation()"
-                              class="text-xs text-[#155347] hover:underline"
-                            >
-                              Open
-                            </button>
-                          }
+                        <div class="flex items-center gap-2.5">
                           <lucide-icon
-                            [name]="isDocExpanded(doc.id) ? 'chevron-up' : 'chevron-down'"
-                            class="h-4 w-4 text-gray-400"
+                            [name]="isPermFolderExpanded(folder.id) ? 'chevron-down' : 'chevron-right'"
+                            class="h-3.5 w-3.5 text-gray-400"
                           ></lucide-icon>
+                          <lucide-icon
+                            [name]="isPermFolderExpanded(folder.id) ? 'folder-open' : 'folder'"
+                            class="h-4 w-4 text-amber-500"
+                          ></lucide-icon>
+                          <span class="text-sm font-medium text-gray-900">{{ folder.name }}</span>
+                          <span class="text-xs text-gray-400">({{ getVisibleDocsInFolder(folder.id).length }})</span>
                         </div>
+                        <lucide-icon
+                          [name]="isPermFolderExpanded(folder.id) ? 'chevron-up' : 'chevron-down'"
+                          class="h-4 w-4 text-gray-400"
+                        ></lucide-icon>
                       </div>
 
-                      <!-- Expanded: Member permissions list -->
-                      @if (isDocExpanded(doc.id)) {
-                        <div class="border-t border-gray-200 p-4 bg-gray-50">
-
-                          <!-- Existing permissions -->
-                          @if (getDocPermissionsForView(doc).length) {
-                            <div class="divide-y divide-gray-100 mb-3">
-                              @for (perm of getDocPermissionsForView(doc); track perm.id ?? perm.teamMemberId) {
-                                <div class="flex items-center justify-between py-3 px-1">
-                                  <div class="flex items-center gap-2">
-                                    <div class="h-6 w-6 rounded-full bg-gray-200 text-gray-600 flex items-center justify-center text-[10px] font-bold">
-                                      {{ getInitials(perm.memberName) }}
-                                    </div>
-                                    <span class="text-sm text-gray-700">{{ perm.memberName }}</span>
-                                    @if (perm.memberRole === 1) {
-                                      <span class="text-[10px] font-medium bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded-full">Team Admin</span>
-                                    }
-                                  </div>
-                                  <div class="flex items-center gap-2">
-                                    @if (canChangeDocRole(perm)) {
-                                      <select
-                                        [ngModel]="perm.documentRole"
-                                        (ngModelChange)="onDocRoleChange(perm, $event)"
-                                        class="text-xs border border-gray-300 rounded-md px-2 py-1 bg-white focus:outline-none focus:ring-1 focus:ring-[#155347]"
-                                      >
-                                        <option [ngValue]="0">Viewer</option>
-                                        <option [ngValue]="1">Editor</option>
-                                      </select>
-                                    } @else {
-                                      <app-badge variant="outline">
-                                        {{ docRoleNames[perm.documentRole] }}
-                                      </app-badge>
-                                    }
-                                    @if (canRemoveDocPermission(perm)) {
-                                      <button
-                                        (click)="removeDocPermission(doc.id, perm)"
-                                        class="p-1 text-gray-400 hover:text-red-500 transition-colors"
-                                        title="Remove access"
-                                      >
-                                        <lucide-icon name="x" class="h-3.5 w-3.5"></lucide-icon>
-                                      </button>
-                                    }
-                                  </div>
-                                </div>
-                              }
-                            </div>
-                          } @else {
-                            <p class="text-xs text-gray-500 mb-3">No members have explicit access to this document yet.</p>
-                          }
-
-                          <!-- Add Member Form -->
-                          @if (canManageDocPermissions() && addMemberDocId() === doc.id) {
-                            <div class="flex items-center gap-2 p-3 bg-white rounded border border-gray-200">
-                              <select
-                                [ngModel]="addMemberSelectedId()"
-                                (ngModelChange)="addMemberSelectedId.set($event)"
-                                class="text-xs border border-gray-300 rounded-md px-2 py-1 bg-white flex-1 focus:outline-none focus:ring-1 focus:ring-[#155347]"
-                              >
-                                <option [ngValue]="null" disabled>Select member...</option>
-                                @for (m of getAddableMembers(doc); track m.id) {
-                                  <option [ngValue]="m.id">{{ m.name }}{{ m.role === 1 ? ' (Team Admin)' : '' }}</option>
-                                }
-                              </select>
-                              @if (isSelectedMemberAdmin()) {
-                                <span class="text-xs font-medium text-gray-500 bg-gray-100 px-2 py-1 rounded-md">Editor</span>
-                              } @else {
-                                <select
-                                  [ngModel]="addMemberSelectedRole()"
-                                  (ngModelChange)="addMemberSelectedRole.set($event)"
-                                  class="text-xs border border-gray-300 rounded-md px-2 py-1 bg-white focus:outline-none focus:ring-1 focus:ring-[#155347]"
-                                >
-                                  <option [ngValue]="0">Viewer</option>
-                                  <option [ngValue]="1">Editor</option>
-                                </select>
-                              }
-                              <button
-                                (click)="confirmAddMember()"
-                                [disabled]="!addMemberSelectedId()"
-                                class="px-3 py-1 text-xs font-medium text-white bg-[#155347] rounded-md hover:bg-[#0e3d33] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                              >
-                                Add
-                              </button>
-                              <button
-                                (click)="closeAddMemberForm()"
-                                class="p-1 text-gray-400 hover:text-gray-600 transition-colors"
-                              >
-                                <lucide-icon name="x" class="h-4 w-4"></lucide-icon>
-                              </button>
-                            </div>
-                          } @else {
-                            @if (canManageDocPermissions() && getAddableMembers(doc).length > 0) {
-                              <button
-                                (click)="openAddMemberForm(doc.id)"
-                                class="flex items-center gap-1 text-xs text-[#155347] hover:text-[#0e3d33] font-medium transition-colors"
-                              >
-                                <lucide-icon name="plus" class="h-3.5 w-3.5"></lucide-icon>
-                                Add Member
-                              </button>
-                            }
+                      <!-- Documents inside folder -->
+                      @if (isPermFolderExpanded(folder.id)) {
+                        <div class="border-t border-gray-200">
+                          @for (doc of getVisibleDocsInFolder(folder.id); track doc.id) {
+                            <ng-container *ngTemplateOutlet="docPermissionPanel; context: { $implicit: doc }"></ng-container>
                           }
                         </div>
                       }
                     </div>
                   }
+
+                  <!-- Unfoldered documents -->
+                  @if (getVisibleUnfolderedDocs().length) {
+                    @if (hasAnyFolderStructure()) {
+                      <!-- Show as a collapsible group when folders exist -->
+                      <div class="border border-gray-200 rounded-lg overflow-hidden">
+                        <div
+                          (click)="togglePermFolder('root')"
+                          class="flex items-center justify-between p-3 cursor-pointer hover:bg-gray-50 transition-colors bg-gray-50/50"
+                        >
+                          <div class="flex items-center gap-2.5">
+                            <lucide-icon
+                              [name]="isPermFolderExpanded('root') ? 'chevron-down' : 'chevron-right'"
+                              class="h-3.5 w-3.5 text-gray-400"
+                            ></lucide-icon>
+                            <lucide-icon name="file-text" class="h-4 w-4 text-gray-400"></lucide-icon>
+                            <span class="text-sm font-medium text-gray-900">No Folder</span>
+                            <span class="text-xs text-gray-400">({{ getVisibleUnfolderedDocs().length }})</span>
+                          </div>
+                          <lucide-icon
+                            [name]="isPermFolderExpanded('root') ? 'chevron-up' : 'chevron-down'"
+                            class="h-4 w-4 text-gray-400"
+                          ></lucide-icon>
+                        </div>
+
+                        @if (isPermFolderExpanded('root')) {
+                          <div class="border-t border-gray-200">
+                            @for (doc of getVisibleUnfolderedDocs(); track doc.id) {
+                              <ng-container *ngTemplateOutlet="docPermissionPanel; context: { $implicit: doc }"></ng-container>
+                            }
+                          </div>
+                        }
+                      </div>
+                    } @else {
+                      <!-- No folders at all: show documents flat (original style) -->
+                      @for (doc of getVisibleUnfolderedDocs(); track doc.id) {
+                        <ng-container *ngTemplateOutlet="docPermissionPanel; context: { $implicit: doc }"></ng-container>
+                      }
+                    }
+                  }
                 </div>
               </app-card-content>
             </app-card>
           }
+
+          <!-- Reusable Document Permission Panel Template -->
+          <ng-template #docPermissionPanel let-doc>
+            <div class="border border-gray-200 rounded-lg overflow-hidden">
+              <!-- Document Header (clickable to expand) -->
+              <div
+                (click)="toggleDocPanel(doc.id)"
+                class="flex items-center justify-between p-4 cursor-pointer hover:bg-gray-50 transition-colors"
+              >
+                <div class="flex items-center gap-2">
+                  <lucide-icon name="file-text" class="h-4 w-4 text-gray-500"></lucide-icon>
+                  <span class="text-sm font-medium text-gray-900">{{ doc.title }}</span>
+                  @if (getDocPermissionsForView(doc).length) {
+                    <span class="text-xs text-gray-400">({{ getDocPermissionsForView(doc).length }} members)</span>
+                  }
+                </div>
+                <div class="flex items-center gap-2">
+                  @if (isOwnerOrAdmin()) {
+                    <button
+                      data-tour="share-btn"
+                      (click)="openShareModal(doc.id); $event.stopPropagation()"
+                      class="inline-flex items-center gap-1 text-xs text-emerald-700 bg-emerald-50 hover:bg-emerald-100 px-2 py-1 rounded-md font-medium transition-colors"
+                    >
+                      <lucide-icon name="share-2" [size]="12"></lucide-icon>
+                      Share
+                    </button>
+                  }
+                  @if (isCurrentUserMember()) {
+                    <button
+                      (click)="openDocument(doc.id); $event.stopPropagation()"
+                      class="text-xs text-[#155347] hover:underline"
+                    >
+                      Open
+                    </button>
+                  }
+                  <lucide-icon
+                    [name]="isDocExpanded(doc.id) ? 'chevron-up' : 'chevron-down'"
+                    class="h-4 w-4 text-gray-400"
+                  ></lucide-icon>
+                </div>
+              </div>
+
+              <!-- Expanded: Member permissions list -->
+              @if (isDocExpanded(doc.id)) {
+                <div class="border-t border-gray-200 p-4 bg-gray-50">
+
+                  <!-- Existing permissions -->
+                  @if (getDocPermissionsForView(doc).length) {
+                    <div class="divide-y divide-gray-100 mb-3">
+                      @for (perm of getDocPermissionsForView(doc); track perm.id ?? perm.teamMemberId) {
+                        <div class="flex items-center justify-between py-3 px-1">
+                          <div class="flex items-center gap-2">
+                            <div class="h-6 w-6 rounded-full bg-gray-200 text-gray-600 flex items-center justify-center text-[10px] font-bold">
+                              {{ getInitials(perm.memberName) }}
+                            </div>
+                            <span class="text-sm text-gray-700">{{ perm.memberName }}</span>
+                            @if (perm.memberRole === 1) {
+                              <span class="text-[10px] font-medium bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded-full">Team Admin</span>
+                            }
+                          </div>
+                          <div class="flex items-center gap-2">
+                            @if (canChangeDocRole(perm)) {
+                              <select
+                                [ngModel]="perm.documentRole"
+                                (ngModelChange)="onDocRoleChange(perm, $event)"
+                                class="text-xs border border-gray-300 rounded-md px-2 py-1 bg-white focus:outline-none focus:ring-1 focus:ring-[#155347]"
+                              >
+                                <option [ngValue]="0">Viewer</option>
+                                <option [ngValue]="1">Editor</option>
+                              </select>
+                            } @else {
+                              <app-badge variant="outline">
+                                {{ docRoleNames[perm.documentRole] }}
+                              </app-badge>
+                            }
+                            @if (canRemoveDocPermission(perm)) {
+                              <button
+                                (click)="removeDocPermission(doc.id, perm)"
+                                class="p-1 text-gray-400 hover:text-red-500 transition-colors"
+                                title="Remove access"
+                              >
+                                <lucide-icon name="x" class="h-3.5 w-3.5"></lucide-icon>
+                              </button>
+                            }
+                          </div>
+                        </div>
+                      }
+                    </div>
+                  } @else {
+                    <p class="text-xs text-gray-500 mb-3">No members have explicit access to this document yet.</p>
+                  }
+
+                  <!-- Add Member Form -->
+                  @if (canManageDocPermissions() && addMemberDocId() === doc.id) {
+                    <div class="flex items-center gap-2 p-3 bg-white rounded border border-gray-200">
+                      <select
+                        [ngModel]="addMemberSelectedId()"
+                        (ngModelChange)="addMemberSelectedId.set($event)"
+                        class="text-xs border border-gray-300 rounded-md px-2 py-1 bg-white flex-1 focus:outline-none focus:ring-1 focus:ring-[#155347]"
+                      >
+                        <option [ngValue]="null" disabled>Select member...</option>
+                        @for (m of getAddableMembers(doc); track m.id) {
+                          <option [ngValue]="m.id">{{ m.name }}{{ m.role === 1 ? ' (Team Admin)' : '' }}</option>
+                        }
+                      </select>
+                      @if (isSelectedMemberAdmin()) {
+                        <span class="text-xs font-medium text-gray-500 bg-gray-100 px-2 py-1 rounded-md">Editor</span>
+                      } @else {
+                        <select
+                          [ngModel]="addMemberSelectedRole()"
+                          (ngModelChange)="addMemberSelectedRole.set($event)"
+                          class="text-xs border border-gray-300 rounded-md px-2 py-1 bg-white focus:outline-none focus:ring-1 focus:ring-[#155347]"
+                        >
+                          <option [ngValue]="0">Viewer</option>
+                          <option [ngValue]="1">Editor</option>
+                        </select>
+                      }
+                      <button
+                        (click)="confirmAddMember()"
+                        [disabled]="!addMemberSelectedId()"
+                        class="px-3 py-1 text-xs font-medium text-white bg-[#155347] rounded-md hover:bg-[#0e3d33] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      >
+                        Add
+                      </button>
+                      <button
+                        (click)="closeAddMemberForm()"
+                        class="p-1 text-gray-400 hover:text-gray-600 transition-colors"
+                      >
+                        <lucide-icon name="x" class="h-4 w-4"></lucide-icon>
+                      </button>
+                    </div>
+                  } @else {
+                    @if (canManageDocPermissions() && getAddableMembers(doc).length > 0) {
+                      <button
+                        (click)="openAddMemberForm(doc.id)"
+                        class="flex items-center gap-1 text-xs text-[#155347] hover:text-[#0e3d33] font-medium transition-colors"
+                      >
+                        <lucide-icon name="plus" class="h-3.5 w-3.5"></lucide-icon>
+                        Add Member
+                      </button>
+                    }
+                  }
+                </div>
+              }
+            </div>
+          </ng-template>
         </div>
 
         <!-- Stats Section -->

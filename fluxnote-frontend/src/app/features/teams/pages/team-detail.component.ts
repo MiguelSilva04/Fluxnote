@@ -84,6 +84,9 @@ export class TeamDetailComponent {
   addMemberSelectedId = signal<number | null>(null);
   addMemberSelectedRole = signal<number>(0);
 
+  /** Track which folders are expanded in the Document Permissions section */
+  expandedPermFolders = signal<Set<number | 'root'>>(new Set());
+
   /** Folder management state */
   isCreateFolderModalOpen = signal(false);
   isRenameFolderModalOpen = signal(false);
@@ -759,6 +762,44 @@ export class TeamDetailComponent {
         }
       });
     }
+  }
+
+  // --- Document Permissions folder grouping ---
+
+  togglePermFolder(folderId: number | 'root'): void {
+    const current = new Set(this.expandedPermFolders());
+    if (current.has(folderId)) {
+      current.delete(folderId);
+    } else {
+      current.add(folderId);
+    }
+    this.expandedPermFolders.set(current);
+  }
+
+  isPermFolderExpanded(folderId: number | 'root'): boolean {
+    return this.expandedPermFolders().has(folderId);
+  }
+
+  getVisibleDocsInFolder(folderId: number): TeamDocument[] {
+    return this.visibleDocuments().filter(d => d.folderId === folderId);
+  }
+
+  getVisibleUnfolderedDocs(): TeamDocument[] {
+    return this.visibleDocuments().filter(d => !d.folderId);
+  }
+
+  /** Returns folders that have at least one visible document */
+  getVisibleFolders(): Folder[] {
+    const team = this.selectedTeam();
+    if (!team?.folders) return [];
+    const visibleDocFolderIds = new Set(
+      this.visibleDocuments().filter(d => d.folderId).map(d => d.folderId)
+    );
+    return team.folders.filter(f => visibleDocFolderIds.has(f.id));
+  }
+
+  hasAnyFolderStructure(): boolean {
+    return this.getVisibleFolders().length > 0;
   }
 
   startTour(): void {
