@@ -47,10 +47,10 @@ pipelines:
 
           # ---- Frontend: Build & Deploy ----
           - step:
-              size: 2x
               name: Deploy Frontend
               services:
                 - docker
+                    memory: 2048
               caches:
                 - docker
               script:
