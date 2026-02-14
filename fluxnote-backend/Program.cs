@@ -126,10 +126,8 @@ if (builder.Environment.IsDevelopment())
 }
 else
 {
-    // Em produção, usar SmtpEmailSender quando configurado
-    // Por agora, usa ConsoleEmailSender como fallback (precisa do DevEmailStore)
-    builder.Services.AddSingleton<IDevEmailStore, DevEmailStore>();
-    builder.Services.AddScoped<IEmailSender, ConsoleEmailSender>();
+    // Em produção, usar SmtpEmailSender para envio real de emails via SMTP2GO
+    builder.Services.AddScoped<IEmailSender, SmtpEmailSender>();
 }
 
 builder.Services.AddScoped<TeamAutorizationService>();
