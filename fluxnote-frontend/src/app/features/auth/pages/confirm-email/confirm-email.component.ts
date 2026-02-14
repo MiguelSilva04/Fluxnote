@@ -1,13 +1,13 @@
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../../core/services';
-import { CardComponent, CardContentComponent } from '../../../../shared/components/ui';
+import { CardComponent, CardContentComponent, ButtonComponent } from '../../../../shared/components/ui';
 
 @Component({
   selector: 'app-confirm-email',
   standalone: true,
-  imports: [CommonModule, CardComponent, CardContentComponent],
+  imports: [CommonModule, RouterLink, CardComponent, CardContentComponent, ButtonComponent],
   template: `
     <div class="min-h-screen bg-gray-50 flex items-center justify-center p-4">
       <app-card customClass="w-full max-w-md shadow-xl border-0">
@@ -20,7 +20,9 @@ import { CardComponent, CardContentComponent } from '../../../../shared/componen
             <p class="text-red-600">{{ error() }}</p>
           } @else {
             <p class="text-green-700">{{ message() }}</p>
-            <p class="text-gray-600 mt-4">Redirecting to login...</p>
+            <a routerLink="/login" class="mt-6 block">
+              <app-button customClass="w-full" size="lg">Go to Login</app-button>
+            </a>
           }
         </app-card-content>
       </app-card>
