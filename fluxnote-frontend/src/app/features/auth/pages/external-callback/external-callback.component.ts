@@ -13,10 +13,10 @@ import { CardComponent, CardContentComponent } from '../../../../shared/componen
       <app-card customClass="w-full max-w-md shadow-xl border-0">
         <app-card-content customClass="p-8 text-center">
           @if (loading()) {
-            <h2 class="text-xl font-bold text-gray-900 mb-2">A processar autenticação...</h2>
-            <p class="text-sm text-gray-500">Aguarde enquanto terminamos o login social.</p>
+            <h2 class="text-xl font-bold text-gray-900 mb-2">Processing authentication...</h2>
+            <p class="text-sm text-gray-500">Wait while we finish your authentication with google.</p>
           } @else if (error()) {
-            <h2 class="text-xl font-bold text-red-600 mb-2">Falha na autenticação</h2>
+            <h2 class="text-xl font-bold text-red-600 mb-2">Fail on authentication</h2>
             <p class="text-sm text-gray-600">{{ error() }}</p>
           }
         </app-card-content>
