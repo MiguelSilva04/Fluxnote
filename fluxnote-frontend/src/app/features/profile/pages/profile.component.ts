@@ -4,7 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { LucideAngularModule } from 'lucide-angular';
 import { DashboardLayoutComponent } from '../../../layout/dashboard-layout/dashboard-layout.component';
 import { ButtonComponent, CardComponent, CardContentComponent, BadgeComponent, WorkInProgressComponent } from '../../../shared/components/ui';
-import { AuthService } from '../../../core/services';
+import { AuthService, UploadService } from '../../../core/services';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-profile',
@@ -586,6 +587,7 @@ import { AuthService } from '../../../core/services';
 })
 export class ProfileComponent {
   private authService = inject(AuthService);
+  private uploadService = inject(UploadService);
 
   user = this.authService.currentUser;
 
@@ -837,12 +839,21 @@ export class ProfileComponent {
 
     let profilePictureUrl: string;
 
-    if (this.uploadMode() === 'file') {
-      // Use base64 from file
-      profilePictureUrl = this.filePreview()!;
-    } else {
-      // Use URL
-      profilePictureUrl = this.avatarUrl;
+    try {
+      if (this.uploadMode() === 'file') {
+        // Upload ficheiro para o servidor e usar URL devolvida
+        const file = this.selectedFile()!;
+        const uploadResult = await firstValueFrom(this.uploadService.uploadImage(file));
+        profilePictureUrl = uploadResult.url;
+      } else {
+        // Usar URL externa diretamente
+        profilePictureUrl = this.avatarUrl;
+      }
+    } catch {
+      this.errorMessage.set('Failed to upload image. Please try again.');
+      this.isSavingAvatar.set(false);
+      this.autoHideMessages();
+      return;
     }
 
     const result = await this.authService.updateProfile({

@@ -51,6 +51,9 @@ coverage/
 # Docker
 docker-compose.override.yml
 
+# Local dev uploads (imagens guardadas localmente em dev)
+fluxnote-backend/wwwroot/uploads/
+
 # Environment files
 *.env
 *.env.local

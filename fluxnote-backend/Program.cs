@@ -32,6 +32,7 @@ using Fluxnote.Backend.Services.Auth;
 using Fluxnote.Backend.Services.Authorization;
 using Fluxnote.Backend.Services.Email;
 using Fluxnote.Backend.Services.AI;
+using Fluxnote.Backend.Services.Storage;
 using Fluxnote.Backend.Validators;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -143,6 +144,22 @@ builder.Services.AddScoped<TokenService>();
 // Docker: ApiKey lida de variável de ambiente Gemini__ApiKey (definida no .env)
 builder.Services.Configure<GeminiOptions>(builder.Configuration.GetSection("Gemini"));
 builder.Services.AddHttpClient<IAIService, GeminiAIService>();
+
+// ==============================================================================
+// 7. STORAGE DE IMAGENS
+// ==============================================================================
+// Dev: guarda ficheiros localmente, servidos via UploadsController
+// Prod: upload para Azure Blob Storage (connection string via env var)
+builder.Services.Configure<BlobStorageOptions>(builder.Configuration.GetSection("BlobStorage"));
+
+if (builder.Environment.IsDevelopment())
+{
+    builder.Services.AddScoped<IStorageService, LocalStorageService>();
+}
+else
+{
+    builder.Services.AddScoped<IStorageService, BlobStorageService>();
+}
 
 // ==============================================================================
 // 5. ASP.NET CORE IDENTITY

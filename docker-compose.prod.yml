@@ -31,6 +31,7 @@ services:
       - EmailOptions__FromEmail=${SMTP_FROM_EMAIL}
       - EmailOptions__SmtpUser=${SMTP_USER}
       - EmailOptions__SmtpPass=${SMTP_PASS}
+      - BlobStorage__ConnectionString=${BLOB_CONNECTION_STRING}
     env_file:
       - .env
     ports:
