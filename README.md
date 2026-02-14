@@ -10,8 +10,6 @@
 [Convert]::ToBase64String((1..32 | ForEach-Object { Get-Random -Maximum 256 }))
 ```
 
-#### Guardar em user-secrets (desenvolvimento local)
-
 ```powershell
 dotnet user-secrets init
 dotnet user-secrets set "Jwt:Key" "COLAR_KEY_AQUI"
@@ -26,10 +24,18 @@ A aplicação usa Google Gemini AI para funcionalidades como geração de resumo
 1. Aceder a <https://aistudio.google.com/apikey>
 2. Criar uma nova API key (free tier: 15 req/min, 1M tokens/dia)
 
-#### Guardar em user-secrets  (desenvolvimento local)
-
 ```powershell
 dotnet user-secrets set "Gemini:ApiKey" "COLAR_API_KEY_AQUI"
+```
+
+### 3. Configuração do Email (SMTP2GO)
+
+A aplicação usa SMTP2GO para envio de emails de confirmação em produção.
+
+```powershell
+dotnet user-secrets set "EmailOptions:FromEmail" "EMAIL_VERIFICADO_NO_SMTP2GO"
+dotnet user-secrets set "EmailOptions:SmtpUser" "SMTP2GO_USERNAME"
+dotnet user-secrets set "EmailOptions:SmtpPass" "SMTP2GO_PASSWORD"
 ```
 
 ## Executar com Docker
@@ -41,6 +47,9 @@ Para executar o projeto através do Docker, seguir os seguintes passos **na raiz
    ```text
    JWT_KEY=COLAR_JWT_KEY_AQUI
    GEMINI_API_KEY=COLAR_GEMINI_KEY_AQUI
+   SMTP_FROM_EMAIL=EMAIL_VERIFICADO_NO_SMTP2GO
+   SMTP_USER=SMTP2GO_USERNAME
+   SMTP_PASS=SMTP2GO_PASSWORD
    ```
 
 ### Ambiente de Desenvolvimento (DEV)

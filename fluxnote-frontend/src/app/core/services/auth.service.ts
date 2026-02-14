@@ -630,11 +630,8 @@ export class AuthService {
         )
       );
       return res.confirmationLink;
-    } catch (error: any) {
-      if (error.status === 404) {
-        return null; // ou lançar erro
-      }
-      throw error;
+    } catch {
+      return null;
     }
   }
 

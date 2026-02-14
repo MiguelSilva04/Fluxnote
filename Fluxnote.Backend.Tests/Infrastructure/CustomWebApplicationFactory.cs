@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Fluxnote.Backend.Data;
 using Fluxnote.Backend.Tests.Fakes;
 using System.Collections.Generic;
+using Fluxnote.Backend.Services.AI;
 using Fluxnote.Backend.Services.Email;
 
 namespace Fluxnote.Backend.Tests.Infrastructure;
@@ -17,28 +18,28 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
 {
     private DbConnection? _connection;
 
-    // Static constructor runs when the type is first used — sets env vars before host creation
+    // Construtor estático - executa quando o tipo é usado pela primeira vez, define variáveis de ambiente antes da criação do host
     static CustomWebApplicationFactory()
     {
-        // Ensure Program.Main can find the Jwt key (double-underscore name for nested config)
+        // Garantir que o Program.Main encontra a chave JWT (nome com double-underscore para config aninhada)
         Environment.SetEnvironmentVariable("Jwt__Key", "test-secret-key-please-change-for-ci");
 
-        // Optionally set other env vars your Program expects
+        // Definir outras variáveis de ambiente esperadas pelo Program
         Environment.SetEnvironmentVariable("Jwt__Issuer", "fluxnote-tests");
         Environment.SetEnvironmentVariable("Jwt__Audience", "fluxnote-tests");
     }
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
-        // Ensure test environment
+        // Garantir ambiente de teste
         builder.UseEnvironment("Test");
 
-        // Inject minimal required configuration values for tests
+        // Injetar valores de configuração mínimos necessários para testes
         builder.ConfigureAppConfiguration((context, configBuilder) =>
         {
             var testSettings = new Dictionary<string, string?>
             {
-                // JWT configuration
+                // Configuração JWT
                 { "Jwt:Key", "test-secret-key-please-change-for-ci" },
                 { "Jwt:Issuer", "fluxnote-tests" },
                 { "Jwt:Audience", "fluxnote-tests" },
@@ -50,12 +51,12 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
                 { "Authentication:Microsoft:ClientSecret", "test-ms-client-secret" },
                 { "Authentication:ExternalCallbackUrl", "http://localhost:4200/auth/external-callback" },
                 { "Authentication:ExternalErrorUrl", "http://localhost:4200/auth/external-error" },
-                // Auth configuration
+                // Configuração de autenticação
                 { "Auth:RefreshIdleDays", "7" },
                 { "Auth:RefreshAbsoluteDays", "7" },
                 { "Auth:RefreshAbsoluteDaysRememberMe", "30" },
                 { "Auth:RefreshCookieName", "fluxnote_rt" },
-                // Disable rate limiting for tests
+                // Desativar rate limiting para testes
                 { "IpRateLimiting:EnableEndpointRateLimiting", "false" },
                 // Frontend
                 { "Frontend:BaseUrl", "http://localhost:4200" }
@@ -66,31 +67,35 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
 
         builder.ConfigureServices(services =>
         {
-            // Replace real email sender with test fake
+            // Substituir o serviço real de email pelo fake de teste
             services.AddSingleton<TestEmailSender>();
             services.AddSingleton<IEmailSender>(sp => sp.GetRequiredService<TestEmailSender>());
 
-            // Remove existing DbContext registration(s)
+            // Substituir o serviço real de IA pelo fake de teste
+            services.AddSingleton<TestAIService>();
+            services.AddSingleton<IAIService>(sp => sp.GetRequiredService<TestAIService>());
+
+            // Remover registos existentes do DbContext
             var descriptor = services.SingleOrDefault(d => d.ServiceType == typeof(DbContextOptions<FluxnoteServerContext>));
             if (descriptor != null) services.Remove(descriptor);
 
             var contextDescriptor = services.SingleOrDefault(d => d.ServiceType == typeof(FluxnoteServerContext));
             if (contextDescriptor != null) services.Remove(contextDescriptor);
 
-            // Create and open a shared in-memory SQLite connection for EF Core
+            // Criar e abrir uma conexão SQLite in-memory partilhada para o EF Core
             _connection ??= new SqliteConnection("DataSource=:memory:");
             if (_connection is SqliteConnection sqlite)
             {
                 sqlite.Open();
             }
 
-            // Register the test DbContext using the open connection
+            // Registar o DbContext de teste usando a conexão aberta
             services.AddDbContext<FluxnoteServerContext>(options =>
             {
                 options.UseSqlite(_connection);
             });
 
-            // Build the provider and ensure DB is created
+            // Construir o provider e garantir que a BD é criada
             var sp = services.BuildServiceProvider();
             using var scope = sp.CreateScope();
             var db = scope.ServiceProvider.GetRequiredService<FluxnoteServerContext>();

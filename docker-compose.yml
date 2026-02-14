@@ -30,6 +30,7 @@ services:
       - ConnectionStrings__FluxnoteServerContext=Server=db;Database=FluxnoteDb;User Id=sa;Password=FluxNote@2024!;TrustServerCertificate=True;
       - Jwt__Key=${JWT_KEY}
       - Gemini__ApiKey=${GEMINI_API_KEY}
+      - BlobStorage__ConnectionString=${BLOB_CONNECTION_STRING}
     env_file:
       - .env
     ports:
