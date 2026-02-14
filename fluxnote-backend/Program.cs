@@ -127,7 +127,8 @@ if (builder.Environment.IsDevelopment())
 else
 {
     // Em produção, usar SmtpEmailSender quando configurado
-    // Por agora, usa ConsoleEmailSender como fallback
+    // Por agora, usa ConsoleEmailSender como fallback (precisa do DevEmailStore)
+    builder.Services.AddSingleton<IDevEmailStore, DevEmailStore>();
     builder.Services.AddScoped<IEmailSender, ConsoleEmailSender>();
 }
 
@@ -217,15 +218,24 @@ builder.Services.AddAuthorization(options =>
 // Permite pedidos do frontend Angular (localhost:4200).
 // AllowCredentials: Necessário para cookies de refresh token.
 
+var frontendUrl = builder.Configuration["Frontend:Url"];
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("spa", policy =>
     {
-        // Permite qualquer origem na porta 4200 (LAN, localhost, etc.)
+        // Permite origens do frontend:
+        // - Desenvolvimento: qualquer origem na porta 4200 ou 80 (LAN, localhost, etc.)
+        // - Produção (Azure): URL configurada via Frontend:Url (env var Frontend__Url)
         policy.SetIsOriginAllowed(origin =>
                {
                    var uri = new Uri(origin);
-                   return uri.Port == 4200 || uri.Port == 80;
+                   // Dev: portas locais
+                   if (uri.Port == 4200 || uri.Port == 80) return true;
+                   // Prod: URL configurada (ex: https://fluxnote-frontend-app.azurewebsites.net)
+                   if (!string.IsNullOrEmpty(frontendUrl))
+                       return origin.TrimEnd('/') == frontendUrl.TrimEnd('/');
+                   return false;
                })
                .WithHeaders("Content-Type", "Authorization", "X-Requested-With")
                .WithMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
