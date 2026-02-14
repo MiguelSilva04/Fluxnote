@@ -73,10 +73,65 @@ public class SmtpEmailSender : IEmailSender
         message.To.Add(MailboxAddress.Parse(toEmail));
         message.Subject = "Confirm your email";
 
-        var bodyHtml =
-            $@"<p>Thanks for join our community!</p>
-               <p>Confirm your email by clicking here:</p>
-               <p><a href=""{confirmationLink}"">Confirmar email</a></p>";
+        var bodyHtml = $@"
+<!DOCTYPE html>
+<html lang=""en"">
+<head>
+  <meta charset=""UTF-8"">
+  <meta name=""viewport"" content=""width=device-width, initial-scale=1.0"">
+</head>
+<body style=""margin:0; padding:0; background-color:#f3f4f6; font-family:Arial, Helvetica, sans-serif;"">
+  <table role=""presentation"" width=""100%"" cellpadding=""0"" cellspacing=""0"" style=""background-color:#f3f4f6; padding:40px 0;"">
+    <tr>
+      <td align=""center"">
+        <table role=""presentation"" width=""480"" cellpadding=""0"" cellspacing=""0"" style=""background-color:#ffffff; border-radius:12px; overflow:hidden; box-shadow:0 4px 6px rgba(0,0,0,0.07);"">
+          <!-- Header -->
+          <tr>
+            <td style=""background-color:#155347; padding:32px 40px; text-align:center;"">
+              <h1 style=""margin:0; color:#ffffff; font-size:28px; font-weight:700; letter-spacing:-0.5px;"">Fluxnote</h1>
+            </td>
+          </tr>
+          <!-- Body -->
+          <tr>
+            <td style=""padding:40px;"">
+              <h2 style=""margin:0 0 8px; color:#111827; font-size:22px; font-weight:600;"">Welcome aboard!</h2>
+              <p style=""margin:0 0 24px; color:#6b7280; font-size:15px; line-height:1.6;"">
+                Thanks for joining Fluxnote. To get started, please confirm your email address by clicking the button below.
+              </p>
+              <!-- Button -->
+              <table role=""presentation"" width=""100%"" cellpadding=""0"" cellspacing=""0"">
+                <tr>
+                  <td align=""center"" style=""padding:8px 0 32px;"">
+                    <a href=""{confirmationLink}""
+                       style=""display:inline-block; padding:14px 36px; background-color:#155347; color:#ffffff; text-decoration:none; font-size:15px; font-weight:600; border-radius:8px; letter-spacing:0.3px;"">
+                      Confirm my email
+                    </a>
+                  </td>
+                </tr>
+              </table>
+              <p style=""margin:0 0 16px; color:#9ca3af; font-size:13px; line-height:1.5;"">
+                If the button doesn't work, copy and paste this link into your browser:
+              </p>
+              <p style=""margin:0; word-break:break-all; color:#155347; font-size:13px; line-height:1.5;"">
+                {confirmationLink}
+              </p>
+            </td>
+          </tr>
+          <!-- Footer -->
+          <tr>
+            <td style=""padding:24px 40px; background-color:#f9fafb; border-top:1px solid #e5e7eb; text-align:center;"">
+              <p style=""margin:0; color:#9ca3af; font-size:12px; line-height:1.5;"">
+                You received this email because you created a Fluxnote account.<br>
+                If you didn't request this, you can safely ignore it.
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>";
 
         message.Body = new BodyBuilder { HtmlBody = bodyHtml }.ToMessageBody();
 

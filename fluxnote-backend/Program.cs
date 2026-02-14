@@ -32,8 +32,11 @@ using Fluxnote.Backend.Services.Auth;
 using Fluxnote.Backend.Services.Authorization;
 using Fluxnote.Backend.Services.Email;
 using Fluxnote.Backend.Services.AI;
+using Fluxnote.Backend.Services.Storage;
 using Fluxnote.Backend.Validators;
+using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authentication.MicrosoftAccount;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
@@ -61,6 +64,10 @@ builder.Services.AddDbContext<FluxnoteServerContext>(options =>
 var jwtKey = builder.Configuration["Jwt:Key"];
 var jwtIssuer = builder.Configuration["Jwt:Issuer"];
 var jwtAudience = builder.Configuration["Jwt:Audience"];
+var googleClientId = builder.Configuration["Authentication:Google:ClientId"];
+var googleClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
+var microsoftClientId = builder.Configuration["Authentication:Microsoft:ClientId"];
+var microsoftClientSecret = builder.Configuration["Authentication:Microsoft:ClientSecret"];
 
 if (string.IsNullOrWhiteSpace(jwtKey))
     throw new InvalidOperationException("Jwt:Key missing (Jwt__Key).");
@@ -71,7 +78,7 @@ if (string.IsNullOrWhiteSpace(jwtKey))
 // - ValidateIssuer/Audience: Verifica se o token foi emitido por esta aplicação
 // - ValidateLifetime: Verifica se o token não expirou
 // - ClockSkew: Tolerância de 30 segundos para diferenças de relógio
-builder.Services
+var authenticationBuilder = builder.Services
     .AddAuthentication(options =>
     {
         options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -91,6 +98,34 @@ builder.Services
             ClockSkew = TimeSpan.FromSeconds(30)
         };
     });
+
+if (!string.IsNullOrWhiteSpace(googleClientId) && !string.IsNullOrWhiteSpace(googleClientSecret))
+{
+    authenticationBuilder.AddGoogle(options =>
+    {
+        options.ClientId = googleClientId;
+        options.ClientSecret = googleClientSecret;
+        options.CallbackPath = "/api/auth/google-callback";
+        options.SignInScheme = IdentityConstants.ExternalScheme;
+        options.SaveTokens = true;
+        options.Scope.Add("openid");
+    });
+}
+
+if (!string.IsNullOrWhiteSpace(microsoftClientId) && !string.IsNullOrWhiteSpace(microsoftClientSecret))
+{
+    authenticationBuilder.AddMicrosoftAccount(options =>
+    {
+        options.ClientId = microsoftClientId;
+        options.ClientSecret = microsoftClientSecret;
+        options.CallbackPath = "/api/auth/microsoft-callback";
+        options.SignInScheme = IdentityConstants.ExternalScheme;
+        options.SaveTokens = true;
+        options.Scope.Add("openid");
+        options.Scope.Add("email");
+        options.Scope.Add("profile");
+    });
+}
 
 // ==============================================================================
 // 3. RATE LIMITING (AspNetCoreRateLimit)
@@ -126,9 +161,8 @@ if (builder.Environment.IsDevelopment())
 }
 else
 {
-    // Em produção, usar SmtpEmailSender quando configurado
-    // Por agora, usa ConsoleEmailSender como fallback
-    builder.Services.AddScoped<IEmailSender, ConsoleEmailSender>();
+    // Em produção, usar SmtpEmailSender para envio real de emails via SMTP2GO
+    builder.Services.AddScoped<IEmailSender, SmtpEmailSender>();
 }
 
 builder.Services.AddScoped<TeamAutorizationService>();
@@ -144,6 +178,22 @@ builder.Services.AddScoped<TokenService>();
 // Docker: ApiKey lida de variável de ambiente Gemini__ApiKey (definida no .env)
 builder.Services.Configure<GeminiOptions>(builder.Configuration.GetSection("Gemini"));
 builder.Services.AddHttpClient<IAIService, GeminiAIService>();
+
+// ==============================================================================
+// 7. STORAGE DE IMAGENS
+// ==============================================================================
+// Dev: guarda ficheiros localmente, servidos via UploadsController
+// Prod: upload para Azure Blob Storage (connection string via env var)
+builder.Services.Configure<BlobStorageOptions>(builder.Configuration.GetSection("BlobStorage"));
+
+if (builder.Environment.IsDevelopment())
+{
+    builder.Services.AddScoped<IStorageService, LocalStorageService>();
+}
+else
+{
+    builder.Services.AddScoped<IStorageService, BlobStorageService>();
+}
 
 // ==============================================================================
 // 5. ASP.NET CORE IDENTITY
@@ -174,6 +224,8 @@ builder.Services.AddIdentity<User, IdentityRole>(options =>
 
 builder.Services.ConfigureApplicationCookie(options =>
 {
+    options.Cookie.SameSite = SameSiteMode.Lax;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
     options.Events.OnRedirectToLogin = context =>
     {
         context.Response.StatusCode = 401;
@@ -217,15 +269,24 @@ builder.Services.AddAuthorization(options =>
 // Permite pedidos do frontend Angular (localhost:4200).
 // AllowCredentials: Necessário para cookies de refresh token.
 
+var frontendUrl = builder.Configuration["Frontend:Url"];
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("spa", policy =>
     {
-        // Permite qualquer origem na porta 4200 (LAN, localhost, etc.)
+        // Permite origens do frontend:
+        // - Desenvolvimento: qualquer origem na porta 4200 ou 80 (LAN, localhost, etc.)
+        // - Produção (Azure): URL configurada via Frontend:Url (env var Frontend__Url)
         policy.SetIsOriginAllowed(origin =>
                {
                    var uri = new Uri(origin);
-                   return uri.Port == 4200 || uri.Port == 80;
+                   // Dev: portas locais
+                   if (uri.Port == 4200 || uri.Port == 80) return true;
+                   // Prod: URL configurada (ex: https://fluxnote-frontend-app.azurewebsites.net)
+                   if (!string.IsNullOrEmpty(frontendUrl))
+                       return origin.TrimEnd('/') == frontendUrl.TrimEnd('/');
+                   return false;
                })
                .WithHeaders("Content-Type", "Authorization", "X-Requested-With")
                .WithMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")

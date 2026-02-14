@@ -9,6 +9,7 @@ import {
   InputComponent,
   CardComponent,
   CardContentComponent,
+  WorkInProgressComponent,
 } from '../../../../shared/components/ui';
 import { ToastService } from '../../../../shared/services/toast.service';
 
@@ -24,6 +25,7 @@ import { ToastService } from '../../../../shared/services/toast.service';
     InputComponent,
     CardComponent,
     CardContentComponent,
+    WorkInProgressComponent,
   ],
   template: `
     <div class="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
@@ -177,7 +179,12 @@ import { ToastService } from '../../../../shared/services/toast.service';
             </div>
 
             <div class="mt-6 grid grid-cols-2 gap-3">
-              <app-button variant="outline" customClass="w-full" [leftIcon]="true">
+              <app-button
+                variant="outline"
+                customClass="w-full"
+                [leftIcon]="true"
+                (onClick)="registerWithGoogle()"
+              >
                 <svg leftIcon class="h-5 w-5" viewBox="0 0 24 24">
                   <path
                     d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -198,7 +205,12 @@ import { ToastService } from '../../../../shared/services/toast.service';
                 </svg>
                 Google
               </app-button>
-              <app-button variant="outline" customClass="w-full" [leftIcon]="true">
+              <app-button
+                variant="outline"
+                customClass="w-full"
+                [leftIcon]="true"
+                (onClick)="registerWithMicrosoft()"
+              >
                 <svg leftIcon class="h-5 w-5" viewBox="0 0 23 23">
                   <path fill="#f3f3f3" d="M0 0h23v23H0z" />
                   <path fill="#f35325" d="M1 1h10v10H1z" />
@@ -219,6 +231,7 @@ import { ToastService } from '../../../../shared/services/toast.service';
           </p>
         </app-card-content>
       </app-card>
+      <app-work-in-progress [show]="showWipModal()" (close)="showWipModal.set(false)" />
     </div>
   `,
 })
@@ -228,6 +241,7 @@ export class RegisterComponent {
   private toastService = inject(ToastService);
 
   showPassword = signal(false);
+  showWipModal = signal(false);
   isLoading = this.authService.isLoading;
   
   // Campos reativos usando signals
@@ -249,7 +263,6 @@ export class RegisterComponent {
   validations = computed(() => {
     const pwd = this.password();
     const confirmPwd = this.confirmPassword();
-    console.log(pwd, confirmPwd);
     
     return {
       length: pwd.length >= 8,
@@ -293,5 +306,13 @@ export class RegisterComponent {
         state: { fromRegistration: true }
       });
     }
+  }
+
+  registerWithGoogle(): void {
+    this.authService.externalLogin('google');
+  }
+
+  registerWithMicrosoft(): void {
+    this.showWipModal.set(true);
   }
 }

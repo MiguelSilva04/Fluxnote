@@ -1,5 +1,6 @@
 import {
   Component,
+  inject,
   input,
   output,
   signal,
@@ -14,6 +15,7 @@ import { FormsModule } from '@angular/forms';
 import { LucideAngularModule } from 'lucide-angular';
 import Quill from 'quill';
 import { Subject, debounceTime, takeUntil } from 'rxjs';
+import { UploadService } from '../../../core/services';
 
 export type SaveStatus = 'idle' | 'saving' | 'saved' | 'error';
 
@@ -80,6 +82,7 @@ export class TextEditorComponent implements OnInit, AfterViewInit, OnDestroy {
   private quill!: Quill;
   private destroy$ = new Subject<void>();
   private contentChange$ = new Subject<string>();
+  private uploadService = inject(UploadService);
 
   ngOnInit(): void {
     this.contentChange$
@@ -184,7 +187,7 @@ export class TextEditorComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private handleDroppedImage(file: File): void {
-    const maxSizeInMB = 2;
+    const maxSizeInMB = 5;
     const maxSizeInBytes = maxSizeInMB * 1024 * 1024;
 
     if (file.size > maxSizeInBytes) {
@@ -192,12 +195,10 @@ export class TextEditorComponent implements OnInit, AfterViewInit, OnDestroy {
       return;
     }
 
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const base64 = e.target?.result as string;
-      this.insertImageAtCursor(base64);
-    };
-    reader.readAsDataURL(file);
+    this.uploadService.uploadImage(file).subscribe({
+      next: (res) => this.insertImageAtCursor(res.url),
+      error: () => alert('Failed to upload image. Please try again.'),
+    });
   }
 
   private updateActiveFormats(): void {
@@ -352,7 +353,7 @@ export class TextEditorComponent implements OnInit, AfterViewInit, OnDestroy {
   onImageSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
-    const maxSizeInMB = 2;
+    const maxSizeInMB = 5;
     const maxSizeInBytes = maxSizeInMB * 1024 * 1024;
 
     if (file) {
@@ -366,12 +367,10 @@ export class TextEditorComponent implements OnInit, AfterViewInit, OnDestroy {
         return;
       }
 
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const base64 = e.target?.result as string;
-        this.insertImageAtCursor(base64);
-      };
-      reader.readAsDataURL(file);
+      this.uploadService.uploadImage(file).subscribe({
+        next: (res) => this.insertImageAtCursor(res.url),
+        error: () => alert('Failed to upload image. Please try again.'),
+      });
     }
 
     input.value = '';
