@@ -87,6 +87,10 @@ export class TeamDetailComponent {
   /** Track which folders are expanded in the Document Permissions section */
   expandedPermFolders = signal<Set<number | 'root'>>(new Set());
 
+  /** Drag & drop state for Document Permissions */
+  draggingDocId = signal<number | null>(null);
+  dragOverTarget = signal<number | 'root' | null>(null);
+
   /** Folder management state */
   isCreateFolderModalOpen = signal(false);
   isRenameFolderModalOpen = signal(false);
@@ -798,8 +802,94 @@ export class TeamDetailComponent {
     return team.folders.filter(f => visibleDocFolderIds.has(f.id));
   }
 
+  /** Returns folders for the sidebar: Owners/Admins see all, Members see only folders with accessible docs */
+  getSidebarFolders(): Folder[] {
+    const team = this.selectedTeam();
+    if (!team?.folders) return [];
+    if (this.isOwnerOrAdmin()) return team.folders;
+    return this.getVisibleFolders();
+  }
+
   hasAnyFolderStructure(): boolean {
     return this.getVisibleFolders().length > 0;
+  }
+
+  // --- Drag & Drop for Document Permissions ---
+
+  onDragStart(event: DragEvent, docId: number): void {
+    this.draggingDocId.set(docId);
+    if (event.dataTransfer) {
+      event.dataTransfer.effectAllowed = 'move';
+      event.dataTransfer.setData('text/plain', String(docId));
+    }
+  }
+
+  onDragEnd(): void {
+    this.draggingDocId.set(null);
+    this.dragOverTarget.set(null);
+  }
+
+  onDragOverFolder(event: DragEvent, folderId: number): void {
+    event.preventDefault();
+    if (event.dataTransfer) event.dataTransfer.dropEffect = 'move';
+    this.dragOverTarget.set(folderId);
+  }
+
+  onDragOverRoot(event: DragEvent): void {
+    event.preventDefault();
+    if (event.dataTransfer) event.dataTransfer.dropEffect = 'move';
+    this.dragOverTarget.set('root');
+  }
+
+  onDragLeave(): void {
+    this.dragOverTarget.set(null);
+  }
+
+  onDropOnFolder(event: DragEvent, folderId: number): void {
+    event.preventDefault();
+    this.dragOverTarget.set(null);
+    const docId = this.draggingDocId();
+    this.draggingDocId.set(null);
+    if (!docId || !this.isOwnerOrAdmin()) return;
+
+    const team = this.selectedTeam();
+    if (!team) return;
+
+    this.folderService.moveDocumentToFolder(folderId, docId).subscribe({
+      next: () => {
+        this.toastService.success('Document moved to folder.');
+        this.loadTeam(team.id);
+      },
+      error: (err) => {
+        console.error('Error moving document to folder:', err);
+        this.toastService.error('Failed to move document.');
+      }
+    });
+  }
+
+  onDropOnRoot(event: DragEvent): void {
+    event.preventDefault();
+    this.dragOverTarget.set(null);
+    const docId = this.draggingDocId();
+    this.draggingDocId.set(null);
+    if (!docId || !this.isOwnerOrAdmin()) return;
+
+    const team = this.selectedTeam();
+    if (!team) return;
+
+    const doc = team.documents?.find(d => d.id === docId);
+    if (!doc?.folderId) return;
+
+    this.folderService.removeDocumentFromFolder(doc.folderId, docId).subscribe({
+      next: () => {
+        this.toastService.success('Document removed from folder.');
+        this.loadTeam(team.id);
+      },
+      error: (err) => {
+        console.error('Error removing document from folder:', err);
+        this.toastService.error('Failed to move document.');
+      }
+    });
   }
 
   startTour(): void {

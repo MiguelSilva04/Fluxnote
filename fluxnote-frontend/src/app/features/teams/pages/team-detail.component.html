@@ -103,7 +103,15 @@
                 <div class="space-y-3">
                   <!-- Folders with documents -->
                   @for (folder of getVisibleFolders(); track folder.id) {
-                    <div class="border border-gray-200 rounded-lg overflow-hidden">
+                    <div
+                      class="border border-gray-200 rounded-lg overflow-hidden transition-colors"
+                      [class.ring-2]="dragOverTarget() === folder.id"
+                      [class.ring-[#155347]]="dragOverTarget() === folder.id"
+                      [class.bg-[#155347]/5]="dragOverTarget() === folder.id"
+                      (dragover)="onDragOverFolder($event, folder.id)"
+                      (dragleave)="onDragLeave()"
+                      (drop)="onDropOnFolder($event, folder.id)"
+                    >
                       <!-- Folder Header -->
                       <div
                         (click)="togglePermFolder(folder.id)"
@@ -121,10 +129,6 @@
                           <span class="text-sm font-medium text-gray-900">{{ folder.name }}</span>
                           <span class="text-xs text-gray-400">({{ getVisibleDocsInFolder(folder.id).length }})</span>
                         </div>
-                        <lucide-icon
-                          [name]="isPermFolderExpanded(folder.id) ? 'chevron-up' : 'chevron-down'"
-                          class="h-4 w-4 text-gray-400"
-                        ></lucide-icon>
                       </div>
 
                       <!-- Documents inside folder -->
@@ -142,7 +146,16 @@
                   @if (getVisibleUnfolderedDocs().length) {
                     @if (hasAnyFolderStructure()) {
                       <!-- Show as a collapsible group when folders exist -->
-                      <div class="border border-gray-200 rounded-lg overflow-hidden">
+                      <div
+                        class="border border-gray-200 rounded-lg overflow-hidden transition-colors"
+                        [class.ring-2]="dragOverTarget() === 'root'"
+                        [class.ring-dashed]="dragOverTarget() === 'root'"
+                        [class.ring-gray-400]="dragOverTarget() === 'root'"
+                        [class.bg-gray-50]="dragOverTarget() === 'root'"
+                        (dragover)="onDragOverRoot($event)"
+                        (dragleave)="onDragLeave()"
+                        (drop)="onDropOnRoot($event)"
+                      >
                         <div
                           (click)="togglePermFolder('root')"
                           class="flex items-center justify-between p-3 cursor-pointer hover:bg-gray-50 transition-colors bg-gray-50/50"
@@ -184,7 +197,13 @@
 
           <!-- Reusable Document Permission Panel Template -->
           <ng-template #docPermissionPanel let-doc>
-            <div class="border border-gray-200 rounded-lg overflow-hidden">
+            <div
+              class="border border-gray-200 rounded-lg overflow-hidden transition-opacity"
+              [class.opacity-50]="draggingDocId() === doc.id"
+              [attr.draggable]="isOwnerOrAdmin() ? 'true' : null"
+              (dragstart)="onDragStart($event, doc.id)"
+              (dragend)="onDragEnd()"
+            >
               <!-- Document Header (clickable to expand) -->
               <div
                 (click)="toggleDocPanel(doc.id)"
@@ -340,7 +359,7 @@
                 <div class="flex items-center justify-between">
                   <span class="text-sm text-gray-600">Documents</span>
                   <span class="text-sm font-bold text-gray-900">
-                    {{ selectedTeam()?.documents?.length ?? 0 }}
+                    {{ visibleDocuments().length }}
                   </span>
                 </div>
 
@@ -362,7 +381,7 @@
           </app-card>
 
           <!-- Folders Management -->
-          @if (selectedTeam()!.folders?.length || isOwnerOrAdmin()) {
+          @if (getSidebarFolders().length || isOwnerOrAdmin()) {
             <app-card>
               <app-card-content customClass="p-6">
                 <div class="flex items-center justify-between mb-4">
@@ -379,12 +398,12 @@
                 </div>
 
                 <div class="space-y-2">
-                  @for (folder of selectedTeam()!.folders ?? []; track folder.id) {
+                  @for (folder of getSidebarFolders(); track folder.id) {
                     <div class="flex items-center justify-between p-2 border border-gray-200 rounded-lg">
                       <div class="flex items-center gap-2">
                         <lucide-icon name="folder" class="h-4 w-4 text-amber-500"></lucide-icon>
                         <span class="text-sm text-gray-900">{{ folder.name }}</span>
-                        <span class="text-xs text-gray-400">({{ folder.documentCount }})</span>
+                        <span class="text-xs text-gray-400">({{ getVisibleDocsInFolder(folder.id).length }})</span>
                       </div>
                       @if (isOwnerOrAdmin()) {
                         <div class="flex items-center gap-1">

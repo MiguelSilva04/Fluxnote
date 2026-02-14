@@ -78,10 +78,34 @@ namespace Fluxnote.Backend.Controllers
             if (userId is null)
                 return Unauthorized(new { message = "User not authenticated." });
 
-            // Obter equipas onde o utilizador é membro (incluindo a role)
-            var userTeamMemberships = await _context.TeamMember
+            // Obter equipas onde o utilizador é membro (incluindo a role e memberId)
+            var userMemberships = await _context.TeamMember
                 .Where(m => m.UserId == userId && m.TeamId != null)
-                .ToDictionaryAsync(m => m.TeamId!.Value, m => (int)m.Role);
+                .Select(m => new { TeamId = m.TeamId!.Value, Role = (int)m.Role, MemberId = m.Id })
+                .ToListAsync();
+
+            var userTeamMemberships = userMemberships.ToDictionary(m => m.TeamId, m => m.Role);
+
+            // Para equipas onde o utilizador é Member (role 0), obter IDs de documentos acessíveis
+            var memberTeamEntries = userMemberships.Where(m => m.Role == 0).ToList();
+            var accessibleDocIdsByTeam = new Dictionary<int, HashSet<int>>();
+
+            if (memberTeamEntries.Any())
+            {
+                var memberIds = memberTeamEntries.Select(m => m.MemberId).ToList();
+                var permissions = await _context.DocumentPermission
+                    .Where(p => memberIds.Contains(p.TeamMemberId))
+                    .Select(p => new { p.DocumentId, p.TeamMember.TeamId })
+                    .ToListAsync();
+
+                foreach (var entry in memberTeamEntries)
+                {
+                    accessibleDocIdsByTeam[entry.TeamId] = permissions
+                        .Where(p => p.TeamId == entry.TeamId)
+                        .Select(p => p.DocumentId)
+                        .ToHashSet();
+                }
+            }
 
             var teams = await _context.Team
                 .Include(t => t.Members)
@@ -119,16 +143,28 @@ namespace Fluxnote.Backend.Controllers
                         Name = f.Name,
                         TeamId = f.TeamId,
                         CreatedAt = f.CreatedAt,
-                        UpdatedAt = f.UpdatedAt,
-                        DocumentCount = t.Documents.Count(d => !d.IsDeleted && d.FolderId == f.Id)
+                        UpdatedAt = f.UpdatedAt
                     }).OrderBy(f => f.Name).ToList()
                 })
                 .ToListAsync();
 
-            // Preencher CurrentUserRole após a query
+            // Preencher CurrentUserRole, filtrar documentos por acesso e calcular DocumentCount
             foreach (var team in teams)
             {
                 team.CurrentUserRole = userTeamMemberships.GetValueOrDefault(team.Id, 0);
+
+                // Members (role 0): filtrar documentos para apenas os que têm permissão
+                if (team.CurrentUserRole == 0 && accessibleDocIdsByTeam.TryGetValue(team.Id, out var accessibleIds))
+                {
+                    team.Documents = team.Documents.Where(d => accessibleIds.Contains(d.Id)).ToList();
+                }
+
+                // Calcular contagem de documentos por pasta e remover pastas vazias
+                foreach (var folder in team.Folders)
+                {
+                    folder.DocumentCount = team.Documents.Count(d => d.FolderId == folder.Id);
+                }
+                team.Folders = team.Folders.Where(f => f.DocumentCount > 0).ToList();
             }
 
             return Ok(teams);

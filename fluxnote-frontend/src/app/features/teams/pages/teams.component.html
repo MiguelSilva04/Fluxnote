@@ -212,7 +212,7 @@
                                 class="h-4 w-4 text-amber-500"
                               ></lucide-icon>
                               <span class="text-sm font-medium text-gray-900">{{ folder.name }}</span>
-                              <span class="text-xs text-gray-400">({{ folder.documentCount }})</span>
+                              <span class="text-xs text-gray-400">({{ getDocumentsInFolder(team, folder.id).length }})</span>
                             </div>
                           </div>
                           <!-- Documentos dentro da pasta -->
