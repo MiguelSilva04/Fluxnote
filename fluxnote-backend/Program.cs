@@ -402,10 +402,13 @@ if (!app.Environment.IsEnvironment("Testing"))
 
 // Forwarded Headers - necessário para Azure App Service (reverse proxy HTTPS -> HTTP)
 // Garante que o ASP.NET gera redirect URIs com HTTPS em produção
-app.UseForwardedHeaders(new ForwardedHeadersOptions
+var forwardedHeadersOptions = new ForwardedHeadersOptions
 {
     ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
-});
+};
+forwardedHeadersOptions.KnownNetworks.Clear();
+forwardedHeadersOptions.KnownProxies.Clear();
+app.UseForwardedHeaders(forwardedHeadersOptions);
 
 // Swagger UI disponível em /swagger (apenas desenvolvimento)
 if (app.Environment.IsDevelopment())
