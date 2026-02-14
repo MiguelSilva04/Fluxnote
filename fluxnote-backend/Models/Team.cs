@@ -91,5 +91,10 @@ namespace Fluxnote.Backend.Models
         /// </remarks>
         /// <seealso cref="Document"/>
         public ICollection<Document> Documents { get; set; } = new List<Document>();
+
+        /// <summary>
+        /// Coleção de pastas pertencentes à equipa.
+        /// </summary>
+        public ICollection<Folder> Folders { get; set; } = new List<Folder>();
     }
 }

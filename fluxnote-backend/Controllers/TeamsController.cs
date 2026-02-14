@@ -1,4 +1,5 @@
 using Fluxnote.Backend.Data;
+using Fluxnote.Backend.Dtos.Folders;
 using Fluxnote.Backend.Dtos.Teams;
 using Fluxnote.Backend.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -85,6 +86,7 @@ namespace Fluxnote.Backend.Controllers
             var teams = await _context.Team
                 .Include(t => t.Members)
                 .Include(t => t.Documents.Where(d => !d.IsDeleted))
+                .Include(t => t.Folders)
                 .Where(t => userTeamMemberships.Keys.Contains(t.Id))
                 .Select(t => new TeamDto
                 {
@@ -108,8 +110,18 @@ namespace Fluxnote.Backend.Controllers
                         Id = d.Id,
                         Title = d.Title,
                         UpdatedAt = d.UpdatedAt,
-                        CreatedById = d.CreatedById
-                    }).ToList()
+                        CreatedById = d.CreatedById,
+                        FolderId = d.FolderId
+                    }).ToList(),
+                    Folders = t.Folders.Select(f => new FolderDto
+                    {
+                        Id = f.Id,
+                        Name = f.Name,
+                        TeamId = f.TeamId,
+                        CreatedAt = f.CreatedAt,
+                        UpdatedAt = f.UpdatedAt,
+                        DocumentCount = t.Documents.Count(d => !d.IsDeleted && d.FolderId == f.Id)
+                    }).OrderBy(f => f.Name).ToList()
                 })
                 .ToListAsync();
 
@@ -158,7 +170,8 @@ namespace Fluxnote.Backend.Controllers
                 .Include(t => t.Members)
                 .Include(t => t.Documents.Where(d => !d.IsDeleted))
                     .ThenInclude(d => d.Permissions)
-                        .ThenInclude(p => p.TeamMember);
+                        .ThenInclude(p => p.TeamMember)
+                .Include(t => t.Folders);
 
             var team = await teamQuery.FirstOrDefaultAsync(t => t.Id == id);
 
@@ -193,6 +206,7 @@ namespace Fluxnote.Backend.Controllers
                     Title = d.Title,
                     UpdatedAt = d.UpdatedAt,
                     CreatedById = d.CreatedById,
+                    FolderId = d.FolderId,
                     // Apenas Owner vê todos os documentos; TeamAdmin e Member precisam de DocumentPermission
                     Permissions = isOwner
                         ? d.Permissions.Select(p => new DocumentPermissionSummaryDto
@@ -213,7 +227,16 @@ namespace Fluxnote.Backend.Controllers
                                 DocumentRole = (int)p.Role
                             }).ToList()
                             : new List<DocumentPermissionSummaryDto>())
-                }).ToList()
+                }).ToList(),
+                Folders = team.Folders.Select(f => new FolderDto
+                {
+                    Id = f.Id,
+                    Name = f.Name,
+                    TeamId = f.TeamId,
+                    CreatedAt = f.CreatedAt,
+                    UpdatedAt = f.UpdatedAt,
+                    DocumentCount = team.Documents.Count(d => !d.IsDeleted && d.FolderId == f.Id)
+                }).OrderBy(f => f.Name).ToList()
             };
 
             return Ok(dto);
@@ -376,6 +399,7 @@ namespace Fluxnote.Backend.Controllers
             var team = await _context.Team
                 .Include(t => t.Members)
                 .Include(t => t.Documents)
+                .Include(t => t.Folders)
                 .FirstOrDefaultAsync(t => t.Id == id);
                 
             if (team == null)
@@ -408,6 +432,12 @@ namespace Fluxnote.Backend.Controllers
                     .ToListAsync();
                 if (invites.Any())
                     _context.DocumentInvite.RemoveRange(invites);
+            }
+
+            // Remove todas as pastas da equipa
+            if (team.Folders != null && team.Folders.Any())
+            {
+                _context.Folder.RemoveRange(team.Folders);
             }
 
             // Remove todos os membros da equipa

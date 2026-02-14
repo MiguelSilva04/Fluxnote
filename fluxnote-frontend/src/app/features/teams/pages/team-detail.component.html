@@ -283,7 +283,59 @@
             </app-card-content>
           </app-card>
 
-          <!-- Documents Quick List -->
+          <!-- Folders Management -->
+          @if (selectedTeam()!.folders?.length || isOwnerOrAdmin()) {
+            <app-card>
+              <app-card-content customClass="p-6">
+                <div class="flex items-center justify-between mb-4">
+                  <h3 class="text-sm font-semibold text-gray-900">Folders</h3>
+                  @if (isOwnerOrAdmin()) {
+                    <button
+                      (click)="openCreateFolderModal()"
+                      class="flex items-center gap-1 text-xs text-[#155347] hover:text-[#0e3d33] font-medium transition-colors"
+                    >
+                      <lucide-icon name="folder-plus" class="h-3.5 w-3.5"></lucide-icon>
+                      New
+                    </button>
+                  }
+                </div>
+
+                <div class="space-y-2">
+                  @for (folder of selectedTeam()!.folders ?? []; track folder.id) {
+                    <div class="flex items-center justify-between p-2 border border-gray-200 rounded-lg">
+                      <div class="flex items-center gap-2">
+                        <lucide-icon name="folder" class="h-4 w-4 text-amber-500"></lucide-icon>
+                        <span class="text-sm text-gray-900">{{ folder.name }}</span>
+                        <span class="text-xs text-gray-400">({{ folder.documentCount }})</span>
+                      </div>
+                      @if (isOwnerOrAdmin()) {
+                        <div class="flex items-center gap-1">
+                          <button
+                            (click)="openRenameFolderModal(folder)"
+                            class="p-1 text-gray-400 hover:text-gray-600 transition-colors"
+                            title="Rename folder"
+                          >
+                            <lucide-icon name="pencil" class="h-3.5 w-3.5"></lucide-icon>
+                          </button>
+                          <button
+                            (click)="openDeleteFolderModal(folder)"
+                            class="p-1 text-gray-400 hover:text-red-500 transition-colors"
+                            title="Delete folder"
+                          >
+                            <lucide-icon name="trash-2" class="h-3.5 w-3.5"></lucide-icon>
+                          </button>
+                        </div>
+                      }
+                    </div>
+                  } @empty {
+                    <p class="text-xs text-gray-500">No folders yet.</p>
+                  }
+                </div>
+              </app-card-content>
+            </app-card>
+          }
+
+          <!-- Documents Quick List with Folder Assignment -->
           <app-card>
             <app-card-content customClass="p-6">
               <h3 class="text-sm font-semibold text-gray-900 mb-4">Documents</h3>
@@ -291,11 +343,25 @@
               <div class="space-y-2">
                 @if (visibleDocuments().length) {
                   @for (doc of visibleDocuments(); track doc.id) {
-                    <div
-                      (click)="openDocument(doc.id)"
-                      class="p-2 border-b text-sm cursor-pointer hover:bg-gray-50 rounded"
-                    >
-                      {{ doc.title }}
+                    <div class="flex items-center justify-between p-2 border-b hover:bg-gray-50 rounded">
+                      <div
+                        (click)="openDocument(doc.id)"
+                        class="text-sm cursor-pointer flex-1"
+                      >
+                        {{ doc.title }}
+                      </div>
+                      @if (isOwnerOrAdmin() && selectedTeam()!.folders?.length) {
+                        <select
+                          [ngModel]="doc.folderId ?? null"
+                          (ngModelChange)="moveDocToFolder(doc, $event)"
+                          class="text-[10px] border border-gray-200 rounded px-1.5 py-0.5 bg-white focus:outline-none focus:ring-1 focus:ring-[#155347] max-w-[100px]"
+                        >
+                          <option [ngValue]="null">No folder</option>
+                          @for (folder of selectedTeam()!.folders; track folder.id) {
+                            <option [ngValue]="folder.id">{{ folder.name }}</option>
+                          }
+                        </select>
+                      }
                     </div>
                   }
                 } @else {
@@ -449,6 +515,97 @@
       (viewInvite)="viewInviteLink($event)"
     />
   }
+
+  <!-- Create Folder Modal -->
+  <app-modal
+    [isOpen]="isCreateFolderModalOpen()"
+    title="Create New Folder"
+    maxWidth="sm"
+    [hasFooter]="true"
+    (onClose)="closeCreateFolderModal()"
+  >
+    <div class="space-y-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Folder Name</label>
+        <input
+          type="text"
+          [(ngModel)]="newFolderName"
+          placeholder="e.g. Marketing Documents"
+          class="w-full h-10 px-3 rounded-lg border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-[#155347] focus:border-transparent text-sm"
+        />
+      </div>
+    </div>
+    <div footer class="flex gap-3">
+      <app-button variant="ghost" (onClick)="closeCreateFolderModal()">Cancel</app-button>
+      <app-button (onClick)="createFolder()">Create Folder</app-button>
+    </div>
+  </app-modal>
+
+  <!-- Rename Folder Modal -->
+  <app-modal
+    [isOpen]="isRenameFolderModalOpen()"
+    title="Rename Folder"
+    maxWidth="sm"
+    [hasFooter]="true"
+    (onClose)="closeRenameFolderModal()"
+  >
+    <div class="space-y-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Folder Name</label>
+        <input
+          type="text"
+          [(ngModel)]="renameFolderName"
+          class="w-full h-10 px-3 rounded-lg border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-[#155347] focus:border-transparent text-sm"
+        />
+      </div>
+    </div>
+    <div footer class="flex gap-3">
+      <app-button variant="ghost" (onClick)="closeRenameFolderModal()">Cancel</app-button>
+      <app-button (onClick)="confirmRenameFolder()">Rename</app-button>
+    </div>
+  </app-modal>
+
+  <!-- Delete Folder Modal -->
+  <app-modal
+    [isOpen]="isDeleteFolderModalOpen()"
+    title="Delete Folder"
+    maxWidth="sm"
+    [hasFooter]="true"
+    (onClose)="closeDeleteFolderModal()"
+  >
+    <div class="space-y-4">
+      <div class="flex items-center justify-center w-12 h-12 mx-auto bg-red-100 rounded-full">
+        <lucide-icon name="triangle-alert" class="h-6 w-6 text-red-600"></lucide-icon>
+      </div>
+      <p class="text-center text-gray-600">
+        Are you sure you want to delete the folder
+        <strong>{{ deleteFolderTarget()?.name }}</strong>?
+        Documents inside will not be deleted, they will be moved out of the folder.
+      </p>
+    </div>
+    <div footer class="flex gap-3">
+      <app-button
+        variant="outline"
+        (onClick)="closeDeleteFolderModal()"
+        customClass="flex-1"
+        [disabled]="isDeletingFolder()"
+      >
+        Cancel
+      </app-button>
+      <app-button
+        (onClick)="confirmDeleteFolder()"
+        customClass="flex-1 bg-red-600 hover:bg-red-700 text-white"
+        [disabled]="isDeletingFolder()"
+      >
+        @if (isDeletingFolder()) {
+          <lucide-icon name="loader-circle" class="h-4 w-4 animate-spin mr-2"></lucide-icon>
+          Deleting...
+        } @else {
+          Delete Folder
+        }
+      </app-button>
+    </div>
+  </app-modal>
 
   <!-- Remove Document Permission Modal -->
   <app-modal

@@ -117,9 +117,20 @@ namespace Fluxnote.Backend.Models
         public DateTime? DeletedAt { get; set; }
 
         /// <summary>
+        /// Identificador da pasta onde o documento está organizado (opcional).
+        /// Null indica que o documento não está em nenhuma pasta.
+        /// </summary>
+        public int? FolderId { get; set; }
+
+        /// <summary>
         /// Referência de navegação para a equipa proprietária.
         /// </summary>
         public Team Team { get; set; } = null!;
+
+        /// <summary>
+        /// Referência de navegação para a pasta (opcional).
+        /// </summary>
+        public Folder? Folder { get; set; }
 
         /// <summary>
         /// Referência de navegação para o utilizador criador.

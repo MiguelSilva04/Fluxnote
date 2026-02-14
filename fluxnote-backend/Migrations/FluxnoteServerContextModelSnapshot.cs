@@ -43,6 +43,9 @@ namespace fluxnotebackend.Migrations
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<int?>("FolderId")
+                        .HasColumnType("int");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
@@ -63,6 +66,8 @@ namespace fluxnotebackend.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CreatedById");
+
+                    b.HasIndex("FolderId");
 
                     b.HasIndex("IsDeleted");
 
@@ -151,6 +156,41 @@ namespace fluxnotebackend.Migrations
                         .IsUnique();
 
                     b.ToTable("DocumentPermission");
+                });
+
+            modelBuilder.Entity("Fluxnote.Backend.Models.Folder", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedById")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int>("TeamId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("TeamId");
+
+                    b.ToTable("Folder");
                 });
 
             modelBuilder.Entity("Fluxnote.Backend.Models.RefreshToken", b =>
@@ -515,6 +555,11 @@ namespace fluxnotebackend.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("Fluxnote.Backend.Models.Folder", "Folder")
+                        .WithMany("Documents")
+                        .HasForeignKey("FolderId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.HasOne("Fluxnote.Backend.Models.Team", "Team")
                         .WithMany("Documents")
                         .HasForeignKey("TeamId")
@@ -522,6 +567,8 @@ namespace fluxnotebackend.Migrations
                         .IsRequired();
 
                     b.Navigation("CreatedBy");
+
+                    b.Navigation("Folder");
 
                     b.Navigation("Team");
                 });
@@ -562,6 +609,25 @@ namespace fluxnotebackend.Migrations
                     b.Navigation("Document");
 
                     b.Navigation("TeamMember");
+                });
+
+            modelBuilder.Entity("Fluxnote.Backend.Models.Folder", b =>
+                {
+                    b.HasOne("Fluxnote.Backend.Models.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Fluxnote.Backend.Models.Team", "Team")
+                        .WithMany("Folders")
+                        .HasForeignKey("TeamId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("Team");
                 });
 
             modelBuilder.Entity("Fluxnote.Backend.Models.RefreshToken", b =>
@@ -642,9 +708,16 @@ namespace fluxnotebackend.Migrations
                     b.Navigation("Permissions");
                 });
 
+            modelBuilder.Entity("Fluxnote.Backend.Models.Folder", b =>
+                {
+                    b.Navigation("Documents");
+                });
+
             modelBuilder.Entity("Fluxnote.Backend.Models.Team", b =>
                 {
                     b.Navigation("Documents");
+
+                    b.Navigation("Folders");
 
                     b.Navigation("Members");
                 });

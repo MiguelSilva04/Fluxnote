@@ -6,11 +6,11 @@ import { LucideAngularModule } from 'lucide-angular';
 import { DashboardLayoutComponent } from '../../../layout/dashboard-layout/dashboard-layout.component';
 import { ButtonComponent, CardComponent, CardContentComponent, BadgeComponent, ModalComponent } from '../../../shared/components/ui';
 import { DocumentShareModalComponent } from '../../../shared/components/document-share-modal/document-share-modal.component';
-import { TeamService, DocumentPermissionService, AuthService, DocumentInviteService, DocumentService } from '../../../core/services';
+import { TeamService, DocumentPermissionService, AuthService, DocumentInviteService, DocumentService, FolderService } from '../../../core/services';
 import { ToastService } from '../../../shared/services/toast.service';
 import { TourService } from '../../../shared/services/tour.service';
 import { TourStep } from '../../../shared/components/ui/tour/tour.models';
-import { TeamMemberToPost, TeamDocument, DocumentPermissionSummary, DocumentInviteDto } from '../../../core/models';
+import { TeamMemberToPost, TeamDocument, DocumentPermissionSummary, DocumentInviteDto, Folder } from '../../../core/models';
 
 @Component({
   selector: 'app-team-detail',
@@ -40,6 +40,7 @@ export class TeamDetailComponent {
 
   private inviteService = inject(DocumentInviteService);
   private tourService = inject(TourService);
+  private folderService = inject(FolderService);
 
   shareDocId = signal<number | null>(null);
   shareRole = signal<number>(0); // 0=Viewer, 1=Editor
@@ -82,6 +83,16 @@ export class TeamDetailComponent {
   addMemberDocId = signal<number | null>(null);
   addMemberSelectedId = signal<number | null>(null);
   addMemberSelectedRole = signal<number>(0);
+
+  /** Folder management state */
+  isCreateFolderModalOpen = signal(false);
+  isRenameFolderModalOpen = signal(false);
+  isDeleteFolderModalOpen = signal(false);
+  newFolderName = '';
+  renameFolderTarget = signal<Folder | null>(null);
+  renameFolderName = '';
+  deleteFolderTarget = signal<Folder | null>(null);
+  isDeletingFolder = signal(false);
 
   ngOnInit(): void {
     this.route.params.subscribe(params => {
@@ -626,6 +637,128 @@ export class TeamDetailComponent {
   viewInviteLink(url: string): void {
     this.shareGeneratedUrl.set(url);
     this.shareCopied.set(false);
+  }
+
+  // --- Folder Management ---
+
+  openCreateFolderModal(): void {
+    this.newFolderName = '';
+    this.isCreateFolderModalOpen.set(true);
+  }
+
+  closeCreateFolderModal(): void {
+    this.isCreateFolderModalOpen.set(false);
+    this.newFolderName = '';
+  }
+
+  createFolder(): void {
+    const team = this.selectedTeam();
+    if (!team || !this.newFolderName.trim()) return;
+
+    this.folderService.createFolder(this.newFolderName.trim(), team.id).subscribe({
+      next: () => {
+        this.closeCreateFolderModal();
+        this.toastService.success('Folder created.');
+        this.loadTeam(team.id);
+      },
+      error: (err) => {
+        console.error('Error creating folder:', err);
+        this.toastService.error('Failed to create folder.');
+      }
+    });
+  }
+
+  openRenameFolderModal(folder: Folder): void {
+    this.renameFolderTarget.set(folder);
+    this.renameFolderName = folder.name;
+    this.isRenameFolderModalOpen.set(true);
+  }
+
+  closeRenameFolderModal(): void {
+    this.isRenameFolderModalOpen.set(false);
+    this.renameFolderTarget.set(null);
+    this.renameFolderName = '';
+  }
+
+  confirmRenameFolder(): void {
+    const folder = this.renameFolderTarget();
+    if (!folder || !this.renameFolderName.trim()) return;
+
+    this.folderService.updateFolder(folder.id, this.renameFolderName.trim()).subscribe({
+      next: () => {
+        this.closeRenameFolderModal();
+        this.toastService.success('Folder renamed.');
+        const team = this.selectedTeam();
+        if (team) this.loadTeam(team.id);
+      },
+      error: (err) => {
+        console.error('Error renaming folder:', err);
+        this.toastService.error('Failed to rename folder.');
+      }
+    });
+  }
+
+  openDeleteFolderModal(folder: Folder): void {
+    this.deleteFolderTarget.set(folder);
+    this.isDeleteFolderModalOpen.set(true);
+  }
+
+  closeDeleteFolderModal(): void {
+    this.isDeleteFolderModalOpen.set(false);
+    this.deleteFolderTarget.set(null);
+  }
+
+  confirmDeleteFolder(): void {
+    const folder = this.deleteFolderTarget();
+    if (!folder) return;
+
+    this.isDeletingFolder.set(true);
+    this.folderService.deleteFolder(folder.id).subscribe({
+      next: () => {
+        this.isDeletingFolder.set(false);
+        this.closeDeleteFolderModal();
+        this.toastService.success('Folder deleted. Documents moved out.');
+        const team = this.selectedTeam();
+        if (team) this.loadTeam(team.id);
+      },
+      error: (err) => {
+        this.isDeletingFolder.set(false);
+        console.error('Error deleting folder:', err);
+        this.toastService.error('Failed to delete folder.');
+      }
+    });
+  }
+
+  moveDocToFolder(doc: TeamDocument, folderId: number | null): void {
+    const team = this.selectedTeam();
+    if (!team) return;
+
+    if (folderId === null) {
+      // Remove from current folder
+      const currentFolderId = doc.folderId;
+      if (!currentFolderId) return;
+      this.folderService.removeDocumentFromFolder(currentFolderId, doc.id).subscribe({
+        next: () => {
+          this.toastService.success('Document removed from folder.');
+          this.loadTeam(team.id);
+        },
+        error: (err) => {
+          console.error('Error removing document from folder:', err);
+          this.toastService.error('Failed to move document.');
+        }
+      });
+    } else {
+      this.folderService.moveDocumentToFolder(folderId, doc.id).subscribe({
+        next: () => {
+          this.toastService.success('Document moved to folder.');
+          this.loadTeam(team.id);
+        },
+        error: (err) => {
+          console.error('Error moving document to folder:', err);
+          this.toastService.error('Failed to move document.');
+        }
+      });
+    }
   }
 
   startTour(): void {
