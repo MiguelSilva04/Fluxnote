@@ -109,6 +109,13 @@ if (!string.IsNullOrWhiteSpace(googleClientId) && !string.IsNullOrWhiteSpace(goo
         options.SignInScheme = IdentityConstants.ExternalScheme;
         options.SaveTokens = true;
         options.Scope.Add("openid");
+        options.Events.OnRemoteFailure = context =>
+        {
+            var errorUrl = builder.Configuration["Authentication:ExternalErrorUrl"] ?? "http://localhost:4200/auth/external-error";
+            context.Response.Redirect($"{errorUrl}?error=external_provider_error&message={Uri.EscapeDataString(context.Failure?.Message ?? "Authentication failed")}");
+            context.HandleResponse();
+            return Task.CompletedTask;
+        };
     });
 }
 
@@ -124,6 +131,13 @@ if (!string.IsNullOrWhiteSpace(microsoftClientId) && !string.IsNullOrWhiteSpace(
         options.Scope.Add("openid");
         options.Scope.Add("email");
         options.Scope.Add("profile");
+        options.Events.OnRemoteFailure = context =>
+        {
+            var errorUrl = builder.Configuration["Authentication:ExternalErrorUrl"] ?? "http://localhost:4200/auth/external-error";
+            context.Response.Redirect($"{errorUrl}?error=external_provider_error&message={Uri.EscapeDataString(context.Failure?.Message ?? "Authentication failed")}");
+            context.HandleResponse();
+            return Task.CompletedTask;
+        };
     });
 }
 

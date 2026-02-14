@@ -9,7 +9,6 @@ import {
   InputComponent,
   CardComponent,
   CardContentComponent,
-  WorkInProgressComponent,
 } from '../../../../shared/components/ui';
 import { ToastService } from '../../../../shared/services/toast.service';
 
@@ -25,7 +24,6 @@ import { ToastService } from '../../../../shared/services/toast.service';
     InputComponent,
     CardComponent,
     CardContentComponent,
-    WorkInProgressComponent,
   ],
   template: `
     <div class="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
@@ -231,7 +229,6 @@ import { ToastService } from '../../../../shared/services/toast.service';
           </p>
         </app-card-content>
       </app-card>
-      <app-work-in-progress [show]="showWipModal()" (close)="showWipModal.set(false)" />
     </div>
   `,
 })
@@ -241,7 +238,6 @@ export class RegisterComponent {
   private toastService = inject(ToastService);
 
   showPassword = signal(false);
-  showWipModal = signal(false);
   isLoading = this.authService.isLoading;
   
   // Campos reativos usando signals
@@ -313,6 +309,6 @@ export class RegisterComponent {
   }
 
   registerWithMicrosoft(): void {
-    this.showWipModal.set(true);
+    this.authService.externalLogin('microsoft');
   }
 }
