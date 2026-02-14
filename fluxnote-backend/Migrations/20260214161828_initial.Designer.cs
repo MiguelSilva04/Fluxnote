@@ -12,11 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace fluxnotebackend.Migrations
 {
     [DbContext(typeof(FluxnoteServerContext))]
-<<<<<<<< HEAD:fluxnote-backend/Migrations/20260214161828_initial.Designer.cs
     [Migration("20260214161828_initial")]
-========
-    [Migration("20260213145409_initial")]
->>>>>>>> origin/main:fluxnote-backend/Migrations/20260213145409_initial.Designer.cs
     partial class initial
     {
         /// <inheritdoc />
