@@ -50,7 +50,6 @@ pipelines:
               name: Deploy Frontend
               services:
                 - docker
-                    memory: 2048
               caches:
                 - docker
               script:
@@ -69,3 +68,8 @@ pipelines:
                     DOCKER_REGISTRY_SERVER_URL: 'https://$AZURE_REGISTRY_URL'
                     DOCKER_REGISTRY_SERVER_USER: $AZURE_ACR_NAME
                     DOCKER_REGISTRY_SERVER_PASSWORD: $AZURE_ACR_PASSWORD
+
+definitions:
+  services:
+    docker:
+      memory: 3072
