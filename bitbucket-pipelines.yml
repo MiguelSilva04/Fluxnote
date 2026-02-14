@@ -33,12 +33,14 @@ pipelines:
                 - docker build -t $AZURE_REGISTRY_URL/fluxnote-backend:latest -t $AZURE_REGISTRY_URL/fluxnote-backend:$BITBUCKET_COMMIT ./fluxnote-backend
                 - docker push $AZURE_REGISTRY_URL/fluxnote-backend:latest
                 - docker push $AZURE_REGISTRY_URL/fluxnote-backend:$BITBUCKET_COMMIT
-                - pipe: atlassian/azure-cli-run:1.1.0
+                - pipe: atlassian/azure-web-apps-containers-deploy:1.3.2
                   variables:
                     AZURE_APP_ID: $AZURE_APP_ID
                     AZURE_PASSWORD: $AZURE_PASSWORD
                     AZURE_TENANT_ID: $AZURE_TENANT_ID
-                    CLI_COMMAND: 'az webapp config container set --name $AZURE_APP_NAME_BACKEND --resource-group $AZURE_RESOURCE_GROUP --container-image-name $AZURE_REGISTRY_URL/fluxnote-backend:latest --container-registry-url https://$AZURE_REGISTRY_URL --container-registry-user $AZURE_ACR_NAME --container-registry-password $AZURE_ACR_PASSWORD && az webapp restart --name $AZURE_APP_NAME_BACKEND --resource-group $AZURE_RESOURCE_GROUP'
+                    AZURE_RESOURCE_GROUP: $AZURE_RESOURCE_GROUP
+                    AZURE_APP_NAME: $AZURE_APP_NAME_BACKEND
+                    DOCKER_CUSTOM_IMAGE_NAME: '$AZURE_REGISTRY_URL/fluxnote-backend:latest'
 
           # ---- Frontend: Build & Deploy ----
           - step:
@@ -52,9 +54,11 @@ pipelines:
                 - docker build -t $AZURE_REGISTRY_URL/fluxnote-frontend:latest -t $AZURE_REGISTRY_URL/fluxnote-frontend:$BITBUCKET_COMMIT -f ./fluxnote-frontend/Dockerfile.azure ./fluxnote-frontend
                 - docker push $AZURE_REGISTRY_URL/fluxnote-frontend:latest
                 - docker push $AZURE_REGISTRY_URL/fluxnote-frontend:$BITBUCKET_COMMIT
-                - pipe: atlassian/azure-cli-run:1.1.0
+                - pipe: atlassian/azure-web-apps-containers-deploy:1.3.2
                   variables:
                     AZURE_APP_ID: $AZURE_APP_ID
                     AZURE_PASSWORD: $AZURE_PASSWORD
                     AZURE_TENANT_ID: $AZURE_TENANT_ID
-                    CLI_COMMAND: 'az webapp config container set --name $AZURE_APP_NAME_FRONTEND --resource-group $AZURE_RESOURCE_GROUP --container-image-name $AZURE_REGISTRY_URL/fluxnote-frontend:latest --container-registry-url https://$AZURE_REGISTRY_URL --container-registry-user $AZURE_ACR_NAME --container-registry-password $AZURE_ACR_PASSWORD && az webapp restart --name $AZURE_APP_NAME_FRONTEND --resource-group $AZURE_RESOURCE_GROUP'
+                    AZURE_RESOURCE_GROUP: $AZURE_RESOURCE_GROUP
+                    AZURE_APP_NAME: $AZURE_APP_NAME_FRONTEND
+                    DOCKER_CUSTOM_IMAGE_NAME: '$AZURE_REGISTRY_URL/fluxnote-frontend:latest'
