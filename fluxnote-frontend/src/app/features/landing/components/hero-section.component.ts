@@ -13,7 +13,7 @@ import { Router } from '@angular/router';
           <div class="text-center lg:text-left">
             <h1 class="text-4xl lg:text-6xl font-bold text-gray-900 mb-6">
               Create documents with
-              <span class="text-[#155347]"> AI</span> &
+              <span class="text-[#155347]"> AI</span> and
               <span class="text-[#155347]"> real-time collaboration</span>
             </h1>
 

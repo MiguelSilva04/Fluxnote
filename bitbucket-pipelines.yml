@@ -41,6 +41,9 @@ pipelines:
                     AZURE_RESOURCE_GROUP: $AZURE_RESOURCE_GROUP
                     AZURE_APP_NAME: $AZURE_APP_NAME_BACKEND
                     DOCKER_CUSTOM_IMAGE_NAME: '$AZURE_REGISTRY_URL/fluxnote-backend:latest'
+                    DOCKER_REGISTRY_SERVER_URL: 'https://$AZURE_REGISTRY_URL'
+                    DOCKER_REGISTRY_SERVER_USER: $AZURE_ACR_NAME
+                    DOCKER_REGISTRY_SERVER_PASSWORD: $AZURE_ACR_PASSWORD
 
           # ---- Frontend: Build & Deploy ----
           - step:
@@ -62,3 +65,6 @@ pipelines:
                     AZURE_RESOURCE_GROUP: $AZURE_RESOURCE_GROUP
                     AZURE_APP_NAME: $AZURE_APP_NAME_FRONTEND
                     DOCKER_CUSTOM_IMAGE_NAME: '$AZURE_REGISTRY_URL/fluxnote-frontend:latest'
+                    DOCKER_REGISTRY_SERVER_URL: 'https://$AZURE_REGISTRY_URL'
+                    DOCKER_REGISTRY_SERVER_USER: $AZURE_ACR_NAME
+                    DOCKER_REGISTRY_SERVER_PASSWORD: $AZURE_ACR_PASSWORD
