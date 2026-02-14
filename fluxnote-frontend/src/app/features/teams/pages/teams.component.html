@@ -189,10 +189,18 @@
                     <div class="space-y-1">
                       <!-- Pastas -->
                       @for (folder of team.folders; track folder.id) {
-                        <div>
+                        <div
+                          (dragover)="onDragOverFolder($event, folder.id)"
+                          (dragleave)="onDragLeave()"
+                          (drop)="onDropOnFolder($event, folder.id, team)"
+                        >
                           <div
                             (click)="toggleFolder(folder.id)"
-                            class="flex items-center justify-between p-2.5 hover:bg-gray-50 rounded-lg transition-colors cursor-pointer"
+                            class="flex items-center justify-between p-2.5 rounded-lg transition-colors cursor-pointer"
+                            [class.bg-[#155347]/10]="dragOverTarget() === folder.id"
+                            [class.ring-2]="dragOverTarget() === folder.id"
+                            [class.ring-[#155347]]="dragOverTarget() === folder.id"
+                            [class.hover:bg-gray-50]="dragOverTarget() !== folder.id"
                           >
                             <div class="flex items-center gap-2.5">
                               <lucide-icon
@@ -212,8 +220,12 @@
                             <div class="ml-8 space-y-0.5">
                               @for (doc of getDocumentsInFolder(team, folder.id); track doc.id) {
                                 <div
+                                  draggable="true"
+                                  (dragstart)="onDragStart($event, doc.id)"
+                                  (dragend)="onDragEnd()"
                                   (click)="handleDocumentClick(doc.id)"
                                   class="flex items-center justify-between p-2.5 hover:bg-gray-50 rounded-lg transition-colors cursor-pointer"
+                                  [class.opacity-50]="draggingDocId() === doc.id"
                                 >
                                   <div class="flex items-center gap-3 flex-1">
                                     <lucide-icon name="file-text" class="h-4 w-4 text-gray-400"></lucide-icon>
@@ -248,10 +260,25 @@
                       }
 
                       <!-- Documentos sem pasta -->
+                      <div
+                        (dragover)="onDragOverRoot($event)"
+                        (dragleave)="onDragLeave()"
+                        (drop)="onDropOnRoot($event, team)"
+                        class="rounded-lg transition-colors"
+                        [class.bg-gray-100]="dragOverTarget() === 'root'"
+                        [class.ring-2]="dragOverTarget() === 'root'"
+                        [class.ring-dashed]="dragOverTarget() === 'root'"
+                        [class.ring-gray-400]="dragOverTarget() === 'root'"
+                        [class.min-h-[40px]]="draggingDocId() !== null && getUnfolderedDocuments(team).length === 0"
+                      >
                       @for (doc of getUnfolderedDocuments(team); track doc.id) {
                         <div
+                          draggable="true"
+                          (dragstart)="onDragStart($event, doc.id)"
+                          (dragend)="onDragEnd()"
                           (click)="handleDocumentClick(doc.id)"
                           class="flex items-center justify-between p-2.5 hover:bg-gray-50 rounded-lg transition-colors cursor-pointer"
+                          [class.opacity-50]="draggingDocId() === doc.id"
                         >
                           <div class="flex items-center gap-3 flex-1">
                             <lucide-icon name="file-text" class="h-4 w-4 text-gray-400"></lucide-icon>
@@ -278,11 +305,12 @@
                           }
                         </div>
                       }
+                      </div>
                     </div>
                   </div>
                 }
-                
-        
+
+
                 <!-- Deletion scheduled -->
                 @if (team.deletionScheduled) {
                   <div class="mt-6 pt-6 border-t border-gray-100">

@@ -161,6 +161,17 @@ export class TeamsComponent {
   newTeamName = '';
 
   /**
+   * ID do documento a ser arrastado (drag & drop).
+   */
+  draggingDocId = signal<number | null>(null);
+
+  /**
+   * ID da pasta sobre a qual o documento está a ser arrastado (drop target).
+   * Usa 'root' para a zona de documentos sem pasta.
+   */
+  dragOverTarget = signal<number | 'root' | null>(null);
+
+  /**
    * Signal que controla quais pastas estão expandidas.
    */
   expandedFolders = signal<Set<number>>(new Set());
@@ -423,6 +434,73 @@ export class TeamsComponent {
       error: (err) => {
         console.error('Error creating folder:', err);
       }
+    });
+  }
+
+  // ── Drag & Drop ──
+
+  onDragStart(event: DragEvent, docId: number): void {
+    this.draggingDocId.set(docId);
+    event.dataTransfer?.setData('text/plain', String(docId));
+    if (event.dataTransfer) {
+      event.dataTransfer.effectAllowed = 'move';
+    }
+  }
+
+  onDragEnd(): void {
+    this.draggingDocId.set(null);
+    this.dragOverTarget.set(null);
+  }
+
+  onDragOverFolder(event: DragEvent, folderId: number): void {
+    event.preventDefault();
+    if (event.dataTransfer) {
+      event.dataTransfer.dropEffect = 'move';
+    }
+    this.dragOverTarget.set(folderId);
+  }
+
+  onDragOverRoot(event: DragEvent): void {
+    event.preventDefault();
+    if (event.dataTransfer) {
+      event.dataTransfer.dropEffect = 'move';
+    }
+    this.dragOverTarget.set('root');
+  }
+
+  onDragLeave(): void {
+    this.dragOverTarget.set(null);
+  }
+
+  onDropOnFolder(event: DragEvent, folderId: number, team: { id: number; currentUserRole: number }): void {
+    event.preventDefault();
+    this.dragOverTarget.set(null);
+    const docId = this.draggingDocId();
+    this.draggingDocId.set(null);
+    if (!docId || !this.isOwnerOrAdmin(team)) return;
+
+    this.folderService.moveDocumentToFolder(folderId, docId).subscribe({
+      next: () => this.loadTeams(),
+      error: (err) => console.error('Error moving document to folder:', err)
+    });
+  }
+
+  onDropOnRoot(event: DragEvent, team: { id: number; currentUserRole: number }): void {
+    event.preventDefault();
+    this.dragOverTarget.set(null);
+    const docId = this.draggingDocId();
+    this.draggingDocId.set(null);
+    if (!docId || !this.isOwnerOrAdmin(team)) return;
+
+    // Find which folder the doc is currently in
+    const teams = this.teams();
+    const fullTeam = teams?.find(t => t.id === team.id);
+    const doc = fullTeam?.documents.find(d => d.id === docId);
+    if (!doc?.folderId) return; // Already unfoldered
+
+    this.folderService.removeDocumentFromFolder(doc.folderId, docId).subscribe({
+      next: () => this.loadTeams(),
+      error: (err) => console.error('Error removing document from folder:', err)
     });
   }
 
