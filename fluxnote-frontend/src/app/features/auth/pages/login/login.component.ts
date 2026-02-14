@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
 import { AuthService } from '../../../../core/services';
-import { ButtonComponent, InputComponent, CardComponent, CardContentComponent } from '../../../../shared/components/ui';
+import { ButtonComponent, InputComponent, CardComponent, CardContentComponent, WorkInProgressComponent } from '../../../../shared/components/ui';
 import { ToastService } from '../../../../shared/services/toast.service';
 
 @Component({
@@ -18,7 +18,8 @@ import { ToastService } from '../../../../shared/services/toast.service';
     ButtonComponent,
     InputComponent,
     CardComponent,
-    CardContentComponent
+    CardContentComponent,
+    WorkInProgressComponent
   ],
   template: `
     <div class="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
@@ -96,7 +97,12 @@ import { ToastService } from '../../../../shared/services/toast.service';
             </div>
 
             <div class="mt-6 space-y-3">
-              <app-button variant="outline" customClass="w-full relative" [leftIcon]="true">
+              <app-button
+                variant="outline"
+                customClass="w-full relative"
+                [leftIcon]="true"
+                (onClick)="loginWithGoogle()"
+              >
                 <svg leftIcon class="h-5 w-5" viewBox="0 0 24 24">
                   <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
                   <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
@@ -105,7 +111,12 @@ import { ToastService } from '../../../../shared/services/toast.service';
                 </svg>
                 Sign in with Google
               </app-button>
-              <app-button variant="outline" customClass="w-full" [leftIcon]="true">
+              <app-button
+                variant="outline"
+                customClass="w-full"
+                [leftIcon]="true"
+                (onClick)="loginWithMicrosoft()"
+              >
                 <svg leftIcon class="h-5 w-5" viewBox="0 0 23 23">
                   <path fill="#f3f3f3" d="M0 0h23v23H0z" />
                   <path fill="#f35325" d="M1 1h10v10H1z" />
@@ -126,6 +137,7 @@ import { ToastService } from '../../../../shared/services/toast.service';
           </p>
         </app-card-content>
       </app-card>
+      <app-work-in-progress [show]="showWipModal()" (close)="showWipModal.set(false)" />
     </div>
   `
 })
@@ -136,6 +148,7 @@ export class LoginComponent {
   private toastService = inject(ToastService);
 
   showPassword = signal(false);
+  showWipModal = signal(false);
   isLoading = this.authService.isLoading;
   formData = { email: '', password: '', rememberMe: false };
 
@@ -166,5 +179,14 @@ export class LoginComponent {
         this.toastService.error(result.message || 'Login failed. Please try again.');
       }
     }
+  }
+
+  loginWithGoogle(): void {
+    const returnUrl = this.route.snapshot.queryParams['returnUrl'];
+    this.authService.externalLogin('google', returnUrl);
+  }
+
+  loginWithMicrosoft(): void {
+    this.showWipModal.set(true);
   }
 }

@@ -52,6 +52,18 @@ export interface TokenResponse {
   expiresInSeconds: number;
 }
 
+export type ExternalAuthProvider = 'google' | 'microsoft';
+
+/**
+ * resultado do processamento do callback OAuth no frontend.
+ */
+export interface ExternalCallbackResult {
+  success: boolean;
+  error?: string;
+  returnUrl?: string;
+  linked?: string;
+}
+
 export interface UserProfile {
   id: string;
   email: string;
@@ -86,6 +98,25 @@ export interface ApiResult {
   success: boolean;
   message?: string;
   errors?: string[];
+}
+
+/**
+ * providers externos ligados e disponíveis para o utilizador autenticado.
+ */
+export interface ExternalLoginsResponse {
+  linkedProviders: Array<{
+    provider: string;
+    providerDisplayName?: string;
+    providerKey: string;
+  }>;
+  availableProviders: string[];
+  hasPassword: boolean;
+  unlinkLastExternalDeletesAccount: boolean;
+}
+
+export interface UnlinkExternalLoginResponse {
+  message: string;
+  accountDeleted: boolean;
 }
 
 /**
@@ -205,6 +236,83 @@ export class AuthService {
    * @param http - cliente HTTP do Angular para realizar requisições ao backend
    */
   constructor(private router: Router, private http: HttpClient) { }
+
+  /**
+   * inicia autenticação externa e redireciona o browser para o backend.
+   *
+   * @param provider - provider OAuth (google/microsoft)
+   * @param returnUrl - rota opcional para retorno após autenticação
+   */
+  externalLogin(provider: ExternalAuthProvider, returnUrl?: string): void {
+    const params = new URLSearchParams();
+    if (returnUrl) {
+      params.set('returnUrl', returnUrl);
+    }
+
+    const query = params.toString();
+    const url = `${this.baseUrl}/external-login/${provider}${query ? `?${query}` : ''}`;
+    window.location.assign(url);
+  }
+
+  /**
+   * inicia o fluxo de vinculação de provider externo à conta já autenticada.
+   *
+   * @param provider - provider OAuth (google/microsoft)
+   * @param returnUrl - rota opcional para retorno após vinculação
+   */
+  linkExternalLogin(provider: ExternalAuthProvider, returnUrl?: string): void {
+    const accessToken = this.getAccessToken();
+    if (!accessToken) {
+      this.router.navigate(['/login']);
+      return;
+    }
+
+    const params = new URLSearchParams();
+    params.set('accessToken', accessToken);
+    if (returnUrl) {
+      params.set('returnUrl', returnUrl);
+    }
+
+    const query = params.toString();
+    const url = `${this.baseUrl}/link-external/${provider}${query ? `?${query}` : ''}`;
+    window.location.assign(url);
+  }
+
+  /**
+   * processa o fragmento retornado no callback OAuth.
+   * atualiza token/sessão quando receber `access_token`.
+   *
+   * @param fragment - hash da URL de callback
+   * @returns objeto com estado de sucesso, erro e returnUrl opcional
+   */
+  async handleExternalCallback(fragment = window.location.hash): Promise<ExternalCallbackResult> {
+    const hash = fragment.startsWith('#') ? fragment.substring(1) : fragment;
+    const params = new URLSearchParams(hash);
+
+    const error = params.get('error');
+    const errorDescription = params.get('error_description');
+    if (error) {
+      return { success: false, error: errorDescription || error };
+    }
+
+    const linked = params.get('linked');
+    if (linked) {
+      const returnUrl = params.get('returnUrl') ?? undefined;
+      return { success: true, linked, returnUrl };
+    }
+
+    const accessToken = params.get('access_token');
+    if (!accessToken) {
+      return { success: false, error: 'No token received from external provider.' };
+    }
+
+    this._accessToken.set(accessToken);
+    this._status.set('authenticated');
+    await this.loadUserProfile();
+
+    const returnUrl = params.get('returnUrl') ?? undefined;
+    return { success: true, returnUrl };
+  }
 
   /**
    * formata um tempo em segundos para uma string legível com minutos e segundos.
@@ -804,6 +912,48 @@ export class AuthService {
         available: false,
         message: errorBody.message || 'Failed to check username availability.'
       };
+    }
+  }
+
+  /**
+   * obtém os providers OAuth ligados à conta autenticada.
+   *
+   * @returns providers ligados/disponíveis ou null em caso de erro/autenticação ausente
+   */
+  async getExternalLogins(): Promise<ExternalLoginsResponse | null> {
+    try {
+      const token = this.getAccessToken();
+      if (!token) {
+        return null;
+      }
+
+      return await firstValueFrom(
+        this.http.get<ExternalLoginsResponse>(`${this.baseUrl}/external-logins`, {
+          headers: { Authorization: `Bearer ${token}` }
+        })
+      );
+    } catch {
+      return null;
+    }
+  }
+
+  /**
+   * remove a associação de um provider externo à conta autenticada.
+   */
+  async unlinkExternalLogin(provider: ExternalAuthProvider): Promise<UnlinkExternalLoginResponse | null> {
+    try {
+      const token = this.getAccessToken();
+      if (!token) {
+        return null;
+      }
+
+      return await firstValueFrom(
+        this.http.delete<UnlinkExternalLoginResponse>(`${this.baseUrl}/unlink-external/${provider}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        })
+      );
+    } catch {
+      return null;
     }
   }
 

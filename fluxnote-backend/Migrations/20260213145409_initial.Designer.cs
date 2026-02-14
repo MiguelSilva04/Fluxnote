@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace fluxnotebackend.Migrations
 {
     [DbContext(typeof(FluxnoteServerContext))]
-    [Migration("20260201181945_AddDocumentPermission")]
-    partial class AddDocumentPermission
+    [Migration("20260213145409_initial")]
+    partial class initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -72,6 +72,53 @@ namespace fluxnotebackend.Migrations
                     b.HasIndex("TeamId");
 
                     b.ToTable("Document");
+                });
+
+            modelBuilder.Entity("Fluxnote.Backend.Models.DocumentInvite", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("CreatedByTeamMemberId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("DocumentId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsRevoked")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("Role")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("UsedByUserId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedByTeamMemberId");
+
+                    b.HasIndex("DocumentId");
+
+                    b.HasIndex("ExpiresAt");
+
+                    b.HasIndex("Token")
+                        .IsUnique();
+
+                    b.ToTable("DocumentInvite");
                 });
 
             modelBuilder.Entity("Fluxnote.Backend.Models.DocumentPermission", b =>
@@ -480,6 +527,25 @@ namespace fluxnotebackend.Migrations
                     b.Navigation("CreatedBy");
 
                     b.Navigation("Team");
+                });
+
+            modelBuilder.Entity("Fluxnote.Backend.Models.DocumentInvite", b =>
+                {
+                    b.HasOne("Fluxnote.Backend.Models.TeamMember", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedByTeamMemberId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Fluxnote.Backend.Models.Document", "Document")
+                        .WithMany()
+                        .HasForeignKey("DocumentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("Document");
                 });
 
             modelBuilder.Entity("Fluxnote.Backend.Models.DocumentPermission", b =>

@@ -34,7 +34,9 @@ using Fluxnote.Backend.Services.Email;
 using Fluxnote.Backend.Services.AI;
 using Fluxnote.Backend.Services.Storage;
 using Fluxnote.Backend.Validators;
+using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authentication.MicrosoftAccount;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
@@ -62,6 +64,10 @@ builder.Services.AddDbContext<FluxnoteServerContext>(options =>
 var jwtKey = builder.Configuration["Jwt:Key"];
 var jwtIssuer = builder.Configuration["Jwt:Issuer"];
 var jwtAudience = builder.Configuration["Jwt:Audience"];
+var googleClientId = builder.Configuration["Authentication:Google:ClientId"];
+var googleClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
+var microsoftClientId = builder.Configuration["Authentication:Microsoft:ClientId"];
+var microsoftClientSecret = builder.Configuration["Authentication:Microsoft:ClientSecret"];
 
 if (string.IsNullOrWhiteSpace(jwtKey))
     throw new InvalidOperationException("Jwt:Key missing (Jwt__Key).");
@@ -72,7 +78,7 @@ if (string.IsNullOrWhiteSpace(jwtKey))
 // - ValidateIssuer/Audience: Verifica se o token foi emitido por esta aplicação
 // - ValidateLifetime: Verifica se o token não expirou
 // - ClockSkew: Tolerância de 30 segundos para diferenças de relógio
-builder.Services
+var authenticationBuilder = builder.Services
     .AddAuthentication(options =>
     {
         options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -92,6 +98,34 @@ builder.Services
             ClockSkew = TimeSpan.FromSeconds(30)
         };
     });
+
+if (!string.IsNullOrWhiteSpace(googleClientId) && !string.IsNullOrWhiteSpace(googleClientSecret))
+{
+    authenticationBuilder.AddGoogle(options =>
+    {
+        options.ClientId = googleClientId;
+        options.ClientSecret = googleClientSecret;
+        options.CallbackPath = "/api/auth/google-callback";
+        options.SignInScheme = IdentityConstants.ExternalScheme;
+        options.SaveTokens = true;
+        options.Scope.Add("openid");
+    });
+}
+
+if (!string.IsNullOrWhiteSpace(microsoftClientId) && !string.IsNullOrWhiteSpace(microsoftClientSecret))
+{
+    authenticationBuilder.AddMicrosoftAccount(options =>
+    {
+        options.ClientId = microsoftClientId;
+        options.ClientSecret = microsoftClientSecret;
+        options.CallbackPath = "/api/auth/microsoft-callback";
+        options.SignInScheme = IdentityConstants.ExternalScheme;
+        options.SaveTokens = true;
+        options.Scope.Add("openid");
+        options.Scope.Add("email");
+        options.Scope.Add("profile");
+    });
+}
 
 // ==============================================================================
 // 3. RATE LIMITING (AspNetCoreRateLimit)
@@ -190,6 +224,8 @@ builder.Services.AddIdentity<User, IdentityRole>(options =>
 
 builder.Services.ConfigureApplicationCookie(options =>
 {
+    options.Cookie.SameSite = SameSiteMode.Lax;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
     options.Events.OnRedirectToLogin = context =>
     {
         context.Response.StatusCode = 401;

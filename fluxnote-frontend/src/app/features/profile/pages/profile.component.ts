@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { LucideAngularModule } from 'lucide-angular';
 import { DashboardLayoutComponent } from '../../../layout/dashboard-layout/dashboard-layout.component';
-import { ButtonComponent, CardComponent, CardContentComponent, BadgeComponent, WorkInProgressComponent } from '../../../shared/components/ui';
+import { ButtonComponent, CardComponent, CardContentComponent, BadgeComponent, WorkInProgressComponent, ModalComponent } from '../../../shared/components/ui';
 import { AuthService, UploadService } from '../../../core/services';
 import { firstValueFrom } from 'rxjs';
 
@@ -19,7 +19,8 @@ import { firstValueFrom } from 'rxjs';
     CardComponent,
     CardContentComponent,
     BadgeComponent,
-    WorkInProgressComponent
+    WorkInProgressComponent,
+    ModalComponent
   ],
   template: `
     <app-dashboard-layout>
@@ -234,10 +235,17 @@ import { firstValueFrom } from 'rxjs';
                       </svg>
                       <div>
                         <p class="text-sm font-medium text-gray-900">Google</p>
-                        <p class="text-xs text-gray-500">Not connected</p>
+                        <p class="text-xs text-gray-500">{{ googleConnected() ? 'Connected' : 'Not connected' }}</p>
                       </div>
                     </div>
-                    <app-button variant="outline" size="sm" (click)="showWipModal.set(true)">Connect</app-button>
+                    <app-button
+                      variant="outline"
+                      size="sm"
+                      [disabled]="isCheckingExternalAccounts() || isDisconnectingGoogle()"
+                      (click)="googleConnected() ? disconnectGoogle() : connectGoogle()"
+                    >
+                      {{ googleConnected() ? 'Disconnect' : 'Connect' }}
+                    </app-button>
                   </div>
                   <div class="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
                     <div class="flex items-center gap-3">
@@ -250,10 +258,17 @@ import { firstValueFrom } from 'rxjs';
                       </svg>
                       <div>
                         <p class="text-sm font-medium text-gray-900">Microsoft</p>
-                        <p class="text-xs text-gray-500">Not connected</p>
+                        <p class="text-xs text-gray-500">{{ microsoftConnected() ? 'Connected' : 'Not connected' }}</p>
                       </div>
                     </div>
-                    <app-button variant="outline" size="sm" (click)="showWipModal.set(true)">Connect</app-button>
+                    <app-button
+                      variant="outline"
+                      size="sm"
+                      [disabled]="isCheckingExternalAccounts() || microsoftConnected()"
+                      (click)="connectMicrosoft()"
+                    >
+                      {{ microsoftConnected() ? 'Connected' : 'Connect' }}
+                    </app-button>
                   </div>
                 </div>
               </app-card-content>
@@ -556,6 +571,51 @@ import { firstValueFrom } from 'rxjs';
 
       <app-work-in-progress [show]="showWipModal()" (close)="showWipModal.set(false)" />
 
+      <app-modal
+        [isOpen]="showDisconnectGoogleModal()"
+        title="Disconnect Google"
+        maxWidth="sm"
+        [hasFooter]="true"
+        (onClose)="closeDisconnectGoogleModal()"
+      >
+        <div class="space-y-4">
+          <div class="flex items-center justify-center w-12 h-12 mx-auto bg-yellow-100 rounded-full">
+            <lucide-icon name="triangle-alert" class="h-6 w-6 text-yellow-600"></lucide-icon>
+          </div>
+          <p class="text-center text-gray-600">
+            @if (unlinkLastExternalDeletesAccount()) {
+              Google is your only login method. Disconnecting it will permanently delete your account.
+              This action cannot be undone.
+            } @else {
+              Disconnect Google from this account? Your profile and documents will remain available.
+            }
+          </p>
+        </div>
+
+        <div footer class="flex gap-3">
+          <app-button
+            variant="outline"
+            (onClick)="closeDisconnectGoogleModal()"
+            customClass="flex-1"
+            [disabled]="isDisconnectingGoogle()"
+          >
+            Cancel
+          </app-button>
+          <app-button
+            (onClick)="confirmDisconnectGoogle()"
+            [customClass]="'flex-1 text-white ' + (unlinkLastExternalDeletesAccount() ? 'bg-red-600 hover:bg-red-700' : 'bg-[#155347] hover:bg-[#0d3d31]')"
+            [disabled]="isDisconnectingGoogle()"
+          >
+            @if (isDisconnectingGoogle()) {
+              <lucide-icon name="loader-circle" class="h-4 w-4 animate-spin mr-2"></lucide-icon>
+              Disconnecting...
+            } @else {
+              Disconnect
+            }
+          </app-button>
+        </div>
+      </app-modal>
+
       <!-- Save Confirmation Modal -->
       @if (showConfirmModal()) {
         <div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50" (click)="showConfirmModal.set(false)">
@@ -611,6 +671,12 @@ export class ProfileComponent {
   showConfirmModal = signal(false);
   showPasswordConfirmModal = signal(false);
   showWipModal = signal(false);
+  showDisconnectGoogleModal = signal(false);
+  isDisconnectingGoogle = signal(false);
+  isCheckingExternalAccounts = signal(false);
+  googleConnected = signal(false);
+  microsoftConnected = signal(false);
+  unlinkLastExternalDeletesAccount = signal(false);
   showLogoutModal = signal(false);
   showLogoutAllModal = signal(false);
   avatarUrl = '';
@@ -647,9 +713,18 @@ export class ProfileComponent {
     // Initialize form with user data reactively
     effect(() => {
       const user = this.user();
-      if (user && !this.originalData.fullName) {
+      if (!user) {
+        this.googleConnected.set(false);
+        this.microsoftConnected.set(false);
+        this.unlinkLastExternalDeletesAccount.set(false);
+        return;
+      }
+
+      if (!this.originalData.fullName) {
         this.initializeForm(user);
       }
+
+      void this.loadExternalAccounts();
     });
   }
 
@@ -938,6 +1013,71 @@ export class ProfileComponent {
     }
 
     this.isChangingPassword.set(false);
+  }
+
+  async connectGoogle(): Promise<void> {
+    if (this.googleConnected()) {
+      return;
+    }
+
+    // Vincula Google à conta atual, sem trocar de utilizador autenticado.
+    this.authService.linkExternalLogin('google', '/profile');
+  }
+
+  async disconnectGoogle(): Promise<void> {
+    this.showDisconnectGoogleModal.set(true);
+  }
+
+  closeDisconnectGoogleModal(): void {
+    this.showDisconnectGoogleModal.set(false);
+  }
+
+  async confirmDisconnectGoogle(): Promise<void> {
+    this.isDisconnectingGoogle.set(true);
+    const result = await this.authService.unlinkExternalLogin('google');
+    this.isDisconnectingGoogle.set(false);
+    this.showDisconnectGoogleModal.set(false);
+
+    if (!result) {
+      this.errorMessage.set('Failed to disconnect Google account.');
+      this.autoHideMessages();
+      return;
+    }
+
+    if (result.accountDeleted) {
+      this.successMessage.set('Google disconnected and your account was deleted.');
+      this.autoHideMessages();
+      await this.authService.logout();
+      return;
+    }
+
+    this.successMessage.set(result.message || 'Google disconnected successfully.');
+    await this.loadExternalAccounts();
+    this.autoHideMessages();
+  }
+
+  connectMicrosoft(): void {
+    if (this.microsoftConnected()) {
+      return;
+    }
+
+    this.showWipModal.set(true);
+  }
+
+  private async loadExternalAccounts(): Promise<void> {
+    this.isCheckingExternalAccounts.set(true);
+
+    const data = await this.authService.getExternalLogins();
+    if (data) {
+      const linked = new Set(data.linkedProviders.map(p => p.provider.toLowerCase()));
+      this.googleConnected.set(linked.has('google'));
+      this.microsoftConnected.set(linked.has('microsoft'));
+      this.unlinkLastExternalDeletesAccount.set(data.unlinkLastExternalDeletesAccount);
+    } else {
+      this.unlinkLastExternalDeletesAccount.set(false);
+    }
+
+    this.isCheckingExternalAccounts.set(false);
   }
 
   // Utility methods

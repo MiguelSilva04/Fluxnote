@@ -4,12 +4,17 @@ using Fluxnote.Backend.Dtos.Auth;
 using Fluxnote.Backend.Models;
 using Fluxnote.Backend.Services.Auth;
 using Fluxnote.Backend.Services.Email;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authentication.MicrosoftAccount;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
@@ -316,6 +321,491 @@ public class AuthController : ControllerBase
     }
 
     /// <summary>
+    /// Inicia o fluxo OAuth para um provider externo (Google/Microsoft).
+    /// </summary>
+    /// <param name="provider">Provider externo: <c>google</c> ou <c>microsoft</c>.</param>
+    /// <param name="returnUrl">Rota opcional do frontend para onde redirecionar após login.</param>
+    /// <returns>
+    /// <list type="bullet">
+    ///     <item><b>302 Redirect:</b> Redireciona para a página de consentimento do provider.</item>
+    ///     <item><b>400 Bad Request:</b> Provider inválido.</item>
+    /// </list>
+    /// </returns>
+    [HttpGet("external-login/{provider}")]
+    [AllowAnonymous]
+    public async Task<IActionResult> ExternalLogin(string provider, [FromQuery] string? returnUrl = null)
+    {
+        var authScheme = ResolveAuthScheme(provider);
+        if (authScheme is null)
+        {
+            return BadRequest(new
+            {
+                error = "Provider not supported.",
+                supportedProviders = new[] { "google", "microsoft" }
+            });
+        }
+
+        await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
+        var redirectUrl = Url.Action(nameof(ExternalLoginCallback), "Auth", new { returnUrl });
+        var properties = _signInManager.ConfigureExternalAuthenticationProperties(authScheme, redirectUrl!);
+        return Challenge(properties, authScheme);
+    }
+
+    /// <summary>
+    /// Callback OAuth chamado pelo provider após autenticação externa.
+    /// </summary>
+    /// <param name="returnUrl">Rota opcional para redirecionamento no frontend.</param>
+    /// <param name="remoteError">Erro retornado pelo provider (se existir).</param>
+    /// <returns>
+    /// <list type="bullet">
+    ///     <item><b>302 Redirect:</b> Para callback/error page do frontend.</item>
+    /// </list>
+    /// </returns>
+    /// <remarks>
+    /// Fluxo principal:
+    /// <list type="number">
+    ///     <item><description>Lê claims do provider externo.</description></item>
+    ///     <item><description>Faz sign-in de login externo existente, ou vincula por email, ou cria conta nova.</description></item>
+    ///     <item><description>Gera access token + refresh cookie e redireciona para o frontend.</description></item>
+    /// </list>
+    /// </remarks>
+    [HttpGet("external-callback")]
+    [AllowAnonymous]
+    public async Task<IActionResult> ExternalLoginCallback([FromQuery] string? returnUrl = null, [FromQuery] string? remoteError = null)
+    {
+        var frontendCallbackUrl = _configuration["Authentication:ExternalCallbackUrl"] ?? "http://localhost:4200/auth/external-callback";
+        var frontendErrorUrl = _configuration["Authentication:ExternalErrorUrl"] ?? "http://localhost:4200/auth/external-error";
+
+        if (!string.IsNullOrWhiteSpace(remoteError))
+        {
+            return RedirectExternalError(frontendErrorUrl, "external_provider_error", remoteError);
+        }
+
+        var info = await _signInManager.GetExternalLoginInfoAsync();
+        if (info is null)
+        {
+            return RedirectExternalError(frontendErrorUrl, "external_login_failed");
+        }
+
+        var email = info.Principal.FindFirstValue(ClaimTypes.Email) ?? info.Principal.FindFirstValue("email");
+        if (string.IsNullOrWhiteSpace(email))
+        {
+            return RedirectExternalError(frontendErrorUrl, "email_not_provided");
+        }
+
+        var fullName = info.Principal.FindFirstValue(ClaimTypes.Name);
+        var profilePicture = ExtractProfilePicture(info.Principal);
+        var authProvider = ResolveAuthProvider(info.LoginProvider);
+
+        var signInResult = await _signInManager.ExternalLoginSignInAsync(
+            info.LoginProvider,
+            info.ProviderKey,
+            isPersistent: false,
+            bypassTwoFactor: true);
+
+        User? user;
+
+        if (signInResult.Succeeded)
+        {
+            user = await _userManager.FindByLoginAsync(info.LoginProvider, info.ProviderKey);
+            if (user is null)
+            {
+                return RedirectExternalError(frontendErrorUrl, "external_login_failed");
+            }
+        }
+        else
+        {
+            user = await _userManager.FindByEmailAsync(email);
+
+            if (user is not null)
+            {
+                var addLoginResult = await _userManager.AddLoginAsync(user, info);
+                if (!addLoginResult.Succeeded)
+                {
+                    var errors = string.Join(", ", addLoginResult.Errors.Select(e => e.Description));
+                    return RedirectExternalError(frontendErrorUrl, "link_external_failed", errors);
+                }
+            }
+            else
+            {
+                user = new User
+                {
+                    UserName = await GenerateUniqueUsernameAsync(email),
+                    Email = email,
+                    FullName = fullName,
+                    ProfilePictureUrl = profilePicture,
+                    EmailConfirmed = true,
+                    AccountStatus = AccountStatus.Active,
+                    AuthProvider = authProvider,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                };
+
+                var createResult = await _userManager.CreateAsync(user);
+                if (!createResult.Succeeded)
+                {
+                    var errors = string.Join(", ", createResult.Errors.Select(e => e.Description));
+                    return RedirectExternalError(frontendErrorUrl, "create_user_failed", errors);
+                }
+
+                var addLoginResult = await _userManager.AddLoginAsync(user, info);
+                if (!addLoginResult.Succeeded)
+                {
+                    await _userManager.DeleteAsync(user);
+                    var errors = string.Join(", ", addLoginResult.Errors.Select(e => e.Description));
+                    return RedirectExternalError(frontendErrorUrl, "link_external_failed", errors);
+                }
+            }
+        }
+
+        if (!user.EmailConfirmed || user.AccountStatus == AccountStatus.PendingEmailConfirmation)
+        {
+            user.EmailConfirmed = true;
+            user.AccountStatus = AccountStatus.Active;
+            user.UpdatedAt = DateTime.UtcNow;
+            await _userManager.UpdateAsync(user);
+        }
+
+        if (user.AccountStatus is AccountStatus.Suspended or AccountStatus.Blocked)
+        {
+            return RedirectExternalError(frontendErrorUrl, "account_not_active");
+        }
+
+        if (!string.IsNullOrWhiteSpace(fullName) && string.IsNullOrWhiteSpace(user.FullName))
+        {
+            user.FullName = fullName;
+        }
+        if (!string.IsNullOrWhiteSpace(profilePicture) && string.IsNullOrWhiteSpace(user.ProfilePictureUrl))
+        {
+            user.ProfilePictureUrl = profilePicture;
+        }
+        user.UpdatedAt = DateTime.UtcNow;
+        await _userManager.UpdateAsync(user);
+
+        var accessToken = _tokenService.CreateAccessToken(user);
+
+        var now = DateTime.UtcNow;
+        var idleDays = int.Parse(_configuration["Auth:RefreshIdleDays"] ?? "7");
+        var absoluteDays = int.Parse(_configuration["Auth:RefreshAbsoluteDaysRememberMe"] ?? "30");
+        var sessionStartedAt = now;
+        var absoluteExpiresAt = sessionStartedAt.AddDays(absoluteDays);
+        var expiresAt = Min(now.AddDays(idleDays), absoluteExpiresAt);
+
+        var refreshPlain = TokenService.GenerateRefreshTokenPlain();
+        var refreshHash = TokenService.HashRefreshToken(refreshPlain);
+
+        _db.RefreshTokens.Add(new RefreshToken
+        {
+            TokenHash = refreshHash,
+            UserId = user.Id,
+            SessionId = Guid.NewGuid().ToString(),
+            SessionStartedAt = sessionStartedAt,
+            LastUsedAt = now,
+            ExpiresAt = expiresAt,
+            AbsoluteDays = absoluteDays,
+            IdleDays = idleDays,
+            CreatedAt = now,
+            CreatedByIp = HttpContext.Connection.RemoteIpAddress?.ToString()
+        });
+
+        await _db.SaveChangesAsync();
+        SetRefreshCookie(refreshPlain, expiresAt);
+
+        var fragmentParams = new Dictionary<string, string?>
+        {
+            ["access_token"] = accessToken
+        };
+
+        if (!string.IsNullOrWhiteSpace(returnUrl))
+        {
+            fragmentParams["returnUrl"] = returnUrl;
+        }
+
+        var fragment = (QueryString.Create(fragmentParams).Value ?? string.Empty).TrimStart('?');
+        return Redirect($"{frontendCallbackUrl}#{fragment}");
+    }
+
+    /// <summary>
+    /// Obtém os providers externos ligados à conta autenticada.
+    /// </summary>
+    /// <returns>
+    /// <list type="bullet">
+    ///     <item><b>200 OK:</b> Providers ligados e disponíveis.</item>
+    ///     <item><b>401 Unauthorized:</b> Token inválido.</item>
+    /// </list>
+    /// </returns>
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [HttpGet("external-logins")]
+    public async Task<IActionResult> GetExternalLogins()
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (userId is null)
+        {
+            return Unauthorized(new { message = "Invalid claims for obtaining user id." });
+        }
+
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user is null)
+        {
+            return Unauthorized(new { message = "User not found." });
+        }
+
+        var logins = await _userManager.GetLoginsAsync(user);
+        var linkedProviders = logins.Select(l => new
+        {
+            provider = l.LoginProvider,
+            providerDisplayName = l.ProviderDisplayName,
+            providerKey = l.ProviderKey
+        });
+
+        var availableProviders = new[] { "Google", "Microsoft" }
+            .Where(p => !logins.Any(l => l.LoginProvider.Equals(p, StringComparison.OrdinalIgnoreCase)));
+
+        var hasPassword = await _userManager.HasPasswordAsync(user);
+        var unlinkLastExternalDeletesAccount =
+            !hasPassword &&
+            logins.Count == 1 &&
+            user.AuthProvider != AuthProvider.Local;
+
+        return Ok(new
+        {
+            linkedProviders,
+            availableProviders,
+            hasPassword,
+            unlinkLastExternalDeletesAccount
+        });
+    }
+
+    /// <summary>
+    /// Inicia o fluxo de vinculação de um provider externo à conta atual.
+    /// </summary>
+    /// <param name="provider">Provider externo: <c>google</c> ou <c>microsoft</c>.</param>
+    /// <returns>
+    /// <list type="bullet">
+    ///     <item><b>302 Redirect:</b> Para challenge OAuth do provider.</item>
+    ///     <item><b>400 Bad Request:</b> Provider inválido.</item>
+    ///     <item><b>401 Unauthorized:</b> Token inválido.</item>
+    /// </list>
+    /// </returns>
+    [AllowAnonymous]
+    [HttpGet("link-external/{provider}")]
+    [HttpPost("link-external/{provider}")]
+    public async Task<IActionResult> LinkExternalLogin(string provider, [FromQuery] string? accessToken = null, [FromQuery] string? returnUrl = null)
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? ExtractUserIdFromAccessToken(accessToken);
+        if (userId is null)
+        {
+            return Unauthorized(new { message = "Invalid claims for obtaining user id." });
+        }
+
+        var authScheme = ResolveAuthScheme(provider);
+        if (authScheme is null)
+        {
+            return BadRequest(new { error = "Provider not supported." });
+        }
+
+        await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
+        var redirectUrl = Url.Action(nameof(LinkExternalLoginCallback), "Auth", new { linkUserId = userId, returnUrl });
+        var properties = _signInManager.ConfigureExternalAuthenticationProperties(authScheme, redirectUrl!, userId);
+        return Challenge(properties, authScheme);
+    }
+
+    /// <summary>
+    /// Callback do fluxo de vinculação de provider externo.
+    /// </summary>
+    /// <param name="linkUserId">ID do utilizador para concluir a ligação.</param>
+    /// <param name="remoteError">Erro retornado pelo provider (se existir).</param>
+    /// <returns>Redireciona para callback/error page do frontend.</returns>
+    [HttpGet("link-external-callback")]
+    [AllowAnonymous]
+    public async Task<IActionResult> LinkExternalLoginCallback([FromQuery] string? linkUserId = null, [FromQuery] string? returnUrl = null, [FromQuery] string? remoteError = null)
+    {
+        var frontendCallbackUrl = _configuration["Authentication:ExternalCallbackUrl"] ?? "http://localhost:4200/auth/external-callback";
+        var frontendErrorUrl = _configuration["Authentication:ExternalErrorUrl"] ?? "http://localhost:4200/auth/external-error";
+
+        if (!string.IsNullOrWhiteSpace(remoteError))
+        {
+            return RedirectExternalError(frontendErrorUrl, "external_provider_error", remoteError);
+        }
+
+        if (string.IsNullOrWhiteSpace(linkUserId))
+        {
+            return RedirectExternalError(frontendErrorUrl, "unauthorized");
+        }
+
+        var user = await _userManager.FindByIdAsync(linkUserId);
+        if (user is null)
+        {
+            return RedirectExternalError(frontendErrorUrl, "unauthorized");
+        }
+
+        var info = await _signInManager.GetExternalLoginInfoAsync(linkUserId);
+        if (info is null)
+        {
+            return RedirectExternalError(frontendErrorUrl, "external_login_failed");
+        }
+
+        var existingUser = await _userManager.FindByLoginAsync(info.LoginProvider, info.ProviderKey);
+        if (existingUser is not null && existingUser.Id != user.Id)
+        {
+            return RedirectExternalError(
+                frontendErrorUrl,
+                "provider_already_linked",
+                "Esta conta Google ja esta ligada a outro utilizador. Use outra conta Google ou inicie sessao nessa conta.");
+        }
+
+        var result = await _userManager.AddLoginAsync(user, info);
+        if (!result.Succeeded)
+        {
+            var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+            return RedirectExternalError(frontendErrorUrl, "link_external_failed", errors);
+        }
+
+        var fragmentParams = new Dictionary<string, string?>
+        {
+            ["linked"] = info.LoginProvider.ToLowerInvariant()
+        };
+
+        if (!string.IsNullOrWhiteSpace(returnUrl))
+        {
+            fragmentParams["returnUrl"] = returnUrl;
+        }
+
+        var fragment = (QueryString.Create(fragmentParams).Value ?? string.Empty).TrimStart('?');
+        return Redirect($"{frontendCallbackUrl}#{fragment}");
+    }
+
+    /// <summary>
+    /// Remove a vinculação de um provider externo da conta autenticada.
+    /// </summary>
+    /// <param name="provider">Provider a remover.</param>
+    /// <returns>
+    /// <list type="bullet">
+    ///     <item><b>200 OK:</b> Provider removido.</item>
+    ///     <item><b>400 Bad Request:</b> Tentativa de remover último método de autenticação.</item>
+    ///     <item><b>401 Unauthorized:</b> Token inválido.</item>
+    ///     <item><b>404 Not Found:</b> Provider não está ligado.</item>
+    /// </list>
+    /// </returns>
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [HttpDelete("unlink-external/{provider}")]
+    public async Task<IActionResult> UnlinkExternalLogin(string provider)
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (userId is null)
+        {
+            return Unauthorized(new { message = "Invalid claims for obtaining user id." });
+        }
+
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user is null)
+        {
+            return Unauthorized(new { message = "User not found." });
+        }
+
+        var hasPassword = await _userManager.HasPasswordAsync(user);
+        var logins = await _userManager.GetLoginsAsync(user);
+
+        var login = logins.FirstOrDefault(l =>
+            l.LoginProvider.Equals(provider, StringComparison.OrdinalIgnoreCase));
+
+        if (login is null)
+        {
+            return NotFound(new { error = "Provider is not linked to this account." });
+        }
+
+        var isOnlyLoginMethod = !hasPassword && logins.Count == 1;
+        var shouldDeleteAccountOnUnlink = isOnlyLoginMethod && user.AuthProvider != AuthProvider.Local;
+
+        // If this is an OAuth-only account and this is the only auth method, unlinking removes account by design.
+        if (shouldDeleteAccountOnUnlink)
+        {
+            var userRefreshTokens = await _db.RefreshTokens
+                .Where(rt => rt.UserId == user.Id && rt.RevokedAt == null)
+                .ToListAsync();
+
+            var now = DateTime.UtcNow;
+            foreach (var token in userRefreshTokens)
+            {
+                token.RevokedAt = now;
+            }
+
+            var deleteResult = await _userManager.DeleteAsync(user);
+            if (deleteResult.Succeeded)
+            {
+                await _db.SaveChangesAsync();
+                ClearRefreshCookie();
+
+                return Ok(new
+                {
+                    message = "External provider unlinked and account deleted because it was the only login method.",
+                    accountDeleted = true
+                });
+            }
+
+            // Fallback for users with related data (e.g., created documents with restrict-delete FK):
+            // perform logical deletion and unlink external provider.
+            var removeLoginResult = await _userManager.RemoveLoginAsync(user, login.LoginProvider, login.ProviderKey);
+            if (!removeLoginResult.Succeeded)
+            {
+                return BadRequest(new { errors = removeLoginResult.Errors.Select(e => e.Description) });
+            }
+
+            var deletedSuffix = Guid.NewGuid().ToString("N")[..12];
+            user.UserName = $"deleted_{deletedSuffix}";
+            user.Email = $"deleted_{deletedSuffix}@deleted.local";
+            user.FullName = "Deleted User";
+            user.ProfilePictureUrl = null;
+            user.PhoneNumber = null;
+            user.Bio = null;
+            user.Timezone = null;
+            user.Location = null;
+            user.EmailConfirmed = false;
+            user.AccountStatus = AccountStatus.Blocked;
+            user.LockoutEnabled = true;
+            user.LockoutEnd = DateTimeOffset.MaxValue;
+            user.UpdatedAt = DateTime.UtcNow;
+
+            var updateResult = await _userManager.UpdateAsync(user);
+            if (!updateResult.Succeeded)
+            {
+                return BadRequest(new { errors = updateResult.Errors.Select(e => e.Description) });
+            }
+
+            await _db.SaveChangesAsync();
+            ClearRefreshCookie();
+
+            return Ok(new
+            {
+                message = "External provider unlinked and account logically deleted because it was the only login method.",
+                accountDeleted = true
+            });
+        }
+
+        // Defensive guard: local accounts should never end up with zero login methods.
+        if (isOnlyLoginMethod)
+        {
+            return BadRequest(new
+            {
+                error = "Cannot unlink the only login method.",
+                message = "Set a password before disconnecting this external provider."
+            });
+        }
+
+        var result = await _userManager.RemoveLoginAsync(user, login.LoginProvider, login.ProviderKey);
+        if (!result.Succeeded)
+        {
+            return BadRequest(new { errors = result.Errors.Select(e => e.Description) });
+        }
+
+        return Ok(new
+        {
+            message = $"Provider {provider} unlinked successfully.",
+            accountDeleted = false
+        });
+    }
+
+    /// <summary>
     /// Obtém o perfil completo do utilizador autenticado.
     /// </summary>
     /// <returns>
@@ -605,13 +1095,13 @@ public class AuthController : ControllerBase
         if (user is null)
             return Unauthorized(new { message = "User not found." });
 
-        // verifica se o utilizador usa autenticação local
-        if (user.AuthProvider != AuthProvider.Local)
+        var hasPassword = await _userManager.HasPasswordAsync(user);
+        if (!hasPassword)
         {
             return BadRequest(new
             {
                 message = "Cannot change password.",
-                errors = new[] { "Password change is only available for accounts using email/password authentication." }
+                errors = new[] { "This account does not have a password yet. Use /api/auth/set-password first." }
             });
         }
 
@@ -641,6 +1131,49 @@ public class AuthController : ControllerBase
         await _userManager.UpdateAsync(user);
 
         return Ok(new { message = "Password changed successfully." });
+    }
+
+    /// <summary>
+    /// Define password para utilizadores que só tinham login externo (sem password local).
+    /// </summary>
+    /// <param name="request">Nova password.</param>
+    /// <returns>
+    /// <list type="bullet">
+    ///     <item><b>200 OK:</b> Password definida com sucesso.</item>
+    ///     <item><b>400 Bad Request:</b> Utilizador já possui password ou password inválida.</item>
+    ///     <item><b>401 Unauthorized:</b> Token inválido.</item>
+    /// </list>
+    /// </returns>
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [HttpPost("set-password")]
+    public async Task<IActionResult> SetPassword([FromBody] SetPasswordRequest request)
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (userId is null)
+            return Unauthorized(new { message = "Invalid claims for obtaining user id." });
+
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user is null)
+            return Unauthorized(new { message = "User not found." });
+
+        if (await _userManager.HasPasswordAsync(user))
+        {
+            return BadRequest(new
+            {
+                message = "User already has a password. Use /api/auth/users/me/password instead."
+            });
+        }
+
+        var result = await _userManager.AddPasswordAsync(user, request.NewPassword);
+        if (!result.Succeeded)
+        {
+            return BadRequest(new { errors = result.Errors.Select(e => e.Description) });
+        }
+
+        user.UpdatedAt = DateTime.UtcNow;
+        await _userManager.UpdateAsync(user);
+
+        return Ok(new { message = "Password set successfully." });
     }
 
     /// <summary>
@@ -949,7 +1482,7 @@ public class AuthController : ControllerBase
         {
             if (revokeAll)
             {
-                await RevokeSessionAsync(stored.UserId, stored.SessionId, now);
+                await RevokeAllUserSessionsAsync(stored.UserId, now);
             }
             else
             {
@@ -968,6 +1501,18 @@ public class AuthController : ControllerBase
     {
         // revoga quaisquer refresh tokens activos desta sessão
         var tokens = await _db.RefreshTokens
+            .Where(rt => rt.UserId == userId && rt.SessionId == sessionId && rt.RevokedAt == null && rt.ExpiresAt > now)
+            .ToListAsync();
+
+        foreach (var t in tokens)
+            t.RevokedAt = now;
+
+        await _db.SaveChangesAsync();
+    }
+
+    private async Task RevokeAllUserSessionsAsync(string userId, DateTime now)
+    {
+        var tokens = await _db.RefreshTokens
             .Where(rt => rt.UserId == userId && rt.RevokedAt == null && rt.ExpiresAt > now)
             .ToListAsync();
 
@@ -976,6 +1521,133 @@ public class AuthController : ControllerBase
 
         await _db.SaveChangesAsync();
     }
+
+    /// <summary>
+    /// Redireciona para a página de erro do frontend com parâmetros de erro OAuth.
+    /// </summary>
+    private IActionResult RedirectExternalError(string frontendErrorUrl, string error, string? errorDescription = null)
+    {
+        var queryParams = new Dictionary<string, string?>
+        {
+            ["error"] = error
+        };
+
+        if (!string.IsNullOrWhiteSpace(errorDescription))
+        {
+            queryParams["error_description"] = errorDescription;
+        }
+
+        return Redirect(QueryHelpers.AddQueryString(frontendErrorUrl, queryParams));
+    }
+
+    /// <summary>
+    /// Resolve o nome do esquema ASP.NET Authentication para um provider externo.
+    /// </summary>
+    private static string? ResolveAuthScheme(string provider)
+    {
+        return provider.ToLowerInvariant() switch
+        {
+            "google" => GoogleDefaults.AuthenticationScheme,
+            "microsoft" => MicrosoftAccountDefaults.AuthenticationScheme,
+            _ => null
+        };
+    }
+
+    /// <summary>
+    /// Extrai o user id de um access token JWT válido enviado por query string.
+    /// </summary>
+    private string? ExtractUserIdFromAccessToken(string? accessToken)
+    {
+        if (string.IsNullOrWhiteSpace(accessToken))
+        {
+            return null;
+        }
+
+        var jwtKey = _configuration["Jwt:Key"];
+        var jwtIssuer = _configuration["Jwt:Issuer"];
+        var jwtAudience = _configuration["Jwt:Audience"];
+
+        if (string.IsNullOrWhiteSpace(jwtKey))
+        {
+            return null;
+        }
+
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var validationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = jwtIssuer,
+            ValidAudience = jwtAudience,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
+            ClockSkew = TimeSpan.FromSeconds(30)
+        };
+
+        try
+        {
+            var principal = tokenHandler.ValidateToken(accessToken, validationParameters, out _);
+            return principal.FindFirstValue(ClaimTypes.NameIdentifier);
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    /// <summary>
+    /// Converte o nome do provider externo para o enum de persistência <see cref="AuthProvider"/>.
+    /// </summary>
+    private static AuthProvider ResolveAuthProvider(string provider)
+    {
+        return provider.ToLowerInvariant() switch
+        {
+            "google" => AuthProvider.Google,
+            "microsoft" => AuthProvider.Microsoft,
+            _ => AuthProvider.Local
+        };
+    }
+
+    /// <summary>
+    /// Extrai URL de avatar das claims retornadas por providers externos.
+    /// </summary>
+    private static string? ExtractProfilePicture(ClaimsPrincipal principal)
+    {
+        return principal.FindFirstValue("picture")
+            ?? principal.FindFirstValue("urn:google:picture")
+            ?? principal.FindFirstValue("photo");
+    }
+
+    /// <summary>
+    /// Gera um username único e estável com base no email do utilizador.
+    /// </summary>
+    private async Task<string> GenerateUniqueUsernameAsync(string email)
+    {
+        var baseUsername = email.Split('@')[0];
+        baseUsername = new string(baseUsername.Where(c => char.IsLetterOrDigit(c) || c == '_').ToArray());
+
+        if (baseUsername.Length < 3)
+        {
+            baseUsername = $"user_{baseUsername}";
+        }
+
+        if (baseUsername.Length > 25)
+        {
+            baseUsername = baseUsername[..25];
+        }
+
+        var candidate = baseUsername;
+        var counter = 1;
+        while (await _userManager.FindByNameAsync(candidate) is not null)
+        {
+            candidate = $"{baseUsername}{counter}";
+            counter++;
+        }
+
+        return candidate;
+    }
+
     private static DateTime Min(DateTime a, DateTime b) => a <= b ? a : b;
 
     private void ClearRefreshCookie()

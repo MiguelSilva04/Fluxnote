@@ -44,6 +44,13 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
                 { "Jwt:Issuer", "fluxnote-tests" },
                 { "Jwt:Audience", "fluxnote-tests" },
                 { "Jwt:AccessTokenMinutes", "15" },
+                // OAuth (dummy values for tests)
+                { "Authentication:Google:ClientId", "test-google-client-id" },
+                { "Authentication:Google:ClientSecret", "test-google-client-secret" },
+                { "Authentication:Microsoft:ClientId", "test-ms-client-id" },
+                { "Authentication:Microsoft:ClientSecret", "test-ms-client-secret" },
+                { "Authentication:ExternalCallbackUrl", "http://localhost:4200/auth/external-callback" },
+                { "Authentication:ExternalErrorUrl", "http://localhost:4200/auth/external-error" },
                 // Configuração de autenticação
                 { "Auth:RefreshIdleDays", "7" },
                 { "Auth:RefreshAbsoluteDays", "7" },
