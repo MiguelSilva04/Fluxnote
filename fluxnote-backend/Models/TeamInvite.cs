@@ -2,7 +2,7 @@
 
 namespace Fluxnote.Backend.Models;
 
-public class DocumentInvite
+public class TeamInvite
 {
     /// <summary>
     /// Identificador único do convite (chave primária).
@@ -18,13 +18,13 @@ public class DocumentInvite
     /// <summary>
     /// Foreign Keys
     /// </summary>
-    public int DocumentId { get; set; }
+    public int TeamId { get; set; }
     public int? CreatedByTeamMemberId { get; set; }
 
     /// <summary>
     /// Role a atribuir ao convidado ao aceitar o convite
     /// </summary>
-    public DocumentRole Role { get; set; } = DocumentRole.Viewer;
+    public TeamRole Role { get; set; } = TeamRole.Member;
 
     /// <summary>
     /// Metadata
@@ -41,7 +41,7 @@ public class DocumentInvite
     /// <summary>
     /// Navigation properties
     /// </summary>
-    public Document Document { get; set; } = null!;
+    public Team Team { get; set; } = null!;
     public TeamMember? CreatedBy { get; set; } = null!;
 }
 

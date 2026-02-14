@@ -41,6 +41,15 @@
             <app-card-content customClass="p-6">
               <div class="flex items-center justify-between mb-6">
                 <h2 class="text-lg font-bold text-gray-900">Team Members</h2>
+                @if (isOwnerOrAdmin()) {  
+                <button (click)="openTeamShareModal() "
+                    class="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-white bg-[#155347] rounded-md hover:opacity-90 transition"
+                    title="Invite member"
+                  >
+                  <lucide-icon name="user-plus" class="h-4 w-4"></lucide-icon>
+                    Invite to Team
+                  </button>
+                }
               </div>
 
               <div class="space-y-3">
@@ -220,7 +229,7 @@
                   @if (isOwnerOrAdmin()) {
                     <button
                       data-tour="share-btn"
-                      (click)="openShareModal(doc.id); $event.stopPropagation()"
+                      (click)="openDocumentShareModal(doc.id); $event.stopPropagation()"
                       class="inline-flex items-center gap-1 text-xs text-emerald-700 bg-emerald-50 hover:bg-emerald-100 px-2 py-1 rounded-md font-medium transition-colors"
                     >
                       <lucide-icon name="share-2" [size]="12"></lucide-icon>
@@ -602,13 +611,13 @@
       [loading]="shareLoading()"
       [copied]="shareCopied()"
       [invites]="documentInvites()"
-      (close)="closeShareModal()"
+      (close)="closeDocumentShareModal()"
       (roleChange)="shareRole.set($event)"
       (expirationDaysChange)="shareExpirationDays.set($event)"
-      (generateInvite)="generateInviteLink()"
+      (generateInvite)="generateDocumentInviteLink()"
       (copyInvite)="copyInviteLink()"
-      (revokeInvite)="revokeInvite($event)"
-      (clearInvites)="clearInvitesList()"
+      (revokeInvite)="revokeDocumentInvite($event)"
+      (clearInvites)="clearDocumentInvitesList()"
       (viewInvite)="viewInviteLink($event)"
     />
   }
@@ -703,6 +712,25 @@
       </app-button>
     </div>
   </app-modal>
+
+  @if (shareTeamOpen()) {
+    <app-team-share-modal
+        [isOpen]="true"
+        [expirationDays]="shareExpirationDays()"
+        [generatedUrl]="shareGeneratedUrl()"
+        [loading]="shareLoading()"
+        [copied]="shareCopied()"
+        [invites]="teamInvites()"
+        (close)="closeTeamShareModal()"
+        (expirationDaysChange)="shareExpirationDays.set($event)"
+        (generateInvite)="generateTeamInviteLink()"
+        (copyInvite)="copyInviteLink()"
+        (revokeInvite)="revokeTeamInvite($event)"
+        (clearInvites)="clearTeamInvitesList()"
+        (viewInvite)="viewInviteLink($event)"
+      />
+  }
+  
 
   <!-- Remove Document Permission Modal -->
   <app-modal

@@ -1,6 +1,6 @@
 import { HttpClient } from "@angular/common/http";
 import { inject, Injectable } from "@angular/core";
-import { AcceptInviteResponse, CreateDocumentInviteRequest, DocumentInviteDto } from "../models";
+import { AcceptDocumentInviteResponse, CreateDocumentInviteRequest, DocumentInviteDto } from "../models";
 import { Observable } from "rxjs";
 
 @Injectable({
@@ -21,8 +21,8 @@ export class DocumentInviteService {
         return this.http.get<DocumentInviteDto>(`/api/document-invites/${token}/info`);
       }
     
-      acceptInvite(token: string): Observable<AcceptInviteResponse> {
-        return this.http.post<AcceptInviteResponse>(`/api/document-invites/${token}/accept`, {});
+      acceptInvite(token: string): Observable<AcceptDocumentInviteResponse> {
+        return this.http.post<AcceptDocumentInviteResponse>(`/api/document-invites/${token}/accept`, {});
       }
     
       revokeInvite(id: number): Observable<void> {

@@ -87,7 +87,7 @@ namespace fluxnotebackend.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("CreatedByTeamMemberId")
+                    b.Property<int?>("CreatedByTeamMemberId")
                         .HasColumnType("int");
 
                     b.Property<int>("DocumentId")
@@ -281,6 +281,53 @@ namespace fluxnotebackend.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Team");
+                });
+
+            modelBuilder.Entity("Fluxnote.Backend.Models.TeamInvite", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("CreatedByTeamMemberId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsRevoked")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("Role")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TeamId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("UsedByUserId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedByTeamMemberId");
+
+                    b.HasIndex("ExpiresAt");
+
+                    b.HasIndex("TeamId");
+
+                    b.HasIndex("Token")
+                        .IsUnique();
+
+                    b.ToTable("TeamInvite");
                 });
 
             modelBuilder.Entity("Fluxnote.Backend.Models.TeamMember", b =>
@@ -578,8 +625,7 @@ namespace fluxnotebackend.Migrations
                     b.HasOne("Fluxnote.Backend.Models.TeamMember", "CreatedBy")
                         .WithMany()
                         .HasForeignKey("CreatedByTeamMemberId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.HasOne("Fluxnote.Backend.Models.Document", "Document")
                         .WithMany()
@@ -639,6 +685,24 @@ namespace fluxnotebackend.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Fluxnote.Backend.Models.TeamInvite", b =>
+                {
+                    b.HasOne("Fluxnote.Backend.Models.TeamMember", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedByTeamMemberId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("Fluxnote.Backend.Models.Team", "Team")
+                        .WithMany()
+                        .HasForeignKey("TeamId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("Team");
                 });
 
             modelBuilder.Entity("Fluxnote.Backend.Models.TeamMember", b =>
