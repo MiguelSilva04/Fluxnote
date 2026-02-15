@@ -43,7 +43,7 @@ public class OAuthIntegrationTests : IClassFixture<CustomWebApplicationFactory>
         var response = await authenticatedClient.PostAsync("/api/auth/link-external/invalid-provider", null);
 
         // Assert
-        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
     }
 
     [Fact]

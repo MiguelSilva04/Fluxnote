@@ -5,8 +5,8 @@ import { Router } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
 import { DashboardLayoutComponent } from '../../../layout/dashboard-layout/dashboard-layout.component';
 import { ButtonComponent, CardComponent, BadgeComponent, ModalComponent, InputComponent } from '../../../shared/components/ui';
-import { TeamService, DocumentService, AuthService } from '../../../core/services';
-import { TeamDocument } from '../../../core/models';
+import { TeamService, DocumentService, AuthService, FolderService } from '../../../core/services';
+import { TeamDocument, Folder } from '../../../core/models';
 
 /**
  * Componente responsável por apresentar e gerir a lista de equipas.
@@ -39,6 +39,11 @@ export class TeamsComponent {
    * Serviço de documentos para operações de delete.
    */
   documentService = inject(DocumentService);
+
+  /**
+   * Serviço de pastas.
+   */
+  folderService = inject(FolderService);
 
   /**
    * Serviço de autenticação para verificar owner.
@@ -154,6 +159,37 @@ export class TeamsComponent {
    * Nome da nova equipa a ser criada.
    */
   newTeamName = '';
+
+  /**
+   * ID do documento a ser arrastado (drag & drop).
+   */
+  draggingDocId = signal<number | null>(null);
+
+  /**
+   * ID da pasta sobre a qual o documento está a ser arrastado (drop target).
+   * Usa 'root' para a zona de documentos sem pasta.
+   */
+  dragOverTarget = signal<number | 'root' | null>(null);
+
+  /**
+   * Signal que controla quais pastas estão expandidas.
+   */
+  expandedFolders = signal<Set<number>>(new Set());
+
+  /**
+   * Signal que controla o modal de criação de pasta.
+   */
+  isCreateFolderModalOpen = signal(false);
+
+  /**
+   * ID da equipa para a qual se está a criar uma pasta.
+   */
+  createFolderForTeamId = signal<number | null>(null);
+
+  /**
+   * Nome da nova pasta.
+   */
+  newFolderName = '';
 
   /**
    * Signal que controla o loading screen
@@ -326,6 +362,146 @@ export class TeamsComponent {
       //this.teamService.getTeams(this.http);
       //this.newTeamDescription = '';
     }
+  }
+
+  /**
+   * Expande ou recolhe uma pasta.
+   */
+  toggleFolder(folderId: number): void {
+    this.expandedFolders.update(set => {
+      const newSet = new Set(set);
+      if (newSet.has(folderId)) {
+        newSet.delete(folderId);
+      } else {
+        newSet.add(folderId);
+      }
+      return newSet;
+    });
+  }
+
+  /**
+   * Verifica se uma pasta está expandida.
+   */
+  isFolderExpanded(folderId: number): boolean {
+    return this.expandedFolders().has(folderId);
+  }
+
+  /**
+   * Retorna documentos de uma pasta específica.
+   */
+  getDocumentsInFolder(team: { documents: TeamDocument[] }, folderId: number): TeamDocument[] {
+    return team.documents.filter(d => d.folderId === folderId);
+  }
+
+  /**
+   * Retorna documentos sem pasta.
+   */
+  getUnfolderedDocuments(team: { documents: TeamDocument[] }): TeamDocument[] {
+    return team.documents.filter(d => !d.folderId);
+  }
+
+  /**
+   * Verifica se o utilizador é Owner ou TeamAdmin da equipa.
+   */
+  isOwnerOrAdmin(team: { currentUserRole: number }): boolean {
+    return team.currentUserRole === 2 || team.currentUserRole === 1;
+  }
+
+  /**
+   * Abre o modal de criação de pasta.
+   */
+  openCreateFolderModal(event: Event, teamId: number): void {
+    event.stopPropagation();
+    this.createFolderForTeamId.set(teamId);
+    this.newFolderName = '';
+    this.isCreateFolderModalOpen.set(true);
+  }
+
+  /**
+   * Cria uma nova pasta.
+   */
+  createFolder(): void {
+    const teamId = this.createFolderForTeamId();
+    if (!this.newFolderName.trim() || !teamId) return;
+
+    this.folderService.createFolder(this.newFolderName.trim(), teamId).subscribe({
+      next: () => {
+        this.isCreateFolderModalOpen.set(false);
+        this.newFolderName = '';
+        this.createFolderForTeamId.set(null);
+        this.loadTeams();
+      },
+      error: (err) => {
+        console.error('Error creating folder:', err);
+      }
+    });
+  }
+
+  // ── Drag & Drop ──
+
+  onDragStart(event: DragEvent, docId: number): void {
+    this.draggingDocId.set(docId);
+    event.dataTransfer?.setData('text/plain', String(docId));
+    if (event.dataTransfer) {
+      event.dataTransfer.effectAllowed = 'move';
+    }
+  }
+
+  onDragEnd(): void {
+    this.draggingDocId.set(null);
+    this.dragOverTarget.set(null);
+  }
+
+  onDragOverFolder(event: DragEvent, folderId: number): void {
+    event.preventDefault();
+    if (event.dataTransfer) {
+      event.dataTransfer.dropEffect = 'move';
+    }
+    this.dragOverTarget.set(folderId);
+  }
+
+  onDragOverRoot(event: DragEvent): void {
+    event.preventDefault();
+    if (event.dataTransfer) {
+      event.dataTransfer.dropEffect = 'move';
+    }
+    this.dragOverTarget.set('root');
+  }
+
+  onDragLeave(): void {
+    this.dragOverTarget.set(null);
+  }
+
+  onDropOnFolder(event: DragEvent, folderId: number, team: { id: number; currentUserRole: number }): void {
+    event.preventDefault();
+    this.dragOverTarget.set(null);
+    const docId = this.draggingDocId();
+    this.draggingDocId.set(null);
+    if (!docId || !this.isOwnerOrAdmin(team)) return;
+
+    this.folderService.moveDocumentToFolder(folderId, docId).subscribe({
+      next: () => this.loadTeams(),
+      error: (err) => console.error('Error moving document to folder:', err)
+    });
+  }
+
+  onDropOnRoot(event: DragEvent, team: { id: number; currentUserRole: number }): void {
+    event.preventDefault();
+    this.dragOverTarget.set(null);
+    const docId = this.draggingDocId();
+    this.draggingDocId.set(null);
+    if (!docId || !this.isOwnerOrAdmin(team)) return;
+
+    // Find which folder the doc is currently in
+    const teams = this.teams();
+    const fullTeam = teams?.find(t => t.id === team.id);
+    const doc = fullTeam?.documents.find(d => d.id === docId);
+    if (!doc?.folderId) return; // Already unfoldered
+
+    this.folderService.removeDocumentFromFolder(doc.folderId, docId).subscribe({
+      next: () => this.loadTeams(),
+      error: (err) => console.error('Error removing document from folder:', err)
+    });
   }
 
   /**

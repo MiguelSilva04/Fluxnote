@@ -171,43 +171,131 @@
                   </div>
                 </div>
   
-                @if (expandedTeam() === team.id && team.documents.length > 0) {
+                @if (expandedTeam() === team.id && (team.documents.length > 0 || team.folders.length > 0)) {
                   <div class="mt-6 pt-6 border-t border-gray-100">
-                    <div class="space-y-2">
-                      @for (doc of team.documents; track doc.id) {
-                        <div 
+                    <!-- Botão criar pasta (Owner/Admin) -->
+                    @if (isOwnerOrAdmin(team)) {
+                      <div class="flex justify-end mb-3">
+                        <button
+                          (click)="openCreateFolderModal($event, team.id)"
+                          class="flex items-center gap-1.5 text-xs text-[#155347] hover:text-[#0d3d31] font-medium px-2 py-1 rounded hover:bg-gray-50 transition-colors"
+                        >
+                          <lucide-icon name="folder-plus" class="h-3.5 w-3.5"></lucide-icon>
+                          New Folder
+                        </button>
+                      </div>
+                    }
+
+                    <div class="space-y-1">
+                      <!-- Pastas -->
+                      @for (folder of team.folders; track folder.id) {
+                        <div
+                          (dragover)="onDragOverFolder($event, folder.id)"
+                          (dragleave)="onDragLeave()"
+                          (drop)="onDropOnFolder($event, folder.id, team)"
+                        >
+                          <div
+                            (click)="toggleFolder(folder.id)"
+                            class="flex items-center justify-between p-2.5 rounded-lg transition-colors cursor-pointer"
+                            [class.bg-[#155347]/10]="dragOverTarget() === folder.id"
+                            [class.ring-2]="dragOverTarget() === folder.id"
+                            [class.ring-[#155347]]="dragOverTarget() === folder.id"
+                            [class.hover:bg-gray-50]="dragOverTarget() !== folder.id"
+                          >
+                            <div class="flex items-center gap-2.5">
+                              <lucide-icon
+                                [name]="isFolderExpanded(folder.id) ? 'chevron-down' : 'chevron-right'"
+                                class="h-3.5 w-3.5 text-gray-400"
+                              ></lucide-icon>
+                              <lucide-icon
+                                [name]="isFolderExpanded(folder.id) ? 'folder-open' : 'folder'"
+                                class="h-4 w-4 text-amber-500"
+                              ></lucide-icon>
+                              <span class="text-sm font-medium text-gray-900">{{ folder.name }}</span>
+                              <span class="text-xs text-gray-400">({{ getDocumentsInFolder(team, folder.id).length }})</span>
+                            </div>
+                          </div>
+                          <!-- Documentos dentro da pasta -->
+                          @if (isFolderExpanded(folder.id)) {
+                            <div class="ml-8 space-y-0.5">
+                              @for (doc of getDocumentsInFolder(team, folder.id); track doc.id) {
+                                <div
+                                  draggable="true"
+                                  (dragstart)="onDragStart($event, doc.id)"
+                                  (dragend)="onDragEnd()"
+                                  (click)="handleDocumentClick(doc.id)"
+                                  class="flex items-center justify-between p-2.5 hover:bg-gray-50 rounded-lg transition-colors cursor-pointer"
+                                  [class.opacity-50]="draggingDocId() === doc.id"
+                                >
+                                  <div class="flex items-center gap-3 flex-1">
+                                    <lucide-icon name="file-text" class="h-4 w-4 text-gray-400"></lucide-icon>
+                                    <span class="text-sm font-medium text-gray-900">{{ doc.title }}</span>
+                                  </div>
+                                  @if (isDocumentOwner(doc)) {
+                                    <div class="relative">
+                                      <button class="p-1 hover:bg-gray-200 rounded" (click)="toggleDocumentMenu($event, doc.id)">
+                                        <lucide-icon name="ellipsis-vertical" class="h-4 w-4 text-gray-400"></lucide-icon>
+                                      </button>
+                                      @if (openDocumentMenu() === doc.id) {
+                                        <div class="absolute right-0 top-6 bg-white rounded-lg shadow-lg border border-gray-200 py-1 min-w-[120px] z-10">
+                                          <button (click)="handleDuplicateDocument($event, doc.id)" class="w-full px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2">
+                                            <lucide-icon name="copy" class="h-4 w-4"></lucide-icon>
+                                            Duplicate
+                                          </button>
+                                          <button (click)="handleDeleteDocument($event, doc.id)" class="w-full px-3 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2">
+                                            <lucide-icon name="trash-2" class="h-4 w-4"></lucide-icon>
+                                            Delete
+                                          </button>
+                                        </div>
+                                      }
+                                    </div>
+                                  }
+                                </div>
+                              } @empty {
+                                <div class="px-3 py-2 text-xs text-gray-400 italic">Empty folder</div>
+                              }
+                            </div>
+                          }
+                        </div>
+                      }
+
+                      <!-- Documentos sem pasta -->
+                      <div
+                        (dragover)="onDragOverRoot($event)"
+                        (dragleave)="onDragLeave()"
+                        (drop)="onDropOnRoot($event, team)"
+                        class="rounded-lg transition-colors"
+                        [class.bg-gray-100]="dragOverTarget() === 'root'"
+                        [class.ring-2]="dragOverTarget() === 'root'"
+                        [class.ring-dashed]="dragOverTarget() === 'root'"
+                        [class.ring-gray-400]="dragOverTarget() === 'root'"
+                        [class.min-h-[40px]]="draggingDocId() !== null && getUnfolderedDocuments(team).length === 0"
+                      >
+                      @for (doc of getUnfolderedDocuments(team); track doc.id) {
+                        <div
+                          draggable="true"
+                          (dragstart)="onDragStart($event, doc.id)"
+                          (dragend)="onDragEnd()"
                           (click)="handleDocumentClick(doc.id)"
-                          class="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg transition-colors cursor-pointer"
+                          class="flex items-center justify-between p-2.5 hover:bg-gray-50 rounded-lg transition-colors cursor-pointer"
+                          [class.opacity-50]="draggingDocId() === doc.id"
                         >
                           <div class="flex items-center gap-3 flex-1">
                             <lucide-icon name="file-text" class="h-4 w-4 text-gray-400"></lucide-icon>
-                            <span class="text-sm font-medium text-gray-900">
-                              {{ doc.title }}
-                            </span>
+                            <span class="text-sm font-medium text-gray-900">{{ doc.title }}</span>
                           </div>
-                          
-                          <!-- Menu de opções do documento -->
                           @if (isDocumentOwner(doc)) {
                             <div class="relative">
-                              <button 
-                                class="p-1 hover:bg-gray-200 rounded" 
-                                (click)="toggleDocumentMenu($event, doc.id)"
-                              >
+                              <button class="p-1 hover:bg-gray-200 rounded" (click)="toggleDocumentMenu($event, doc.id)">
                                 <lucide-icon name="ellipsis-vertical" class="h-4 w-4 text-gray-400"></lucide-icon>
                               </button>
                               @if (openDocumentMenu() === doc.id) {
                                 <div class="absolute right-0 top-6 bg-white rounded-lg shadow-lg border border-gray-200 py-1 min-w-[120px] z-10">
-                                  <button
-                                    (click)="handleDuplicateDocument($event, doc.id)"
-                                    class="w-full px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
-                                  >
+                                  <button (click)="handleDuplicateDocument($event, doc.id)" class="w-full px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2">
                                     <lucide-icon name="copy" class="h-4 w-4"></lucide-icon>
                                     Duplicate
                                   </button>
-                                  <button
-                                    (click)="handleDeleteDocument($event, doc.id)"
-                                    class="w-full px-3 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
-                                  >
+                                  <button (click)="handleDeleteDocument($event, doc.id)" class="w-full px-3 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2">
                                     <lucide-icon name="trash-2" class="h-4 w-4"></lucide-icon>
                                     Delete
                                   </button>
@@ -217,11 +305,12 @@
                           }
                         </div>
                       }
+                      </div>
                     </div>
                   </div>
                 }
-                
-        
+
+
                 <!-- Deletion scheduled -->
                 @if (team.deletionScheduled) {
                   <div class="mt-6 pt-6 border-t border-gray-100">
@@ -320,6 +409,23 @@
         >
           Duplicate
         </app-button>
+      </div>
+    </app-modal>
+
+    <!-- Create Folder Modal -->
+    <app-modal
+      [isOpen]="isCreateFolderModalOpen()"
+      title="Create New Folder"
+      (onClose)="isCreateFolderModalOpen.set(false)"
+      [hasFooter]="true"
+      maxWidth="sm"
+    >
+      <div class="space-y-4">
+        <app-input label="Folder Name" placeholder="e.g. Marketing Documents" [(ngModel)]="newFolderName"></app-input>
+      </div>
+      <div footer class="flex gap-3">
+        <app-button variant="ghost" (onClick)="isCreateFolderModalOpen.set(false)">Cancel</app-button>
+        <app-button (onClick)="createFolder()">Create Folder</app-button>
       </div>
     </app-modal>
   </app-dashboard-layout>

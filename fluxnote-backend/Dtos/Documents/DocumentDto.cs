@@ -37,6 +37,12 @@ namespace Fluxnote.Backend.Dtos.Documents
         /// <summary>Indica se o documento está na lixeira.</summary>
         public bool IsDeleted { get; set; }
 
+        /// <summary>ID da pasta onde o documento está (null se solto).</summary>
+        public int? FolderId { get; set; }
+
+        /// <summary>Nome da pasta (null se solto).</summary>
+        public string? FolderName { get; set; }
+
         /// <summary>
         /// Preview do texto com contexto em torno do termo pesquisado.
         /// </summary>

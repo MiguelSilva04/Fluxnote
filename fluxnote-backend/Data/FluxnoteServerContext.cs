@@ -80,6 +80,8 @@ namespace Fluxnote.Backend.Data
         /// </summary>
         public DbSet<Fluxnote.Backend.Models.DocumentInvite> DocumentInvite { get; set; } = default!;
 
+        public DbSet<Fluxnote.Backend.Models.Folder> Folder { get; set; } = default!;
+
         /// <summary>
         /// DbSet para refresh tokens de autenticação.
         /// </summary>
@@ -191,6 +193,31 @@ namespace Fluxnote.Backend.Data
                 // Indices para performance
                 entity.HasIndex(ti => ti.TeamId);
                 entity.HasIndex(ti => ti.ExpiresAt);
+            });
+
+            builder.Entity<Folder>(entity =>
+            {
+                // Relação com Team (cascade delete - apagar equipa apaga pastas)
+                entity.HasOne(f => f.Team)
+                      .WithMany(t => t.Folders)
+                      .HasForeignKey(f => f.TeamId)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+                // Relação com User (restrict delete)
+                entity.HasOne(f => f.CreatedBy)
+                      .WithMany()
+                      .HasForeignKey(f => f.CreatedById)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                // Relação com Documents (NoAction para evitar ciclos de cascade no SQL Server)
+                // O set-null é feito manualmente no FoldersController.DeleteFolder
+                entity.HasMany(f => f.Documents)
+                      .WithOne(d => d.Folder)
+                      .HasForeignKey(d => d.FolderId)
+                      .OnDelete(DeleteBehavior.NoAction);
+
+                // Índices
+                entity.HasIndex(f => f.TeamId);
             });
 
             // Configuração específica para SQL Server (SQLite usa BLOB por defeito)

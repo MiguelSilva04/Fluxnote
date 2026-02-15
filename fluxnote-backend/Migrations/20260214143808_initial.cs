@@ -216,32 +216,28 @@ namespace fluxnotebackend.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Document",
+                name: "Folder",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Title = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     TeamId = table.Column<int>(type: "int", nullable: false),
-                    Content = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
-                    PlainText = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreatedById = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
-                    DeletedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Document", x => x.Id);
+                    table.PrimaryKey("PK_Folder", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Document_AspNetUsers_CreatedById",
+                        name: "FK_Folder_AspNetUsers_CreatedById",
                         column: x => x.CreatedById,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_Document_Team_TeamId",
+                        name: "FK_Folder_Team_TeamId",
                         column: x => x.TeamId,
                         principalTable: "Team",
                         principalColumn: "Id",
@@ -273,6 +269,46 @@ namespace fluxnotebackend.Migrations
                         column: x => x.TeamId,
                         principalTable: "Team",
                         principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Document",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Title = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
+                    TeamId = table.Column<int>(type: "int", nullable: false),
+                    Content = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
+                    PlainText = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedById = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    DeletedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    FolderId = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Document", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Document_AspNetUsers_CreatedById",
+                        column: x => x.CreatedById,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Document_Folder_FolderId",
+                        column: x => x.FolderId,
+                        principalTable: "Folder",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.NoAction);
+                    table.ForeignKey(
+                        name: "FK_Document_Team_TeamId",
+                        column: x => x.TeamId,
+                        principalTable: "Team",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -413,6 +449,11 @@ namespace fluxnotebackend.Migrations
                 column: "CreatedById");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Document_FolderId",
+                table: "Document",
+                column: "FolderId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Document_IsDeleted",
                 table: "Document",
                 column: "IsDeleted");
@@ -458,6 +499,16 @@ namespace fluxnotebackend.Migrations
                 table: "DocumentPermission",
                 columns: new[] { "TeamMemberId", "DocumentId" },
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Folder_CreatedById",
+                table: "Folder",
+                column: "CreatedById");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Folder_TeamId",
+                table: "Folder",
+                column: "TeamId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_RefreshTokens_TokenHash",
@@ -540,6 +591,9 @@ namespace fluxnotebackend.Migrations
 
             migrationBuilder.DropTable(
                 name: "TeamMember");
+
+            migrationBuilder.DropTable(
+                name: "Folder");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");

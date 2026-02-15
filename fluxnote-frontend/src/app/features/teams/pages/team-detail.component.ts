@@ -7,11 +7,11 @@ import { DashboardLayoutComponent } from '../../../layout/dashboard-layout/dashb
 import { ButtonComponent, CardComponent, CardContentComponent, BadgeComponent, ModalComponent } from '../../../shared/components/ui';
 import { DocumentShareModalComponent } from '../../../shared/components/document-share-modal/document-share-modal.component';
 import { TeamShareModalComponent } from '../../../shared/components/team-share-modal/team-share-modal.component';
-import { TeamService, DocumentPermissionService, AuthService, DocumentInviteService, DocumentService, TeamInviteService } from '../../../core/services';
+import { TeamService, DocumentPermissionService, AuthService, DocumentInviteService, DocumentService, TeamInviteService, FolderService } from '../../../core/services';
 import { ToastService } from '../../../shared/services/toast.service';
 import { TourService } from '../../../shared/services/tour.service';
 import { TourStep } from '../../../shared/components/ui/tour/tour.models';
-import { TeamMemberToPost, TeamDocument, DocumentPermissionSummary, DocumentInviteDto, TeamInviteDto } from '../../../core/models';
+import { TeamMemberToPost, TeamDocument, DocumentPermissionSummary, DocumentInviteDto, TeamInviteDto, Folder } from '../../../core/models';
 
 @Component({
   selector: 'app-team-detail',
@@ -43,6 +43,7 @@ export class TeamDetailComponent {
   private documentInviteService = inject(DocumentInviteService);
   private teamInviteService = inject(TeamInviteService);
   private tourService = inject(TourService);
+  private folderService = inject(FolderService);
 
   shareDocId = signal<number | null>(null);
   shareRole = signal<number>(0); // 0=Viewer, 1=Editor
@@ -89,6 +90,23 @@ export class TeamDetailComponent {
   addMemberDocId = signal<number | null>(null);
   addMemberSelectedId = signal<number | null>(null);
   addMemberSelectedRole = signal<number>(0);
+
+  /** Track which folders are expanded in the Document Permissions section */
+  expandedPermFolders = signal<Set<number | 'root'>>(new Set());
+
+  /** Drag & drop state for Document Permissions */
+  draggingDocId = signal<number | null>(null);
+  dragOverTarget = signal<number | 'root' | null>(null);
+
+  /** Folder management state */
+  isCreateFolderModalOpen = signal(false);
+  isRenameFolderModalOpen = signal(false);
+  isDeleteFolderModalOpen = signal(false);
+  newFolderName = '';
+  renameFolderTarget = signal<Folder | null>(null);
+  renameFolderName = '';
+  deleteFolderTarget = signal<Folder | null>(null);
+  isDeletingFolder = signal(false);
 
   ngOnInit(): void {
     this.route.params.subscribe(params => {
@@ -634,6 +652,252 @@ export class TeamDetailComponent {
   viewInviteLink(url: string): void {
     this.shareGeneratedUrl.set(url);
     this.shareCopied.set(false);
+  }
+
+  // --- Folder Management ---
+
+  openCreateFolderModal(): void {
+    this.newFolderName = '';
+    this.isCreateFolderModalOpen.set(true);
+  }
+
+  closeCreateFolderModal(): void {
+    this.isCreateFolderModalOpen.set(false);
+    this.newFolderName = '';
+  }
+
+  createFolder(): void {
+    const team = this.selectedTeam();
+    if (!team || !this.newFolderName.trim()) return;
+
+    this.folderService.createFolder(this.newFolderName.trim(), team.id).subscribe({
+      next: () => {
+        this.closeCreateFolderModal();
+        this.toastService.success('Folder created.');
+        this.loadTeam(team.id);
+      },
+      error: (err) => {
+        console.error('Error creating folder:', err);
+        this.toastService.error('Failed to create folder.');
+      }
+    });
+  }
+
+  openRenameFolderModal(folder: Folder): void {
+    this.renameFolderTarget.set(folder);
+    this.renameFolderName = folder.name;
+    this.isRenameFolderModalOpen.set(true);
+  }
+
+  closeRenameFolderModal(): void {
+    this.isRenameFolderModalOpen.set(false);
+    this.renameFolderTarget.set(null);
+    this.renameFolderName = '';
+  }
+
+  confirmRenameFolder(): void {
+    const folder = this.renameFolderTarget();
+    if (!folder || !this.renameFolderName.trim()) return;
+
+    this.folderService.updateFolder(folder.id, this.renameFolderName.trim()).subscribe({
+      next: () => {
+        this.closeRenameFolderModal();
+        this.toastService.success('Folder renamed.');
+        const team = this.selectedTeam();
+        if (team) this.loadTeam(team.id);
+      },
+      error: (err) => {
+        console.error('Error renaming folder:', err);
+        this.toastService.error('Failed to rename folder.');
+      }
+    });
+  }
+
+  openDeleteFolderModal(folder: Folder): void {
+    this.deleteFolderTarget.set(folder);
+    this.isDeleteFolderModalOpen.set(true);
+  }
+
+  closeDeleteFolderModal(): void {
+    this.isDeleteFolderModalOpen.set(false);
+    this.deleteFolderTarget.set(null);
+  }
+
+  confirmDeleteFolder(): void {
+    const folder = this.deleteFolderTarget();
+    if (!folder) return;
+
+    this.isDeletingFolder.set(true);
+    this.folderService.deleteFolder(folder.id).subscribe({
+      next: () => {
+        this.isDeletingFolder.set(false);
+        this.closeDeleteFolderModal();
+        this.toastService.success('Folder deleted. Documents moved out.');
+        const team = this.selectedTeam();
+        if (team) this.loadTeam(team.id);
+      },
+      error: (err) => {
+        this.isDeletingFolder.set(false);
+        console.error('Error deleting folder:', err);
+        this.toastService.error('Failed to delete folder.');
+      }
+    });
+  }
+
+  moveDocToFolder(doc: TeamDocument, folderId: number | null): void {
+    const team = this.selectedTeam();
+    if (!team) return;
+
+    if (folderId === null) {
+      // Remove from current folder
+      const currentFolderId = doc.folderId;
+      if (!currentFolderId) return;
+      this.folderService.removeDocumentFromFolder(currentFolderId, doc.id).subscribe({
+        next: () => {
+          this.toastService.success('Document removed from folder.');
+          this.loadTeam(team.id);
+        },
+        error: (err) => {
+          console.error('Error removing document from folder:', err);
+          this.toastService.error('Failed to move document.');
+        }
+      });
+    } else {
+      this.folderService.moveDocumentToFolder(folderId, doc.id).subscribe({
+        next: () => {
+          this.toastService.success('Document moved to folder.');
+          this.loadTeam(team.id);
+        },
+        error: (err) => {
+          console.error('Error moving document to folder:', err);
+          this.toastService.error('Failed to move document.');
+        }
+      });
+    }
+  }
+
+  // --- Document Permissions folder grouping ---
+
+  togglePermFolder(folderId: number | 'root'): void {
+    const current = new Set(this.expandedPermFolders());
+    if (current.has(folderId)) {
+      current.delete(folderId);
+    } else {
+      current.add(folderId);
+    }
+    this.expandedPermFolders.set(current);
+  }
+
+  isPermFolderExpanded(folderId: number | 'root'): boolean {
+    return this.expandedPermFolders().has(folderId);
+  }
+
+  getVisibleDocsInFolder(folderId: number): TeamDocument[] {
+    return this.visibleDocuments().filter(d => d.folderId === folderId);
+  }
+
+  getVisibleUnfolderedDocs(): TeamDocument[] {
+    return this.visibleDocuments().filter(d => !d.folderId);
+  }
+
+  /** Returns folders that have at least one visible document */
+  getVisibleFolders(): Folder[] {
+    const team = this.selectedTeam();
+    if (!team?.folders) return [];
+    const visibleDocFolderIds = new Set(
+      this.visibleDocuments().filter(d => d.folderId).map(d => d.folderId)
+    );
+    return team.folders.filter(f => visibleDocFolderIds.has(f.id));
+  }
+
+  /** Returns folders for the sidebar: Owners/Admins see all, Members see only folders with accessible docs */
+  getSidebarFolders(): Folder[] {
+    const team = this.selectedTeam();
+    if (!team?.folders) return [];
+    if (this.isOwnerOrAdmin()) return team.folders;
+    return this.getVisibleFolders();
+  }
+
+  hasAnyFolderStructure(): boolean {
+    return this.getVisibleFolders().length > 0;
+  }
+
+  // --- Drag & Drop for Document Permissions ---
+
+  onDragStart(event: DragEvent, docId: number): void {
+    this.draggingDocId.set(docId);
+    if (event.dataTransfer) {
+      event.dataTransfer.effectAllowed = 'move';
+      event.dataTransfer.setData('text/plain', String(docId));
+    }
+  }
+
+  onDragEnd(): void {
+    this.draggingDocId.set(null);
+    this.dragOverTarget.set(null);
+  }
+
+  onDragOverFolder(event: DragEvent, folderId: number): void {
+    event.preventDefault();
+    if (event.dataTransfer) event.dataTransfer.dropEffect = 'move';
+    this.dragOverTarget.set(folderId);
+  }
+
+  onDragOverRoot(event: DragEvent): void {
+    event.preventDefault();
+    if (event.dataTransfer) event.dataTransfer.dropEffect = 'move';
+    this.dragOverTarget.set('root');
+  }
+
+  onDragLeave(): void {
+    this.dragOverTarget.set(null);
+  }
+
+  onDropOnFolder(event: DragEvent, folderId: number): void {
+    event.preventDefault();
+    this.dragOverTarget.set(null);
+    const docId = this.draggingDocId();
+    this.draggingDocId.set(null);
+    if (!docId || !this.isOwnerOrAdmin()) return;
+
+    const team = this.selectedTeam();
+    if (!team) return;
+
+    this.folderService.moveDocumentToFolder(folderId, docId).subscribe({
+      next: () => {
+        this.toastService.success('Document moved to folder.');
+        this.loadTeam(team.id);
+      },
+      error: (err) => {
+        console.error('Error moving document to folder:', err);
+        this.toastService.error('Failed to move document.');
+      }
+    });
+  }
+
+  onDropOnRoot(event: DragEvent): void {
+    event.preventDefault();
+    this.dragOverTarget.set(null);
+    const docId = this.draggingDocId();
+    this.draggingDocId.set(null);
+    if (!docId || !this.isOwnerOrAdmin()) return;
+
+    const team = this.selectedTeam();
+    if (!team) return;
+
+    const doc = team.documents?.find(d => d.id === docId);
+    if (!doc?.folderId) return;
+
+    this.folderService.removeDocumentFromFolder(doc.folderId, docId).subscribe({
+      next: () => {
+        this.toastService.success('Document removed from folder.');
+        this.loadTeam(team.id);
+      },
+      error: (err) => {
+        console.error('Error removing document from folder:', err);
+        this.toastService.error('Failed to move document.');
+      }
+    });
   }
 
   /**

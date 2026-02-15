@@ -1,4 +1,5 @@
 using Fluxnote.Backend.Data;
+using Fluxnote.Backend.Dtos.Folders;
 using Fluxnote.Backend.Dtos.Teams;
 using Fluxnote.Backend.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -77,14 +78,39 @@ namespace Fluxnote.Backend.Controllers
             if (userId is null)
                 return Unauthorized(new { message = "User not authenticated." });
 
-            // Obter equipas onde o utilizador é membro (incluindo a role)
-            var userTeamMemberships = await _context.TeamMember
+            // Obter equipas onde o utilizador é membro (incluindo a role e memberId)
+            var userMemberships = await _context.TeamMember
                 .Where(m => m.UserId == userId && m.TeamId != null)
-                .ToDictionaryAsync(m => m.TeamId!.Value, m => (int)m.Role);
+                .Select(m => new { TeamId = m.TeamId!.Value, Role = (int)m.Role, MemberId = m.Id })
+                .ToListAsync();
+
+            var userTeamMemberships = userMemberships.ToDictionary(m => m.TeamId, m => m.Role);
+
+            // Para equipas onde o utilizador é Member (role 0), obter IDs de documentos acessíveis
+            var memberTeamEntries = userMemberships.Where(m => m.Role == 0).ToList();
+            var accessibleDocIdsByTeam = new Dictionary<int, HashSet<int>>();
+
+            if (memberTeamEntries.Any())
+            {
+                var memberIds = memberTeamEntries.Select(m => m.MemberId).ToList();
+                var permissions = await _context.DocumentPermission
+                    .Where(p => memberIds.Contains(p.TeamMemberId))
+                    .Select(p => new { p.DocumentId, p.TeamMember.TeamId })
+                    .ToListAsync();
+
+                foreach (var entry in memberTeamEntries)
+                {
+                    accessibleDocIdsByTeam[entry.TeamId] = permissions
+                        .Where(p => p.TeamId == entry.TeamId)
+                        .Select(p => p.DocumentId)
+                        .ToHashSet();
+                }
+            }
 
             var teams = await _context.Team
                 .Include(t => t.Members)
                 .Include(t => t.Documents.Where(d => !d.IsDeleted))
+                .Include(t => t.Folders)
                 .Where(t => userTeamMemberships.Keys.Contains(t.Id))
                 .Select(t => new TeamDto
                 {
@@ -108,15 +134,37 @@ namespace Fluxnote.Backend.Controllers
                         Id = d.Id,
                         Title = d.Title,
                         UpdatedAt = d.UpdatedAt,
-                        CreatedById = d.CreatedById
-                    }).ToList()
+                        CreatedById = d.CreatedById,
+                        FolderId = d.FolderId
+                    }).ToList(),
+                    Folders = t.Folders.Select(f => new FolderDto
+                    {
+                        Id = f.Id,
+                        Name = f.Name,
+                        TeamId = f.TeamId,
+                        CreatedAt = f.CreatedAt,
+                        UpdatedAt = f.UpdatedAt
+                    }).OrderBy(f => f.Name).ToList()
                 })
                 .ToListAsync();
 
-            // Preencher CurrentUserRole após a query
+            // Preencher CurrentUserRole, filtrar documentos por acesso e calcular DocumentCount
             foreach (var team in teams)
             {
                 team.CurrentUserRole = userTeamMemberships.GetValueOrDefault(team.Id, 0);
+
+                // Members (role 0): filtrar documentos para apenas os que têm permissão
+                if (team.CurrentUserRole == 0 && accessibleDocIdsByTeam.TryGetValue(team.Id, out var accessibleIds))
+                {
+                    team.Documents = team.Documents.Where(d => accessibleIds.Contains(d.Id)).ToList();
+                }
+
+                // Calcular contagem de documentos por pasta e remover pastas vazias
+                foreach (var folder in team.Folders)
+                {
+                    folder.DocumentCount = team.Documents.Count(d => d.FolderId == folder.Id);
+                }
+                team.Folders = team.Folders.Where(f => f.DocumentCount > 0).ToList();
             }
 
             return Ok(teams);
@@ -158,7 +206,8 @@ namespace Fluxnote.Backend.Controllers
                 .Include(t => t.Members)
                 .Include(t => t.Documents.Where(d => !d.IsDeleted))
                     .ThenInclude(d => d.Permissions)
-                        .ThenInclude(p => p.TeamMember);
+                        .ThenInclude(p => p.TeamMember)
+                .Include(t => t.Folders);
 
             var team = await teamQuery.FirstOrDefaultAsync(t => t.Id == id);
 
@@ -193,6 +242,7 @@ namespace Fluxnote.Backend.Controllers
                     Title = d.Title,
                     UpdatedAt = d.UpdatedAt,
                     CreatedById = d.CreatedById,
+                    FolderId = d.FolderId,
                     // Apenas Owner vê todos os documentos; TeamAdmin e Member precisam de DocumentPermission
                     Permissions = isOwner
                         ? d.Permissions.Select(p => new DocumentPermissionSummaryDto
@@ -213,7 +263,16 @@ namespace Fluxnote.Backend.Controllers
                                 DocumentRole = (int)p.Role
                             }).ToList()
                             : new List<DocumentPermissionSummaryDto>())
-                }).ToList()
+                }).ToList(),
+                Folders = team.Folders.Select(f => new FolderDto
+                {
+                    Id = f.Id,
+                    Name = f.Name,
+                    TeamId = f.TeamId,
+                    CreatedAt = f.CreatedAt,
+                    UpdatedAt = f.UpdatedAt,
+                    DocumentCount = team.Documents.Count(d => !d.IsDeleted && d.FolderId == f.Id)
+                }).OrderBy(f => f.Name).ToList()
             };
 
             return Ok(dto);
@@ -376,6 +435,7 @@ namespace Fluxnote.Backend.Controllers
             var team = await _context.Team
                 .Include(t => t.Members)
                 .Include(t => t.Documents)
+                .Include(t => t.Folders)
                 .FirstOrDefaultAsync(t => t.Id == id);
                 
             if (team == null)
@@ -408,6 +468,18 @@ namespace Fluxnote.Backend.Controllers
                     .ToListAsync();
                 if (invites.Any())
                     _context.DocumentInvite.RemoveRange(invites);
+            }
+
+            // Limpar FolderId dos documentos antes de remover pastas (NoAction no DB)
+            foreach (var doc in team.Documents)
+            {
+                doc.FolderId = null;
+            }
+
+            // Remove todas as pastas da equipa
+            if (team.Folders != null && team.Folders.Any())
+            {
+                _context.Folder.RemoveRange(team.Folders);
             }
 
             // Remove todos os membros da equipa

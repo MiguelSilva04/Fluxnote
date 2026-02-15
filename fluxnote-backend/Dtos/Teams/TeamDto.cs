@@ -1,3 +1,5 @@
+using Fluxnote.Backend.Dtos.Folders;
+
 namespace Fluxnote.Backend.Dtos.Teams
 {
     /// <summary>
@@ -50,6 +52,9 @@ namespace Fluxnote.Backend.Dtos.Teams
 
         /// <summary>Lista de documentos da equipa (apenas não eliminados).</summary>
         public List<TeamDocumentDto> Documents { get; set; } = new();
+
+        /// <summary>Lista de pastas da equipa.</summary>
+        public List<FolderDto> Folders { get; set; } = new();
     }
 
     /// <summary>
@@ -101,6 +106,9 @@ namespace Fluxnote.Backend.Dtos.Teams
 
         /// <summary>ID do utilizador que criou o documento.</summary>
         public string CreatedById { get; set; } = string.Empty;
+
+        /// <summary>ID da pasta onde o documento está (null se solto).</summary>
+        public int? FolderId { get; set; }
 
         /// <summary>Lista de permissões do documento (apenas para Owner/TeamAdmin).</summary>
         public List<DocumentPermissionSummaryDto> Permissions { get; set; } = new();

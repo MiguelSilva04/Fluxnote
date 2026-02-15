@@ -5,4 +5,5 @@ export { TeamService } from './team.service';
 export { DocumentPermissionService } from './document-permission.service';
 export { DocumentInviteService } from './document-invite.service';
 export { UploadService } from './upload.service';
+export { FolderService } from './folder.service';
 export { TeamInviteService } from './team-invite.service';

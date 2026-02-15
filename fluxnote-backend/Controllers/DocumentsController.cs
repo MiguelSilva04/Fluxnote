@@ -124,6 +124,7 @@ namespace Fluxnote.Backend.Controllers
             var query = _context.Document
                 .Include(d => d.Team)
                 .Include(d => d.CreatedBy)
+                .Include(d => d.Folder)
                 .Where(d => userTeamIds.Contains(d.TeamId) && !d.IsDeleted);
 
             // Filtro por equipa
@@ -190,6 +191,8 @@ namespace Fluxnote.Backend.Controllers
                     CreatedAt = d.CreatedAt,
                     UpdatedAt = d.UpdatedAt,
                     IsDeleted = d.IsDeleted,
+                    FolderId = d.FolderId,
+                    FolderName = d.Folder?.Name,
                     Preview = searchLower != null ? GeneratePreview(d.PlainText, d.Title, searchLower) : null
                 };
             }).ToList();

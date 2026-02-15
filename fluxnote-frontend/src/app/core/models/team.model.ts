@@ -25,6 +25,7 @@ export interface TeamGet {
   currentUserRole: number;
   members: TeamMemberToPost[];
   documents: TeamDocument[];
+  folders: Folder[];
 }
 
 
@@ -33,7 +34,17 @@ export interface TeamDocument {
   title: string;
   updatedAt?: string;
   createdById?: string;
+  folderId?: number;
   permissions?: DocumentPermissionSummary[];
+}
+
+export interface Folder {
+  id: number;
+  name: string;
+  teamId: number;
+  createdAt: string;
+  updatedAt: string;
+  documentCount: number;
 }
 
 export interface DocumentPermissionSummary {
