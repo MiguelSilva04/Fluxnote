@@ -12,6 +12,8 @@ export interface DocumentDto {
   updatedAt: string;
   isDeleted: boolean;
   preview?: string; // Preview do texto (usado em pesquisas)
+  folderId?: number;
+  folderName?: string;
 }
 
 /**

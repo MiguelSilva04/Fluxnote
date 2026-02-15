@@ -159,12 +159,16 @@ namespace Fluxnote.Backend.Controllers
                     team.Documents = team.Documents.Where(d => accessibleIds.Contains(d.Id)).ToList();
                 }
 
-                // Calcular contagem de documentos por pasta e remover pastas vazias
+                // Calcular contagem de documentos por pasta
                 foreach (var folder in team.Folders)
                 {
                     folder.DocumentCount = team.Documents.Count(d => d.FolderId == folder.Id);
                 }
-                team.Folders = team.Folders.Where(f => f.DocumentCount > 0).ToList();
+                // Members só vêem pastas com documentos acessíveis; Owner/Admin vêem todas
+                if (team.CurrentUserRole == 0)
+                {
+                    team.Folders = team.Folders.Where(f => f.DocumentCount > 0).ToList();
+                }
             }
 
             return Ok(teams);
