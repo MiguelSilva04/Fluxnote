@@ -110,6 +110,11 @@ if (!string.IsNullOrWhiteSpace(googleClientId) && !string.IsNullOrWhiteSpace(goo
         options.SignInScheme = IdentityConstants.ExternalScheme;
         options.SaveTokens = true;
         options.Scope.Add("openid");
+
+        // Com proxy reverso, frontend e backend aparecem no mesmo domain para o browser
+        options.CorrelationCookie.SameSite = SameSiteMode.Lax;
+        options.CorrelationCookie.SecurePolicy = CookieSecurePolicy.Always;
+
         options.Events.OnRemoteFailure = context =>
         {
             var errorUrl = builder.Configuration["Authentication:ExternalErrorUrl"] ?? "http://localhost:4200/auth/external-error";
@@ -132,6 +137,11 @@ if (!string.IsNullOrWhiteSpace(microsoftClientId) && !string.IsNullOrWhiteSpace(
         options.Scope.Add("openid");
         options.Scope.Add("email");
         options.Scope.Add("profile");
+
+        // Com proxy reverso, frontend e backend aparecem no mesmo domain para o browser
+        options.CorrelationCookie.SameSite = SameSiteMode.Lax;
+        options.CorrelationCookie.SecurePolicy = CookieSecurePolicy.Always;
+
         options.Events.OnRemoteFailure = context =>
         {
             var errorUrl = builder.Configuration["Authentication:ExternalErrorUrl"] ?? "http://localhost:4200/auth/external-error";
@@ -251,6 +261,14 @@ builder.Services.ConfigureApplicationCookie(options =>
         context.Response.StatusCode = 403;
         return Task.CompletedTask;
     };
+});
+
+// Configurar External Scheme Cookie (usada durante OAuth flow)
+// Com proxy reverso, frontend e backend aparecem no mesmo domain
+builder.Services.ConfigureExternalCookie(options =>
+{
+    options.Cookie.SameSite = SameSiteMode.Lax;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
 });
 
 builder.Services.AddControllers()
@@ -401,10 +419,12 @@ if (!app.Environment.IsEnvironment("Testing"))
 // 8. Controllers
 
 // Forwarded Headers - necessário para Azure App Service (reverse proxy HTTPS -> HTTP)
-// Garante que o ASP.NET gera redirect URIs com HTTPS em produção
+// E para Nginx proxy no frontend (X-Forwarded-Host permite OAuth cookies funcionarem)
 var forwardedHeadersOptions = new ForwardedHeadersOptions
 {
-    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor
+                     | ForwardedHeaders.XForwardedProto
+                     | ForwardedHeaders.XForwardedHost
 };
 forwardedHeadersOptions.KnownNetworks.Clear();
 forwardedHeadersOptions.KnownProxies.Clear();
