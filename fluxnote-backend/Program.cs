@@ -54,7 +54,20 @@ var builder = WebApplication.CreateBuilder(args);
 // Configura o contexto EF Core com SQL Server (LocalDB em desenvolvimento).
 // Connection string definida em appsettings.json.
 builder.Services.AddDbContext<FluxnoteServerContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("FluxnoteServerContext") ?? throw new InvalidOperationException("Connection string 'FluxnoteServerContext' not found.")));
+    options.UseSqlServer(
+        builder.Configuration.GetConnectionString("FluxnoteServerContext") ?? throw new InvalidOperationException("Connection string 'FluxnoteServerContext' not found."),
+        sqlOptions =>
+        {
+            // Aumentar timeout para cold start da BD no Azure (quando a BD "acorda")
+            sqlOptions.CommandTimeout(60); // 60 segundos (default: 30)
+            // Retry automático em caso de falha temporária (transient faults)
+            sqlOptions.EnableRetryOnFailure(
+                maxRetryCount: 5,
+                maxRetryDelay: TimeSpan.FromSeconds(10),
+                errorNumbersToAdd: null
+            );
+        }
+    ));
 
 // ==============================================================================
 // 2. AUTENTICAÇÃO JWT BEARER
