@@ -6,6 +6,7 @@ import { LucideAngularModule } from 'lucide-angular';
 import { DashboardLayoutComponent } from '../../../layout/dashboard-layout/dashboard-layout.component';
 import { ButtonComponent, CardComponent, BadgeComponent, ModalComponent, InputComponent } from '../../../shared/components/ui';
 import { TeamService, DocumentService, AuthService, FolderService } from '../../../core/services';
+import { ToastService } from '../../../shared/services/toast.service';
 import { TeamDocument, Folder } from '../../../core/models';
 
 /**
@@ -49,6 +50,8 @@ export class TeamsComponent {
    * Serviço de autenticação para verificar owner.
    */
   authService = inject(AuthService);
+
+  private toastService = inject(ToastService);
 
   /**
    * Router para navegação entre rotas.
@@ -429,10 +432,12 @@ export class TeamsComponent {
         this.isCreateFolderModalOpen.set(false);
         this.newFolderName = '';
         this.createFolderForTeamId.set(null);
+        this.toastService.success('Folder created successfully');
         this.loadTeams();
       },
       error: (err) => {
         console.error('Error creating folder:', err);
+        this.toastService.error('Failed to create folder');
       }
     });
   }
