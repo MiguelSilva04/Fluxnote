@@ -43,6 +43,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.HttpOverrides;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -109,6 +110,13 @@ if (!string.IsNullOrWhiteSpace(googleClientId) && !string.IsNullOrWhiteSpace(goo
         options.SignInScheme = IdentityConstants.ExternalScheme;
         options.SaveTokens = true;
         options.Scope.Add("openid");
+        options.Events.OnRemoteFailure = context =>
+        {
+            var errorUrl = builder.Configuration["Authentication:ExternalErrorUrl"] ?? "http://localhost:4200/auth/external-error";
+            context.Response.Redirect($"{errorUrl}?error=external_provider_error&message={Uri.EscapeDataString(context.Failure?.Message ?? "Authentication failed")}");
+            context.HandleResponse();
+            return Task.CompletedTask;
+        };
     });
 }
 
@@ -124,6 +132,13 @@ if (!string.IsNullOrWhiteSpace(microsoftClientId) && !string.IsNullOrWhiteSpace(
         options.Scope.Add("openid");
         options.Scope.Add("email");
         options.Scope.Add("profile");
+        options.Events.OnRemoteFailure = context =>
+        {
+            var errorUrl = builder.Configuration["Authentication:ExternalErrorUrl"] ?? "http://localhost:4200/auth/external-error";
+            context.Response.Redirect($"{errorUrl}?error=external_provider_error&message={Uri.EscapeDataString(context.Failure?.Message ?? "Authentication failed")}");
+            context.HandleResponse();
+            return Task.CompletedTask;
+        };
     });
 }
 
@@ -384,6 +399,16 @@ if (!app.Environment.IsEnvironment("Testing"))
 // 6. Authentication
 // 7. Authorization
 // 8. Controllers
+
+// Forwarded Headers - necessário para Azure App Service (reverse proxy HTTPS -> HTTP)
+// Garante que o ASP.NET gera redirect URIs com HTTPS em produção
+var forwardedHeadersOptions = new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+};
+forwardedHeadersOptions.KnownNetworks.Clear();
+forwardedHeadersOptions.KnownProxies.Clear();
+app.UseForwardedHeaders(forwardedHeadersOptions);
 
 // Swagger UI disponível em /swagger (apenas desenvolvimento)
 if (app.Environment.IsDevelopment())

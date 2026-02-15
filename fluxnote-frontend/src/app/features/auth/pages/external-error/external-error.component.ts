@@ -39,16 +39,16 @@ export class ExternalErrorComponent {
 
   private resolveTitle(error: string | null): string {
     return error === 'provider_already_linked'
-      ? 'Google Account already linked'
-      : 'Login with google unavailable';
+      ? 'Account already linked'
+      : 'External Login unavailable';
   }
 
   private resolveMessage(error: string | null): string {
     switch (error) {
       case 'provider_already_linked':
-        return 'This Google Account is already linked to another user.';
+        return 'This external account is already linked to another user.';
       case 'email_not_provided':
-        return 'This Google Account didnt supply an email';
+        return 'This external account did not provide an email.';
       default:
         return 'An error ocurred during the external authentication process.';
     }

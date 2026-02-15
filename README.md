@@ -72,4 +72,15 @@ docker compose -p fluxnote-prod -f docker-compose.prod.yml up
 # Parar containers PROD
 docker compose -p fluxnote-prod -f docker-compose.prod.yml down
 
+#### Azure
+#Build e push do backend
+docker build -t fluxnoteacr.azurecr.io/fluxnote-backend:latest -f fluxnote-backend/Dockerfile ./fluxnote-backend
+docker push fluxnoteacr.azurecr.io/fluxnote-backend:latest
+
+#Build e push do frontend
+docker build -t fluxnoteacr.azurecr.io/fluxnote-frontend:latest -f fluxnote-frontend/Dockerfile.azure ./fluxnote-frontend
+
+docker push fluxnoteacr.azurecr.io/fluxnote-frontend:latest
+
+
 ```

@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
 import { AuthService } from '../../../../core/services';
-import { ButtonComponent, InputComponent, CardComponent, CardContentComponent, WorkInProgressComponent } from '../../../../shared/components/ui';
+import { ButtonComponent, InputComponent, CardComponent, CardContentComponent } from '../../../../shared/components/ui';
 import { ToastService } from '../../../../shared/services/toast.service';
 
 @Component({
@@ -19,7 +19,6 @@ import { ToastService } from '../../../../shared/services/toast.service';
     InputComponent,
     CardComponent,
     CardContentComponent,
-    WorkInProgressComponent
   ],
   template: `
     <div class="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
@@ -137,7 +136,6 @@ import { ToastService } from '../../../../shared/services/toast.service';
           </p>
         </app-card-content>
       </app-card>
-      <app-work-in-progress [show]="showWipModal()" (close)="showWipModal.set(false)" />
     </div>
   `
 })
@@ -148,7 +146,6 @@ export class LoginComponent {
   private toastService = inject(ToastService);
 
   showPassword = signal(false);
-  showWipModal = signal(false);
   isLoading = this.authService.isLoading;
   formData = { email: '', password: '', rememberMe: false };
 
@@ -187,6 +184,7 @@ export class LoginComponent {
   }
 
   loginWithMicrosoft(): void {
-    this.showWipModal.set(true);
+    const returnUrl = this.route.snapshot.queryParams['returnUrl'];
+    this.authService.externalLogin('microsoft', returnUrl);
   }
 }
