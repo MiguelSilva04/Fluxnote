@@ -78,7 +78,7 @@ export class TeamDetailComponent {
   memberToRemove = signal<TeamMemberToPost | null>(null);
   isRemoveDocPermissionModalOpen = signal(false);
   isRemovingDocPermission = signal(false);
-  docPermissionToRemove = signal<{ docId: number; permission: DocumentPermissionSummary } | null>(null);
+  docPermissionToRemove = signal<{ docId: number; docTitle: string; permission: DocumentPermissionSummary } | null>(null);
 
   /** Track which document panels are expanded */
   expandedDocs = signal<Set<number>>(new Set());
@@ -401,8 +401,8 @@ export class TeamDetailComponent {
     });
   }
 
-  removeDocPermission(docId: number, permission: DocumentPermissionSummary): void {
-    this.docPermissionToRemove.set({ docId, permission });
+  removeDocPermission(docId: number, docTitle: string, permission: DocumentPermissionSummary): void {
+    this.docPermissionToRemove.set({ docId, docTitle, permission });
     this.isRemoveDocPermissionModalOpen.set(true);
   }
 
