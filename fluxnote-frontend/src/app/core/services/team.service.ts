@@ -175,22 +175,22 @@ export class TeamService {
               
               this.http.put(`/api/teams/${teamId}`, {id: teamId, Name: teamName, OwnerId: ownerId}).subscribe({
                 next: () => {
-                  //console.log('Atualizado team com ownerId:', ownerId);
+                  //console.log('Updated team with ownerId:', ownerId);
                   this.notifyTeamCreated();
                   this.router.navigate(['/teams']);
                 },
                 error: (err) => {
-                  console.error('Erro ao atualizar team com ownerId:', err);
+                  console.error('Error updating team with ownerId:', err);
                 }
               });
             },
             error: (err) => {
-              console.error('Erro ao criar owner:', err);
+              console.error('Error creating owner:', err);
             }
           });
         },
         error: (err) => {
-          console.error('Erro ao criar team:', err);
+          console.error('Error creating team:', err);
         }
       });
   }

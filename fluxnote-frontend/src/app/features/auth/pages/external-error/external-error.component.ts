@@ -34,7 +34,7 @@ export class ExternalErrorComponent {
   }
 
   goToLogin(): void {
-    void this.router.navigate(['/login']);
+    void this.router.navigate(['/profile']);
   }
 
   private resolveTitle(error: string | null): string {
@@ -50,7 +50,7 @@ export class ExternalErrorComponent {
       case 'email_not_provided':
         return 'This external account did not provide an email.';
       default:
-        return 'An error ocurred during the external authentication process.';
+        return 'An error occurred during the external authentication process.';
     }
   }
 }

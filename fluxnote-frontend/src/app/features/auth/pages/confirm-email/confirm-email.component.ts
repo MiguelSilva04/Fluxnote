@@ -58,7 +58,7 @@ export class ConfirmEmailComponent {
       }, 600);
     } catch (err: any) {
       this.loading.set(false);
-      this.error.set(err?.error?.message ?? 'Falha ao confirmar email.');
+      this.error.set(err?.error?.message ?? 'Failed to confirm email.');
     }
   }
 }
