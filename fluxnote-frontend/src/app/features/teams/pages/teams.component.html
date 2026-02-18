@@ -173,7 +173,7 @@
   
                 @if (expandedTeam() === team.id && (team.documents.length > 0 || team.folders.length > 0)) {
                   <div class="mt-6 pt-6 border-t border-gray-100">
-                    <!-- Botão criar pasta (Owner/Admin) -->
+                    <!-- Create folder button (Owner/Admin) -->
                     @if (isOwnerOrAdmin(team)) {
                       <div class="flex justify-end mb-3">
                         <button
@@ -187,7 +187,7 @@
                     }
 
                     <div class="space-y-1">
-                      <!-- Pastas -->
+                      <!-- Folders -->
                       @for (folder of team.folders; track folder.id) {
                         <div
                           (dragover)="onDragOverFolder($event, folder.id)"
@@ -215,7 +215,7 @@
                               <span class="text-xs text-gray-400">({{ getDocumentsInFolder(team, folder.id).length }})</span>
                             </div>
                           </div>
-                          <!-- Documentos dentro da pasta -->
+                          <!-- Documents inside folder -->
                           @if (isFolderExpanded(folder.id)) {
                             <div class="ml-8 space-y-0.5">
                               @for (doc of getDocumentsInFolder(team, folder.id); track doc.id) {
@@ -259,7 +259,7 @@
                         </div>
                       }
 
-                      <!-- Documentos sem pasta -->
+                      <!-- Unfoldered documents -->
                       <div
                         (dragover)="onDragOverRoot($event)"
                         (dragleave)="onDragLeave()"

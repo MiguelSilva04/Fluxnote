@@ -63,6 +63,34 @@ docker compose -p fluxnote down
 
 ```
 
+### Testes E2E (Playwright)
+
+Os testes E2E correm no ambiente de desenvolvimento (Docker)
+
+#### Pré-requisitos
+
+1. Containers DEV a correr (`docker compose -p fluxnote up`)
+2. Dependências do frontend instaladas (`cd fluxnote-frontend && npm install`)
+3. Browsers do Playwright instalados (`npx playwright install chromium`)
+
+#### Executar testes
+
+```powershell
+cd fluxnote-frontend
+
+# Correr todos os testes (headless)
+npm run e2e
+
+# Correr com browser visível
+npm run e2e:headed
+
+# Abrir UI interativa do Playwright
+npm run e2e:ui
+
+# Ver relatório HTML após execução
+npm run e2e:report
+```
+
 ### Ambiente de Produção (PROD)
 
 ```powershell

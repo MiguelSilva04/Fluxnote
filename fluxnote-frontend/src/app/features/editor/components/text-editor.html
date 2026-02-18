@@ -1,5 +1,5 @@
 <div class="flex flex-col h-full">
-    <!-- Toolbar (escondida para viewers) -->
+    <!-- Toolbar (hidden for viewers) -->
     @if (editable()) {
     <div class="bg-white border-b border-gray-200 px-4 py-2 flex items-center gap-1 flex-wrap">
       <!-- Text formatting -->
@@ -240,9 +240,9 @@
         }
       </div>
     </div>
-    } <!-- Fim de @if (editable()) toolbar -->
+    } <!-- End of @if (editable()) toolbar -->
 
-    <!-- Banner para viewers read-only -->
+    <!-- Banner for read-only viewers -->
     @if (!editable()) {
     <div class="bg-amber-50 border-b border-amber-200 px-4 py-2.5 flex items-center gap-2">
       <lucide-icon name="eye" class="h-4 w-4 text-amber-600"></lucide-icon>
@@ -251,7 +251,7 @@
     </div>
     }
 
-    <!-- Input de ficheiro oculto para upload de imagem -->
+    <!-- Hidden file input for image upload -->
     <input
       type="file"
       #imageInput
@@ -264,8 +264,8 @@
     <div class="flex-1 overflow-y-auto bg-gray-50 p-8 relative">
       <div class="max-w-4xl mx-auto bg-white shadow-sm border border-gray-200 rounded-xl min-h-[600px] relative">
         <div #editorContainer class="quill-editor-container"></div>
-        
-        <!-- Menu de manipulação de imagem (apenas para editores) -->
+
+        <!-- Image manipulation menu (editors only) -->
         @if (editable() && showImageMenu()) {
           <div 
             class="absolute bg-white border border-gray-200 rounded-lg shadow-lg p-2 flex items-center gap-1 z-50"
