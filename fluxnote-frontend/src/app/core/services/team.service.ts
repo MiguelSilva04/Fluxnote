@@ -145,7 +145,7 @@ export class TeamService {
       name:teamName
     };
 
-    if (!this.user) {
+    /* if (!this.user) {
       throw new Error('User information is not available');
     }
     var owner: TeamMemberToPost = {
@@ -155,13 +155,17 @@ export class TeamService {
       teamId: 0,
       userId: this.user.id
     };
-
+ */
 
     
     // 1. Postar a Team
     this.http.post<{ id: number }>('/api/teams', newTeam)
       .subscribe({
-        next: (teamResponse) => {
+        next: () => {
+          this.notifyTeamCreated();
+          this.router.navigate(['/teams']);
+        },
+        /* next: (teamResponse) => {
           var teamId = teamResponse.id;
           owner.teamId = teamId;
          // console.log('teamId:', teamId);
@@ -188,7 +192,7 @@ export class TeamService {
               console.error('Erro ao criar owner:', err);
             }
           });
-        },
+        }, */
         error: (err) => {
           console.error('Erro ao criar team:', err);
         }

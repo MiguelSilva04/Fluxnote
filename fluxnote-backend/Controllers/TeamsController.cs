@@ -4,6 +4,7 @@ using Fluxnote.Backend.Dtos.Teams;
 using Fluxnote.Backend.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
@@ -43,14 +44,16 @@ namespace Fluxnote.Backend.Controllers
     public class TeamsController : ControllerBase
     {
         private readonly FluxnoteServerContext _context;
+        private readonly UserManager<User> _userManager;
 
         /// <summary>
         /// Construtor com injeção de dependências.
         /// </summary>
         /// <param name="context">Contexto da base de dados.</param>
-        public TeamsController(FluxnoteServerContext context)
+        public TeamsController(FluxnoteServerContext context, UserManager<User> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         /// <summary>
@@ -390,6 +393,10 @@ namespace Fluxnote.Backend.Controllers
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userId is null)
                 return Unauthorized(new { message = "User not authenticated." });
+            
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user is null)
+                return Unauthorized(new { message = "User not found." });
 
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -397,15 +404,34 @@ namespace Fluxnote.Backend.Controllers
             if (string.IsNullOrWhiteSpace(request.Name))
                 return BadRequest(new { message = "Team name cannot be empty." });
 
+
             var team = new Team
             {
                 Name = request.Name.Trim(),
+                OwnerId = 0, // Será atualizado após criar o TeamMember
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow,
                 IsActive = true
             };
 
             _context.Team.Add(team);
+            await _context.SaveChangesAsync();
+
+            // Criar o TeamMember como Owner
+            var teamMember = new TeamMember
+            {
+                Name = user.FullName ?? user.Email ?? "Owner",
+                UserId = userId,
+                TeamId = team.Id,
+                Role = TeamRole.Owner,
+                JoinedAt = DateTime.UtcNow
+            };
+
+            _context.TeamMember.Add(teamMember);
+            await _context.SaveChangesAsync();
+
+            // Atualizar o OwnerId da equipa
+            team.OwnerId = teamMember.Id;
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetTeam", new { id = team.Id }, team);
