@@ -26,7 +26,7 @@ namespace Fluxnote.Backend.Tests.TeamTesting
         }
 
         [Fact]
-        public async Task PostTeamMember_CreatesOwnerAsFirstMember()
+        public async Task PostTeam_CreatesOwnerAsFirstTeamMember()
         {
             var email = $"member-post-owner-{Guid.NewGuid()}@test.com";
             await CreateAndConfirmUserAsync(email, "Teste1234!");
@@ -38,28 +38,21 @@ namespace Fluxnote.Backend.Tests.TeamTesting
             teamResponse.EnsureSuccessStatusCode();
             var createdTeam = await teamResponse.Content.ReadFromJsonAsync<Team>();
 
+            // Verifica que o TeamMember do Owner doi automaticamente criado
+            using var scope = _factory.Services.CreateScope();
+            var db = scope.ServiceProvider.GetRequiredService<FluxnoteServerContext>();
             var userId = await GetUserIdAsync(email);
-            var memberRequest = new
-            {
-                Name = "Owner User",
-                Role = (int)TeamRole.Owner,
-                TeamId = createdTeam!.Id,
-                UserId = userId
-            };
+            
+            var ownerMember = await db.TeamMember
+                .FirstOrDefaultAsync(tm => tm.TeamId == createdTeam!.Id && tm.UserId == userId);
 
-            var response = await authClient.PostAsJsonAsync("/api/teammembers", memberRequest);
+            Assert.NotNull(ownerMember);
+            Assert.Equal(TeamRole.Owner, ownerMember!.Role);
+            Assert.Equal(createdTeam!.Id, ownerMember.TeamId);
+            Assert.Equal(userId, ownerMember.UserId);
 
-            Assert.Equal(HttpStatusCode.Created, response.StatusCode);
-
-            var created = await response.Content.ReadFromJsonAsync<TeamMember>();
-            Assert.NotNull(created);
-            Assert.Equal("Owner User", created!.Name);
-            Assert.Equal(TeamRole.Owner, created.Role);
-            Assert.Equal(createdTeam.Id, created.TeamId);
-            Assert.Equal(userId, created.UserId);
-
-            await authClient.DeleteAsync($"/api/teammembers/{created.Id}");
             await authClient.DeleteAsync($"/api/teams/{createdTeam.Id}");
+            await authClient.DeleteAsync($"/api/teammembers/{ownerMember.Id}");
         }
 
         [Fact]
@@ -79,23 +72,12 @@ namespace Fluxnote.Backend.Tests.TeamTesting
             teamResponse.EnsureSuccessStatusCode();
             var createdTeam = await teamResponse.Content.ReadFromJsonAsync<Team>();
 
-            var ownerUserId = await GetUserIdAsync(ownerEmail);
-            var ownerMemberRequest = new
-            {
-                Name = "Owner User",
-                Role = (int)TeamRole.Owner,
-                TeamId = createdTeam!.Id,
-                UserId = ownerUserId
-            };
-            var ownerMemberResponse = await ownerClient.PostAsJsonAsync("/api/teammembers", ownerMemberRequest);
-            ownerMemberResponse.EnsureSuccessStatusCode();
-
             var memberUserId = await GetUserIdAsync(memberEmail);
             var memberRequest = new
             {
                 Name = "Regular Member",
                 Role = (int)TeamRole.Member,
-                TeamId = createdTeam.Id,
+                TeamId = createdTeam!.Id,
                 UserId = memberUserId
             };
 
@@ -130,17 +112,6 @@ namespace Fluxnote.Backend.Tests.TeamTesting
             var teamResponse = await ownerClient.PostAsJsonAsync("/api/teams", team);
             teamResponse.EnsureSuccessStatusCode();
             var createdTeam = await teamResponse.Content.ReadFromJsonAsync<Team>();
-
-            var ownerUserId = await GetUserIdAsync(ownerEmail);
-            var ownerMemberRequest = new
-            {
-                Name = "Owner User",
-                Role = (int)TeamRole.Owner,
-                TeamId = createdTeam!.Id,
-                UserId = ownerUserId
-            };
-            var ownerMemberResponse = await ownerClient.PostAsJsonAsync("/api/teammembers", ownerMemberRequest);
-            ownerMemberResponse.EnsureSuccessStatusCode();
 
             var memberUserId = await GetUserIdAsync(memberEmail);
             var memberRequest = new
@@ -186,23 +157,12 @@ namespace Fluxnote.Backend.Tests.TeamTesting
             teamResponse.EnsureSuccessStatusCode();
             var createdTeam = await teamResponse.Content.ReadFromJsonAsync<Team>();
 
-            var ownerUserId = await GetUserIdAsync(ownerEmail);
-            var ownerMemberRequest = new
-            {
-                Name = "Owner User",
-                Role = (int)TeamRole.Owner,
-                TeamId = createdTeam!.Id,
-                UserId = ownerUserId
-            };
-            var ownerMemberResponse = await ownerClient.PostAsJsonAsync("/api/teammembers", ownerMemberRequest);
-            ownerMemberResponse.EnsureSuccessStatusCode();
-
             var memberUserId = await GetUserIdAsync(memberEmail);
             var memberRequest = new
             {
                 Name = "To Delete",
                 Role = (int)TeamRole.Member,
-                TeamId = createdTeam.Id,
+                TeamId = createdTeam!.Id,
                 UserId = memberUserId
             };
             var postResponse = await ownerClient.PostAsJsonAsync("/api/teammembers", memberRequest);
