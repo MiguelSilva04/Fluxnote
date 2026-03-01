@@ -251,6 +251,23 @@
     </div>
     }
 
+    <!-- Colaboradores activos (visível quando há outros utilizadores no documento) -->
+    @if (collaboratorNames().length > 0) {
+      <div class="bg-white border-b border-gray-100 px-4 py-1.5 flex items-center gap-2">
+        <span class="text-xs text-gray-400 mr-1">Editing:</span>
+        @for (name of collaboratorNames(); track name; let i = $index) {
+          <div
+            class="flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium text-white"
+            [style.background]="getCollaboratorColor(i)"
+            [title]="name"
+          >
+            <span class="w-1.5 h-1.5 rounded-full bg-white/70 animate-pulse"></span>
+            {{ name }}
+          </div>
+        }
+      </div>
+    }
+
     <!-- Hidden file input for image upload -->
     <input
       type="file"
