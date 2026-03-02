@@ -5,6 +5,7 @@ import { LucideAngularModule } from 'lucide-angular';
 import { DashboardLayoutComponent } from '../../../layout/dashboard-layout/dashboard-layout.component';
 import { ButtonComponent, CardComponent, CardContentComponent, BadgeComponent, WorkInProgressComponent, ModalComponent } from '../../../shared/components/ui';
 import { AuthService, UploadService } from '../../../core/services';
+import { CITIES } from '../../../core/data/cities.data';
 import { firstValueFrom } from 'rxjs';
 
 @Component({
@@ -92,8 +93,13 @@ import { firstValueFrom } from 'rxjs';
                       type="text"
                       [ngModel]="formData().fullName"
                       (ngModelChange)="updateFormField('fullName', $event)"
-                      class="w-full h-10 px-4 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#155347] text-sm"
+                      maxlength="50"
+                      [class]="'w-full h-10 px-4 rounded-lg border focus:outline-none focus:ring-2 text-sm ' +
+                        (formErrors()['fullName'] ? 'border-red-400 focus:ring-red-400' : 'border-gray-300 focus:ring-[#155347]')"
                     />
+                    @if (formErrors()['fullName']) {
+                      <p class="text-xs text-red-500 mt-1">{{ formErrors()['fullName'] }}</p>
+                    }
                   </div>
                   <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">
@@ -120,6 +126,9 @@ import { firstValueFrom } from 'rxjs';
                     @if (user()?.usernameChangesRemaining === 0) {
                       <p class="text-xs text-amber-600 mt-1">You've reached your username change limit for this month.</p>
                     }
+                    @if (formErrors()['userName']) {
+                      <p class="text-xs text-red-500 mt-1">{{ formErrors()['userName'] }}</p>
+                    }
                   </div>
                   <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
@@ -134,22 +143,48 @@ import { firstValueFrom } from 'rxjs';
                     <label class="block text-sm font-medium text-gray-700 mb-2">Phone</label>
                     <input
                       type="tel"
-                      maxlength="9"
+                      maxlength="20"
                       [ngModel]="formData().phoneNumber"
                       (ngModelChange)="updateFormField('phoneNumber', $event)"
-                      placeholder="+1 (555) 000-0000"
-                      class="w-full h-10 px-4 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#155347] text-sm"
+                      placeholder="+351 912 345 678"
+                      [class]="'w-full h-10 px-4 rounded-lg border focus:outline-none focus:ring-2 text-sm ' +
+                        (formErrors()['phoneNumber'] ? 'border-red-400 focus:ring-red-400' : 'border-gray-300 focus:ring-[#155347]')"
                     />
+                    @if (formErrors()['phoneNumber']) {
+                      <p class="text-xs text-red-500 mt-1">{{ formErrors()['phoneNumber'] }}</p>
+                    }
                   </div>
                   <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Location</label>
-                    <input
-                      type="text"
-                      [ngModel]="formData().location"
-                      (ngModelChange)="updateFormField('location', $event)"
-                      placeholder="City, Country"
-                      class="w-full h-10 px-4 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#155347] text-sm"
-                    />
+                    <div class="relative">
+                      <input
+                        type="text"
+                        maxlength="100"
+                        autocomplete="off"
+                        [ngModel]="formData().location"
+                        (ngModelChange)="onLocationInput($event)"
+                        (keydown)="onLocationKeydown($event)"
+                        (blur)="closeCityDropdown()"
+                        placeholder="City, Country"
+                        [class]="'w-full h-10 px-4 rounded-lg border focus:outline-none focus:ring-2 text-sm ' +
+                          (formErrors()['location'] ? 'border-red-400 focus:ring-red-400' : 'border-gray-300 focus:ring-[#155347]')"
+                      />
+                      @if (showCityDropdown()) {
+                        <div class="absolute z-50 w-full bg-white border border-gray-200 rounded-lg shadow-lg mt-1 max-h-52 overflow-y-auto">
+                          @for (city of cityResults(); track city; let i = $index) {
+                            <button
+                              type="button"
+                              (mousedown)="selectCity(city)"
+                              [class]="'w-full text-left px-4 py-2 text-sm transition-colors ' +
+                                (highlightedCityIndex() === i ? 'bg-[#155347] text-white' : 'text-gray-700 hover:bg-gray-50')"
+                            >{{ city }}</button>
+                          }
+                        </div>
+                      }
+                    </div>
+                    @if (formErrors()['location']) {
+                      <p class="text-xs text-red-500 mt-1">{{ formErrors()['location'] }}</p>
+                    }
                   </div>
                   <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Timezone</label>
@@ -213,7 +248,7 @@ import { firstValueFrom } from 'rxjs';
                   <app-button
                     customClass="bg-[#155347] hover:bg-[#0d3d31]"
                     (click)="showSaveConfirmation()"
-                    [disabled]="!hasChanges() || isSaving()"
+                    [disabled]="!hasChanges() || isSaving() || !isFormValid()"
                   >
                     {{ isSaving() ? 'Saving...' : 'Save Changes' }}
                   </app-button>
@@ -698,6 +733,11 @@ export class ProfileComponent {
   showNewPassword = signal(false);
   showConfirmPassword = signal(false);
 
+  // City autocomplete
+  cityResults = signal<string[]>([]);
+  showCityDropdown = signal(false);
+  highlightedCityIndex = signal(-1);
+
   // Original values for comparison
   originalData = {
     fullName: '',
@@ -750,6 +790,52 @@ export class ProfileComponent {
     this.clearMessages();
   }
 
+  onLocationInput(value: string): void {
+    this.updateFormField('location', value);
+    const query = value.trim().toLowerCase();
+    if (query.length >= 1) {
+      const results = CITIES
+        .filter(c => c.toLowerCase().includes(query))
+        .slice(0, 8);
+      this.cityResults.set(results);
+      this.showCityDropdown.set(results.length > 0);
+    } else {
+      this.cityResults.set([]);
+      this.showCityDropdown.set(false);
+    }
+    this.highlightedCityIndex.set(-1);
+  }
+
+  selectCity(city: string): void {
+    this.updateFormField('location', city);
+    this.cityResults.set([]);
+    this.showCityDropdown.set(false);
+    this.highlightedCityIndex.set(-1);
+  }
+
+  onLocationKeydown(event: KeyboardEvent): void {
+    if (!this.showCityDropdown()) return;
+    const results = this.cityResults();
+    if (event.key === 'ArrowDown') {
+      event.preventDefault();
+      this.highlightedCityIndex.set(Math.min(this.highlightedCityIndex() + 1, results.length - 1));
+    } else if (event.key === 'ArrowUp') {
+      event.preventDefault();
+      this.highlightedCityIndex.set(Math.max(this.highlightedCityIndex() - 1, -1));
+    } else if (event.key === 'Enter' && this.highlightedCityIndex() >= 0) {
+      event.preventDefault();
+      this.selectCity(results[this.highlightedCityIndex()]);
+    } else if (event.key === 'Escape') {
+      this.showCityDropdown.set(false);
+      this.highlightedCityIndex.set(-1);
+    }
+  }
+
+  closeCityDropdown(): void {
+    // Delay para permitir que o click no item do dropdown seja registado antes do blur
+    setTimeout(() => this.showCityDropdown.set(false), 150);
+  }
+
   hasChanges = computed(() => {
     const current = this.formData();
     return (
@@ -763,6 +849,55 @@ export class ProfileComponent {
     );
   });
 
+  formErrors = computed(() => {
+    const d = this.formData();
+    const errors: Record<string, string> = {};
+
+    // Full Name — obrigatório, 2-50 chars, só letras e pontuação de nome
+    const name = d.fullName.trim();
+    if (!name) {
+      errors['fullName'] = 'Full name is required.';
+    } else if (name.length < 2) {
+      errors['fullName'] = 'Must be at least 2 characters.';
+    } else if (name.length > 50) {
+      errors['fullName'] = 'Must not exceed 50 characters.';
+    } else if (!/^[a-zA-ZÀ-ÿ\s'\-]+$/.test(name)) {
+      errors['fullName'] = 'Only letters, spaces, hyphens and apostrophes allowed.';
+    }
+
+    // Username — opcional; se preenchido: mín 3 chars, sem espaços, só [a-zA-Z0-9_.-]
+    const username = d.userName.trim();
+    if (username) {
+      if (username.length < 3) {
+        errors['userName'] = 'Must be at least 3 characters.';
+      } else if (!/^[a-zA-Z0-9_.\-]+$/.test(username)) {
+        errors['userName'] = 'Only letters, numbers, _ . and - allowed. No spaces.';
+      }
+    }
+
+    // Phone — opcional; se preenchido: formato internacional básico (7-20 chars)
+    const phone = d.phoneNumber.trim();
+    if (phone && !/^\+?[\d\s\-(). ]{7,20}$/.test(phone)) {
+      errors['phoneNumber'] = 'Enter a valid phone number (e.g. +351 912 345 678).';
+    }
+
+    // Location — opcional; se preenchido: 2-100 chars, sem caracteres estranhos
+    const location = d.location.trim();
+    if (location) {
+      if (location.length < 2) {
+        errors['location'] = 'Must be at least 2 characters.';
+      } else if (location.length > 100) {
+        errors['location'] = 'Must not exceed 100 characters.';
+      } else if (!/^[a-zA-ZÀ-ÿ0-9\s,.\-']+$/.test(location)) {
+        errors['location'] = 'Location contains invalid characters.';
+      }
+    }
+
+    return errors;
+  });
+
+  isFormValid = computed(() => Object.keys(this.formErrors()).length === 0);
+
   resetForm() {
     this.formData.set({ ...this.originalData });
     this.avatarPreview.set(null);
@@ -770,6 +905,7 @@ export class ProfileComponent {
   }
 
   showSaveConfirmation() {
+    if (!this.isFormValid()) return;
     this.showConfirmModal.set(true);
   }
 
