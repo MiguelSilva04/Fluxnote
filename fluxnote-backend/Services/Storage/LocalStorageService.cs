@@ -6,6 +6,7 @@ namespace Fluxnote.Backend.Services.Storage;
 /// Implementação de IStorageService para desenvolvimento.
 /// Guarda imagens localmente em wwwroot/uploads/ e retorna URL relativa
 /// servida pelo UploadsController (GET /api/uploads/images/{fileName}).
+/// Guarda ficheiros de contexto em wwwroot/context/
 /// </summary>
 public class LocalStorageService : IStorageService
 {
@@ -33,5 +34,42 @@ public class LocalStorageService : IStorageService
 
         // URL relativa que passa pelo proxy do Angular (/api/*)
         return $"/api/uploads/images/{uniqueName}";
+    }
+
+    public async Task<string> UploadContextFileAsync(Stream stream, string fileName, string contentType)
+    {
+        var contextPath = Path.Combine(
+            _env.WebRootPath ?? Path.Combine(_env.ContentRootPath, "wwwroot"),
+            "context");
+
+        Directory.CreateDirectory(contextPath);
+
+        var extension = Path.GetExtension(fileName);
+        var uniqueName = $"{Guid.NewGuid()}{extension}";
+        var filePath = Path.Combine(contextPath, uniqueName);
+
+        using var fileStream = new FileStream(filePath, FileMode.Create);
+        await stream.CopyToAsync(fileStream);
+
+        // Referência interna — não exposta via HTTP (ficheiros de contexto são server-side only)
+        return $"local://context/{uniqueName}";
+    }
+
+    public Task DeleteContextFileAsync(string storedPath)
+    {
+        const string prefix = "local://context/";
+        if (!storedPath.StartsWith(prefix))
+            return Task.CompletedTask;
+
+        var fileName = Path.GetFileName(storedPath.Substring(prefix.Length));
+        var filePath = Path.Combine(
+            _env.WebRootPath ?? Path.Combine(_env.ContentRootPath, "wwwroot"),
+            "context",
+            fileName);
+
+        if (File.Exists(filePath))
+            File.Delete(filePath);
+
+        return Task.CompletedTask;
     }
 }

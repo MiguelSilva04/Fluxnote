@@ -140,5 +140,9 @@ namespace Fluxnote.Backend.Models
         // Coleção de permissões
         public ICollection<DocumentPermission> Permissions { get; set; } = new List<DocumentPermission>();
 
+        /// <summary>
+        /// Ficheiros de contexto associados a este documento para uso pela IA.
+        /// </summary>
+        public ICollection<DocumentContext> ContextFiles { get; set; } = new List<DocumentContext>();
     }
 }

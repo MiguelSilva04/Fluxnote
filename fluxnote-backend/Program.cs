@@ -233,6 +233,9 @@ else
     builder.Services.AddScoped<IStorageService, BlobStorageService>();
 }
 
+// Serviço de extração de texto para ficheiros de contexto (PDF, TXT)
+builder.Services.AddTransient<ITextExtractionService, TextExtractionService>();
+
 // ==============================================================================
 // 5. ASP.NET CORE IDENTITY
 // ==============================================================================
@@ -290,10 +293,10 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.MaxDepth = 64;
     });
 
-// Increase max request body size for base64 image uploads (5MB)
+// Aumentar limite de tamanho do body para suportar uploads de imagens (5MB) e ficheiros de contexto (10MB)
 builder.WebHost.ConfigureKestrel(options =>
 {
-    options.Limits.MaxRequestBodySize = 5 * 1024 * 1024; // 5MB
+    options.Limits.MaxRequestBodySize = 10 * 1024 * 1024; // 10MB
 });
 // Regista validadores FluentValidation do assembly
 builder.Services.AddValidatorsFromAssemblyContaining<RegisterRequestValidator>();

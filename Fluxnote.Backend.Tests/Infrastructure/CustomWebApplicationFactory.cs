@@ -11,6 +11,7 @@ using Fluxnote.Backend.Tests.Fakes;
 using System.Collections.Generic;
 using Fluxnote.Backend.Services.AI;
 using Fluxnote.Backend.Services.Email;
+using Fluxnote.Backend.Services.Storage;
 
 namespace Fluxnote.Backend.Tests.Infrastructure;
 
@@ -74,6 +75,10 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
             // Substituir o serviço real de IA pelo fake de teste
             services.AddSingleton<TestAIService>();
             services.AddSingleton<IAIService>(sp => sp.GetRequiredService<TestAIService>());
+
+            // Substituir o serviço real de storage pelo fake de teste
+            services.AddSingleton<TestStorageService>();
+            services.AddSingleton<IStorageService>(sp => sp.GetRequiredService<TestStorageService>());
 
             // Remover registos existentes do DbContext
             var descriptor = services.SingleOrDefault(d => d.ServiceType == typeof(DbContextOptions<FluxnoteServerContext>));
