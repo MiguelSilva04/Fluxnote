@@ -4,6 +4,7 @@ using Fluxnote.Backend.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace fluxnotebackend.Migrations
 {
     [DbContext(typeof(FluxnoteServerContext))]
-    partial class FluxnoteServerContextModelSnapshot : ModelSnapshot
+    [Migration("20260228220631_DocumentContext")]
+    partial class DocumentContext
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -62,9 +65,6 @@ namespace fluxnotebackend.Migrations
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
-
-                    b.Property<byte[]>("YDocSnapshot")
-                        .HasColumnType("varbinary(max)");
 
                     b.HasKey("Id");
 

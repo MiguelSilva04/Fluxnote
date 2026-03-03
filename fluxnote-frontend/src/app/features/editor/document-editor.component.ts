@@ -1,4 +1,4 @@
-import { Component, inject, signal, ViewChild, OnInit, computed } from '@angular/core';
+import { Component, inject, signal, ViewChild, ElementRef, OnInit, computed } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -10,7 +10,7 @@ import {
 } from '../../shared/components/ui';
 import { DocumentShareModalComponent } from '../../shared/components/document-share-modal/document-share-modal.component';
 import { DocumentService, DocumentInviteService } from '../../core/services';
-import { Collaborator, Version, Comment, AISuggestion, DocumentInviteDto } from '../../core/models';
+import { Collaborator, Version, Comment, AISuggestion, DocumentInviteDto, DocumentContextDto } from '../../core/models';
 import { TextEditorComponent } from './components/text-editor.component';
 
 // import { HttpClient } from '@angular/common/http';
@@ -214,38 +214,112 @@ import { TextEditorComponent } from './components/text-editor.component';
                 </button>
               </div>
 
-              <div class="flex-1 overflow-y-auto p-6">
-                <div class="mb-6">
-                  <h4 class="text-sm font-semibold text-gray-900 mb-3">Actions</h4>
-                  <div class="space-y-2">
-                    <!-- Generate Summary (functional) -->
-                    <button
-                      (click)="generateSummary()"
-                      [disabled]="summaryLoading()"
-                      class="w-full p-4 border border-gray-200 rounded-lg hover:bg-purple-50 hover:border-purple-300 transition-colors text-left disabled:opacity-50 disabled:cursor-not-allowed group"
-                    >
-                      <div class="flex items-start gap-3">
-                        <div
-                          class="w-9 h-9 rounded-lg bg-purple-100 flex items-center justify-center shrink-0 group-hover:bg-purple-200 transition-colors"
-                        >
-                          <lucide-icon
-                            name="file-text"
-                            class="h-5 w-5 text-purple-600"
-                          ></lucide-icon>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                          <p class="text-sm font-medium text-gray-900 mb-0.5">Generate Summary</p>
-                          <p class="text-xs text-gray-500">
-                            Get a concise AI-generated summary of this document
-                          </p>
-                        </div>
+            <div class="flex-1 overflow-y-auto p-6">
+              <div class="mb-6">
+                <h4 class="text-sm font-semibold text-gray-900 mb-3">Actions</h4>
+                <div class="space-y-2">
+
+                  <!-- Generate Summary (functional) -->
+                  <button
+                    (click)="generateSummary()"
+                    [disabled]="summaryLoading()"
+                    class="w-full p-4 border border-gray-200 rounded-lg hover:bg-purple-50 hover:border-purple-300 transition-colors text-left disabled:opacity-50 disabled:cursor-not-allowed group"
+                  >
+                    <div class="flex items-start gap-3">
+                      <div class="w-9 h-9 rounded-lg bg-purple-100 flex items-center justify-center shrink-0 group-hover:bg-purple-200 transition-colors">
+                        <lucide-icon name="file-text" class="h-5 w-5 text-purple-600"></lucide-icon>
                       </div>
-                    </button>
-                  </div>
+                      <div class="flex-1 min-w-0">
+                        <p class="text-sm font-medium text-gray-900 mb-0.5">Generate Summary</p>
+                        <p class="text-xs text-gray-500">Get a concise AI-generated summary of this document</p>
+                      </div>
+                    </div>
+                  </button>
+
                 </div>
               </div>
-            </aside>
-          }
+
+              <!-- Context Section -->
+              <div class="border-t border-gray-100 pt-4">
+                <button
+                  (click)="showContextSection.set(!showContextSection())"
+                  class="w-full flex items-center justify-between text-sm font-semibold text-gray-900 mb-3 hover:text-[#155347] transition-colors"
+                >
+                  <div class="flex items-center gap-2">
+                    <lucide-icon name="file-stack" class="h-4 w-4"></lucide-icon>
+                    Context
+                    @if (contextFiles().length > 0) {
+                      <span class="inline-flex items-center justify-center w-4 h-4 text-xs font-medium bg-[#155347] text-white rounded-full">{{ contextFiles().length }}</span>
+                    }
+                  </div>
+                  <lucide-icon [name]="showContextSection() ? 'chevron-up' : 'chevron-down'" class="h-4 w-4 text-gray-400"></lucide-icon>
+                </button>
+
+                @if (showContextSection()) {
+                  @if (contextLoading()) {
+                    <div class="flex items-center gap-2 py-2 text-gray-400">
+                      <lucide-icon name="loader-circle" class="h-4 w-4 animate-spin"></lucide-icon>
+                      <span class="text-xs">Loading...</span>
+                    </div>
+                  } @else {
+                    <div class="space-y-2 mb-3">
+                      @for (file of contextFiles(); track file.id) {
+                        <div class="flex items-center gap-2 p-2 rounded-lg border border-gray-100 bg-gray-50 group">
+                          <lucide-icon name="file-text" class="h-4 w-4 text-gray-400 shrink-0"></lucide-icon>
+                          <div class="flex-1 min-w-0">
+                            <p class="text-xs font-medium text-gray-800 truncate" [title]="file.fileName">{{ file.fileName }}</p>
+                            <p class="text-xs text-gray-400">{{ formatFileSize(file.fileSizeBytes) }}</p>
+                          </div>
+                          @if (file.hasExtractedText) {
+                            <lucide-icon name="brain" class="h-3.5 w-3.5 text-green-500 shrink-0" title="Text extracted"></lucide-icon>
+                          }
+                          <button
+                            (click)="removeContextFile(file.id)"
+                            [disabled]="contextUploading()"
+                            class="p-1 rounded text-gray-300 hover:text-red-500 hover:bg-red-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
+                            title="Remove"
+                          >
+                            <lucide-icon name="trash-2" class="h-3.5 w-3.5"></lucide-icon>
+                          </button>
+                        </div>
+                      }
+                      @if (contextFiles().length === 0) {
+                        <p class="text-xs text-gray-400 py-1">No context files yet.</p>
+                      }
+                    </div>
+
+                    @if (contextError()) {
+                      <p class="text-xs text-red-500 mb-2">{{ contextError() }}</p>
+                    }
+
+                    <button
+                      (click)="openContextFileInput()"
+                      [disabled]="contextUploading()"
+                      class="w-full flex items-center justify-center gap-2 px-3 py-2 text-xs font-medium text-[#155347] border border-dashed border-[#155347] rounded-lg hover:bg-[#155347]/5 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      @if (contextUploading()) {
+                        <lucide-icon name="loader-circle" class="h-3.5 w-3.5 animate-spin"></lucide-icon>
+                        Uploading...
+                      } @else {
+                        <lucide-icon name="plus" class="h-3.5 w-3.5"></lucide-icon>
+                        Add file (PDF, TXT)
+                      }
+                    </button>
+
+                    <input
+                      #contextFileInput
+                      type="file"
+                      accept=".pdf,.txt"
+                      class="hidden"
+                      (change)="onContextFileSelected($event)"
+                    />
+                  }
+                }
+              </div>
+
+            </div>
+          </aside>
+        }
 
           <!-- Version History Sidebar -->
           @if (showVersionHistory()) {
@@ -527,6 +601,7 @@ import { TextEditorComponent } from './components/text-editor.component';
 })
 export class DocumentEditorComponent implements OnInit {
   @ViewChild('editor') editor!: TextEditorComponent;
+  @ViewChild('contextFileInput') contextFileInput!: ElementRef<HTMLInputElement>;
 
   private router = inject(Router);
   private route = inject(ActivatedRoute);
@@ -559,6 +634,13 @@ export class DocumentEditorComponent implements OnInit {
   summaryLoading = signal(false);
   summaryError = signal<string | null>(null);
   summaryCopied = signal(false);
+
+  // AI Context
+  contextFiles = signal<DocumentContextDto[]>([]);
+  contextLoading = signal(false);
+  contextUploading = signal(false);
+  contextError = signal<string | null>(null);
+  showContextSection = signal(true);
 
   // Document state
   documentTitle = '';
@@ -617,6 +699,9 @@ export class DocumentEditorComponent implements OnInit {
         this.documentRole.set(doc.role || 'Viewer');
         this.isLoading.set(false);
         this.loadDocumentInvites(doc.id);
+        if (doc.role === 'Editor') {
+          this.loadContextFiles();
+        }
       },
       error: (err) => {
         console.error('Error loading document:', err);
@@ -626,6 +711,67 @@ export class DocumentEditorComponent implements OnInit {
         setTimeout(() => this.router.navigate(['/dashboard']), 2000);
       },
     });
+  }
+
+
+  
+  loadContextFiles(): void {
+    if (!this.documentId) return;
+    this.contextLoading.set(true);
+    this.contextError.set(null);
+    this.documentService.getContextFiles(this.documentId).subscribe({
+      next: (files) => {
+        this.contextFiles.set(files);
+        this.contextLoading.set(false);
+      },
+      error: (err) => {
+        this.contextError.set(err.error?.message || 'Error loading context files.');
+        this.contextLoading.set(false);
+      }
+    });
+  }
+
+  openContextFileInput(): void {
+    this.contextFileInput.nativeElement.click();
+  }
+
+  onContextFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file || !this.documentId) return;
+
+    input.value = '';
+    this.contextUploading.set(true);
+    this.contextError.set(null);
+
+    this.documentService.uploadContextFile(this.documentId, file).subscribe({
+      next: (dto) => {
+        this.contextFiles.update(files => [dto, ...files]);
+        this.contextUploading.set(false);
+      },
+      error: (err) => {
+        this.contextError.set(err.error?.message || 'Error uploading file.');
+        this.contextUploading.set(false);
+      }
+    });
+  }
+
+  removeContextFile(contextId: number): void {
+    if (!this.documentId) return;
+    this.documentService.deleteContextFile(this.documentId, contextId).subscribe({
+      next: () => {
+        this.contextFiles.update(files => files.filter(f => f.id !== contextId));
+      },
+      error: (err) => {
+        this.contextError.set(err.error?.message || 'Error removing context file.');
+      }
+    });
+  }
+
+  formatFileSize(bytes: number): string {
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
   }
 
   pendingInvites(): DocumentInviteDto[] {

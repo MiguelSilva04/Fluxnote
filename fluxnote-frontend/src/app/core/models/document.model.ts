@@ -80,3 +80,14 @@ export interface AISuggestion {
   description: string;
   icon: string;
 }
+
+export interface DocumentContextDto {
+  id: number;
+  documentId: number;
+  fileName: string;
+  contentType: string;
+  fileSizeBytes: number;
+  uploadedAt: string;
+  uploadedByName: string;
+  hasExtractedText: boolean;
+}

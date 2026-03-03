@@ -83,6 +83,11 @@ namespace Fluxnote.Backend.Data
         public DbSet<Fluxnote.Backend.Models.Folder> Folder { get; set; } = default!;
 
         /// <summary>
+        /// DbSet para ficheiros de contexto de documentos (uso pela IA).
+        /// </summary>
+        public DbSet<Fluxnote.Backend.Models.DocumentContext> DocumentContext { get; set; } = default!;
+
+        /// <summary>
         /// DbSet para refresh tokens de autenticação.
         /// </summary>
         public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
@@ -218,6 +223,25 @@ namespace Fluxnote.Backend.Data
 
                 // Índices
                 entity.HasIndex(f => f.TeamId);
+            });
+
+            builder.Entity<DocumentContext>(entity =>
+            {
+                // Relação com Document (cascade delete — apagar documento apaga todos os seus contextos)
+                entity.HasOne(dc => dc.Document)
+                      .WithMany(d => d.ContextFiles)
+                      .HasForeignKey(dc => dc.DocumentId)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+                // Relação com User (restrict delete — preservar referência ao uploader)
+                entity.HasOne(dc => dc.UploadedBy)
+                      .WithMany()
+                      .HasForeignKey(dc => dc.UploadedById)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                // Índices para performance
+                entity.HasIndex(dc => dc.DocumentId);
+                entity.HasIndex(dc => dc.UploadedAt);
             });
 
             // Configuração específica para SQL Server (SQLite usa BLOB por defeito)

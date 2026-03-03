@@ -1,14 +1,15 @@
 import { inject, Injectable, signal } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, catchError, tap, throwError } from 'rxjs';
-import { 
-  Document, 
-  DocumentDto, 
-  DocumentDetailDto, 
-  CreateDocumentRequest, 
-  Version, 
-  Comment, 
-  AISuggestion 
+import {
+  Document,
+  DocumentDto,
+  DocumentDetailDto,
+  CreateDocumentRequest,
+  Version,
+  Comment,
+  AISuggestion,
+  DocumentContextDto
 } from '../models';
 
 @Injectable({
@@ -184,6 +185,49 @@ export class DocumentService {
     return this.http.post<{ summary: string }>(`/api/documents/${id}/summary`, {}).pipe(
       catchError(error => {
         console.error('Error generating summary:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  /**
+   * Lista os ficheiros de contexto de um documento
+   * @param documentId ID do documento
+   */
+  getContextFiles(documentId: number): Observable<DocumentContextDto[]> {
+    return this.http.get<DocumentContextDto[]>(`/api/documents/${documentId}/context`).pipe(
+      catchError(error => {
+        console.error('Error loading context files:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  /**
+   * Faz upload de um ficheiro de contexto para o documento
+   * @param documentId ID do documento
+   * @param file Ficheiro a carregar (PDF ou TXT)
+   */
+  uploadContextFile(documentId: number, file: File): Observable<DocumentContextDto> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.post<DocumentContextDto>(`/api/documents/${documentId}/context`, formData).pipe(
+      catchError(error => {
+        console.error('Error uploading context file:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  /**
+   * Remove um ficheiro de contexto do documento
+   * @param documentId ID do documento
+   * @param contextId ID do ficheiro de contexto
+   */
+  deleteContextFile(documentId: number, contextId: number): Observable<void> {
+    return this.http.delete<void>(`/api/documents/${documentId}/context/${contextId}`).pipe(
+      catchError(error => {
+        console.error('Error deleting context file:', error);
         return throwError(() => error);
       })
     );

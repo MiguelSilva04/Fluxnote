@@ -2,6 +2,7 @@ using Fluxnote.Backend.Data;
 using Fluxnote.Backend.Dtos.Documents;
 using Fluxnote.Backend.Models;
 using Fluxnote.Backend.Services.AI;
+using Fluxnote.Backend.Services.Storage;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -56,6 +57,8 @@ namespace Fluxnote.Backend.Controllers
         private readonly FluxnoteServerContext _context;
         private readonly UserManager<User> _userManager;
         private readonly IAIService _aiService;
+        private readonly IStorageService _storageService;
+        private readonly ITextExtractionService _textExtractionService;
 
         /// <summary>
         /// Limite de documentos para o plano Free.
@@ -68,11 +71,20 @@ namespace Fluxnote.Backend.Controllers
         /// <param name="context">Contexto da base de dados.</param>
         /// <param name="userManager">Gestor de utilizadores do Identity.</param>
         /// <param name="aiService">Serviço de IA generativa.</param>
-        public DocumentsController(FluxnoteServerContext context, UserManager<User> userManager, IAIService aiService)
+        /// <param name="storageService">Serviço de armazenamento de ficheiros.</param>
+        /// <param name="textExtractionService">Serviço de extração de texto para ficheiros de contexto.</param>
+        public DocumentsController(
+            FluxnoteServerContext context,
+            UserManager<User> userManager,
+            IAIService aiService,
+            IStorageService storageService,
+            ITextExtractionService textExtractionService)
         {
             _context = context;
             _userManager = userManager;
             _aiService = aiService;
+            _storageService = storageService;
+            _textExtractionService = textExtractionService;
         }
 
         /// <summary>
@@ -960,8 +972,271 @@ namespace Fluxnote.Backend.Controllers
                 });
             }
 
+            // Eliminar ficheiros de contexto do storage antes de apagar o documento
+            // (as linhas da BD são apagadas por cascade, mas os ficheiros no storage têm de ser removidos manualmente)
+            var contextFiles = await _context.DocumentContext
+                .Where(dc => dc.DocumentId == document.Id)
+                .ToListAsync();
+
+            foreach (var cf in contextFiles)
+            {
+                await _storageService.DeleteContextFileAsync(cf.StoredPath);
+            }
+
             // Eliminar permanentemente
             _context.Document.Remove(document);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+
+        /// <summary>
+        /// Faz upload de um ficheiro de contexto para o documento.
+        /// O texto é extraído e guardado na BD para uso futuro pela IA.
+        /// Apenas Editors e Owners podem adicionar contexto.
+        /// </summary>
+        /// <param name="id">ID do documento.</param>
+        /// <param name="file">Ficheiro a carregar (PDF ou TXT, máx. 10MB).</param>
+        [HttpPost("{id}/context")]
+        [Consumes("multipart/form-data")] // So aceita pedidos do Content-Type multipart/form-data (formulário com ficheiro)
+        public async Task<ActionResult<DocumentContextDto>> UploadContext(int id, IFormFile file)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId is null)
+                return Unauthorized(new { message = "User not authenticated." });
+
+            if (file == null || file.Length == 0)
+                return BadRequest(new { message = "No file provided." });
+
+            if (file.Length > 10 * 1024 * 1024)
+                return BadRequest(new { message = "File size exceeds 10MB limit." });
+
+            var allowedTypes = new[] { "application/pdf", "text/plain" };
+            if (!allowedTypes.Contains(file.ContentType, StringComparer.OrdinalIgnoreCase))
+                return BadRequest(new { message = "Allowed formats: PDF, TXT." });
+
+            var document = await _context.Document
+                .FirstOrDefaultAsync(d => d.Id == id && !d.IsDeleted);
+
+            if (document is null)
+                return NotFound(new { message = "Document not found." });
+
+            // Verificar membro da equipa
+            var userTeamMember = await _context.TeamMember
+                .FirstOrDefaultAsync(m => m.TeamId == document.TeamId && m.UserId == userId);
+
+            if (userTeamMember == null)
+            {
+                return StatusCode(StatusCodes.Status403Forbidden, new
+                {
+                    message = "Permission denied.",
+                    errors = new[] { "You are not a member of this team." }
+                });
+            }
+
+            // Apenas Editor ou Owner podem adicionar contexto
+            bool isOwner = userTeamMember.Role == TeamRole.Owner;
+            bool canEdit = isOwner;
+
+            if (!canEdit)
+            {
+                var permission = await _context.DocumentPermission
+                    .FirstOrDefaultAsync(dp => dp.TeamMemberId == userTeamMember.Id && dp.DocumentId == document.Id);
+
+                canEdit = permission?.Role == DocumentRole.Editor;
+            }
+
+            if (!canEdit)
+            {
+                return StatusCode(StatusCodes.Status403Forbidden, new
+                {
+                    message = "Permission denied.",
+                    errors = new[] { "Only Editors and Owners can upload context files." }
+                });
+            }
+
+            // Extração de texto - copiar stream para memória para poder reutilizá-lo no upload
+            byte[] fileBytes;
+            using (var ms = new MemoryStream())
+            {
+                await file.OpenReadStream().CopyToAsync(ms);
+                fileBytes = ms.ToArray();
+            }
+
+            string? extractedText;
+            using (var extractStream = new MemoryStream(fileBytes))
+            {
+                extractedText = await _textExtractionService.ExtractTextAsync(extractStream, file.ContentType);
+            }
+
+            // Upload do ficheiro para storage
+            string storedPath;
+            using (var uploadStream = new MemoryStream(fileBytes))
+            {
+                storedPath = await _storageService.UploadContextFileAsync(uploadStream, file.FileName, file.ContentType);
+            }
+
+            var user = await _userManager.FindByIdAsync(userId);
+            var contextFile = new DocumentContext
+            {
+                DocumentId = id,
+                FileName = file.FileName,
+                ContentType = file.ContentType,
+                StoredPath = storedPath,
+                ExtractedText = extractedText,
+                FileSizeBytes = file.Length,
+                UploadedAt = DateTime.UtcNow,
+                UploadedById = userId
+            };
+
+            _context.DocumentContext.Add(contextFile);
+            await _context.SaveChangesAsync();
+
+            var dto = new DocumentContextDto
+            {
+                Id = contextFile.Id,
+                DocumentId = contextFile.DocumentId,
+                FileName = contextFile.FileName,
+                ContentType = contextFile.ContentType,
+                FileSizeBytes = contextFile.FileSizeBytes,
+                UploadedAt = contextFile.UploadedAt,
+                UploadedByName = user?.FullName ?? user?.Email ?? string.Empty,
+                HasExtractedText = extractedText != null
+            };
+
+            return CreatedAtAction(nameof(GetContextFiles), new { id }, dto);
+        }
+
+        /// <summary>
+        /// Lista os ficheiros de contexto associados ao documento.
+        /// Apenas Editors e Owners podem listar (Viewers não têm acesso ao painel de IA).
+        /// </summary>
+        /// <param name="id">ID do documento.</param>
+        [HttpGet("{id}/context")]
+        public async Task<ActionResult<IEnumerable<DocumentContextDto>>> GetContextFiles(int id)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId is null)
+                return Unauthorized(new { message = "User not authenticated." });
+
+            var document = await _context.Document
+                .FirstOrDefaultAsync(d => d.Id == id && !d.IsDeleted);
+
+            if (document is null)
+                return NotFound(new { message = "Document not found." });
+
+            var userTeamMember = await _context.TeamMember
+                .FirstOrDefaultAsync(m => m.TeamId == document.TeamId && m.UserId == userId);
+
+            if (userTeamMember == null)
+            {
+                return StatusCode(StatusCodes.Status403Forbidden, new
+                {
+                    message = "Permission denied.",
+                    errors = new[] { "You are not a member of this team." }
+                });
+            }
+
+            bool isOwner = userTeamMember.Role == TeamRole.Owner;
+            bool canEdit = isOwner;
+
+            if (!canEdit)
+            {
+                var permission = await _context.DocumentPermission
+                    .FirstOrDefaultAsync(dp => dp.TeamMemberId == userTeamMember.Id && dp.DocumentId == document.Id);
+                canEdit = permission?.Role == DocumentRole.Editor;
+            }
+
+            if (!canEdit)
+            {
+                return StatusCode(StatusCodes.Status403Forbidden, new
+                {
+                    message = "Permission denied.",
+                    errors = new[] { "Only Editors and Owners can view context files." }
+                });
+            }
+
+            var contextFiles = await _context.DocumentContext
+                .Include(dc => dc.UploadedBy)
+                .Where(dc => dc.DocumentId == id)
+                .OrderByDescending(dc => dc.UploadedAt)
+                .Select(dc => new DocumentContextDto
+                {
+                    Id = dc.Id,
+                    DocumentId = dc.DocumentId,
+                    FileName = dc.FileName,
+                    ContentType = dc.ContentType,
+                    FileSizeBytes = dc.FileSizeBytes,
+                    UploadedAt = dc.UploadedAt,
+                    UploadedByName = dc.UploadedBy.FullName ?? dc.UploadedBy.Email ?? string.Empty,
+                    HasExtractedText = dc.ExtractedText != null
+                })
+                .ToListAsync();
+
+            return Ok(contextFiles);
+        }
+
+        /// <summary>
+        /// Remove um ficheiro de contexto do documento.
+        /// Apenas Editors podem remover contexto.
+        /// </summary>
+        /// <param name="id">ID do documento.</param>
+        /// <param name="contextId">ID do ficheiro de contexto.</param>
+        [HttpDelete("{id}/context/{contextId}")]
+        public async Task<IActionResult> DeleteContext(int id, int contextId)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId is null)
+                return Unauthorized(new { message = "User not authenticated." });
+
+            var document = await _context.Document
+                .FirstOrDefaultAsync(d => d.Id == id && !d.IsDeleted);
+
+            if (document is null)
+                return NotFound(new { message = "Document not found." });
+
+            var contextFile = await _context.DocumentContext
+                .FirstOrDefaultAsync(dc => dc.Id == contextId && dc.DocumentId == id);
+
+            if (contextFile is null)
+                return NotFound(new { message = "Context file not found." });
+
+            var userTeamMember = await _context.TeamMember
+                .FirstOrDefaultAsync(m => m.TeamId == document.TeamId && m.UserId == userId);
+
+            if (userTeamMember == null)
+            {
+                return StatusCode(StatusCodes.Status403Forbidden, new
+                {
+                    message = "Permission denied.",
+                    errors = new[] { "You are not a member of this team." }
+                });
+            }
+
+            bool isOwner = userTeamMember.Role == TeamRole.Owner;
+            bool canEdit = isOwner;
+
+            if (!canEdit)
+            {
+                var permission = await _context.DocumentPermission
+                    .FirstOrDefaultAsync(dp => dp.TeamMemberId == userTeamMember.Id && dp.DocumentId == document.Id);
+
+                canEdit = permission?.Role == DocumentRole.Editor;
+            }
+
+            if (!canEdit)
+            {
+                return StatusCode(StatusCodes.Status403Forbidden, new
+                {
+                    message = "Permission denied.",
+                    errors = new[] { "Only Editors and Owners can remove context files." }
+                });
+            }
+
+            // Remover do storage antes de apagar da BD
+            await _storageService.DeleteContextFileAsync(contextFile.StoredPath);
+
+            _context.DocumentContext.Remove(contextFile);
             await _context.SaveChangesAsync();
 
             return NoContent();
