@@ -152,6 +152,26 @@ export class TextEditorComponent implements OnInit, AfterViewInit, OnDestroy {
       this.updateActiveFormats();
     });
 
+    // Intercetar CTRL+V de imagens para fazer upload em vez de inserir base64
+    this.quill.root.addEventListener('paste', (e: ClipboardEvent) => {
+      if (!this.editable()) return;
+
+      const items = e.clipboardData?.items;
+      if (!items) return;
+
+      for (const item of Array.from(items)) {
+        if (item.type.startsWith('image/')) {
+          e.preventDefault();
+          e.stopImmediatePropagation();
+          const file = item.getAsFile();
+          if (file) {
+            this.handleDroppedImage(file);
+          }
+          return;
+        }
+      }
+    }, true);
+
     // Interceptar drag & drop para validar tamanho da imagem (fase de captura para executar antes do Quill)
     this.quill.root.addEventListener(
       'drop',
