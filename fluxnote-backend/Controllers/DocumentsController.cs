@@ -983,5 +983,37 @@ namespace Fluxnote.Backend.Controllers
             text = System.Text.RegularExpressions.Regex.Replace(text, @"\s+", " ").Trim();
             return text;
         }
+
+        // GET /api/documents/{id}/ydoc
+        // Devolve o snapshot Y.Doc para inicializar um novo cliente de colaboração
+        [HttpGet("{id}/ydoc")]
+        public async Task<IActionResult> GetYDocSnapshot(int id)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId is null) return Unauthorized();
+
+            var doc = await _context.Document
+                .Include(d => d.Team)
+                    .ThenInclude(t => t.Members)
+                .Include(d => d.Permissions)
+                    .ThenInclude(p => p.TeamMember)
+                .FirstOrDefaultAsync(d => d.Id == id && !d.IsDeleted);
+
+            if (doc is null) return NotFound();
+
+            // Verificar acesso (mesmo critério do Hub)
+            var member = doc.Team.Members.FirstOrDefault(m => m.UserId == userId);
+            if (member is null) return Forbid();
+
+            bool hasAccess = member.Role >= TeamRole.TeamAdmin ||
+                             doc.Permissions.Any(p => p.TeamMember.UserId == userId);
+            if (!hasAccess) return Forbid();
+
+            // Devolver snapshot como Base64 (ou null se ainda não existe)
+            if (doc.YDocSnapshot is { Length: > 0 })
+                return Ok(new { snapshot = Convert.ToBase64String(doc.YDocSnapshot) });
+
+            return Ok(new { snapshot = (string?)null });
+        }
     }
 }
