@@ -2,7 +2,7 @@ import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
-import { AuthService } from '../../core/services';
+import { AuthService, PanelStateService } from '../../core/services';
 import { ModalComponent, ButtonComponent } from '../../shared/components/ui';
 
 @Component({
@@ -10,8 +10,20 @@ import { ModalComponent, ButtonComponent } from '../../shared/components/ui';
   standalone: true,
   imports: [CommonModule, RouterLink, RouterLinkActive, LucideAngularModule, ModalComponent, ButtonComponent],
   template: `
-    <aside class="w-64 bg-white border-r border-gray-200 fixed left-0 top-0 h-screen flex flex-col">
-      <a routerLink="/dashboard" class="p-6 border-b border-gray-100 flex items-center justify-center">
+    <!-- Backdrop (mobile/tablet) — fecha o sidebar ao clicar fora -->
+    @if (panelState.isSidebarOpen()) {
+      <div
+        class="fixed inset-0 bg-black/40 z-30 lg:hidden"
+        (click)="panelState.closeSidebar()"
+      ></div>
+    }
+
+    <aside
+      [class]="'w-64 bg-white border-r border-gray-200 fixed left-0 top-0 h-screen flex flex-col z-40 transition-transform duration-300 ease-in-out ' +
+               (panelState.isSidebarOpen() ? 'translate-x-0' : '-translate-x-full') +
+               ' lg:translate-x-0'"
+    >
+      <a routerLink="/dashboard" (click)="panelState.closeSidebar()" class="p-6 border-b border-gray-100 flex items-center justify-center">
         <img src="assets/textIcon.png" alt="Fluxnote" class="h-auto w-auto" />
       </a>
 
@@ -21,6 +33,7 @@ import { ModalComponent, ButtonComponent } from '../../shared/components/ui';
           routerLinkActive="bg-[#e8f0ee] text-[#155347]"
           [routerLinkActiveOptions]="{ exact: true }"
           data-tour="sidebar-dashboard"
+          (click)="panelState.closeSidebar()"
           class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors text-gray-600 hover:bg-gray-50 hover:text-gray-900"
         >
           <lucide-icon name="layout-dashboard" class="h-5 w-5"></lucide-icon>
@@ -30,6 +43,7 @@ import { ModalComponent, ButtonComponent } from '../../shared/components/ui';
           routerLink="/teams"
           routerLinkActive="bg-[#e8f0ee] text-[#155347]"
           data-tour="sidebar-teams"
+          (click)="panelState.closeSidebar()"
           class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors text-gray-600 hover:bg-gray-50 hover:text-gray-900"
         >
           <lucide-icon name="users" class="h-5 w-5"></lucide-icon>
@@ -38,6 +52,7 @@ import { ModalComponent, ButtonComponent } from '../../shared/components/ui';
         <a
           routerLink="/subscriptions"
           routerLinkActive="bg-[#e8f0ee] text-[#155347]"
+          (click)="panelState.closeSidebar()"
           class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors text-gray-600 hover:bg-gray-50 hover:text-gray-900"
         >
           <lucide-icon name="credit-card" class="h-5 w-5"></lucide-icon>
@@ -47,6 +62,7 @@ import { ModalComponent, ButtonComponent } from '../../shared/components/ui';
           routerLink="/profile"
           data-tour="sidebar-profile"
           routerLinkActive="bg-[#e8f0ee] text-[#155347]"
+          (click)="panelState.closeSidebar()"
           class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors text-gray-600 hover:bg-gray-50 hover:text-gray-900"
         >
           <lucide-icon name="user" class="h-5 w-5"></lucide-icon>
@@ -55,6 +71,7 @@ import { ModalComponent, ButtonComponent } from '../../shared/components/ui';
         <a
           routerLink="/settings"
           routerLinkActive="bg-[#e8f0ee] text-[#155347]"
+          (click)="panelState.closeSidebar()"
           class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors text-gray-600 hover:bg-gray-50 hover:text-gray-900"
         >
           <lucide-icon name="settings" class="h-5 w-5"></lucide-icon>
@@ -66,6 +83,7 @@ import { ModalComponent, ButtonComponent } from '../../shared/components/ui';
         <a
           routerLink="/help"
           routerLinkActive="bg-[#e8f0ee] text-[#155347]"
+          (click)="panelState.closeSidebar()"
           class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors"
         >
           <lucide-icon name="badge-question-mark" class="h-5 w-5"></lucide-icon>
@@ -74,6 +92,7 @@ import { ModalComponent, ButtonComponent } from '../../shared/components/ui';
         <a
           routerLink="/trash"
           routerLinkActive="bg-[#e8f0ee] text-[#155347]"
+          (click)="panelState.closeSidebar()"
           class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors"
         >
           <lucide-icon name="trash-2" class="h-5 w-5"></lucide-icon>
@@ -123,6 +142,7 @@ import { ModalComponent, ButtonComponent } from '../../shared/components/ui';
 })
 export class SidebarComponent {
   private authService = inject(AuthService);
+  panelState = inject(PanelStateService);
 
   showLogoutModal = signal(false);
 

@@ -327,6 +327,46 @@ export class TextEditorComponent implements OnInit, AfterViewInit, OnDestroy {
       this.updateActiveFormats();
     });
 
+    // Intercetar CTRL+V de imagens para fazer upload em vez de inserir base64
+    this.quill.root.addEventListener('paste', (e: ClipboardEvent) => {
+      if (!this.editable()) return;
+
+      const items = e.clipboardData?.items;
+      if (!items) return;
+
+      for (const item of Array.from(items)) {
+        if (item.type.startsWith('image/')) {
+          e.preventDefault();
+          e.stopImmediatePropagation();
+          const file = item.getAsFile();
+          if (file) {
+            this.handleDroppedImage(file);
+          }
+          return;
+        }
+      }
+    }, true);
+
+    // Intercetar CTRL+V de imagens para fazer upload em vez de inserir base64
+    this.quill.root.addEventListener('paste', (e: ClipboardEvent) => {
+      if (!this.editable()) return;
+
+      const items = e.clipboardData?.items;
+      if (!items) return;
+
+      for (const item of Array.from(items)) {
+        if (item.type.startsWith('image/')) {
+          e.preventDefault();
+          e.stopImmediatePropagation();
+          const file = item.getAsFile();
+          if (file) {
+            this.handleDroppedImage(file);
+          }
+          return;
+        }
+      }
+    }, true);
+
     this.quill.root.addEventListener(
       'drop',
       (e: DragEvent) => {

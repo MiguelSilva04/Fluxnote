@@ -1,10 +1,10 @@
 <app-dashboard-layout>
-  <div data-tour="documents-section" class="flex items-center justify-between mb-8">
+  <div data-tour="documents-section" class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6 md:mb-8">
     <div>
-      <h1 class="text-3xl font-bold text-gray-900 mb-2">My Documents</h1>
-      <p class="text-gray-600">Manage and organize your documents</p>
+      <h1 class="text-2xl md:text-3xl font-bold text-gray-900 mb-1">My Documents</h1>
+      <p class="text-sm md:text-base text-gray-600">Manage and organize your documents</p>
     </div>
-    <app-button data-tour="create-document-btn" (onClick)="openCreateDocumentModal()" [leftIcon]="true" customClass="bg-[#155347] hover:bg-[#0d3d31]">
+    <app-button data-tour="create-document-btn" (onClick)="openCreateDocumentModal()" [leftIcon]="true" customClass="bg-[#155347] hover:bg-[#0d3d31] self-start sm:self-auto">
       <lucide-icon leftIcon name="plus" class="h-4 w-4"></lucide-icon>
       New Document
     </app-button>
@@ -30,8 +30,8 @@
 
   <!-- Tabs -->
   @if (!isLoading()) {
-    <div class="flex items-center justify-between mb-6">
-      <div data-tour="team-filter-tabs" class="flex gap-1 border-b border-gray-200 overflow-x-auto">
+    <div class="flex items-center justify-between mb-6 gap-2">
+      <div data-tour="team-filter-tabs" class="flex gap-1 border-b border-gray-200 overflow-x-auto flex-1 min-w-0">
         <button
           (click)="selectTeamFilter(null)"
           [class]="'px-4 py-2 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ' + (selectedTeamFilter() === null ? 'border-[#155347] text-[#155347]' : 'border-transparent text-gray-600 hover:text-gray-900')"
@@ -437,7 +437,7 @@
   <!-- Tour button -->
   <button
     (click)="startTour()"
-    class="fixed bottom-6 right-6 z-50 h-12 w-12 rounded-full bg-[#155347] text-white shadow-lg hover:bg-[#0d3d31] transition-all hover:scale-105 flex items-center justify-center"
+    class="fixed bottom-4 right-4 md:bottom-6 md:right-6 z-50 h-11 w-11 md:h-12 md:w-12 rounded-full bg-[#155347] text-white shadow-lg hover:bg-[#0d3d31] transition-all hover:scale-105 flex items-center justify-center"
     aria-label="Iniciar tour guiado"
   >
     <lucide-icon name="badge-question-mark" [size]="22"></lucide-icon>

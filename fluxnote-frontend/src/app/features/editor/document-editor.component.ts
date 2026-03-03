@@ -49,58 +49,58 @@ import { TextEditorComponent } from './components/text-editor.component';
       } @else {
         <!-- Header -->
         <header
-          class="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between shrink-0"
+          class="bg-white border-b border-gray-200 px-3 md:px-6 py-2 md:py-4 flex items-center justify-between gap-2 shrink-0"
         >
-          <div class="flex items-center gap-4">
+          <div class="flex items-center gap-2 md:gap-4 min-w-0 flex-1">
             <button
               (click)="navigateBack()"
-              class="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              class="p-2 hover:bg-gray-100 rounded-lg transition-colors flex-shrink-0"
             >
-              <lucide-icon name="arrow-left" class="h-5 w-5 text-gray-600"></lucide-icon>
-            </button>
-            <div class="flex-1">
-              <!-- Editable Title -->
-              @if (canEdit()) {
-                @if (isEditingTitle()) {
-                  <input
-                    #titleInput
-                    type="text"
-                    [(ngModel)]="documentTitle"
-                    (blur)="saveTitle()"
-                    (keydown.enter)="saveTitle()"
-                    (keydown.escape)="cancelTitleEdit()"
-                    class="text-lg font-bold text-gray-900 bg-transparent border-b-2 border-[#155347] focus:outline-none w-full max-w-md"
-                  />
+                <lucide-icon name="arrow-left" class="h-5 w-5 text-gray-600"></lucide-icon>
+              </button>
+              <div class="min-w-0 flex-1">
+                <!-- Editable Title -->
+                @if (canEdit()) {
+                  @if (isEditingTitle()) {
+                    <input
+                      #titleInput
+                      type="text"
+                      [(ngModel)]="documentTitle"
+                      (blur)="saveTitle()"
+                      (keydown.enter)="saveTitle()"
+                      (keydown.escape)="cancelTitleEdit()"
+                      class="text-base md:text-lg font-bold text-gray-900 bg-transparent border-b-2 border-[#155347] focus:outline-none w-full max-w-md"
+                    />
+                  } @else {
+                    <h1
+                      (click)="startEditingTitle()"
+                      class="text-base md:text-lg font-bold text-gray-900 cursor-pointer hover:text-[#155347] transition-colors truncate"
+                      title="Click to edit title"
+                    >
+                      {{ documentTitle }}
+                    </h1>
+                  }
                 } @else {
-                  <h1
-                    (click)="startEditingTitle()"
-                    class="text-lg font-bold text-gray-900 cursor-pointer hover:text-[#155347] transition-colors"
-                    title="Click to edit title"
-                  >
+                  <h1 class="text-base md:text-lg font-bold text-gray-900 truncate">
                     {{ documentTitle }}
                   </h1>
                 }
-              } @else {
-                <h1 class="text-lg font-bold text-gray-900">
-                  {{ documentTitle }}
-                </h1>
-              }
-              <div class="flex items-center gap-2">
-                <p class="text-xs text-gray-500">{{ lastEditedText() }}</p>
-                @if (!canEdit()) {
-                  <span
+                <div class="flex items-center gap-2">
+                  <p class="text-xs text-gray-500 hidden sm:block">{{ lastEditedText() }}</p>
+                  @if (!canEdit()) {
+                    <span
                     class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-700"
                   >
-                    <lucide-icon name="eye" class="h-3 w-3"></lucide-icon>
-                    View only
-                  </span>
-                }
+                      <lucide-icon name="eye" class="h-3 w-3"></lucide-icon>
+                      <span class="hidden sm:inline">View only</span>
+                    </span>
+                  }
+                </div>
               </div>
             </div>
-          </div>
-          <div class="flex items-center gap-2">
+            <div class="flex items-center gap-1 md:gap-2 flex-shrink-0">
             @if (canEdit()) {
-              <app-button variant="outline" size="sm" [leftIcon]="true" (onClick)="toggleAIPanel()">
+              <app-button variant="outline" size="sm" [leftIcon]="true" (onClick)="toggleAIPanel()" customClass="hidden md:inline-flex">
                 <lucide-icon leftIcon name="sparkles" class="h-4 w-4"></lucide-icon>
                 AI Assistance
               </app-button>
@@ -108,7 +108,7 @@ import { TextEditorComponent } from './components/text-editor.component';
                 variant="outline"
                 size="sm"
                 [leftIcon]="true"
-                (onClick)="showWipModal.set(true)"
+                (onClick)="showWipModal.set(true)" customClass="hidden md:inline-flex"
               >
                 <lucide-icon leftIcon name="clock" class="h-4 w-4"></lucide-icon>
                 History
@@ -117,7 +117,7 @@ import { TextEditorComponent } from './components/text-editor.component';
                 variant="outline"
                 size="sm"
                 [leftIcon]="true"
-                (onClick)="showWipModal.set(true)"
+                (onClick)="showWipModal.set(true)" customClass="hidden md:inline-flex"
               >
                 <lucide-icon leftIcon name="message-square" class="h-4 w-4"></lucide-icon>
                 Comments

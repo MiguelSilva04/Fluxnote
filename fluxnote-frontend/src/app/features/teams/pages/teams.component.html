@@ -1,9 +1,9 @@
 
 <app-dashboard-layout>
     <div class="flex flex-col gap-6">
-      <div class="flex items-center justify-between">
-        <h1 class="text-2xl font-bold text-gray-900">My Teams</h1>
-        <div class="flex items-center gap-3">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <h1 class="text-xl md:text-2xl font-bold text-gray-900">My Teams</h1>
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
           <div class="relative">
             <lucide-icon name="search" class="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400"></lucide-icon>
             <input
@@ -11,20 +11,20 @@
               placeholder="Search teams..."
               [ngModel]="searchQuery()"
               (ngModelChange)="searchQuery.set($event)"
-              class="h-10 pl-10 pr-4 rounded-lg border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-[#155347] focus:border-transparent text-sm w-64"
+              class="h-10 pl-10 pr-4 rounded-lg border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-[#155347] focus:border-transparent text-sm w-full sm:w-48 md:w-64"
             />
           </div>
           <select
             [ngModel]="roleFilter()"
             (ngModelChange)="roleFilter.set($event)"
-            class="h-10 px-4 rounded-lg border border-gray-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[#155347]"
+            class="h-10 px-3 rounded-lg border border-gray-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[#155347] w-full sm:w-auto"
           >
             <option [ngValue]="null">All Roles</option>
             <option [ngValue]="2">Owner</option>
             <option [ngValue]="1">Team Admin</option>
             <option [ngValue]="0">Member</option>
           </select>
-          <app-button (onClick)="isCreateModalOpen.set(true)" [leftIcon]="true">
+          <app-button (onClick)="isCreateModalOpen.set(true)" [leftIcon]="true" customClass="self-start sm:self-auto">
             <lucide-icon leftIcon name="plus" class="h-4 w-4"></lucide-icon>
             Create Team
           </app-button>
@@ -107,52 +107,42 @@
         @else if(filteredTeams()){
           @for (team of filteredTeams(); track team.id) 
           {
-            <app-card customClass="overflow-hidden">
-              <div class="p-6">
-                <div class="flex items-center justify-between">
-                  <div class="flex items-center gap-4 flex-1">
+            <app-card>
+              <div class="p-4 sm:p-6">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                  <!-- Clickable info area → navigates to team details -->
+                  <div class="flex items-center gap-3 flex-1 min-w-0 cursor-pointer"
+                       (click)="handleViewTeamDetails(team.id)">
                     <!-- Avatar -->
-                    <div class="h-12 w-12 rounded-full bg-[#155347] text-white flex items-center justify-center text-sm font-bold"
-                    >
+                    <div class="h-10 w-10 sm:h-12 sm:w-12 rounded-full bg-[#155347] text-white flex items-center justify-center text-sm font-bold flex-shrink-0">
                       {{ getInitials(team.name)}}
                     </div>
-        
-                    <div class="flex-1">
-                      <div class="flex items-center gap-3 mb-1">
-                        <h3 class="text-lg font-bold text-gray-900">
+
+                    <div class="flex-1 min-w-0">
+                      <div class="flex flex-wrap items-center gap-x-2 gap-y-1 mb-0.5">
+                        <h3 class="text-base sm:text-lg font-bold text-gray-900 truncate hover:text-[#155347] transition-colors">
                           {{ team.name }}
                         </h3>
 
                         <span [class]="getRoleBadgeClass(team.currentUserRole)">
                           {{ getRoleName(team.currentUserRole) }}
                         </span>
-        
-                        <span class="text-sm text-gray-500">
-                          Created {{ timeAgo(team.createdAt) }}
-                        </span>
                       </div>
-        
-                      <!-- <div class="flex items-center gap-3 text-sm text-gray-500">
-                        <span>Status:</span>
-                        <span
-                          [class.text-green-600]="team.isActive"
-                          [class.text-red-600]="!team.isActive"
-                          class="font-medium"
-                        >
-                          {{ team.isActive ? 'Ativo' : 'Inativo' }}
-                        </span>
-                      </div> -->
+                      <span class="text-xs sm:text-sm text-gray-500">
+                        Created {{ timeAgo(team.createdAt) }}
+                      </span>
                     </div>
                   </div>
-        
-                  <div class="flex items-center gap-4">
+
+                  <div class="flex items-center gap-2 sm:gap-3 flex-shrink-0">
                     <!-- Members -->
-                    <div class="flex items-center gap-2 text-sm text-gray-600">
+                    <div class="flex items-center gap-1.5 text-sm text-gray-600">
                       <lucide-icon name="users" class="h-4 w-4"></lucide-icon>
-                      <span>{{ team.members.length }} Members</span>
+                      <span>{{ team.members.length }}</span>
+                      <span class="hidden sm:inline">Members</span>
                     </div>
-        
-                    <!-- View details -->
+
+                    <!-- View details — always shows text -->
                     <app-button data-tour="team-details"
                       variant="outline"
                       size="sm"
@@ -161,8 +151,8 @@
                     >
                       View Team Details
                     </app-button>
-  
-                    <button (click)="toggleTeam(team.id)" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+
+                    <button (click)="toggleTeam(team.id)" class="p-2 hover:bg-gray-100 rounded-lg transition-colors flex-shrink-0">
                       <lucide-icon
                         [name]="expandedTeam() === team.id ? 'chevron-up' : 'chevron-down'"
                         class="h-5 w-5 text-gray-500"
@@ -190,6 +180,7 @@
                       <!-- Folders -->
                       @for (folder of team.folders; track folder.id) {
                         <div
+                          [attr.data-folder-target]="folder.id"
                           (dragover)="onDragOverFolder($event, folder.id)"
                           (dragleave)="onDragLeave()"
                           (drop)="onDropOnFolder($event, folder.id, team)"
@@ -223,9 +214,12 @@
                                   draggable="true"
                                   (dragstart)="onDragStart($event, doc.id)"
                                   (dragend)="onDragEnd()"
+                                  (touchstart)="onTouchStartDoc($event, doc.id, team)"
+                                  (touchmove)="onTouchMoveDoc($event)"
+                                  (touchend)="onTouchEndDoc($event)"
                                   (click)="handleDocumentClick(doc.id)"
                                   class="flex items-center justify-between p-2.5 hover:bg-gray-50 rounded-lg transition-colors cursor-pointer"
-                                  [class.opacity-50]="draggingDocId() === doc.id"
+                                  [class.opacity-50]="draggingDocId() === doc.id || touchDraggingDocId() === doc.id"
                                 >
                                   <div class="flex items-center gap-3 flex-1">
                                     <lucide-icon name="file-text" class="h-4 w-4 text-gray-400"></lucide-icon>
@@ -261,6 +255,7 @@
 
                       <!-- Unfoldered documents -->
                       <div
+                        data-root-target="true"
                         (dragover)="onDragOverRoot($event)"
                         (dragleave)="onDragLeave()"
                         (drop)="onDropOnRoot($event, team)"
@@ -269,16 +264,19 @@
                         [class.ring-2]="dragOverTarget() === 'root'"
                         [class.ring-dashed]="dragOverTarget() === 'root'"
                         [class.ring-gray-400]="dragOverTarget() === 'root'"
-                        [class.min-h-[40px]]="draggingDocId() !== null && getUnfolderedDocuments(team).length === 0"
+                        [class.min-h-[40px]]="(draggingDocId() !== null || touchDraggingDocId() !== null) && getUnfolderedDocuments(team).length === 0"
                       >
                       @for (doc of getUnfolderedDocuments(team); track doc.id) {
                         <div
                           draggable="true"
                           (dragstart)="onDragStart($event, doc.id)"
                           (dragend)="onDragEnd()"
+                          (touchstart)="onTouchStartDoc($event, doc.id, team)"
+                          (touchmove)="onTouchMoveDoc($event)"
+                          (touchend)="onTouchEndDoc($event)"
                           (click)="handleDocumentClick(doc.id)"
                           class="flex items-center justify-between p-2.5 hover:bg-gray-50 rounded-lg transition-colors cursor-pointer"
-                          [class.opacity-50]="draggingDocId() === doc.id"
+                          [class.opacity-50]="draggingDocId() === doc.id || touchDraggingDocId() === doc.id"
                         >
                           <div class="flex items-center gap-3 flex-1">
                             <lucide-icon name="file-text" class="h-4 w-4 text-gray-400"></lucide-icon>

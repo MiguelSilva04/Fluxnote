@@ -18,9 +18,9 @@ import { SettingsPanelComponent, ProfilePanelComponent, NotificationsPanelCompon
   template: `
     <div class="min-h-screen bg-gray-50 flex">
       <app-sidebar></app-sidebar>
-      <div class="flex-1 flex flex-col ml-64">
+      <div class="flex-1 flex flex-col lg:ml-64 min-w-0">
         <app-header></app-header>
-        <main class="flex-1 p-8">
+        <main class="flex-1 p-4 md:p-6 lg:p-8">
           <ng-content></ng-content>
         </main>
       </div>

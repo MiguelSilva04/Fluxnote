@@ -19,7 +19,7 @@ export class CardComponent {
   @Input() hoverable = false;
 
   get cardClasses(): string {
-    const baseClasses = 'bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden';
+    const baseClasses = 'bg-white rounded-xl border border-gray-200 shadow-sm';
     const hoverClasses = this.hoverable ? 'transition-shadow hover:shadow-md cursor-pointer' : '';
     return `${baseClasses} ${hoverClasses} ${this.customClass}`;
   }
