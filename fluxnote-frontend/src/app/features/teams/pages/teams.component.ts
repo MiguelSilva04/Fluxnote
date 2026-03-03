@@ -442,7 +442,80 @@ export class TeamsComponent {
     });
   }
 
-  // ── Drag & Drop ──
+  // ── Touch Drag & Drop ──
+
+  private touchTimer: ReturnType<typeof setTimeout> | null = null;
+  private touchDragActive = false;
+  private touchCurrentTeam: { id: number; currentUserRole: number } | null = null;
+  touchDraggingDocId = signal<number | null>(null);
+
+  onTouchStartDoc(event: TouchEvent, docId: number, team: { id: number; currentUserRole: number }): void {
+    if (!this.isOwnerOrAdmin(team)) return;
+    this.touchTimer = setTimeout(() => {
+      this.touchDragActive = true;
+      this.touchCurrentTeam = team;
+      this.touchDraggingDocId.set(docId);
+      this.draggingDocId.set(docId);
+      if (navigator.vibrate) navigator.vibrate(50);
+    }, 400);
+  }
+
+  onTouchMoveDoc(event: TouchEvent): void {
+    if (!this.touchDragActive) {
+      if (this.touchTimer) { clearTimeout(this.touchTimer); this.touchTimer = null; }
+      return;
+    }
+    event.preventDefault();
+    const touch = event.touches[0];
+    const el = document.elementFromPoint(touch.clientX, touch.clientY);
+    if (!el) return;
+    const folderEl = el.closest('[data-folder-target]');
+    const rootEl = el.closest('[data-root-target]');
+    if (folderEl) {
+      this.dragOverTarget.set(parseInt(folderEl.getAttribute('data-folder-target')!));
+    } else if (rootEl) {
+      this.dragOverTarget.set('root');
+    } else {
+      this.dragOverTarget.set(null);
+    }
+  }
+
+  onTouchEndDoc(event: TouchEvent): void {
+    if (this.touchTimer) { clearTimeout(this.touchTimer); this.touchTimer = null; }
+    if (!this.touchDragActive || !this.touchCurrentTeam) {
+      this.touchDragActive = false;
+      return;
+    }
+    const docId = this.touchDraggingDocId();
+    const target = this.dragOverTarget();
+    const team = this.touchCurrentTeam;
+    this.touchDragActive = false;
+    this.touchDraggingDocId.set(null);
+    this.draggingDocId.set(null);
+    this.dragOverTarget.set(null);
+    this.touchCurrentTeam = null;
+    if (!docId) return;
+    if (typeof target === 'number') {
+      if (!this.isOwnerOrAdmin(team)) return;
+      this.folderService.moveDocumentToFolder(target, docId).subscribe({
+        next: () => { this.toastService.success('Document moved to folder'); this.loadTeams(); },
+        error: () => this.toastService.error('Failed to move document')
+      });
+    } else if (target === 'root') {
+      if (!this.isOwnerOrAdmin(team)) return;
+      const teams = this.teams();
+      const fullTeam = teams?.find(t => t.id === team.id);
+      const doc = fullTeam?.documents.find(d => d.id === docId);
+      if (doc?.folderId) {
+        this.folderService.removeDocumentFromFolder(doc.folderId, docId).subscribe({
+          next: () => { this.toastService.success('Document removed from folder'); this.loadTeams(); },
+          error: () => this.toastService.error('Failed to move document')
+        });
+      }
+    }
+  }
+
+  // ── Mouse Drag & Drop ──
 
   onDragStart(event: DragEvent, docId: number): void {
     this.draggingDocId.set(docId);

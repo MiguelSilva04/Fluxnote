@@ -61,7 +61,7 @@ import { ButtonComponent, CardComponent, CardContentComponent, BadgeComponent, W
                     </div>
                   }
 
-                  <app-card-content [customClass]="'p-6 ' + (plan.current ? 'bg-gradient-to-br from-[#e8f0ee] to-white' : '')">
+                  <app-card-content [customClass]="'p-6 ' + (plan.current ? 'bg-gradient-to-br from-[#e8f0ee] to-white rounded-xl' : '')">
                     <div class="text-center mb-6">
                       <h3 class="text-2xl font-bold text-gray-900 mb-2">{{ plan.name }}</h3>
                       <div class="mb-2">

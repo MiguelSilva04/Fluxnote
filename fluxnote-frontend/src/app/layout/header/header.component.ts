@@ -13,9 +13,18 @@ import { Subject, debounceTime, takeUntil, distinctUntilChanged } from 'rxjs';
   standalone: true,
   imports: [CommonModule, FormsModule, LucideAngularModule, WorkInProgressComponent],
   template: `
-    <header class="h-16 bg-white border-b border-gray-200 px-6 flex items-center justify-between shrink-0">
-      <div class="flex items-center gap-4 flex-1">
-        <div class="relative max-w-md w-full">
+    <header class="h-14 md:h-16 bg-white border-b border-gray-200 px-3 md:px-6 flex items-center gap-2 md:gap-4 shrink-0">
+      <!-- Hamburger (mobile only) -->
+      <button
+        (click)="panelState.toggleSidebar()"
+        class="lg:hidden flex-shrink-0 p-2 text-gray-500 hover:bg-gray-100 rounded-lg transition-colors"
+        aria-label="Toggle sidebar"
+      >
+        <lucide-icon name="menu" class="h-5 w-5"></lucide-icon>
+      </button>
+
+      <div class="flex items-center gap-4 flex-1 min-w-0">
+        <div class="relative w-full max-w-md">
           <lucide-icon name="search" class="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400"></lucide-icon>
           <input
             type="text"
@@ -71,7 +80,7 @@ import { Subject, debounceTime, takeUntil, distinctUntilChanged } from 'rxjs';
           }
         </div>
       </div>
-      <div class="flex items-center gap-2">
+      <div class="flex items-center gap-1 md:gap-2 flex-shrink-0">
         <button
           (click)="showWipModal.set(true)"
           class="relative p-2 text-gray-500 hover:bg-gray-100 rounded-lg transition-colors"

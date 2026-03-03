@@ -11,12 +11,16 @@ import { TeamGet } from '../../core/models';
   standalone: true,
   imports: [CommonModule, LucideAngularModule, ButtonComponent, BadgeComponent, RouterLink],
   template: `
-    @if (panelState.isProfilePanelOpen()) {
       <!-- Backdrop -->
-      <div class="fixed inset-0 bg-black/20 z-40" (click)="panelState.closeProfilePanel()"></div>
+      <div class="fixed inset-0 bg-black/20 z-40 transition-opacity duration-300"
+           [class.opacity-0]="!panelState.isProfilePanelOpen()"
+           [class.pointer-events-none]="!panelState.isProfilePanelOpen()"
+           (click)="panelState.closeProfilePanel()"></div>
 
       <!-- Side Panel -->
-      <aside class="fixed right-0 top-0 h-full w-96 bg-white shadow-2xl z-50 flex flex-col">
+      <aside class="fixed right-0 top-0 h-full w-full sm:w-96 bg-white shadow-2xl z-50 flex flex-col transition-transform duration-300 ease-in-out"
+             [class.translate-x-full]="!panelState.isProfilePanelOpen()"
+             [attr.inert]="!panelState.isProfilePanelOpen() ? '' : null">
         <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
           <h2 class="text-lg font-bold text-gray-900">Profile</h2>
           <button (click)="panelState.closeProfilePanel()" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
@@ -154,7 +158,6 @@ import { TeamGet } from '../../core/models';
           </div>
         </div>
       }
-    }
   `
 })
 export class ProfilePanelComponent implements OnInit {

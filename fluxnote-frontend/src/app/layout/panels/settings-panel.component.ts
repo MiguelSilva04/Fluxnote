@@ -10,12 +10,16 @@ import { ButtonComponent, WorkInProgressComponent } from '../../shared/component
   standalone: true,
   imports: [CommonModule, RouterLink, LucideAngularModule, ButtonComponent, WorkInProgressComponent],
   template: `
-    @if (panelState.isSettingsPanelOpen()) {
       <!-- Backdrop -->
-      <div class="fixed inset-0 bg-black/20 z-40" (click)="panelState.closeSettingsPanel()"></div>
+      <div class="fixed inset-0 bg-black/20 z-40 transition-opacity duration-300"
+           [class.opacity-0]="!panelState.isSettingsPanelOpen()"
+           [class.pointer-events-none]="!panelState.isSettingsPanelOpen()"
+           (click)="panelState.closeSettingsPanel()"></div>
 
       <!-- Side Panel -->
-      <aside class="fixed right-0 top-0 h-full w-96 bg-white shadow-2xl z-50 flex flex-col">
+      <aside class="fixed right-0 top-0 h-full w-full sm:w-96 bg-white shadow-2xl z-50 flex flex-col transition-transform duration-300 ease-in-out"
+             [class.translate-x-full]="!panelState.isSettingsPanelOpen()"
+             [attr.inert]="!panelState.isSettingsPanelOpen() ? '' : null">
         <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
           <h2 class="text-lg font-bold text-gray-900">Settings</h2>
           <button (click)="panelState.closeSettingsPanel()" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
@@ -105,7 +109,6 @@ import { ButtonComponent, WorkInProgressComponent } from '../../shared/component
       </aside>
 
       <app-work-in-progress [show]="showWipModal()" (close)="showWipModal.set(false)" />
-    }
   `
 })
 export class SettingsPanelComponent {
