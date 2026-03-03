@@ -9,13 +9,15 @@ import {
   ViewChild,
   ElementRef,
   AfterViewInit,
+  effect,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { LucideAngularModule } from 'lucide-angular';
 import Quill from 'quill';
 import { Subject, debounceTime, takeUntil } from 'rxjs';
-import { UploadService } from '../../../core/services';
+import { UploadService, CollaborationService, AuthService } from '../../../core/services';
+import { CollaboratorState } from '../../../core/services/collaboration.service';
 
 export type SaveStatus = 'idle' | 'saving' | 'saved' | 'error';
 
@@ -51,6 +53,12 @@ const DEFAULT_FORMATS: EditorFormats = {
   backgroundColor: '#ffffff',
 };
 
+// Paleta de cores para cada colaborador (índice circular)
+const COLLABORATOR_COLORS = [
+  '#E53935', '#8E24AA', '#1E88E5', '#00897B',
+  '#FB8C00', '#6D4C41', '#546E7A', '#43A047',
+];
+
 @Component({
   selector: 'app-rich-text-editor',
   standalone: true,
@@ -63,49 +71,221 @@ export class TextEditorComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('headerSelect') headerSelect!: ElementRef<HTMLSelectElement>;
   @ViewChild('imageInput') imageInput!: ElementRef<HTMLInputElement>;
 
+  // ─── Inputs existentes ───
   initialContent = input<string>('');
   placeholder = input<string>('Start writing...');
   autoSaveDelay = input<number>(2000);
   editable = input<boolean>(true);
 
+  // ─── Inputs novos para colaboração ───
+  /** ID do documento para colaboração em tempo real. Null desactiva a colaboração. */
+  documentId = input<number | null>(null);
+
+  // ─── Outputs ───
   contentChange = output<string>();
   save = output<string>();
 
+  // ─── State ───
   saveStatus = signal<SaveStatus>('idle');
   formats: EditorFormats = { ...DEFAULT_FORMATS };
+
+  // Colaboradores visíveis (avatares no topo do editor)
+  collaboratorNames = signal<string[]>([]);
 
   // Manipulação de imagem
   selectedImage = signal<HTMLImageElement | null>(null);
   showImageMenu = signal(false);
   imageMenuPosition = signal({ top: 0, left: 0 });
 
+  // ─── Privados ───
   private quill!: Quill;
   private destroy$ = new Subject<void>();
   private contentChange$ = new Subject<string>();
+  private snapshotInterval?: ReturnType<typeof setInterval>;
+  private awarenessInterval?: ReturnType<typeof setInterval>;
+  private colorIndex = 0;
+  // Mapa connectionId → elemento DOM do cursor no editor
+  private collaboratorCursors = new Map<string, HTMLElement>();
+
   private uploadService = inject(UploadService);
+  private collaborationService = inject(CollaborationService);
+  private authService = inject(AuthService);
 
   ngOnInit(): void {
     this.contentChange$
       .pipe(debounceTime(this.autoSaveDelay()), takeUntil(this.destroy$))
       .subscribe((content) => {
-        if (!this.editable()) {
-          return;
-        }
+        if (!this.editable()) return;
         this.triggerSave(content);
       });
   }
 
   ngAfterViewInit(): void {
     this.initializeQuill();
-    
-    // Fechar menus de cores ao clicar fora
     document.addEventListener('click', this.handleClickOutside.bind(this));
+
+    // Iniciar colaboração após Quill estar pronto
+    const docId = this.documentId();
+    if (docId !== null) {
+      this.initCollaboration(docId);
+    }
   }
 
   ngOnDestroy(): void {
     document.removeEventListener('click', this.handleClickOutside.bind(this));
+
+    // Limpar intervalos
+    if (this.snapshotInterval) clearInterval(this.snapshotInterval);
+    if (this.awarenessInterval) clearInterval(this.awarenessInterval);
+
+    // Limpar cursores remotos antes de desconectar
+    this.clearAllCursors();
+
+    // Desconectar colaboração (guarda snapshot final automaticamente)
+    this.collaborationService.disconnect();
+
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // Colaboração CRDT
+  // ─────────────────────────────────────────────────────────────
+
+  private async initCollaboration(documentId: number): Promise<void> {
+    try {
+      // Conectar ao documento (busca snapshot, liga Yjs ao Quill, inicia SignalR)
+      await this.collaborationService.connect(documentId, this.quill);
+
+      // Snapshot periódico a cada 30 segundos
+      this.snapshotInterval = setInterval(() => {
+        this.collaborationService.saveSnapshot(documentId);
+      }, 30_000);
+
+      // ── Awareness: enviar posição do cursor do utilizador actual ──
+      const user = this.authService.currentUser();
+      if (user) {
+        const color = COLLABORATOR_COLORS[this.colorIndex++ % COLLABORATOR_COLORS.length];
+
+        const sendAwareness = () => {
+          const range = this.quill.getSelection();
+          this.collaborationService.sendAwareness(documentId, {
+            connectionId: '',
+            userId: user.id || '',
+            name: user.fullName || user.email,
+            color,
+            cursor: range ? { index: range.index, length: range.length } : null,
+          });
+        };
+
+        // Enviar imediatamente ao conectar
+        sendAwareness();
+
+        // Enviar em cada mudança de selecção (debounced 150ms para não inundar)
+        const selectionChange$ = new Subject<void>();
+        selectionChange$
+          .pipe(debounceTime(20), takeUntil(this.destroy$))
+          .subscribe(() => sendAwareness());
+        this.quill.on('selection-change', () => selectionChange$.next());
+
+        // Fallback periódico para manter presença (ex: tab em background)
+        this.awarenessInterval = setInterval(sendAwareness, 5_000);
+      }
+
+      // ── Reagir a cursores dos outros utilizadores ──
+      this.collaborationService.awarenessUpdate$
+        .pipe(takeUntil(this.destroy$))
+        .subscribe(({ connectionId, state }) => {
+          this.renderCursor(connectionId, state);
+          this.collaboratorNames.set(
+            [...this.collaborationService.collaborators.values()].map((s) => s.name)
+          );
+        });
+
+      // Remover cursor quando um utilizador sai
+      this.collaborationService.userLeft$
+        .pipe(takeUntil(this.destroy$))
+        .subscribe((connectionId) => {
+          this.clearCursor(connectionId);
+          this.collaboratorNames.set(
+            [...this.collaborationService.collaborators.values()].map((s) => s.name)
+          );
+        });
+
+    } catch (err) {
+      // Colaboração falhou → editor continua a funcionar em modo offline (HTTP save)
+      console.error('[TextEditor] Colaboração não iniciada:', err);
+    }
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // Renderização de cursores remotos
+  // ─────────────────────────────────────────────────────────────
+
+  private renderCursor(connectionId: string, state: CollaboratorState): void {
+    // Remover cursor anterior deste utilizador (será re-criado na nova posição)
+    this.clearCursor(connectionId);
+
+    // Sem cursor = utilizador sem foco no editor
+    if (!state.cursor) return;
+
+    let bounds: { left: number; top: number; height: number } | null;
+    try {
+      bounds = this.quill.getBounds(state.cursor.index, state.cursor.length ?? 0) as typeof bounds;
+    } catch {
+      return;
+    }
+    if (!bounds) return;
+
+    // quill.getBounds() devolve coordenadas relativas ao elemento do container do Quill.
+    // Com position:fixed + getBoundingClientRect() do container, obtemos a posição no viewport.
+    const containerRect = this.editorContainer.nativeElement.getBoundingClientRect();
+
+    // Linha vertical do cursor (2px de largura, cor do utilizador)
+    const el = document.createElement('div');
+    el.setAttribute('data-collab-id', connectionId);
+    Object.assign(el.style, {
+      position:      'fixed',
+      pointerEvents: 'none',
+      userSelect:    'none',
+      zIndex:        '1000',
+      left:          `${containerRect.left + bounds.left}px`,
+      top:           `${containerRect.top  + bounds.top}px`,
+      height:        `${bounds.height}px`,
+      width:         '2px',
+      background:    state.color,
+    });
+
+    // Etiqueta com o nome do utilizador
+    const label = document.createElement('div');
+    label.textContent = state.name;
+    Object.assign(label.style, {
+      position:     'absolute',
+      top:          '-20px',
+      left:         '0',
+      background:   state.color,
+      color:        '#fff',
+      fontSize:     '11px',
+      fontWeight:   '600',
+      padding:      '2px 7px',
+      borderRadius: '4px 4px 4px 0',
+      whiteSpace:   'nowrap',
+      lineHeight:   '1.4',
+    });
+    el.appendChild(label);
+
+    document.body.appendChild(el);
+    this.collaboratorCursors.set(connectionId, el);
+  }
+
+  private clearCursor(connectionId: string): void {
+    const el = this.collaboratorCursors.get(connectionId);
+    if (el) { el.remove(); this.collaboratorCursors.delete(connectionId); }
+  }
+
+  private clearAllCursors(): void {
+    for (const el of this.collaboratorCursors.values()) el.remove();
+    this.collaboratorCursors.clear();
   }
 
   private handleClickOutside(event: MouseEvent): void {
@@ -120,19 +300,16 @@ export class TextEditorComponent implements OnInit, AfterViewInit, OnDestroy {
     this.quill = new Quill(this.editorContainer.nativeElement, {
       theme: 'snow',
       placeholder: this.placeholder(),
-      modules: {
-        toolbar: false,
-      },
+      modules: { toolbar: false },
     });
 
-    // Desativar corretor ortográfico
     this.quill.root.setAttribute('spellcheck', 'false');
 
+    // Conteúdo inicial (HTML) — se não houver snapshot Yjs, fica aqui
     if (this.initialContent()) {
       this.quill.root.innerHTML = this.initialContent();
     }
 
-    // Define modo read-only baseado no input editable
     if (!this.editable()) {
       this.quill.enable(false);
     }
@@ -143,9 +320,7 @@ export class TextEditorComponent implements OnInit, AfterViewInit, OnDestroy {
     });
 
     this.quill.on('selection-change', (range) => {
-      if (range) {
-        this.updateActiveFormats();
-      }
+      if (range) this.updateActiveFormats();
     });
 
     this.quill.root.addEventListener('keyup', () => {
@@ -172,7 +347,26 @@ export class TextEditorComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     }, true);
 
-    // Interceptar drag & drop para validar tamanho da imagem (fase de captura para executar antes do Quill)
+    // Intercetar CTRL+V de imagens para fazer upload em vez de inserir base64
+    this.quill.root.addEventListener('paste', (e: ClipboardEvent) => {
+      if (!this.editable()) return;
+
+      const items = e.clipboardData?.items;
+      if (!items) return;
+
+      for (const item of Array.from(items)) {
+        if (item.type.startsWith('image/')) {
+          e.preventDefault();
+          e.stopImmediatePropagation();
+          const file = item.getAsFile();
+          if (file) {
+            this.handleDroppedImage(file);
+          }
+          return;
+        }
+      }
+    }, true);
+
     this.quill.root.addEventListener(
       'drop',
       (e: DragEvent) => {
@@ -194,7 +388,6 @@ export class TextEditorComponent implements OnInit, AfterViewInit, OnDestroy {
       true
     );
 
-    // Handler de clique em imagem para manipulação (apenas para editores)
     this.quill.root.addEventListener('click', (e: MouseEvent) => {
       const target = e.target as HTMLElement;
       if (target.tagName === 'IMG' && this.editable()) {
@@ -207,14 +400,11 @@ export class TextEditorComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private handleDroppedImage(file: File): void {
-    const maxSizeInMB = 5;
-    const maxSizeInBytes = maxSizeInMB * 1024 * 1024;
-
+    const maxSizeInBytes = 5 * 1024 * 1024;
     if (file.size > maxSizeInBytes) {
-      alert(`Image size must be less than ${maxSizeInMB}MB. Dropped image is ${(file.size / 1024 / 1024).toFixed(2)}MB.`);
+      alert(`Image size must be less than 5MB. Dropped image is ${(file.size / 1024 / 1024).toFixed(2)}MB.`);
       return;
     }
-
     this.uploadService.uploadImage(file).subscribe({
       next: (res) => this.insertImageAtCursor(res.url),
       error: () => alert('Failed to upload image. Please try again.'),
@@ -223,7 +413,6 @@ export class TextEditorComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private updateActiveFormats(): void {
     if (!this.quill) return;
-
     const quillFormats = this.quill.getFormat();
     this.formats = {
       bold: !!quillFormats['bold'],
@@ -240,7 +429,6 @@ export class TextEditorComponent implements OnInit, AfterViewInit, OnDestroy {
       textColor: (quillFormats['color'] as string) || '#000000',
       backgroundColor: (quillFormats['background'] as string) || '#ffffff',
     };
-
     if (this.headerSelect) {
       this.headerSelect.nativeElement.value = quillFormats['header']?.toString() || '';
     }
@@ -249,13 +437,10 @@ export class TextEditorComponent implements OnInit, AfterViewInit, OnDestroy {
   private triggerSave(content: string): void {
     this.saveStatus.set('saving');
     this.save.emit(content);
-
     setTimeout(() => {
       this.saveStatus.set('saved');
       setTimeout(() => {
-        if (this.saveStatus() === 'saved') {
-          this.saveStatus.set('idle');
-        }
+        if (this.saveStatus() === 'saved') this.saveStatus.set('idle');
       }, 2000);
     }, 500);
   }
@@ -291,9 +476,7 @@ export class TextEditorComponent implements OnInit, AfterViewInit, OnDestroy {
       this.quill.format('link', false);
     } else {
       const url = prompt('Enter URL:');
-      if (url) {
-        this.quill.format('link', url);
-      }
+      if (url) this.quill.format('link', url);
     }
     this.updateActiveFormats();
   }
@@ -310,7 +493,6 @@ export class TextEditorComponent implements OnInit, AfterViewInit, OnDestroy {
     this.updateActiveFormats();
   }
 
-  // Menus de cores
   showTextColorMenu = signal(false);
   showBgColorMenu = signal(false);
 
@@ -346,12 +528,12 @@ export class TextEditorComponent implements OnInit, AfterViewInit, OnDestroy {
 
   toggleTextColorMenu(): void {
     this.showBgColorMenu.set(false);
-    this.showTextColorMenu.update(v => !v);
+    this.showTextColorMenu.update((v) => !v);
   }
 
   toggleBgColorMenu(): void {
     this.showTextColorMenu.set(false);
-    this.showBgColorMenu.update(v => !v);
+    this.showBgColorMenu.update((v) => !v);
   }
 
   applyTextColor(color: string): void {
@@ -373,26 +555,21 @@ export class TextEditorComponent implements OnInit, AfterViewInit, OnDestroy {
   onImageSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
-    const maxSizeInMB = 5;
-    const maxSizeInBytes = maxSizeInMB * 1024 * 1024;
-
+    const maxSizeInBytes = 5 * 1024 * 1024;
     if (file) {
       if (!file.type.startsWith('image/')) {
         alert('Please select a valid image file.');
         return;
       }
-
       if (file.size > maxSizeInBytes) {
-        alert(`Image size must be less than ${maxSizeInMB}MB. Selected image is ${(file.size / 1024 / 1024).toFixed(2)}MB.`);
+        alert(`Image size must be less than 5MB. Selected image is ${(file.size / 1024 / 1024).toFixed(2)}MB.`);
         return;
       }
-
       this.uploadService.uploadImage(file).subscribe({
         next: (res) => this.insertImageAtCursor(res.url),
         error: () => alert('Failed to upload image. Please try again.'),
       });
     }
-
     input.value = '';
   }
 
@@ -402,31 +579,22 @@ export class TextEditorComponent implements OnInit, AfterViewInit, OnDestroy {
     this.quill.setSelection(range.index + 1);
   }
 
-  // Métodos de manipulação de imagem
   private selectImage(img: HTMLImageElement): void {
-    // Remover seleção da imagem anterior
     this.deselectImage();
-    
     this.selectedImage.set(img);
     img.classList.add('selected-image');
-    
-    // Calcular posição do menu
     const rect = img.getBoundingClientRect();
     const editorRect = this.editorContainer.nativeElement.getBoundingClientRect();
-    
     this.imageMenuPosition.set({
       top: rect.top - editorRect.top - 45,
-      left: rect.left - editorRect.left + (rect.width / 2) - 100
+      left: rect.left - editorRect.left + rect.width / 2 - 100,
     });
-    
     this.showImageMenu.set(true);
   }
 
   deselectImage(): void {
     const currentImage = this.selectedImage();
-    if (currentImage) {
-      currentImage.classList.remove('selected-image');
-    }
+    if (currentImage) currentImage.classList.remove('selected-image');
     this.selectedImage.set(null);
     this.showImageMenu.set(false);
   }
@@ -434,25 +602,9 @@ export class TextEditorComponent implements OnInit, AfterViewInit, OnDestroy {
   setImageSize(size: 'small' | 'medium' | 'large' | 'full'): void {
     const img = this.selectedImage();
     if (!img) return;
-
-    // Remover classes de tamanho existentes
     img.classList.remove('img-small', 'img-medium', 'img-large', 'img-full');
-    
-    switch (size) {
-      case 'small':
-        img.style.width = '25%';
-        break;
-      case 'medium':
-        img.style.width = '50%';
-        break;
-      case 'large':
-        img.style.width = '75%';
-        break;
-      case 'full':
-        img.style.width = '100%';
-        break;
-    }
-    
+    const widths = { small: '25%', medium: '50%', large: '75%', full: '100%' };
+    img.style.width = widths[size];
     img.style.height = 'auto';
     this.triggerContentChange();
   }
@@ -460,35 +612,26 @@ export class TextEditorComponent implements OnInit, AfterViewInit, OnDestroy {
   setImageAlign(align: 'left' | 'center' | 'right'): void {
     const img = this.selectedImage();
     if (!img) return;
-
-    // Resetar estilos
     img.style.display = 'block';
+    img.style.float = '';
     img.style.marginLeft = '';
     img.style.marginRight = '';
-    img.style.float = '';
-
-    switch (align) {
-      case 'left':
-        img.style.float = 'left';
-        img.style.marginRight = '1rem';
-        break;
-      case 'center':
-        img.style.marginLeft = 'auto';
-        img.style.marginRight = 'auto';
-        break;
-      case 'right':
-        img.style.float = 'right';
-        img.style.marginLeft = '1rem';
-        break;
+    if (align === 'left') {
+      img.style.float = 'left';
+      img.style.marginRight = '1rem';
+    } else if (align === 'center') {
+      img.style.marginLeft = 'auto';
+      img.style.marginRight = 'auto';
+    } else {
+      img.style.float = 'right';
+      img.style.marginLeft = '1rem';
     }
-    
     this.triggerContentChange();
   }
 
   deleteImage(): void {
     const img = this.selectedImage();
     if (!img) return;
-
     img.remove();
     this.deselectImage();
     this.triggerContentChange();
@@ -500,9 +643,14 @@ export class TextEditorComponent implements OnInit, AfterViewInit, OnDestroy {
     this.contentChange$.next(content);
   }
 
+  /** Devolve a cor do colaborador pelo índice (para usar no template) */
+  getCollaboratorColor(index: number): string {
+    return COLLABORATOR_COLORS[index % COLLABORATOR_COLORS.length];
+  }
+
   getToolbarButtonClass(isActive: boolean | string | undefined): string {
-    const baseClass = 'p-2 rounded hover:bg-gray-100 transition-colors';
-    return isActive ? `${baseClass} bg-[#e8f0ee] text-[#155347]` : `${baseClass} text-gray-600`;
+    const base = 'p-2 rounded hover:bg-gray-100 transition-colors';
+    return isActive ? `${base} bg-[#e8f0ee] text-[#155347]` : `${base} text-gray-600`;
   }
 
   getContent(): string {
@@ -510,9 +658,7 @@ export class TextEditorComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   setContent(content: string): void {
-    if (this.quill) {
-      this.quill.root.innerHTML = content;
-    }
+    if (this.quill) this.quill.root.innerHTML = content;
   }
 
   setSaveStatus(status: SaveStatus): void {

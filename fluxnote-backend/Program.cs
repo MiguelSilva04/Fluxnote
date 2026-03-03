@@ -27,23 +27,24 @@ using AspNetCoreRateLimit;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Fluxnote.Backend.Data;
+using Fluxnote.Backend.Hubs;
 using Fluxnote.Backend.Models;
+using Fluxnote.Backend.Services.AI;
 using Fluxnote.Backend.Services.Auth;
 using Fluxnote.Backend.Services.Authorization;
 using Fluxnote.Backend.Services.Email;
-using Fluxnote.Backend.Services.AI;
 using Fluxnote.Backend.Services.Storage;
 using Fluxnote.Backend.Validators;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authentication.MicrosoftAccount;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.AspNetCore.HttpOverrides;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -110,6 +111,22 @@ var authenticationBuilder = builder.Services
             ValidAudience = jwtAudience,
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
             ClockSkew = TimeSpan.FromSeconds(30)
+        };
+        // SignalR envia o token JWT como query string (?access_token=...)
+        // em vez de header Authorization (limitação do WebSocket)
+        options.Events = new JwtBearerEvents
+        {
+            OnMessageReceived = context =>
+            {
+                var accessToken = context.Request.Query["access_token"];
+                var path = context.HttpContext.Request.Path;
+                if (!string.IsNullOrEmpty(accessToken) &&
+                    path.StartsWithSegments("/hubs"))
+                {
+                    context.Token = accessToken;
+                }
+                return Task.CompletedTask;
+            }
         };
     });
 
@@ -313,6 +330,15 @@ builder.Services.AddAuthorization(options =>
 });
 
 // ==============================================================================
+// SIGNALR — Colaboração em tempo real (CRDT com Yjs)
+// ==============================================================================
+builder.Services.AddSignalR(options =>
+{
+    options.EnableDetailedErrors = builder.Environment.IsDevelopment();
+    options.MaximumReceiveMessageSize = 512 * 1024; // 512 KB por update Yjs
+});
+
+// ==============================================================================
 // 6. CORS (Cross-Origin Resource Sharing)
 // ==============================================================================
 // Permite pedidos do frontend Angular (localhost:4200).
@@ -337,7 +363,7 @@ builder.Services.AddCors(options =>
                        return origin.TrimEnd('/') == frontendUrl.TrimEnd('/');
                    return false;
                })
-               .WithHeaders("Content-Type", "Authorization", "X-Requested-With")
+               .WithHeaders("Content-Type", "Authorization", "X-Requested-With", "Upgrade", "Connection")
                .WithMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                // Expõe headers de rate limiting para o cliente
                .WithExposedHeaders("Retry-After", "X-Rate-Limit-Limit", "X-Rate-Limit-Remaining", "X-Rate-Limit-Reset")
@@ -477,6 +503,9 @@ app.UseAuthorization();
 
 // Mapeia controladores da API
 app.MapControllers();
+
+// Hub SignalR para colaboração em tempo real
+app.MapHub<DocumentHub>("/hubs/document");
 
 // Inicia a aplicação
 app.Run();

@@ -19,12 +19,16 @@ interface NotificationItem {
   standalone: true,
   imports: [CommonModule, LucideAngularModule, ButtonComponent],
   template: `
-    @if (panelState.isNotificationsPanelOpen()) {
       <!-- Backdrop -->
-      <div class="fixed inset-0 bg-black/20 z-40" (click)="panelState.closeNotificationsPanel()"></div>
+      <div class="fixed inset-0 bg-black/20 z-40 transition-opacity duration-300"
+           [class.opacity-0]="!panelState.isNotificationsPanelOpen()"
+           [class.pointer-events-none]="!panelState.isNotificationsPanelOpen()"
+           (click)="panelState.closeNotificationsPanel()"></div>
 
       <!-- Side Panel -->
-      <aside class="fixed right-0 top-0 h-full w-96 bg-white shadow-2xl z-50 flex flex-col">
+      <aside class="fixed right-0 top-0 h-full w-full sm:w-96 bg-white shadow-2xl z-50 flex flex-col transition-transform duration-300 ease-in-out"
+             [class.translate-x-full]="!panelState.isNotificationsPanelOpen()"
+             [attr.inert]="!panelState.isNotificationsPanelOpen() ? '' : null">
         <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
           <div>
             <h2 class="text-lg font-bold text-gray-900">Notifications</h2>
@@ -74,7 +78,6 @@ interface NotificationItem {
           </app-button>
         </div>
       </aside>
-    }
   `
 })
 export class NotificationsPanelComponent {

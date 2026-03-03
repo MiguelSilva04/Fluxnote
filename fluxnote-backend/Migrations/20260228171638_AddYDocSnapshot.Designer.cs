@@ -4,6 +4,7 @@ using Fluxnote.Backend.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace fluxnotebackend.Migrations
 {
     [DbContext(typeof(FluxnoteServerContext))]
-    partial class FluxnoteServerContextModelSnapshot : ModelSnapshot
+    [Migration("20260228171638_AddYDocSnapshot")]
+    partial class AddYDocSnapshot
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -77,56 +80,6 @@ namespace fluxnotebackend.Migrations
                     b.HasIndex("TeamId");
 
                     b.ToTable("Document");
-                });
-
-            modelBuilder.Entity("Fluxnote.Backend.Models.DocumentContext", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("ContentType")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<int>("DocumentId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ExtractedText")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("FileName")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<long>("FileSizeBytes")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("StoredPath")
-                        .IsRequired()
-                        .HasMaxLength(2048)
-                        .HasColumnType("nvarchar(2048)");
-
-                    b.Property<DateTime>("UploadedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("UploadedById")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("DocumentId");
-
-                    b.HasIndex("UploadedAt");
-
-                    b.HasIndex("UploadedById");
-
-                    b.ToTable("DocumentContext");
                 });
 
             modelBuilder.Entity("Fluxnote.Backend.Models.DocumentInvite", b =>
@@ -673,25 +626,6 @@ namespace fluxnotebackend.Migrations
                     b.Navigation("Team");
                 });
 
-            modelBuilder.Entity("Fluxnote.Backend.Models.DocumentContext", b =>
-                {
-                    b.HasOne("Fluxnote.Backend.Models.Document", "Document")
-                        .WithMany("ContextFiles")
-                        .HasForeignKey("DocumentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Fluxnote.Backend.Models.User", "UploadedBy")
-                        .WithMany()
-                        .HasForeignKey("UploadedById")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Document");
-
-                    b.Navigation("UploadedBy");
-                });
-
             modelBuilder.Entity("Fluxnote.Backend.Models.DocumentInvite", b =>
                 {
                     b.HasOne("Fluxnote.Backend.Models.TeamMember", "CreatedBy")
@@ -841,8 +775,6 @@ namespace fluxnotebackend.Migrations
 
             modelBuilder.Entity("Fluxnote.Backend.Models.Document", b =>
                 {
-                    b.Navigation("ContextFiles");
-
                     b.Navigation("Permissions");
                 });
 

@@ -67,6 +67,16 @@ namespace Fluxnote.Backend.Models
         public byte[]? Content { get; set; }
 
         /// <summary>
+        /// Snapshot binário do Y.Doc para colaboração em tempo real (Yjs).
+        /// </summary>
+        /// <remarks>
+        /// Serializado via Y.encodeStateAsUpdate() no frontend.
+        /// Guardado periodicamente pelo Hub ao receber SaveSnapshot.
+        /// Permite novos clientes inicializarem o estado correcto ao entrar.
+        /// </remarks>
+        public byte[]? YDocSnapshot { get; set; }
+
+        /// <summary>
         /// Texto extraído do conteúdo para pesquisa full-text.
         /// </summary>
         /// <remarks>

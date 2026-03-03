@@ -8,6 +8,11 @@ export class PanelStateService {
   readonly isProfilePanelOpen = signal(false);
   readonly isNotificationsPanelOpen = signal(false);
 
+  // Sidebar mobile overlay
+  readonly isSidebarOpen = signal(false);
+  toggleSidebar(): void { this.isSidebarOpen.update(v => !v); }
+  closeSidebar(): void  { this.isSidebarOpen.set(false); }
+
   openSettingsPanel(): void {
     this.closeAllPanels();
     this.isSettingsPanelOpen.set(true);

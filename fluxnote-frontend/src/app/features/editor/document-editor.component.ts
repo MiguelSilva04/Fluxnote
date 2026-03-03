@@ -3,7 +3,11 @@ import { CommonModule, Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
-import { ButtonComponent, BadgeComponent, WorkInProgressComponent } from '../../shared/components/ui';
+import {
+  ButtonComponent,
+  BadgeComponent,
+  WorkInProgressComponent,
+} from '../../shared/components/ui';
 import { DocumentShareModalComponent } from '../../shared/components/document-share-modal/document-share-modal.component';
 import { DocumentService, DocumentInviteService } from '../../core/services';
 import { Collaborator, Version, Comment, AISuggestion, DocumentInviteDto, DocumentContextDto } from '../../core/models';
@@ -30,7 +34,10 @@ import { TextEditorComponent } from './components/text-editor.component';
       <!-- Loading State -->
       @if (isLoading()) {
         <div class="flex flex-col items-center justify-center h-screen gap-4">
-          <lucide-icon name="loader-circle" class="h-10 w-10 text-[#155347] animate-spin"></lucide-icon>
+          <lucide-icon
+            name="loader-circle"
+            class="h-10 w-10 text-[#155347] animate-spin"
+          ></lucide-icon>
           <div class="text-gray-500 text-sm">Loading document...</div>
         </div>
       } @else if (loadError()) {
@@ -41,143 +48,171 @@ import { TextEditorComponent } from './components/text-editor.component';
         </div>
       } @else {
         <!-- Header -->
-        <header class="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between shrink-0">
-          <div class="flex items-center gap-4">
-            <button (click)="navigateBack()" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-            <lucide-icon name="arrow-left" class="h-5 w-5 text-gray-600"></lucide-icon>
-          </button>
-          <div class="flex-1">
-            <!-- Editable Title -->
-            @if (canEdit()) {
-              @if (isEditingTitle()) {
-                <input
-                  #titleInput
-                  type="text"
-                  [(ngModel)]="documentTitle"
-                  (blur)="saveTitle()"
-                  (keydown.enter)="saveTitle()"
-                  (keydown.escape)="cancelTitleEdit()"
-                  class="text-lg font-bold text-gray-900 bg-transparent border-b-2 border-[#155347] focus:outline-none w-full max-w-md"
-                />
-              } @else {
-                <h1
-                  (click)="startEditingTitle()"
-                  class="text-lg font-bold text-gray-900 cursor-pointer hover:text-[#155347] transition-colors"
-                  title="Click to edit title"
-                >
-                  {{ documentTitle }}
-                </h1>
-              }
-            } @else {
-              <h1 class="text-lg font-bold text-gray-900">
-                {{ documentTitle }}
-              </h1>
-            }
-            <div class="flex items-center gap-2">
-              <p class="text-xs text-gray-500">{{ lastEditedText() }}</p>
-              @if (!canEdit()) {
-                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-700">
-                  <lucide-icon name="eye" class="h-3 w-3"></lucide-icon>
-                  View only
-                </span>
-              }
-            </div>
-          </div>
-        </div>
-        <div class="flex items-center gap-2">
-          @if (canEdit()) {
-            <app-button variant="outline" size="sm" [leftIcon]="true" (onClick)="toggleAIPanel()">
-              <lucide-icon leftIcon name="sparkles" class="h-4 w-4"></lucide-icon>
-              AI Assistance
-            </app-button>
-            <app-button variant="outline" size="sm" [leftIcon]="true" (onClick)="showWipModal.set(true)">
-              <lucide-icon leftIcon name="clock" class="h-4 w-4"></lucide-icon>
-              History
-            </app-button>
-            <app-button variant="outline" size="sm" [leftIcon]="true" (onClick)="showWipModal.set(true)">
-              <lucide-icon leftIcon name="message-square" class="h-4 w-4"></lucide-icon>
-              Comments
-            </app-button>
-          }
-          @if (pendingInvites().length > 0) {
-            <div class="relative">
-              <button
-                (click)="toggleInvitesPanel()"
-                class="inline-flex items-center gap-2 px-3 py-1.5 text-xs font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-full transition-colors"
-                title="Pending invites"
-              >
-                <lucide-icon name="user-plus" class="h-3.5 w-3.5 text-gray-600"></lucide-icon>
-                Invites
-                <span class="ml-1 inline-flex items-center justify-center h-5 min-w-5 px-1.5 rounded-full bg-[#155347] text-white text-[10px]">
-                  {{ pendingInvites().length }}
-                </span>
+        <header
+          class="bg-white border-b border-gray-200 px-3 md:px-6 py-2 md:py-4 flex items-center justify-between gap-2 shrink-0"
+        >
+          <div class="flex items-center gap-2 md:gap-4 min-w-0 flex-1">
+            <button
+              (click)="navigateBack()"
+              class="p-2 hover:bg-gray-100 rounded-lg transition-colors flex-shrink-0"
+            >
+                <lucide-icon name="arrow-left" class="h-5 w-5 text-gray-600"></lucide-icon>
               </button>
-              @if (showInvitesPanel()) {
-                <div class="absolute right-0 mt-2 w-64 bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden z-10">
-                  <div class="px-3 py-2 text-xs font-medium text-gray-500 bg-gray-50">
-                    Pending invites
-                  </div>
-                  <div class="divide-y divide-gray-100">
-                    @for (inv of pendingInvites(); track inv.id) {
-                      <div class="px-3 py-2 text-sm flex items-center justify-between">
-                        <div>
-                          <div class="font-medium text-gray-900">
-                            {{ inv.role === 1 ? 'Editor' : 'Viewer' }} invite
-                          </div>
-                          <div class="text-xs text-gray-500">
-                            Expires {{ inv.expiresAt | date:'MMM d, y' }}
-                          </div>
-                        </div>
-                        <button
-                          (click)="copyInviteUrl(inv.id, inv.inviteUrl)"
-                          class="text-xs font-medium text-gray-700 hover:text-gray-900">
-                          {{ lastCopiedInviteId() === inv.id ? 'Copied!' : 'Copy link' }}
-                        </button>
-                      </div>
-                    }
-                  </div>
+              <div class="min-w-0 flex-1">
+                <!-- Editable Title -->
+                @if (canEdit()) {
+                  @if (isEditingTitle()) {
+                    <input
+                      #titleInput
+                      type="text"
+                      [(ngModel)]="documentTitle"
+                      (blur)="saveTitle()"
+                      (keydown.enter)="saveTitle()"
+                      (keydown.escape)="cancelTitleEdit()"
+                      class="text-base md:text-lg font-bold text-gray-900 bg-transparent border-b-2 border-[#155347] focus:outline-none w-full max-w-md"
+                    />
+                  } @else {
+                    <h1
+                      (click)="startEditingTitle()"
+                      class="text-base md:text-lg font-bold text-gray-900 cursor-pointer hover:text-[#155347] transition-colors truncate"
+                      title="Click to edit title"
+                    >
+                      {{ documentTitle }}
+                    </h1>
+                  }
+                } @else {
+                  <h1 class="text-base md:text-lg font-bold text-gray-900 truncate">
+                    {{ documentTitle }}
+                  </h1>
+                }
+                <div class="flex items-center gap-2">
+                  <p class="text-xs text-gray-500 hidden sm:block">{{ lastEditedText() }}</p>
+                  @if (!canEdit()) {
+                    <span
+                    class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-700"
+                  >
+                      <lucide-icon name="eye" class="h-3 w-3"></lucide-icon>
+                      <span class="hidden sm:inline">View only</span>
+                    </span>
+                  }
                 </div>
-              }
-            </div>
-          }
-          @if (canEdit()) {
-            <app-button variant="outline" size="sm" [leftIcon]="true" (onClick)="openShareModal()">
-              <lucide-icon leftIcon name="share-2" class="h-4 w-4"></lucide-icon>
-              Share
-            </app-button>
-          }
-          <button class="p-2 hover:bg-gray-100 rounded-lg">
-            <lucide-icon name="ellipsis-vertical" class="h-5 w-5 text-gray-600"></lucide-icon>
-          </button>
-        </div>
-      </header>
-
-      <div class="flex flex-1 overflow-hidden">
-        <!-- Main Editor -->
-        <main class="flex-1 flex flex-col overflow-hidden">
-          <app-rich-text-editor
-            #editor
-            [initialContent]="initialContent"
-            placeholder="Start writing your document..."
-            [autoSaveDelay]="2000"
-            [editable]="canEdit()"
-            (contentChange)="onContentChange($event)"
-            (save)="onSave($event)"
-          />
-        </main>
-
-        <!-- AI Assistant Panel -->
-        @if (showAIPanel()) {
-          <aside class="w-80 bg-white border-l border-gray-200 flex flex-col shadow-xl">
-            <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-              <div class="flex items-center gap-2">
-                <lucide-icon name="sparkles" class="h-5 w-5 text-[#155347]"></lucide-icon>
-                <h3 class="text-lg font-bold text-gray-900">AI Assistance</h3>
               </div>
-              <button (click)="showAIPanel.set(false)" class="p-1 hover:bg-gray-100 rounded">
-                <lucide-icon name="x" class="h-5 w-5 text-gray-500"></lucide-icon>
-              </button>
             </div>
+            <div class="flex items-center gap-1 md:gap-2 flex-shrink-0">
+            @if (canEdit()) {
+              <app-button variant="outline" size="sm" [leftIcon]="true" (onClick)="toggleAIPanel()" customClass="hidden md:inline-flex">
+                <lucide-icon leftIcon name="sparkles" class="h-4 w-4"></lucide-icon>
+                AI Assistance
+              </app-button>
+              <app-button
+                variant="outline"
+                size="sm"
+                [leftIcon]="true"
+                (onClick)="showWipModal.set(true)" customClass="hidden md:inline-flex"
+              >
+                <lucide-icon leftIcon name="clock" class="h-4 w-4"></lucide-icon>
+                History
+              </app-button>
+              <app-button
+                variant="outline"
+                size="sm"
+                [leftIcon]="true"
+                (onClick)="showWipModal.set(true)" customClass="hidden md:inline-flex"
+              >
+                <lucide-icon leftIcon name="message-square" class="h-4 w-4"></lucide-icon>
+                Comments
+              </app-button>
+            }
+            @if (pendingInvites().length > 0) {
+              <div class="relative">
+                <button
+                  (click)="toggleInvitesPanel()"
+                  class="inline-flex items-center gap-2 px-3 py-1.5 text-xs font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-full transition-colors"
+                  title="Pending invites"
+                >
+                  <lucide-icon name="user-plus" class="h-3.5 w-3.5 text-gray-600"></lucide-icon>
+                  Invites
+                  <span
+                    class="ml-1 inline-flex items-center justify-center h-5 min-w-5 px-1.5 rounded-full bg-[#155347] text-white text-[10px]"
+                  >
+                    {{ pendingInvites().length }}
+                  </span>
+                </button>
+                @if (showInvitesPanel()) {
+                  <div
+                    class="absolute right-0 mt-2 w-64 bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden z-10"
+                  >
+                    <div class="px-3 py-2 text-xs font-medium text-gray-500 bg-gray-50">
+                      Pending invites
+                    </div>
+                    <div class="divide-y divide-gray-100">
+                      @for (inv of pendingInvites(); track inv.id) {
+                        <div class="px-3 py-2 text-sm flex items-center justify-between">
+                          <div>
+                            <div class="font-medium text-gray-900">
+                              {{ inv.role === 1 ? 'Editor' : 'Viewer' }} invite
+                            </div>
+                            <div class="text-xs text-gray-500">
+                              Expires {{ inv.expiresAt | date: 'MMM d, y' }}
+                            </div>
+                          </div>
+                          <button
+                            (click)="copyInviteUrl(inv.id, inv.inviteUrl)"
+                            class="text-xs font-medium text-gray-700 hover:text-gray-900"
+                          >
+                            {{ lastCopiedInviteId() === inv.id ? 'Copied!' : 'Copy link' }}
+                          </button>
+                        </div>
+                      }
+                    </div>
+                  </div>
+                }
+              </div>
+            }
+            @if (canEdit()) {
+              <app-button
+                variant="outline"
+                size="sm"
+                [leftIcon]="true"
+                (onClick)="openShareModal()"
+              >
+                <lucide-icon leftIcon name="share-2" class="h-4 w-4"></lucide-icon>
+                Share
+              </app-button>
+            }
+            <button class="p-2 hover:bg-gray-100 rounded-lg">
+              <lucide-icon name="ellipsis-vertical" class="h-5 w-5 text-gray-600"></lucide-icon>
+            </button>
+          </div>
+        </header>
+
+        <div class="flex flex-1 overflow-hidden">
+          <!-- Main Editor -->
+          <main class="flex-1 flex flex-col overflow-hidden">
+            <app-rich-text-editor
+              #editor
+              [initialContent]="initialContent"
+              [documentId]="documentId"
+              placeholder="Start writing your document..."
+              [autoSaveDelay]="2000"
+              [editable]="canEdit()"
+              (contentChange)="onContentChange($event)"
+              (save)="onSave($event)"
+            />
+          </main>
+
+          <!-- AI Assistant Panel -->
+          @if (showAIPanel()) {
+            <aside class="w-80 bg-white border-l border-gray-200 flex flex-col shadow-xl">
+              <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <lucide-icon name="sparkles" class="h-5 w-5 text-[#155347]"></lucide-icon>
+                  <h3 class="text-lg font-bold text-gray-900">AI Assistance</h3>
+                </div>
+                <button (click)="showAIPanel.set(false)" class="p-1 hover:bg-gray-100 rounded">
+                  <lucide-icon name="x" class="h-5 w-5 text-gray-500"></lucide-icon>
+                </button>
+              </div>
 
             <div class="flex-1 overflow-y-auto p-6">
               <div class="mb-6">
@@ -286,177 +321,215 @@ import { TextEditorComponent } from './components/text-editor.component';
           </aside>
         }
 
-        <!-- Version History Sidebar -->
-        @if (showVersionHistory()) {
-          <aside class="w-96 bg-white border-l border-gray-200 flex flex-col shadow-xl">
-            <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-              <h3 class="text-lg font-bold text-gray-900">Version History</h3>
-              <button (click)="showVersionHistory.set(false)" class="p-1 hover:bg-gray-100 rounded">
-                <lucide-icon name="x" class="h-5 w-5 text-gray-500"></lucide-icon>
-              </button>
-            </div>
+          <!-- Version History Sidebar -->
+          @if (showVersionHistory()) {
+            <aside class="w-96 bg-white border-l border-gray-200 flex flex-col shadow-xl">
+              <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+                <h3 class="text-lg font-bold text-gray-900">Version History</h3>
+                <button
+                  (click)="showVersionHistory.set(false)"
+                  class="p-1 hover:bg-gray-100 rounded"
+                >
+                  <lucide-icon name="x" class="h-5 w-5 text-gray-500"></lucide-icon>
+                </button>
+              </div>
 
-            <div class="flex-1 overflow-y-auto p-4">
-              @if (selectedVersions().length === 2) {
-                <div class="mb-4">
-                  <app-button (onClick)="handleCompareVersions()" customClass="w-full bg-[#155347] hover:bg-[#0d3d31]">
-                    Compare Selected Versions
+              <div class="flex-1 overflow-y-auto p-4">
+                @if (selectedVersions().length === 2) {
+                  <div class="mb-4">
+                    <app-button
+                      (onClick)="handleCompareVersions()"
+                      customClass="w-full bg-[#155347] hover:bg-[#0d3d31]"
+                    >
+                      Compare Selected Versions
+                    </app-button>
+                  </div>
+                }
+
+                <div class="space-y-4">
+                  @for (version of versions; track version.id) {
+                    <div
+                      [class]="
+                        'p-4 border-2 rounded-lg transition-colors ' +
+                        (selectedVersions().includes(version.id)
+                          ? 'border-[#155347] bg-[#e8f0ee]'
+                          : 'border-gray-200 hover:border-gray-300')
+                      "
+                    >
+                      <div class="flex items-start justify-between mb-2">
+                        <div>
+                          <h4 class="text-sm font-bold text-gray-900">
+                            Version {{ version.number }}
+                          </h4>
+                          <p class="text-xs text-gray-500">{{ version.timestamp }}</p>
+                        </div>
+                        <input
+                          type="checkbox"
+                          [checked]="selectedVersions().includes(version.id)"
+                          (change)="handleVersionSelect(version.id)"
+                          class="rounded border-gray-300 text-[#155347] focus:ring-[#155347]"
+                        />
+                      </div>
+                      <p class="text-xs font-medium text-gray-900 mb-1">{{ version.author }}:</p>
+                      <p class="text-xs text-gray-700 mb-3">{{ version.description }}</p>
+                      <div class="flex gap-2">
+                        <app-button
+                          variant="outline"
+                          size="sm"
+                          [leftIcon]="true"
+                          (onClick)="handleRestore(version.number)"
+                        >
+                          <lucide-icon leftIcon name="rotate-ccw" class="h-3 w-3"></lucide-icon>
+                          Restore
+                        </app-button>
+                      </div>
+                    </div>
+                  }
+                </div>
+              </div>
+            </aside>
+          }
+
+          <!-- Comments Sidebar -->
+          @if (showComments()) {
+            <aside class="w-96 bg-white border-l border-gray-200 flex flex-col shadow-xl">
+              <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <h3 class="text-lg font-bold text-gray-900">Comments</h3>
+                  <app-badge customClass="bg-red-500 text-white">2</app-badge>
+                </div>
+                <button (click)="showComments.set(false)" class="p-1 hover:bg-gray-100 rounded">
+                  <lucide-icon name="x" class="h-5 w-5 text-gray-500"></lucide-icon>
+                </button>
+              </div>
+
+              <div class="p-4 border-b border-gray-200">
+                <textarea
+                  placeholder="Add a comment..."
+                  [(ngModel)]="newComment"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#155347] text-sm resize-none"
+                  rows="3"
+                ></textarea>
+                <div class="mt-2 flex justify-end">
+                  <app-button
+                    size="sm"
+                    customClass="bg-[#155347] hover:bg-[#0d3d31]"
+                    [leftIcon]="true"
+                  >
+                    <lucide-icon leftIcon name="send" class="h-3 w-3"></lucide-icon>
+                    Post
                   </app-button>
                 </div>
-              }
+              </div>
 
-              <div class="space-y-4">
-                @for (version of versions; track version.id) {
-                  <div
-                    [class]="'p-4 border-2 rounded-lg transition-colors ' + (selectedVersions().includes(version.id) ? 'border-[#155347] bg-[#e8f0ee]' : 'border-gray-200 hover:border-gray-300')"
-                  >
-                    <div class="flex items-start justify-between mb-2">
-                      <div>
-                        <h4 class="text-sm font-bold text-gray-900">Version {{ version.number }}</h4>
-                        <p class="text-xs text-gray-500">{{ version.timestamp }}</p>
+              <div class="flex-1 overflow-y-auto p-4 space-y-4">
+                @for (comment of comments; track comment.id) {
+                  <div class="space-y-2">
+                    <div class="flex gap-3">
+                      <div
+                        [class]="
+                          'h-8 w-8 rounded-full text-white flex items-center justify-center text-xs font-medium shrink-0 ' +
+                          comment.color
+                        "
+                      >
+                        {{ comment.avatar }}
                       </div>
-                      <input
-                        type="checkbox"
-                        [checked]="selectedVersions().includes(version.id)"
-                        (change)="handleVersionSelect(version.id)"
-                        class="rounded border-gray-300 text-[#155347] focus:ring-[#155347]"
-                      />
-                    </div>
-                    <p class="text-xs font-medium text-gray-900 mb-1">{{ version.author }}:</p>
-                    <p class="text-xs text-gray-700 mb-3">{{ version.description }}</p>
-                    <div class="flex gap-2">
-                      <app-button variant="outline" size="sm" [leftIcon]="true" (onClick)="handleRestore(version.number)">
-                        <lucide-icon leftIcon name="rotate-ccw" class="h-3 w-3"></lucide-icon>
-                        Restore
-                      </app-button>
+                      <div class="flex-1">
+                        <div class="flex items-center gap-2 mb-1">
+                          <span class="text-sm font-medium text-gray-900">{{
+                            comment.author
+                          }}</span>
+                          <span class="text-xs text-gray-500">{{ comment.time }}</span>
+                        </div>
+                        <p class="text-sm text-gray-700">{{ comment.text }}</p>
+                        <button class="text-xs text-gray-500 hover:text-[#155347] mt-2">
+                          Reply
+                        </button>
+                      </div>
                     </div>
                   </div>
                 }
               </div>
-            </div>
-          </aside>
+            </aside>
+          }
+        </div>
+
+        @if (showShareModal()) {
+          <app-document-share-modal
+            [isOpen]="true"
+            [role]="shareRole()"
+            [expirationDays]="shareExpirationDays()"
+            [generatedUrl]="shareGeneratedUrl()"
+            [loading]="shareLoading()"
+            [copied]="shareCopied()"
+            [invites]="documentInvites()"
+            (close)="closeShareModal()"
+            (roleChange)="shareRole.set($event)"
+            (expirationDaysChange)="shareExpirationDays.set($event)"
+            (generateInvite)="generateInviteLink()"
+            (copyInvite)="copyInviteLink()"
+            (revokeInvite)="revokeInvite($event)"
+            (clearInvites)="clearUsedInvites()"
+            (viewInvite)="shareGeneratedUrl.set($event); shareCopied.set(false)"
+          />
         }
 
-        <!-- Comments Sidebar -->
-        @if (showComments()) {
-          <aside class="w-96 bg-white border-l border-gray-200 flex flex-col shadow-xl">
-            <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-              <div class="flex items-center gap-2">
-                <h3 class="text-lg font-bold text-gray-900">Comments</h3>
-                <app-badge customClass="bg-red-500 text-white">2</app-badge>
+        <!-- Restore Version Modal -->
+        @if (isRestoreModalOpen()) {
+          <div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <div class="bg-white rounded-xl shadow-2xl w-full max-w-md">
+              <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+                <h2 class="text-lg font-bold text-gray-900">Restore Old Version</h2>
+                <button (click)="closeRestoreModal()" class="text-gray-400 hover:text-gray-600 p-1">
+                  <lucide-icon name="x" class="h-5 w-5"></lucide-icon>
+                </button>
               </div>
-              <button (click)="showComments.set(false)" class="p-1 hover:bg-gray-100 rounded">
-                <lucide-icon name="x" class="h-5 w-5 text-gray-500"></lucide-icon>
-              </button>
-            </div>
 
-            <div class="p-4 border-b border-gray-200">
-              <textarea
-                placeholder="Add a comment..."
-                [(ngModel)]="newComment"
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#155347] text-sm resize-none"
-                rows="3"
-              ></textarea>
-              <div class="mt-2 flex justify-end">
-                <app-button size="sm" customClass="bg-[#155347] hover:bg-[#0d3d31]" [leftIcon]="true">
-                  <lucide-icon leftIcon name="send" class="h-3 w-3"></lucide-icon>
-                  Post
+              <div class="p-6 space-y-4">
+                <div class="flex items-start gap-3 p-4 bg-red-50 border border-red-200 rounded-lg">
+                  <lucide-icon
+                    name="triangle-alert"
+                    class="h-5 w-5 text-red-600 shrink-0 mt-0.5"
+                  ></lucide-icon>
+                  <p class="text-sm text-red-800 font-medium">
+                    This action will replace the current version of the document with the selected
+                    version.
+                  </p>
+                </div>
+
+                <p class="text-sm text-gray-600">
+                  This action cannot be undone. Make sure you want to continue.
+                </p>
+
+                <label class="flex items-start gap-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    [(ngModel)]="restoreConfirmed"
+                    class="mt-0.5 rounded border-gray-300 text-red-600 focus:ring-red-500"
+                  />
+                  <span class="text-sm text-gray-700"
+                    >I understand that this action is irreversible.</span
+                  >
+                </label>
+              </div>
+
+              <div
+                class="px-6 py-4 bg-gray-50 border-t border-gray-100 flex justify-end gap-3 rounded-b-xl"
+              >
+                <app-button variant="ghost" (onClick)="closeRestoreModal()">Cancel</app-button>
+                <app-button
+                  (onClick)="confirmRestore()"
+                  [disabled]="!restoreConfirmed"
+                  customClass="bg-red-600 hover:bg-red-700 disabled:bg-gray-300 disabled:cursor-not-allowed"
+                >
+                  Restore and Replace
                 </app-button>
               </div>
             </div>
-
-            <div class="flex-1 overflow-y-auto p-4 space-y-4">
-              @for (comment of comments; track comment.id) {
-                <div class="space-y-2">
-                  <div class="flex gap-3">
-                    <div
-                      [class]="'h-8 w-8 rounded-full text-white flex items-center justify-center text-xs font-medium shrink-0 ' + comment.color"
-                    >
-                      {{ comment.avatar }}
-                    </div>
-                    <div class="flex-1">
-                      <div class="flex items-center gap-2 mb-1">
-                        <span class="text-sm font-medium text-gray-900">{{ comment.author }}</span>
-                        <span class="text-xs text-gray-500">{{ comment.time }}</span>
-                      </div>
-                      <p class="text-sm text-gray-700">{{ comment.text }}</p>
-                      <button class="text-xs text-gray-500 hover:text-[#155347] mt-2">Reply</button>
-                    </div>
-                  </div>
-                </div>
-              }
-            </div>
-          </aside>
-        }
-      </div>
-
-      @if (showShareModal()) {
-        <app-document-share-modal
-          [isOpen]="true"
-          [role]="shareRole()"
-          [expirationDays]="shareExpirationDays()"
-          [generatedUrl]="shareGeneratedUrl()"
-          [loading]="shareLoading()"
-          [copied]="shareCopied()"
-          [invites]="documentInvites()"
-          (close)="closeShareModal()"
-          (roleChange)="shareRole.set($event)"
-          (expirationDaysChange)="shareExpirationDays.set($event)"
-          (generateInvite)="generateInviteLink()"
-          (copyInvite)="copyInviteLink()"
-          (revokeInvite)="revokeInvite($event)"
-          (clearInvites)="clearUsedInvites()"
-          (viewInvite)="shareGeneratedUrl.set($event); shareCopied.set(false)"
-        />
-      }
-
-      <!-- Restore Version Modal -->
-      @if (isRestoreModalOpen()) {
-        <div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div class="bg-white rounded-xl shadow-2xl w-full max-w-md">
-            <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
-              <h2 class="text-lg font-bold text-gray-900">Restore Old Version</h2>
-              <button (click)="closeRestoreModal()" class="text-gray-400 hover:text-gray-600 p-1">
-                <lucide-icon name="x" class="h-5 w-5"></lucide-icon>
-              </button>
-            </div>
-
-            <div class="p-6 space-y-4">
-              <div class="flex items-start gap-3 p-4 bg-red-50 border border-red-200 rounded-lg">
-                <lucide-icon name="triangle-alert" class="h-5 w-5 text-red-600 shrink-0 mt-0.5"></lucide-icon>
-                <p class="text-sm text-red-800 font-medium">
-                  This action will replace the current version of the document with the selected version.
-                </p>
-              </div>
-
-              <p class="text-sm text-gray-600">
-                This action cannot be undone. Make sure you want to continue.
-              </p>
-
-              <label class="flex items-start gap-3 cursor-pointer">
-                <input
-                  type="checkbox"
-                  [(ngModel)]="restoreConfirmed"
-                  class="mt-0.5 rounded border-gray-300 text-red-600 focus:ring-red-500"
-                />
-                <span class="text-sm text-gray-700">I understand that this action is irreversible.</span>
-              </label>
-            </div>
-
-            <div class="px-6 py-4 bg-gray-50 border-t border-gray-100 flex justify-end gap-3 rounded-b-xl">
-              <app-button variant="ghost" (onClick)="closeRestoreModal()">Cancel</app-button>
-              <app-button
-                (onClick)="confirmRestore()"
-                [disabled]="!restoreConfirmed"
-                customClass="bg-red-600 hover:bg-red-700 disabled:bg-gray-300 disabled:cursor-not-allowed"
-              >
-                Restore and Replace
-              </app-button>
-            </div>
           </div>
-        </div>
+        }
       }
-      } <!-- End of @else (loading) -->
+      <!-- End of @else (loading) -->
 
       <!-- AI Summary Modal -->
       @if (showSummaryModal()) {
@@ -467,13 +540,21 @@ import { TextEditorComponent } from './components/text-editor.component';
                 <lucide-icon name="sparkles" class="h-5 w-5 text-purple-600"></lucide-icon>
                 <h2 class="text-lg font-bold text-gray-900">AI Summary</h2>
               </div>
-              <button (click)="closeSummaryModal()" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
+              <button
+                (click)="closeSummaryModal()"
+                class="text-gray-400 hover:text-gray-600 text-2xl"
+              >
+                &times;
+              </button>
             </div>
 
             <div class="p-6">
               @if (summaryLoading()) {
                 <div class="flex flex-col items-center justify-center py-8 gap-3">
-                  <lucide-icon name="loader-circle" class="h-8 w-8 text-purple-600 animate-spin"></lucide-icon>
+                  <lucide-icon
+                    name="loader-circle"
+                    class="h-8 w-8 text-purple-600 animate-spin"
+                  ></lucide-icon>
                   <p class="text-gray-600 text-sm">Generating summary...</p>
                 </div>
               } @else if (summaryError()) {
@@ -486,12 +567,16 @@ import { TextEditorComponent } from './components/text-editor.component';
                 </div>
               } @else {
                 <div class="bg-purple-50 border border-purple-200 rounded-lg p-4">
-                  <p class="text-gray-800 text-sm leading-relaxed whitespace-pre-wrap">{{ summaryResult() }}</p>
+                  <p class="text-gray-800 text-sm leading-relaxed whitespace-pre-wrap">
+                    {{ summaryResult() }}
+                  </p>
                 </div>
               }
             </div>
 
-            <div class="px-6 py-4 bg-gray-50 border-t border-gray-100 flex justify-end gap-3 rounded-b-xl">
+            <div
+              class="px-6 py-4 bg-gray-50 border-t border-gray-100 flex justify-end gap-3 rounded-b-xl"
+            >
               @if (!summaryLoading() && !summaryError()) {
                 <app-button variant="outline" size="sm" (onClick)="copySummary()">
                   @if (summaryCopied()) {
@@ -523,10 +608,10 @@ export class DocumentEditorComponent implements OnInit {
   private documentService = inject(DocumentService);
   private inviteService = inject(DocumentInviteService);
   private location = inject(Location);
-  
+
   // ID do documento atual
   documentId: number | null = null;
-  
+
   // Estado de carregamento
   isLoading = signal(true);
   loadError = signal<string | null>(null);
@@ -624,7 +709,7 @@ export class DocumentEditorComponent implements OnInit {
         this.isLoading.set(false);
         // Redirecionar para dashboard após delay
         setTimeout(() => this.router.navigate(['/dashboard']), 2000);
-      }
+      },
     });
   }
 
@@ -690,7 +775,7 @@ export class DocumentEditorComponent implements OnInit {
   }
 
   pendingInvites(): DocumentInviteDto[] {
-    return this.documentInvites().filter(inv => !inv.isUsed);
+    return this.documentInvites().filter((inv) => !inv.isUsed);
   }
 
   openShareModal(): void {
@@ -712,22 +797,24 @@ export class DocumentEditorComponent implements OnInit {
     if (!this.documentId) return;
 
     this.shareLoading.set(true);
-    this.inviteService.createInvite({
-      documentId: this.documentId,
-      role: this.shareRole(),
-      expirationDays: this.shareExpirationDays()
-    }).subscribe({
-      next: (invite) => {
-        this.shareGeneratedUrl.set(invite.inviteUrl);
-        this.shareLoading.set(false);
-        this.shareCopied.set(false);
-        this.loadDocumentInvites(this.documentId!);
-      },
-      error: (err) => {
-        console.error('Error creating invite:', err);
-        this.shareLoading.set(false);
-      }
-    });
+    this.inviteService
+      .createInvite({
+        documentId: this.documentId,
+        role: this.shareRole(),
+        expirationDays: this.shareExpirationDays(),
+      })
+      .subscribe({
+        next: (invite) => {
+          this.shareGeneratedUrl.set(invite.inviteUrl);
+          this.shareLoading.set(false);
+          this.shareCopied.set(false);
+          this.loadDocumentInvites(this.documentId!);
+        },
+        error: (err) => {
+          console.error('Error creating invite:', err);
+          this.shareLoading.set(false);
+        },
+      });
   }
 
   copyInviteLink(): void {
@@ -747,16 +834,16 @@ export class DocumentEditorComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error revoking invite:', err);
-      }
+      },
     });
   }
 
   clearUsedInvites(): void {
-    const usedInvites = this.documentInvites().filter(inv => inv.isUsed);
+    const usedInvites = this.documentInvites().filter((inv) => inv.isUsed);
     if (usedInvites.length === 0) return;
 
     let completed = 0;
-    usedInvites.forEach(inv => {
+    usedInvites.forEach((inv) => {
       this.inviteService.revokeInvite(inv.id).subscribe({
         next: () => {
           completed += 1;
@@ -769,7 +856,7 @@ export class DocumentEditorComponent implements OnInit {
           if (completed === usedInvites.length && this.documentId) {
             this.loadDocumentInvites(this.documentId);
           }
-        }
+        },
       });
     });
   }
@@ -800,7 +887,7 @@ export class DocumentEditorComponent implements OnInit {
         // Hide panel for non-owners/admins or in case of errors
         this.documentInvites.set([]);
         this.showInvitesPanel.set(false);
-      }
+      },
     });
   }
 
@@ -836,22 +923,24 @@ export class DocumentEditorComponent implements OnInit {
       this.documentTitle = this.originalTitle;
     }
     this.isEditingTitle.set(false);
-    
+
     // Guardar título no backend
     if (this.documentId && this.documentTitle !== this.originalTitle) {
-      this.documentService.updateDocument(this.documentId, {
-        title: this.documentTitle
-      }).subscribe({
-        next: () => {
-          this.originalTitle = this.documentTitle;
-          this.updateLastEdited();
-        },
-        error: (err) => {
-          console.error('Error saving title:', err);
-          // Reverter título em caso de erro
-          this.documentTitle = this.originalTitle;
-        }
-      });
+      this.documentService
+        .updateDocument(this.documentId, {
+          title: this.documentTitle,
+        })
+        .subscribe({
+          next: () => {
+            this.originalTitle = this.documentTitle;
+            this.updateLastEdited();
+          },
+          error: (err) => {
+            console.error('Error saving title:', err);
+            // Reverter título em caso de erro
+            this.documentTitle = this.originalTitle;
+          },
+        });
     }
   }
 
@@ -886,7 +975,7 @@ export class DocumentEditorComponent implements OnInit {
       error: (err) => {
         console.error('Error saving document:', err);
         this.editor.setSaveStatus('error');
-      }
+      },
     });
   }
 
@@ -962,10 +1051,10 @@ export class DocumentEditorComponent implements OnInit {
       error: (err) => {
         console.error('Error generating summary:', err);
         this.summaryError.set(
-          err.error?.message || 'Failed to generate summary. Please try again.'
+          err.error?.message || 'Failed to generate summary. Please try again.',
         );
         this.summaryLoading.set(false);
-      }
+      },
     });
   }
 
