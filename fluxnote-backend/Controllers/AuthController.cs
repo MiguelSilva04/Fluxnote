@@ -903,9 +903,9 @@ public class AuthController : ControllerBase
             return BadRequest(new { available = false, message = "Username must be between 3 and 30 characters." });
         }
 
-        if (!System.Text.RegularExpressions.Regex.IsMatch(username, @"^[a-zA-Z0-9_]+$"))
+        if (!System.Text.RegularExpressions.Regex.IsMatch(username, @"^[a-zA-Z0-9_@]+$"))
         {
-            return BadRequest(new { available = false, message = "Username can only contain letters, numbers, and underscores." });
+            return BadRequest(new { available = false, message = "Username can only contain letters, numbers, @, and underscores." });
         }
 
         // Check if username is taken by another user

@@ -47,11 +47,11 @@ public class UpdateProfileRequest
     /// Username único para identificação.
     /// </summary>
     /// <remarks>
-    /// Validações: 3-30 caracteres, apenas letras, números e underscore.<br/>
+    /// Validações: 3-30 caracteres, apenas letras, números, arroba (@) e underscore.<br/>
     /// <b>⚠️ Limite:</b> Máximo 3 alterações por mês.
     /// </remarks>
     [StringLength(30, MinimumLength = 3, ErrorMessage = "Username must be between 3 and 30 characters.")]
-    [RegularExpression(@"^[a-zA-Z0-9_]+$", ErrorMessage = "Username can only contain letters, numbers, and underscores.")]
+    [RegularExpression(@"^[a-zA-Z0-9_@]+$", ErrorMessage = "Username can only contain letters, numbers, @, and underscores.")]
     public string? UserName { get; set; }
 
     /// <summary>

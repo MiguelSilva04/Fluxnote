@@ -3,7 +3,14 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { LucideAngularModule } from 'lucide-angular';
 import { DashboardLayoutComponent } from '../../../layout/dashboard-layout/dashboard-layout.component';
-import { ButtonComponent, CardComponent, CardContentComponent, BadgeComponent, WorkInProgressComponent, ModalComponent } from '../../../shared/components/ui';
+import {
+  ButtonComponent,
+  CardComponent,
+  CardContentComponent,
+  BadgeComponent,
+  WorkInProgressComponent,
+  ModalComponent,
+} from '../../../shared/components/ui';
 import { AuthService, UploadService } from '../../../core/services';
 import { CITIES } from '../../../core/data/cities.data';
 import { firstValueFrom } from 'rxjs';
@@ -21,7 +28,7 @@ import { firstValueFrom } from 'rxjs';
     CardContentComponent,
     BadgeComponent,
     WorkInProgressComponent,
-    ModalComponent
+    ModalComponent,
   ],
   template: `
     <app-dashboard-layout>
@@ -30,13 +37,17 @@ import { firstValueFrom } from 'rxjs';
 
         <!-- Success/Error Messages -->
         @if (successMessage()) {
-          <div class="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg flex items-center gap-2 text-green-800">
+          <div
+            class="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg flex items-center gap-2 text-green-800"
+          >
             <lucide-icon name="circle-check" class="h-5 w-5"></lucide-icon>
             <span>{{ successMessage() }}</span>
           </div>
         }
         @if (errorMessage()) {
-          <div class="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2 text-red-800">
+          <div
+            class="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2 text-red-800"
+          >
             <lucide-icon name="circle-alert" class="h-5 w-5"></lucide-icon>
             <span>{{ errorMessage() }}</span>
           </div>
@@ -56,9 +67,11 @@ import { firstValueFrom } from 'rxjs';
                       (error)="onAvatarError()"
                     />
                   } @else {
-                    <div class="h-24 w-24 rounded-full flex items-center justify-center text-white text-2xl font-bold mx-auto"
-                      [style.background]="user()?.color">
-                      {{user()?.initials || ''}}
+                    <div
+                      class="h-24 w-24 rounded-full flex items-center justify-center text-white text-2xl font-bold mx-auto"
+                      [style.background]="user()?.color"
+                    >
+                      {{ user()?.initials || '' }}
                     </div>
                   }
                   <button
@@ -68,13 +81,19 @@ import { firstValueFrom } from 'rxjs';
                     <lucide-icon name="camera" class="h-4 w-4"></lucide-icon>
                   </button>
                 </div>
-                <h2 class="text-xl font-bold text-gray-900 mb-1">{{formData().fullName || user()?.fullName || ''}}</h2>
+                <h2 class="text-xl font-bold text-gray-900 mb-1">
+                  {{ formData().fullName || user()?.fullName || '' }}
+                </h2>
                 @if (formData().userName || user()?.userName) {
-                  <p class="text-sm text-[#155347] font-medium mb-1">{{'@' + (formData().userName || user()?.userName)}}</p>
+                  <p class="text-sm text-[#155347] font-medium mb-1">
+                    {{ '@' + (formData().userName || user()?.userName) }}
+                  </p>
                 }
-                <p class="text-sm text-gray-600 mb-2">{{user()?.email || ''}}</p>
+                <p class="text-sm text-gray-600 mb-2">{{ user()?.email || '' }}</p>
                 @if (user()?.createdAt) {
-                  <p class="text-xs text-gray-400 mb-4">Member since {{ formatDate(user()?.createdAt) }}</p>
+                  <p class="text-xs text-gray-400 mb-4">
+                    Member since {{ formatDate(user()?.createdAt) }}
+                  </p>
                 }
                 <app-badge variant="default">Pro Plan</app-badge>
               </app-card-content>
@@ -94,8 +113,12 @@ import { firstValueFrom } from 'rxjs';
                       [ngModel]="formData().fullName"
                       (ngModelChange)="updateFormField('fullName', $event)"
                       maxlength="50"
-                      [class]="'w-full h-10 px-4 rounded-lg border focus:outline-none focus:ring-2 text-sm ' +
-                        (formErrors()['fullName'] ? 'border-red-400 focus:ring-red-400' : 'border-gray-300 focus:ring-[#155347]')"
+                      [class]="
+                        'w-full h-10 px-4 rounded-lg border focus:outline-none focus:ring-2 text-sm ' +
+                        (formErrors()['fullName']
+                          ? 'border-red-400 focus:ring-red-400'
+                          : 'border-gray-300 focus:ring-[#155347]')
+                      "
                     />
                     @if (formErrors()['fullName']) {
                       <p class="text-xs text-red-500 mt-1">{{ formErrors()['fullName'] }}</p>
@@ -118,13 +141,23 @@ import { firstValueFrom } from 'rxjs';
                         (ngModelChange)="updateFormField('userName', $event)"
                         placeholder="username"
                         maxlength="30"
-                        [disabled]="user()?.usernameChangesRemaining === 0 && formData().userName === originalData.userName"
-                        [class]="'w-full h-10 pl-8 pr-4 rounded-lg border focus:outline-none focus:ring-2 focus:ring-[#155347] text-sm ' +
-                          (user()?.usernameChangesRemaining === 0 && formData().userName === originalData.userName ? 'border-gray-200 bg-gray-50 text-gray-500 cursor-not-allowed' : 'border-gray-300')"
+                        [disabled]="
+                          user()?.usernameChangesRemaining === 0 &&
+                          formData().userName === originalData.userName
+                        "
+                        [class]="
+                          'w-full h-10 pl-8 pr-4 rounded-lg border focus:outline-none focus:ring-2 focus:ring-[#155347] text-sm ' +
+                          (user()?.usernameChangesRemaining === 0 &&
+                          formData().userName === originalData.userName
+                            ? 'border-gray-200 bg-gray-50 text-gray-500 cursor-not-allowed'
+                            : 'border-gray-300')
+                        "
                       />
                     </div>
                     @if (user()?.usernameChangesRemaining === 0) {
-                      <p class="text-xs text-amber-600 mt-1">You've reached your username change limit for this month.</p>
+                      <p class="text-xs text-amber-600 mt-1">
+                        You've reached your username change limit for this month.
+                      </p>
                     }
                     @if (formErrors()['userName']) {
                       <p class="text-xs text-red-500 mt-1">{{ formErrors()['userName'] }}</p>
@@ -147,8 +180,12 @@ import { firstValueFrom } from 'rxjs';
                       [ngModel]="formData().phoneNumber"
                       (ngModelChange)="updateFormField('phoneNumber', $event)"
                       placeholder="+351 912 345 678"
-                      [class]="'w-full h-10 px-4 rounded-lg border focus:outline-none focus:ring-2 text-sm ' +
-                        (formErrors()['phoneNumber'] ? 'border-red-400 focus:ring-red-400' : 'border-gray-300 focus:ring-[#155347]')"
+                      [class]="
+                        'w-full h-10 px-4 rounded-lg border focus:outline-none focus:ring-2 text-sm ' +
+                        (formErrors()['phoneNumber']
+                          ? 'border-red-400 focus:ring-red-400'
+                          : 'border-gray-300 focus:ring-[#155347]')
+                      "
                     />
                     @if (formErrors()['phoneNumber']) {
                       <p class="text-xs text-red-500 mt-1">{{ formErrors()['phoneNumber'] }}</p>
@@ -166,18 +203,30 @@ import { firstValueFrom } from 'rxjs';
                         (keydown)="onLocationKeydown($event)"
                         (blur)="closeCityDropdown()"
                         placeholder="City, Country"
-                        [class]="'w-full h-10 px-4 rounded-lg border focus:outline-none focus:ring-2 text-sm ' +
-                          (formErrors()['location'] ? 'border-red-400 focus:ring-red-400' : 'border-gray-300 focus:ring-[#155347]')"
+                        [class]="
+                          'w-full h-10 px-4 rounded-lg border focus:outline-none focus:ring-2 text-sm ' +
+                          (formErrors()['location']
+                            ? 'border-red-400 focus:ring-red-400'
+                            : 'border-gray-300 focus:ring-[#155347]')
+                        "
                       />
                       @if (showCityDropdown()) {
-                        <div class="absolute z-50 w-full bg-white border border-gray-200 rounded-lg shadow-lg mt-1 max-h-52 overflow-y-auto">
+                        <div
+                          class="absolute z-50 w-full bg-white border border-gray-200 rounded-lg shadow-lg mt-1 max-h-52 overflow-y-auto"
+                        >
                           @for (city of cityResults(); track city; let i = $index) {
                             <button
                               type="button"
                               (mousedown)="selectCity(city)"
-                              [class]="'w-full text-left px-4 py-2 text-sm transition-colors ' +
-                                (highlightedCityIndex() === i ? 'bg-[#155347] text-white' : 'text-gray-700 hover:bg-gray-50')"
-                            >{{ city }}</button>
+                              [class]="
+                                'w-full text-left px-4 py-2 text-sm transition-colors ' +
+                                (highlightedCityIndex() === i
+                                  ? 'bg-[#155347] text-white'
+                                  : 'text-gray-700 hover:bg-gray-50')
+                              "
+                            >
+                              {{ city }}
+                            </button>
                           }
                         </div>
                       }
@@ -232,16 +281,14 @@ import { firstValueFrom } from 'rxjs';
                       rows="3"
                       class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#155347] text-sm resize-none"
                     ></textarea>
-                    <p class="text-xs text-gray-400 mt-1 text-right">{{ formData().bio.length }}/500</p>
+                    <p class="text-xs text-gray-400 mt-1 text-right">
+                      {{ formData().bio.length }}/500
+                    </p>
                   </div>
                 </div>
                 <div class="mt-4 flex justify-end gap-2">
                   @if (hasChanges()) {
-                    <app-button
-                      variant="outline"
-                      (click)="resetForm()"
-                      [disabled]="isSaving()"
-                    >
+                    <app-button variant="outline" (click)="resetForm()" [disabled]="isSaving()">
                       Cancel
                     </app-button>
                   }
@@ -260,17 +307,33 @@ import { firstValueFrom } from 'rxjs';
               <app-card-content customClass="p-6">
                 <h3 class="text-lg font-bold text-gray-900 mb-4">Connected Accounts</h3>
                 <div class="space-y-3">
-                  <div class="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                  <div
+                    class="flex items-center justify-between p-4 border border-gray-200 rounded-lg"
+                  >
                     <div class="flex items-center gap-3">
                       <svg class="h-6 w-6" viewBox="0 0 24 24">
-                        <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
-                        <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
-                        <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
-                        <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
+                        <path
+                          d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                          fill="#4285F4"
+                        />
+                        <path
+                          d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                          fill="#34A853"
+                        />
+                        <path
+                          d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                          fill="#FBBC05"
+                        />
+                        <path
+                          d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                          fill="#EA4335"
+                        />
                       </svg>
                       <div>
                         <p class="text-sm font-medium text-gray-900">Google</p>
-                        <p class="text-xs text-gray-500">{{ googleConnected() ? 'Connected' : 'Not connected' }}</p>
+                        <p class="text-xs text-gray-500">
+                          {{ googleConnected() ? 'Connected' : 'Not connected' }}
+                        </p>
                       </div>
                     </div>
                     <app-button
@@ -282,7 +345,9 @@ import { firstValueFrom } from 'rxjs';
                       {{ googleConnected() ? 'Disconnect' : 'Connect' }}
                     </app-button>
                   </div>
-                  <div class="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                  <div
+                    class="flex items-center justify-between p-4 border border-gray-200 rounded-lg"
+                  >
                     <div class="flex items-center gap-3">
                       <svg class="h-6 w-6" viewBox="0 0 23 23">
                         <path fill="#f3f3f3" d="M0 0h23v23H0z" />
@@ -293,7 +358,9 @@ import { firstValueFrom } from 'rxjs';
                       </svg>
                       <div>
                         <p class="text-sm font-medium text-gray-900">Microsoft</p>
-                        <p class="text-xs text-gray-500">{{ microsoftConnected() ? 'Connected' : 'Not connected' }}</p>
+                        <p class="text-xs text-gray-500">
+                          {{ microsoftConnected() ? 'Connected' : 'Not connected' }}
+                        </p>
                       </div>
                     </div>
                     <app-button
@@ -319,7 +386,9 @@ import { firstValueFrom } from 'rxjs';
                   <lucide-icon name="key" class="h-5 w-5 text-gray-500"></lucide-icon>
                   <div>
                     <p class="text-sm font-medium text-gray-900">Change Password</p>
-                    <p class="text-xs text-gray-500">Update your password to keep your account secure</p>
+                    <p class="text-xs text-gray-500">
+                      Update your password to keep your account secure
+                    </p>
                   </div>
                 </button>
               </app-card-content>
@@ -330,8 +399,14 @@ import { firstValueFrom } from 'rxjs';
 
       <!-- Avatar URL Modal -->
       @if (showAvatarModal()) {
-        <div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50" (click)="closeAvatarModal()">
-          <div class="bg-white rounded-xl shadow-xl max-w-md w-full mx-4 p-6" (click)="$event.stopPropagation()">
+        <div
+          class="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+          (click)="closeAvatarModal()"
+        >
+          <div
+            class="bg-white rounded-xl shadow-xl max-w-md w-full mx-4 p-6"
+            (click)="$event.stopPropagation()"
+          >
             <div class="flex items-center justify-between mb-4">
               <h3 class="text-lg font-bold text-gray-900">Update Profile Picture</h3>
               <button (click)="closeAvatarModal()" class="text-gray-400 hover:text-gray-600">
@@ -343,15 +418,23 @@ import { firstValueFrom } from 'rxjs';
             <div class="flex border-b border-gray-200 mb-4">
               <button
                 (click)="uploadMode.set('file')"
-                [class]="'flex-1 py-2 text-sm font-medium border-b-2 transition-colors ' +
-                  (uploadMode() === 'file' ? 'border-[#155347] text-[#155347]' : 'border-transparent text-gray-500 hover:text-gray-700')"
+                [class]="
+                  'flex-1 py-2 text-sm font-medium border-b-2 transition-colors ' +
+                  (uploadMode() === 'file'
+                    ? 'border-[#155347] text-[#155347]'
+                    : 'border-transparent text-gray-500 hover:text-gray-700')
+                "
               >
                 Upload File
               </button>
               <button
                 (click)="uploadMode.set('url')"
-                [class]="'flex-1 py-2 text-sm font-medium border-b-2 transition-colors ' +
-                  (uploadMode() === 'url' ? 'border-[#155347] text-[#155347]' : 'border-transparent text-gray-500 hover:text-gray-700')"
+                [class]="
+                  'flex-1 py-2 text-sm font-medium border-b-2 transition-colors ' +
+                  (uploadMode() === 'url'
+                    ? 'border-[#155347] text-[#155347]'
+                    : 'border-transparent text-gray-500 hover:text-gray-700')
+                "
               >
                 Image URL
               </button>
@@ -363,8 +446,12 @@ import { firstValueFrom } from 'rxjs';
                 <div>
                   <label class="block text-sm font-medium text-gray-700 mb-2">Choose Image</label>
                   <div
-                    [class]="'border-2 border-dashed rounded-lg p-6 text-center transition-colors cursor-pointer ' +
-                      (isDragging() ? 'border-[#155347] bg-[#155347]/5' : 'border-gray-300 hover:border-[#155347]')"
+                    [class]="
+                      'border-2 border-dashed rounded-lg p-6 text-center transition-colors cursor-pointer ' +
+                      (isDragging()
+                        ? 'border-[#155347] bg-[#155347]/5'
+                        : 'border-gray-300 hover:border-[#155347]')
+                    "
                     (click)="fileInput.click()"
                     (dragover)="onDragOver($event)"
                     (dragleave)="onDragLeave($event)"
@@ -377,8 +464,16 @@ import { firstValueFrom } from 'rxjs';
                       class="hidden"
                       (change)="onFileSelected($event)"
                     />
-                    <lucide-icon [name]="isDragging() ? 'image' : 'upload'" [class]="'h-8 w-8 mx-auto mb-2 ' + (isDragging() ? 'text-[#155347]' : 'text-gray-400')"></lucide-icon>
-                    <p class="text-sm text-gray-600">{{ isDragging() ? 'Drop image here' : 'Click or drag an image here' }}</p>
+                    <lucide-icon
+                      [name]="isDragging() ? 'image' : 'upload'"
+                      [class]="
+                        'h-8 w-8 mx-auto mb-2 ' +
+                        (isDragging() ? 'text-[#155347]' : 'text-gray-400')
+                      "
+                    ></lucide-icon>
+                    <p class="text-sm text-gray-600">
+                      {{ isDragging() ? 'Drop image here' : 'Click or drag an image here' }}
+                    </p>
                     <p class="text-xs text-gray-400 mt-1">JPEG, PNG, GIF or WebP (max 2MB)</p>
                   </div>
                 </div>
@@ -432,7 +527,12 @@ import { firstValueFrom } from 'rxjs';
               }
 
               <div class="flex gap-2 pt-2">
-                <app-button variant="outline" class="flex-1" (click)="closeAvatarModal()" [disabled]="isSavingAvatar()">
+                <app-button
+                  variant="outline"
+                  class="flex-1"
+                  (click)="closeAvatarModal()"
+                  [disabled]="isSavingAvatar()"
+                >
                   Cancel
                 </app-button>
                 <app-button
@@ -450,8 +550,14 @@ import { firstValueFrom } from 'rxjs';
 
       <!-- Change Password Modal -->
       @if (showPasswordModal()) {
-        <div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50" (click)="closePasswordModal()">
-          <div class="bg-white rounded-xl shadow-xl max-w-md w-full mx-4 p-6" (click)="$event.stopPropagation()">
+        <div
+          class="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+          (click)="closePasswordModal()"
+        >
+          <div
+            class="bg-white rounded-xl shadow-xl max-w-md w-full mx-4 p-6"
+            (click)="$event.stopPropagation()"
+          >
             <div class="flex items-center justify-between mb-4">
               <h3 class="text-lg font-bold text-gray-900">Change Password</h3>
               <button (click)="closePasswordModal()" class="text-gray-400 hover:text-gray-600">
@@ -480,7 +586,10 @@ import { firstValueFrom } from 'rxjs';
                     (click)="showCurrentPassword.set(!showCurrentPassword())"
                     class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                   >
-                    <lucide-icon [name]="showCurrentPassword() ? 'eye-off' : 'eye'" class="h-4 w-4"></lucide-icon>
+                    <lucide-icon
+                      [name]="showCurrentPassword() ? 'eye-off' : 'eye'"
+                      class="h-4 w-4"
+                    ></lucide-icon>
                   </button>
                 </div>
               </div>
@@ -499,12 +608,20 @@ import { firstValueFrom } from 'rxjs';
                     (click)="showNewPassword.set(!showNewPassword())"
                     class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                   >
-                    <lucide-icon [name]="showNewPassword() ? 'eye-off' : 'eye'" class="h-4 w-4"></lucide-icon>
+                    <lucide-icon
+                      [name]="showNewPassword() ? 'eye-off' : 'eye'"
+                      class="h-4 w-4"
+                    ></lucide-icon>
                   </button>
                 </div>
                 <!-- Password requirements -->
                 <div class="grid grid-cols-2 gap-2 mt-2">
-                  <div [class]="'flex items-center gap-2 text-xs ' + (passwordValidations().length ? 'text-green-600' : 'text-gray-400')">
+                  <div
+                    [class]="
+                      'flex items-center gap-2 text-xs ' +
+                      (passwordValidations().length ? 'text-green-600' : 'text-gray-400')
+                    "
+                  >
                     @if (passwordValidations().length) {
                       <lucide-icon name="check" class="h-3 w-3"></lucide-icon>
                     } @else {
@@ -512,7 +629,12 @@ import { firstValueFrom } from 'rxjs';
                     }
                     <span>Min 8 characters</span>
                   </div>
-                  <div [class]="'flex items-center gap-2 text-xs ' + (passwordValidations().number ? 'text-green-600' : 'text-gray-400')">
+                  <div
+                    [class]="
+                      'flex items-center gap-2 text-xs ' +
+                      (passwordValidations().number ? 'text-green-600' : 'text-gray-400')
+                    "
+                  >
                     @if (passwordValidations().number) {
                       <lucide-icon name="check" class="h-3 w-3"></lucide-icon>
                     } @else {
@@ -520,7 +642,12 @@ import { firstValueFrom } from 'rxjs';
                     }
                     <span>At least one number</span>
                   </div>
-                  <div [class]="'flex items-center gap-2 text-xs ' + (passwordValidations().special ? 'text-green-600' : 'text-gray-400')">
+                  <div
+                    [class]="
+                      'flex items-center gap-2 text-xs ' +
+                      (passwordValidations().special ? 'text-green-600' : 'text-gray-400')
+                    "
+                  >
                     @if (passwordValidations().special) {
                       <lucide-icon name="check" class="h-3 w-3"></lucide-icon>
                     } @else {
@@ -528,7 +655,12 @@ import { firstValueFrom } from 'rxjs';
                     }
                     <span>One special char</span>
                   </div>
-                  <div [class]="'flex items-center gap-2 text-xs ' + (passwordValidations().match ? 'text-green-600' : 'text-gray-400')">
+                  <div
+                    [class]="
+                      'flex items-center gap-2 text-xs ' +
+                      (passwordValidations().match ? 'text-green-600' : 'text-gray-400')
+                    "
+                  >
                     @if (passwordValidations().match) {
                       <lucide-icon name="check" class="h-3 w-3"></lucide-icon>
                     } @else {
@@ -540,21 +672,30 @@ import { firstValueFrom } from 'rxjs';
               </div>
 
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Confirm New Password</label>
+                <label class="block text-sm font-medium text-gray-700 mb-2"
+                  >Confirm New Password</label
+                >
                 <div class="relative">
                   <input
                     [type]="showConfirmPassword() ? 'text' : 'password'"
                     [ngModel]="confirmNewPassword()"
                     (ngModelChange)="confirmNewPassword.set($event)"
-                    [class]="'w-full h-10 px-4 pr-10 rounded-lg border focus:outline-none focus:ring-2 focus:ring-[#155347] text-sm ' +
-                      (confirmNewPassword() && !passwordValidations().match ? 'border-red-300' : 'border-gray-300')"
+                    [class]="
+                      'w-full h-10 px-4 pr-10 rounded-lg border focus:outline-none focus:ring-2 focus:ring-[#155347] text-sm ' +
+                      (confirmNewPassword() && !passwordValidations().match
+                        ? 'border-red-300'
+                        : 'border-gray-300')
+                    "
                   />
                   <button
                     type="button"
                     (click)="showConfirmPassword.set(!showConfirmPassword())"
                     class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                   >
-                    <lucide-icon [name]="showConfirmPassword() ? 'eye-off' : 'eye'" class="h-4 w-4"></lucide-icon>
+                    <lucide-icon
+                      [name]="showConfirmPassword() ? 'eye-off' : 'eye'"
+                      class="h-4 w-4"
+                    ></lucide-icon>
                   </button>
                 </div>
               </div>
@@ -578,18 +719,33 @@ import { firstValueFrom } from 'rxjs';
 
       <!-- Password Change Confirmation Modal -->
       @if (showPasswordConfirmModal()) {
-        <div class="fixed inset-0 bg-black/50 flex items-center justify-center z-[60]" (click)="showPasswordConfirmModal.set(false)">
-          <div class="bg-white rounded-xl shadow-xl max-w-sm w-full mx-4 p-6" (click)="$event.stopPropagation()">
+        <div
+          class="fixed inset-0 bg-black/50 flex items-center justify-center z-[60]"
+          (click)="showPasswordConfirmModal.set(false)"
+        >
+          <div
+            class="bg-white rounded-xl shadow-xl max-w-sm w-full mx-4 p-6"
+            (click)="$event.stopPropagation()"
+          >
             <div class="text-center mb-4">
-              <div class="h-12 w-12 rounded-full bg-yellow-100 flex items-center justify-center mx-auto mb-4">
+              <div
+                class="h-12 w-12 rounded-full bg-yellow-100 flex items-center justify-center mx-auto mb-4"
+              >
                 <lucide-icon name="key" class="h-6 w-6 text-yellow-600"></lucide-icon>
               </div>
               <h3 class="text-lg font-bold text-gray-900 mb-2">Confirm Password Change</h3>
-              <p class="text-sm text-gray-600">Are you sure you want to change your password? You will need to use the new password on your next login.</p>
+              <p class="text-sm text-gray-600">
+                Are you sure you want to change your password? You will need to use the new password
+                on your next login.
+              </p>
             </div>
 
             <div class="flex gap-2">
-              <app-button variant="outline" class="flex-1" (click)="showPasswordConfirmModal.set(false)">
+              <app-button
+                variant="outline"
+                class="flex-1"
+                (click)="showPasswordConfirmModal.set(false)"
+              >
                 Cancel
               </app-button>
               <app-button
@@ -614,13 +770,15 @@ import { firstValueFrom } from 'rxjs';
         (onClose)="closeDisconnectGoogleModal()"
       >
         <div class="space-y-4">
-          <div class="flex items-center justify-center w-12 h-12 mx-auto bg-yellow-100 rounded-full">
+          <div
+            class="flex items-center justify-center w-12 h-12 mx-auto bg-yellow-100 rounded-full"
+          >
             <lucide-icon name="triangle-alert" class="h-6 w-6 text-yellow-600"></lucide-icon>
           </div>
           <p class="text-center text-gray-600">
             @if (unlinkLastExternalDeletesAccount()) {
-              Google is your only login method. Disconnecting it will permanently delete your account.
-              This action cannot be undone.
+              Google is your only login method. Disconnecting it will permanently delete your
+              account. This action cannot be undone.
             } @else {
               Disconnect Google from this account? Your profile and documents will remain available.
             }
@@ -638,7 +796,12 @@ import { firstValueFrom } from 'rxjs';
           </app-button>
           <app-button
             (onClick)="confirmDisconnectGoogle()"
-            [customClass]="'flex-1 text-white ' + (unlinkLastExternalDeletesAccount() ? 'bg-red-600 hover:bg-red-700' : 'bg-[#155347] hover:bg-[#0d3d31]')"
+            [customClass]="
+              'flex-1 text-white ' +
+              (unlinkLastExternalDeletesAccount()
+                ? 'bg-red-600 hover:bg-red-700'
+                : 'bg-[#155347] hover:bg-[#0d3d31]')
+            "
             [disabled]="isDisconnectingGoogle()"
           >
             @if (isDisconnectingGoogle()) {
@@ -653,14 +816,24 @@ import { firstValueFrom } from 'rxjs';
 
       <!-- Save Confirmation Modal -->
       @if (showConfirmModal()) {
-        <div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50" (click)="showConfirmModal.set(false)">
-          <div class="bg-white rounded-xl shadow-xl max-w-sm w-full mx-4 p-6" (click)="$event.stopPropagation()">
+        <div
+          class="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+          (click)="showConfirmModal.set(false)"
+        >
+          <div
+            class="bg-white rounded-xl shadow-xl max-w-sm w-full mx-4 p-6"
+            (click)="$event.stopPropagation()"
+          >
             <div class="text-center mb-4">
-              <div class="h-12 w-12 rounded-full bg-yellow-100 flex items-center justify-center mx-auto mb-4">
+              <div
+                class="h-12 w-12 rounded-full bg-yellow-100 flex items-center justify-center mx-auto mb-4"
+              >
                 <lucide-icon name="triangle-alert" class="h-6 w-6 text-yellow-600"></lucide-icon>
               </div>
               <h3 class="text-lg font-bold text-gray-900 mb-2">Confirm Changes</h3>
-              <p class="text-sm text-gray-600">Are you sure you want to save these changes to your profile?</p>
+              <p class="text-sm text-gray-600">
+                Are you sure you want to save these changes to your profile?
+              </p>
             </div>
 
             <div class="flex gap-2">
@@ -678,7 +851,7 @@ import { firstValueFrom } from 'rxjs';
         </div>
       }
     </app-dashboard-layout>
-  `
+  `,
 })
 export class ProfileComponent {
   private authService = inject(AuthService);
@@ -694,7 +867,7 @@ export class ProfileComponent {
     profilePictureUrl: '',
     userName: '',
     bio: '',
-    timezone: ''
+    timezone: '',
   });
 
   // UI state
@@ -746,7 +919,7 @@ export class ProfileComponent {
     profilePictureUrl: '',
     userName: '',
     bio: '',
-    timezone: ''
+    timezone: '',
   };
 
   constructor() {
@@ -776,16 +949,16 @@ export class ProfileComponent {
       profilePictureUrl: user.profilePictureUrl || '',
       userName: user.userName || '',
       bio: user.bio || '',
-      timezone: user.timezone || ''
+      timezone: user.timezone || '',
     };
     this.formData.set(data);
     this.originalData = { ...data };
   }
 
   updateFormField(field: string, value: string) {
-    this.formData.update(current => ({
+    this.formData.update((current) => ({
       ...current,
-      [field]: value
+      [field]: value,
     }));
     this.clearMessages();
   }
@@ -794,9 +967,7 @@ export class ProfileComponent {
     this.updateFormField('location', value);
     const query = value.trim().toLowerCase();
     if (query.length >= 1) {
-      const results = CITIES
-        .filter(c => c.toLowerCase().includes(query))
-        .slice(0, 8);
+      const results = CITIES.filter((c) => c.toLowerCase().includes(query)).slice(0, 8);
       this.cityResults.set(results);
       this.showCityDropdown.set(results.length > 0);
     } else {
@@ -862,16 +1033,16 @@ export class ProfileComponent {
     } else if (name.length > 50) {
       errors['fullName'] = 'Must not exceed 50 characters.';
     } else if (!/^[a-zA-ZÀ-ÿ\s'\-]+$/.test(name)) {
-      errors['fullName'] = 'Only letters, spaces, hyphens and apostrophes allowed.';
+      errors['fullName'] = 'Only letters, spaces, hyphens, and apostrophes allowed.';
     }
 
-    // Username — opcional; se preenchido: mín 3 chars, sem espaços, só [a-zA-Z0-9_.-]
+    // Username — opcional; se preenchido: mín 3 chars, sem espaços, só [a-zA-Z0-9_@]
     const username = d.userName.trim();
     if (username) {
       if (username.length < 3) {
         errors['userName'] = 'Must be at least 3 characters.';
-      } else if (!/^[a-zA-Z0-9_.\-]+$/.test(username)) {
-        errors['userName'] = 'Only letters, numbers, _ . and - allowed. No spaces.';
+      } else if (!/^[a-zA-Z0-9_@]+$/.test(username)) {
+        errors['userName'] = 'Only letters, numbers, @, and underscores allowed.';
       }
     }
 
@@ -952,7 +1123,9 @@ export class ProfileComponent {
       this.originalData = { ...current };
       this.avatarPreview.set(null);
     } else {
-      this.errorMessage.set(result.errors?.join(', ') || result.message || 'Failed to update profile.');
+      this.errorMessage.set(
+        result.errors?.join(', ') || result.message || 'Failed to update profile.',
+      );
     }
 
     this.isSaving.set(false);
@@ -1005,7 +1178,6 @@ export class ProfileComponent {
   }
 
   private processFile(file: File) {
-
     // Validate file type
     const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
     if (!allowedTypes.includes(file.type)) {
@@ -1068,14 +1240,14 @@ export class ProfileComponent {
     }
 
     const result = await this.authService.updateProfile({
-      profilePictureUrl
+      profilePictureUrl,
     });
 
     if (result.success) {
       // Update local state to reflect saved value
-      this.formData.update(current => ({
+      this.formData.update((current) => ({
         ...current,
-        profilePictureUrl
+        profilePictureUrl,
       }));
       this.originalData.profilePictureUrl = profilePictureUrl;
       this.avatarPreview.set(null);
@@ -1083,7 +1255,9 @@ export class ProfileComponent {
       this.closeAvatarModal();
       this.autoHideMessages();
     } else {
-      this.errorMessage.set(result.errors?.join(', ') || result.message || 'Failed to update profile picture.');
+      this.errorMessage.set(
+        result.errors?.join(', ') || result.message || 'Failed to update profile picture.',
+      );
       this.autoHideMessages();
     }
 
@@ -1114,16 +1288,13 @@ export class ProfileComponent {
       length: pwd.length >= 8,
       number: /\d/.test(pwd),
       special: /[!@#$%^&*(),.?":{}|<>]/.test(pwd),
-      match: pwd === confirmPwd && pwd !== ''
+      match: pwd === confirmPwd && pwd !== '',
     };
   });
 
   isPasswordFormValid(): boolean {
     const v = this.passwordValidations();
-    return (
-      this.currentPassword().length > 0 &&
-      v.length && v.number && v.special && v.match
-    );
+    return this.currentPassword().length > 0 && v.length && v.number && v.special && v.match;
   }
 
   async confirmChangePassword() {
@@ -1135,7 +1306,7 @@ export class ProfileComponent {
     const result = await this.authService.changePassword({
       currentPassword: this.currentPassword(),
       newPassword: this.newPassword(),
-      confirmPassword: this.confirmNewPassword()
+      confirmPassword: this.confirmNewPassword(),
     });
 
     if (result.success) {
@@ -1145,7 +1316,9 @@ export class ProfileComponent {
       this.autoHideMessages();
     } else {
       this.showPasswordConfirmModal.set(false);
-      this.passwordError.set(result.errors?.join(', ') || result.message || 'Failed to change password.');
+      this.passwordError.set(
+        result.errors?.join(', ') || result.message || 'Failed to change password.',
+      );
     }
 
     this.isChangingPassword.set(false);
@@ -1205,7 +1378,7 @@ export class ProfileComponent {
 
     const data = await this.authService.getExternalLogins();
     if (data) {
-      const linked = new Set(data.linkedProviders.map(p => p.provider.toLowerCase()));
+      const linked = new Set(data.linkedProviders.map((p) => p.provider.toLowerCase()));
       this.googleConnected.set(linked.has('google'));
       this.microsoftConnected.set(linked.has('microsoft'));
       this.unlinkLastExternalDeletesAccount.set(data.unlinkLastExternalDeletesAccount);
