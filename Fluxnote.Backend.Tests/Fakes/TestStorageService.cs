@@ -37,6 +37,12 @@ public class TestStorageService : IStorageService
         return Task.CompletedTask;
     }
 
+    public Task<(Stream? stream, string contentType)?> GetImageAsync(string fileName)
+    {
+        // Fake: devolve null (imagem não encontrada) por defeito
+        return Task.FromResult<(Stream? stream, string contentType)?>(null);
+    }
+
     /// <summary>
     /// Repõe o estado do fake para valores iniciais.
     /// </summary>

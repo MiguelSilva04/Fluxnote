@@ -142,7 +142,6 @@ export class TextEditorComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     });
   };
-
   private uploadService = inject(UploadService);
   private collaborationService = inject(CollaborationService);
   private authService = inject(AuthService);
@@ -369,6 +368,9 @@ export class TextEditorComponent implements OnInit, AfterViewInit, OnDestroy {
       this.updateActiveFormats();
     });
 
+    // Emitir eventos de seleção para o componente pai (tooltip de Improve)
+    this.setupSelectionChangeEmitter();
+
     // Intercetar CTRL+V de imagens para fazer upload em vez de inserir base64
     this.quill.root.addEventListener('paste', (e: ClipboardEvent) => {
       if (!this.editable()) return;
@@ -479,12 +481,9 @@ export class TextEditorComponent implements OnInit, AfterViewInit, OnDestroy {
   private triggerSave(content: string): void {
     this.saveStatus.set('saving');
     this.save.emit(content);
-    setTimeout(() => {
-      this.saveStatus.set('saved');
-      setTimeout(() => {
-        if (this.saveStatus() === 'saved') this.saveStatus.set('idle');
-      }, 2000);
-    }, 500);
+    // O snapshot Y.Doc é agora enviado junto com o HTML no pedido HTTP
+    // pelo document-editor.component (via documentService.updateDocument).
+    // O saveStatus é atualizado pelo parent (document-editor) via setSaveStatus().
   }
 
   format(formatType: string): void {
@@ -753,5 +752,157 @@ export class TextEditorComponent implements OnInit, AfterViewInit, OnDestroy {
 
   setSaveStatus(status: SaveStatus): void {
     this.saveStatus.set(status);
+  }
+
+  /**
+   * Devolve o texto atualmente selecionado no editor Quill.
+   * @returns Texto selecionado ou string vazia se não houver seleção.
+   */
+  getSelectedText(): string {
+    if (!this.quill) return '';
+    const range = this.quill.getSelection();
+    if (!range || range.length === 0) return '';
+    return this.quill.getText(range.index, range.length);
+  }
+
+  /**
+   * Devolve os bounds (posição no ecrã) da seleção atual, útil para posicionar tooltips.
+   * @returns { top, left, width, height } relativo ao viewport, ou null se não houver seleção.
+   */
+  getSelectionBounds(): { top: number; left: number; width: number; height: number } | null {
+    if (!this.quill) return null;
+    const range = this.quill.getSelection();
+    if (!range || range.length === 0) return null;
+    const bounds = this.quill.getBounds(range.index, range.length) as {
+      top: number; left: number; width: number; height: number;
+    };
+    // Converter coordenadas relativas ao container do Quill para coordenadas do viewport
+    const containerRect = this.quill.root.closest('.ql-editor')?.getBoundingClientRect()
+      ?? this.quill.root.getBoundingClientRect();
+    return {
+      top: containerRect.top + bounds.top,
+      left: containerRect.left + bounds.left,
+      width: bounds.width,
+      height: bounds.height,
+    };
+  }
+
+  /**
+   * Substitui o texto atualmente selecionado no editor por um novo texto.
+   * @param newText Texto de substituição.
+   */
+  replaceSelectedText(newText: string): void {
+    if (!this.quill) return;
+    const range = this.quill.getSelection();
+    if (!range || range.length === 0) return;
+    this.quill.deleteText(range.index, range.length, 'user');
+    this.quill.insertText(range.index, newText, 'user');
+    // Selecionar o novo texto inserido
+    this.quill.setSelection(range.index, newText.length, 'silent');
+  }
+
+  /**
+   * Evento de seleção: emitido quando a seleção do utilizador muda.
+   */
+  selectionChange = output<{ text: string; bounds: { top: number; left: number; width: number; height: number } | null }>();
+
+  /**
+   * Evento emitido quando o utilizador clica no botão "+" de gerar conteúdo.
+   * Inclui as coordenadas de viewport no momento do clique para posicionar o card.
+   */
+  generateButtonClick = output<{ viewportTop: number; viewportLeft: number; viewportHeight: number }>();
+
+  // Botão "+" interno — posicionado em absolute dentro do container do editor
+  showGenerateButton = signal(false);
+  generateButtonPos = signal({ top: 0 });
+  private currentEmptyLineIndex = 0;
+
+  /** Emite eventos de seleção para o componente pai detetar seleções de texto. */
+  private setupSelectionChangeEmitter(): void {
+    if (!this.quill) return;
+
+    const evaluate = (range: { index: number; length: number } | null) => {
+      if (!range) {
+        this.selectionChange.emit({ text: '', bounds: null });
+        this.showGenerateButton.set(false);
+        return;
+      }
+      if (range.length > 0) {
+        const text = this.quill.getText(range.index, range.length);
+        const bounds = this.getSelectionBounds();
+        this.selectionChange.emit({ text, bounds });
+        this.showGenerateButton.set(false);
+      } else {
+        this.selectionChange.emit({ text: '', bounds: null });
+        this.checkEmptyLine(range.index);
+      }
+    };
+
+    // Reagir a mudanças de cursor/seleção
+    this.quill.on('selection-change', (range: any) => evaluate(range));
+
+    // Reagir a mudanças de conteúdo (ex: apagar até linha ficar vazia, Enter para nova linha)
+    this.quill.on('text-change', () => {
+      // Defer para garantir que o cursor já está na posição final após a alteração
+      setTimeout(() => {
+        const range = this.quill.getSelection();
+        evaluate(range);
+      }, 0);
+    });
+  }
+
+  /**
+   * Verifica se a posição do cursor está numa linha vazia e emite o evento.
+   */
+  private checkEmptyLine(index: number): void {
+    if (!this.quill) {
+      this.showGenerateButton.set(false);
+      return;
+    }
+
+    const [lineBlot] = this.quill.getLine(index);
+    if (!lineBlot) {
+      this.showGenerateButton.set(false);
+      return;
+    }
+
+    const lineText = (lineBlot as any).domNode?.textContent ?? '';
+    const isEmptyLine = lineText.trim().length === 0;
+
+    if (isEmptyLine) {
+      const bounds = this.quill.getBounds(index, 0) as { top: number; left: number; height: number };
+      this.currentEmptyLineIndex = index;
+      // Posicionar o botão verticalmente centrado na linha, relativo ao .ql-editor
+      this.generateButtonPos.set({ top: bounds.top + bounds.height / 2 - 14 });
+      this.showGenerateButton.set(true);
+    } else {
+      this.showGenerateButton.set(false);
+    }
+  }
+
+  /** Clique no botão "+": emite coordenadas de viewport frescas para o componente pai posicionar o card. */
+  onGenerateButtonMousedown(event: MouseEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const rootRect = this.quill.root.getBoundingClientRect();
+    const bounds = this.quill.getBounds(this.currentEmptyLineIndex, 0) as { top: number; left: number; height: number };
+    this.generateButtonClick.emit({
+      viewportTop: rootRect.top + bounds.top,
+      viewportLeft: rootRect.left + bounds.left,
+      viewportHeight: bounds.height,
+    });
+    this.showGenerateButton.set(false);
+  }
+
+  /**
+   * Insere texto na posição atual do cursor.
+   */
+  insertTextAtCursor(text: string): void {
+    if (!this.quill) return;
+    const range = this.quill.getSelection();
+    const index = range ? range.index : this.quill.getLength() - 1;
+    this.quill.insertText(index, text, 'user');
+    this.quill.setSelection(index + text.length, 0, 'silent');
   }
 }

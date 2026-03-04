@@ -130,6 +130,16 @@ export class CollaborationService {
       .catch((err) => console.error('[Collaboration] Erro ao guardar snapshot:', err));
   }
 
+  /**
+   * Devolve o snapshot actual do Y.Doc como string Base64, ou null se não houver Y.Doc.
+   * Útil para guardar o snapshot via HTTP
+   */
+  getSnapshotBase64(): string | null {
+    if (!this.ydoc) return null;
+    const snapshot = Y.encodeStateAsUpdate(this.ydoc);
+    return this.toBase64(snapshot);
+  }
+
   // ─────────────────────────────────────────────────────────────
   // Desconectar e limpar recursos
   // ─────────────────────────────────────────────────────────────
