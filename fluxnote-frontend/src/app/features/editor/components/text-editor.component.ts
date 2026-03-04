@@ -131,6 +131,17 @@ export class TextEditorComponent implements OnInit, AfterViewInit, OnDestroy {
   private colorIndex = 0;
   // Mapa connectionId → elemento DOM do cursor no editor
   private collaboratorCursors = new Map<string, HTMLElement>();
+  // Scroll: re-render cursors when the local user scrolls (fixed-position cursors go stale)
+  private scrollRafId: number | null = null;
+  private readonly onScroll = () => {
+    if (this.scrollRafId !== null) return;
+    this.scrollRafId = requestAnimationFrame(() => {
+      this.scrollRafId = null;
+      for (const [id, state] of this.collaborationService.collaborators) {
+        this.renderCursor(id, state);
+      }
+    });
+  };
 
   private uploadService = inject(UploadService);
   private collaborationService = inject(CollaborationService);
@@ -148,6 +159,7 @@ export class TextEditorComponent implements OnInit, AfterViewInit, OnDestroy {
   ngAfterViewInit(): void {
     this.initializeQuill();
     document.addEventListener('click', this.handleClickOutside.bind(this));
+    document.addEventListener('scroll', this.onScroll, true);
 
     // Iniciar colaboração após Quill estar pronto
     const docId = this.documentId();
@@ -158,6 +170,8 @@ export class TextEditorComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnDestroy(): void {
     document.removeEventListener('click', this.handleClickOutside.bind(this));
+    document.removeEventListener('scroll', this.onScroll, true);
+    if (this.scrollRafId !== null) cancelAnimationFrame(this.scrollRafId);
 
     // Limpar intervalos
     if (this.snapshotInterval) clearInterval(this.snapshotInterval);
