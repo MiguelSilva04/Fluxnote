@@ -175,14 +175,55 @@ import { TextEditorComponent } from './components/text-editor.component';
                 size="sm"
                 [leftIcon]="true"
                 (onClick)="openShareModal()"
+                customClass="hidden md:inline-flex"
               >
                 <lucide-icon leftIcon name="share-2" class="h-4 w-4"></lucide-icon>
                 Share
               </app-button>
+              <!-- Mobile 3-dots menu -->
+              <div class="relative md:hidden">
+                <button
+                  (click)="showMobileMenu.set(!showMobileMenu())"
+                  class="p-2 hover:bg-gray-100 rounded-lg"
+                >
+                  <lucide-icon name="ellipsis-vertical" class="h-5 w-5 text-gray-600"></lucide-icon>
+                </button>
+                @if (showMobileMenu()) {
+                  <div class="fixed inset-0 z-10" (click)="showMobileMenu.set(false)"></div>
+                  <div class="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden z-20">
+                    <button
+                      (click)="toggleAIPanel(); showMobileMenu.set(false)"
+                      class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors text-left"
+                    >
+                      <lucide-icon name="sparkles" class="h-4 w-4 shrink-0"></lucide-icon>
+                      AI Assistance
+                    </button>
+                    <button
+                      (click)="showWipModal.set(true); showMobileMenu.set(false)"
+                      class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors text-left"
+                    >
+                      <lucide-icon name="clock" class="h-4 w-4 shrink-0"></lucide-icon>
+                      History
+                    </button>
+                    <button
+                      (click)="showWipModal.set(true); showMobileMenu.set(false)"
+                      class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors text-left"
+                    >
+                      <lucide-icon name="message-square" class="h-4 w-4 shrink-0"></lucide-icon>
+                      Comments
+                    </button>
+                    <div class="border-t border-gray-100 my-1"></div>
+                    <button
+                      (click)="openShareModal(); showMobileMenu.set(false)"
+                      class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors text-left"
+                    >
+                      <lucide-icon name="share-2" class="h-4 w-4 shrink-0"></lucide-icon>
+                      Share
+                    </button>
+                  </div>
+                }
+              </div>
             }
-            <button class="p-2 hover:bg-gray-100 rounded-lg">
-              <lucide-icon name="ellipsis-vertical" class="h-5 w-5 text-gray-600"></lucide-icon>
-            </button>
           </div>
         </header>
 
@@ -224,7 +265,7 @@ import { TextEditorComponent } from './components/text-editor.component';
 
           <!-- AI Assistant Panel -->
           @if (showAIPanel()) {
-            <aside class="w-80 bg-white border-l border-gray-200 flex flex-col shadow-xl">
+            <aside class="w-full md:w-80 bg-white border-l border-gray-200 flex flex-col shadow-xl">
               <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
                 <div class="flex items-center gap-2">
                   <lucide-icon name="sparkles" class="h-5 w-5 text-[#155347]"></lucide-icon>
@@ -957,6 +998,7 @@ export class DocumentEditorComponent implements OnInit {
   showShareModal = signal(false);
   showAIPanel = signal(false);
   showWipModal = signal(false);
+  showMobileMenu = signal(false);
   isRestoreModalOpen = signal(false);
   versionToRestore = signal<number | null>(null);
   newComment = '';
