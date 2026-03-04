@@ -33,5 +33,14 @@ namespace Fluxnote.Backend.Dtos.Documents
         /// </list>
         /// </remarks>
         public string? Content { get; set; }
+
+        /// <summary>
+        /// Snapshot Y.Doc (CRDT) codificado em Base64.
+        /// </summary>
+        /// <remarks>
+        /// Enviado opcionalmente pelo cliente de colaboração para manter o snapshot
+        /// sincronizado com o conteúdo HTML. Se null, o snapshot não é alterado.
+        /// </remarks>
+        public string? YDocSnapshot { get; set; }
     }
 }

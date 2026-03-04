@@ -117,7 +117,7 @@ export class DocumentService {
    * @param id ID do documento
    * @param data Dados a atualizar
    */
-  updateDocument(id: number, data: { title?: string; content?: string }): Observable<DocumentDetailDto> {
+  updateDocument(id: number, data: { title?: string; content?: string; yDocSnapshot?: string }): Observable<DocumentDetailDto> {
     return this.http.put<DocumentDetailDto>(`/api/documents/${id}`, data).pipe(
       tap(doc => {
         this._currentDocument.set(doc);
@@ -185,6 +185,36 @@ export class DocumentService {
     return this.http.post<{ summary: string }>(`/api/documents/${id}/summary`, {}).pipe(
       catchError(error => {
         console.error('Error generating summary:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  /**
+   * Sugere melhorias para o texto selecionado usando IA
+   * @param id ID do documento
+   * @param selectedText Texto selecionado pelo utilizador
+   * @returns Observable com o texto melhorado
+   */
+  improveText(id: number, selectedText: string): Observable<{ improvedText: string }> {
+    return this.http.post<{ improvedText: string }>(`/api/documents/${id}/improve`, { selectedText }).pipe(
+      catchError(error => {
+        console.error('Error improving text:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  /**
+   * Gera conteúdo novo usando IA com base num prompt
+   * @param id ID do documento
+   * @param prompt Instrução do utilizador
+   * @returns Observable com o conteúdo gerado
+   */
+  generateContent(id: number, prompt: string): Observable<{ generatedContent: string }> {
+    return this.http.post<{ generatedContent: string }>(`/api/documents/${id}/generate`, { prompt }).pipe(
+      catchError(error => {
+        console.error('Error generating content:', error);
         return throwError(() => error);
       })
     );
