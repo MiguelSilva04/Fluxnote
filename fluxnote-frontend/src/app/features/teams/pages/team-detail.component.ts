@@ -98,6 +98,11 @@ export class TeamDetailComponent {
   draggingDocId = signal<number | null>(null);
   dragOverTarget = signal<number | 'root' | null>(null);
 
+  /** Team name editing (Owner only) */
+  isEditingName = signal(false);
+  editNameValue = '';
+  isSavingName = signal(false);
+
   /** Folder management state */
   isCreateFolderModalOpen = signal(false);
   isRenameFolderModalOpen = signal(false);
@@ -200,6 +205,37 @@ export class TeamDetailComponent {
 
   isOwner(): boolean {
     return this.selectedTeam()?.currentUserRole === 2;
+  }
+
+  startEditName(): void {
+    this.editNameValue = this.selectedTeam()?.name ?? '';
+    this.isEditingName.set(true);
+  }
+
+  cancelEditName(): void {
+    this.isEditingName.set(false);
+  }
+
+  saveTeamName(): void {
+    const team = this.selectedTeam();
+    const name = this.editNameValue.trim();
+    if (!team || !name || name === team.name) {
+      this.isEditingName.set(false);
+      return;
+    }
+    this.isSavingName.set(true);
+    this.teamService.updateTeamName(team.id, name).subscribe({
+      next: () => {
+        this.selectedTeam.set({ ...team, name });
+        this.isEditingName.set(false);
+        this.isSavingName.set(false);
+        this.toastService.success('Team name updated.');
+      },
+      error: () => {
+        this.isSavingName.set(false);
+        this.toastService.error('Failed to update team name.');
+      }
+    });
   }
 
   isOwnerOrAdmin(): boolean {

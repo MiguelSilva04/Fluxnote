@@ -373,6 +373,40 @@ namespace Fluxnote.Backend.Controllers
         }
 
         /// <summary>
+        /// Atualiza o nome de uma equipa. Apenas o Owner pode executar esta operação.
+        /// </summary>
+        [HttpPatch("{id}")]
+        public async Task<IActionResult> PatchTeamName(int id, [FromBody] CreateTeamRequest request)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId is null)
+                return Unauthorized(new { message = "User not authenticated." });
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var team = await _context.Team
+                .Include(t => t.Members)
+                .FirstOrDefaultAsync(t => t.Id == id);
+
+            if (team == null)
+                return NotFound(new { message = "Team not found." });
+
+            var membership = team.Members.FirstOrDefault(m => m.UserId == userId);
+            if (membership == null)
+                return StatusCode(StatusCodes.Status403Forbidden, new { message = "You are not a member of this team." });
+
+            if (membership.Role != TeamRole.Owner)
+                return StatusCode(StatusCodes.Status403Forbidden, new { message = "Only the team owner can rename the team." });
+
+            team.Name = request.Name.Trim();
+            team.UpdatedAt = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+
+        /// <summary>
         /// Cria uma nova equipa.
         /// </summary>
         /// <param name="request">Dados da equipa a criar (nome).</param>
