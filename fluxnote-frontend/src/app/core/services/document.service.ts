@@ -191,6 +191,21 @@ export class DocumentService {
   }
 
   /**
+   * Sugere melhorias para o texto selecionado usando IA
+   * @param id ID do documento
+   * @param selectedText Texto selecionado pelo utilizador
+   * @returns Observable com o texto melhorado
+   */
+  improveText(id: number, selectedText: string): Observable<{ improvedText: string }> {
+    return this.http.post<{ improvedText: string }>(`/api/documents/${id}/improve`, { selectedText }).pipe(
+      catchError(error => {
+        console.error('Error improving text:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  /**
    * Lista os ficheiros de contexto de um documento
    * @param documentId ID do documento
    */

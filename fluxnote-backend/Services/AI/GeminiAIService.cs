@@ -124,5 +124,125 @@ Summary:";
                 throw new Exception("Failed to connect to AI service.");
             }
         }
+
+        /// <inheritdoc />
+        public async Task<string> ImproveTextAsync(string selectedText, string fullDocumentText, IEnumerable<string>? contextTexts = null)
+        {
+            if (string.IsNullOrWhiteSpace(selectedText))
+                return "No text selected to improve.";
+
+            // Limitar o documento a ~6000 caracteres para deixar espaço ao contexto
+            var truncatedDoc = fullDocumentText.Length > 6000 ? fullDocumentText[..6000] + "..." : fullDocumentText;
+
+            // Construir bloco de contexto adicional (ficheiros de contexto)
+            var contextBlock = "";
+            if (contextTexts != null)
+            {
+                var combined = string.Join("\n---\n", contextTexts.Where(t => !string.IsNullOrWhiteSpace(t)));
+                if (!string.IsNullOrEmpty(combined))
+                {
+                    var truncatedContext = combined.Length > 3000 ? combined[..3000] + "..." : combined;
+                    contextBlock = $@"
+
+Additional context files provided by the user:
+---
+{truncatedContext}
+---";
+                }
+            }
+
+            var prompt = $@"You are a professional writing assistant that improves text quality.
+You have access to the full document and optional context files to understand the tone, style, and subject matter.
+
+Full document text:
+---
+{truncatedDoc}
+---
+{contextBlock}
+
+The user has selected the following text to improve:
+'''{selectedText}'''
+
+Provide an improved version of ONLY the selected text. The improvement should:
+- Maintain the same language as the original text
+- Improve clarity, grammar, and readability
+- Keep the same meaning and intent
+- Match the tone and style of the rest of the document
+- Be roughly the same length (not significantly longer or shorter)
+
+Return ONLY the improved text, with no explanations, labels, or additional commentary.";
+
+            var requestBody = new
+            {
+                contents = new[]
+                {
+                    new
+                    {
+                        parts = new[]
+                        {
+                            new { text = prompt }
+                        }
+                    }
+                },
+                generationConfig = new
+                {
+                    temperature = 0.4,
+                    maxOutputTokens = 2048
+                }
+            };
+
+            var url = $"https://generativelanguage.googleapis.com/v1beta/models/{_options.Model}:generateContent?key={_options.ApiKey}";
+
+            try
+            {
+                var json = JsonSerializer.Serialize(requestBody);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                var response = await _httpClient.PostAsync(url, content);
+                var responseBody = await response.Content.ReadAsStringAsync();
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    _logger.LogError("Gemini API error (improve): {StatusCode} - {Body}", response.StatusCode, responseBody);
+
+                    if (response.StatusCode == System.Net.HttpStatusCode.TooManyRequests)
+                        throw new InvalidOperationException("Rate limit exceeded. Please wait a moment and try again.");
+
+                    throw new Exception($"AI service returned error: {response.StatusCode}");
+                }
+
+                using var doc = JsonDocument.Parse(responseBody);
+                var candidates = doc.RootElement.GetProperty("candidates");
+                var firstCandidate = candidates[0];
+
+                if (firstCandidate.TryGetProperty("finishReason", out var finishReason))
+                {
+                    _logger.LogInformation("Gemini finishReason (improve): {FinishReason}", finishReason.GetString());
+                }
+
+                var parts = firstCandidate.GetProperty("content").GetProperty("parts");
+                var sb = new StringBuilder();
+                foreach (var part in parts.EnumerateArray())
+                {
+                    if (part.TryGetProperty("text", out var textProp))
+                    {
+                        sb.Append(textProp.GetString());
+                    }
+                }
+
+                var improvedText = sb.ToString().Trim();
+                return string.IsNullOrEmpty(improvedText) ? "Unable to generate improvement." : improvedText;
+            }
+            catch (JsonException ex)
+            {
+                _logger.LogError(ex, "Failed to parse Gemini API response (improve)");
+                throw new Exception("Failed to parse AI response.");
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex, "Failed to connect to Gemini API (improve)");
+                throw new Exception("Failed to connect to AI service.");
+            }
+        }
     }
 }

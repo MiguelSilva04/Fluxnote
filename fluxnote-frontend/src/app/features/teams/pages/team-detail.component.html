@@ -456,7 +456,7 @@
                       >
                         {{ doc.title }}
                       </div>
-                      @if (isOwnerOrAdmin() && selectedTeam()!.folders?.length) {
+                      @if (isOwnerOrAdmin() && selectedTeam()!.folders.length) {
                         <select
                           [ngModel]="doc.folderId ?? null"
                           (ngModelChange)="moveDocToFolder(doc, $event)"

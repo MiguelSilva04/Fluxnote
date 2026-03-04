@@ -198,7 +198,25 @@ import { TextEditorComponent } from './components/text-editor.component';
               [editable]="canEdit()"
               (contentChange)="onContentChange($event)"
               (save)="onSave($event)"
+              (selectionChange)="onSelectionChange($event)"
             />
+
+            <!-- Improve Text Tooltip (appears on text selection) -->
+            @if (showImproveTooltip() && canEdit()) {
+              <div
+                class="fixed z-50 flex items-center gap-1 bg-gray-900 text-white rounded-lg shadow-xl px-2 py-1.5 animate-in fade-in"
+                [style.top.px]="improveTooltipPosition().top"
+                [style.left.px]="improveTooltipPosition().left"
+              >
+                <button
+                  (mousedown)="requestImproveText($event)"
+                  class="flex items-center gap-1.5 px-2 py-1 rounded-md hover:bg-white/20 transition-colors text-xs font-medium"
+                >
+                  <lucide-icon name="sparkles" class="h-3.5 w-3.5 text-purple-300"></lucide-icon>
+                  Improve with AI
+                </button>
+              </div>
+            }
           </main>
 
           <!-- AI Assistant Panel -->
@@ -235,8 +253,7 @@ import { TextEditorComponent } from './components/text-editor.component';
                       </div>
                     </div>
                   </button>
-
-                </div>
+          </div>
               </div>
 
               <!-- Context Section -->
@@ -596,6 +613,92 @@ import { TextEditorComponent } from './components/text-editor.component';
 
       <!-- Work in Progress Modal -->
       <app-work-in-progress [show]="showWipModal()" (close)="showWipModal.set(false)" />
+
+      <!-- AI Improve Inline Card (aparece junto ao texto selecionado) -->
+      @if (showImproveModal()) {
+        <div
+          class="fixed z-50 bg-white rounded-xl shadow-2xl border border-purple-100 w-[400px] flex flex-col animate-in fade-in slide-in-from-top-2"
+          [style.top.px]="improveCardPosition().top"
+          [style.left.px]="improveCardPosition().left"
+          style="max-height: 360px;"
+        >
+          <!-- Card Header -->
+          <div class="px-4 py-3 flex items-center justify-between shrink-0 border-b border-gray-100">
+            <div class="flex items-center gap-2">
+              <div class="w-6 h-6 rounded-md bg-purple-100 flex items-center justify-center">
+                <lucide-icon name="sparkles" class="h-3.5 w-3.5 text-purple-600"></lucide-icon>
+              </div>
+              <span class="text-sm font-semibold text-gray-900">Improve with AI</span>
+            </div>
+            <button
+              (click)="closeImproveModal()"
+              class="p-1 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+            >
+              <lucide-icon name="x" class="h-4 w-4"></lucide-icon>
+            </button>
+          </div>
+
+          <!-- Card Body -->
+          <div class="flex-1 overflow-y-auto">
+            @if (improveLoading()) {
+              <div class="flex flex-col items-center justify-center py-10 gap-3">
+                <lucide-icon name="loader-circle" class="h-6 w-6 text-purple-600 animate-spin"></lucide-icon>
+                <p class="text-xs text-gray-500">Analyzing and improving your text...</p>
+              </div>
+            } @else if (improveError()) {
+              <div class="m-4 bg-red-50 border border-red-200 rounded-lg p-3 flex items-start gap-2">
+                <lucide-icon name="circle-alert" class="h-4 w-4 text-red-500 shrink-0 mt-0.5"></lucide-icon>
+                <p class="text-xs text-red-600">{{ improveError() }}</p>
+              </div>
+            } @else {
+              <!-- Split diff view -->
+              <div class="divide-y divide-gray-100">
+                <!-- Original -->
+                <div class="px-4 py-3">
+                  <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-widest mb-1.5">Original</p>
+                  <p class="text-xs text-gray-400 leading-relaxed line-clamp-3 line-through">{{ improveOriginalText() }}</p>
+                </div>
+                <!-- Sugestão -->
+                <div class="px-4 py-3 bg-purple-50/60">
+                  <p class="text-[10px] font-semibold text-purple-500 uppercase tracking-widest mb-1.5">Suggestion</p>
+                  <p class="text-sm text-gray-800 leading-relaxed">{{ improveResult() }}</p>
+                </div>
+              </div>
+            }
+          </div>
+
+          <!-- Card Footer -->
+          @if (!improveLoading() && !improveError() && improveResult()) {
+            <div class="px-4 py-3 border-t border-gray-100 flex items-center justify-end gap-2 shrink-0">
+              <button
+                (click)="closeImproveModal()"
+                class="px-3 py-1.5 text-xs text-gray-500 hover:text-gray-700 rounded-lg hover:bg-gray-100 transition-colors"
+              >
+                Discard
+              </button>
+              <button
+                (click)="copyImprovedText()"
+                class="px-3 py-1.5 text-xs border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-1.5"
+              >
+                @if (improveCopied()) {
+                  <lucide-icon name="check" class="h-3.5 w-3.5 text-green-600"></lucide-icon>
+                  <span>Copied!</span>
+                } @else {
+                  <lucide-icon name="clipboard" class="h-3.5 w-3.5"></lucide-icon>
+                  <span>Copy</span>
+                }
+              </button>
+              <button
+                (click)="applyImprovedText()"
+                class="px-3 py-1.5 text-xs bg-[#155347] text-white rounded-lg hover:bg-[#0d3d31] transition-colors flex items-center gap-1.5"
+              >
+                <lucide-icon name="check" class="h-3.5 w-3.5"></lucide-icon>
+                <span>Apply</span>
+              </button>
+            </div>
+          }
+        </div>
+      }
     </div>
   `,
 })
@@ -634,6 +737,19 @@ export class DocumentEditorComponent implements OnInit {
   summaryLoading = signal(false);
   summaryError = signal<string | null>(null);
   summaryCopied = signal(false);
+
+  // AI Improve Text
+  showImproveTooltip = signal(false);
+  improveTooltipPosition = signal({ top: 0, left: 0 });
+  showImproveModal = signal(false);
+  improveCardPosition = signal({ top: 0, left: 0 });
+  improveOriginalText = signal('');
+  improveResult = signal('');
+  improveLoading = signal(false);
+  improveError = signal<string | null>(null);
+  improveCopied = signal(false);
+  private selectedTextForImprove = '';
+  private selectionBounds = { top: 0, left: 0, width: 0, height: 0 };
 
   // AI Context
   contextFiles = signal<DocumentContextDto[]>([]);
@@ -1075,5 +1191,88 @@ export class DocumentEditorComponent implements OnInit {
   handleAIAction(actionId: number): void {
     this.aiGenerating.set(true);
     setTimeout(() => this.aiGenerating.set(false), 2000);
+  }
+
+  // AI Improve Text
+  onSelectionChange(event: { text: string; bounds: { top: number; left: number; width: number; height: number } | null }): void {
+    if (event.text && event.text.trim().length > 0 && event.bounds) {
+      this.selectedTextForImprove = event.text;
+      this.selectionBounds = event.bounds;
+      // Posicionar o tooltip acima da seleção
+      this.improveTooltipPosition.set({
+        top: event.bounds.top - 40,
+        left: event.bounds.left + (event.bounds.width / 2) - 70,
+      });
+      this.showImproveTooltip.set(true);
+    } else {
+      this.showImproveTooltip.set(false);
+    }
+  }
+
+  requestImproveText(event: MouseEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (!this.documentId || !this.selectedTextForImprove.trim()) return;
+
+    this.showImproveTooltip.set(false);
+    this.triggerImproveRequest();
+  }
+
+  private triggerImproveRequest(): void {
+    if (!this.documentId || !this.selectedTextForImprove.trim()) return;
+
+    // Posicionar o card inline abaixo da seleção
+    const cardWidth = 400;
+    const cardMargin = 8;
+    const rawLeft = this.selectionBounds.left + (this.selectionBounds.width / 2) - (cardWidth / 2);
+    const clampedLeft = Math.max(cardMargin, Math.min(rawLeft, window.innerWidth - cardWidth - cardMargin));
+    this.improveCardPosition.set({
+      top: this.selectionBounds.top + this.selectionBounds.height + cardMargin,
+      left: clampedLeft,
+    });
+
+    this.improveOriginalText.set(this.selectedTextForImprove);
+    this.improveResult.set('');
+    this.improveError.set(null);
+    this.improveLoading.set(true);
+    this.improveCopied.set(false);
+    this.showImproveModal.set(true);
+
+    this.documentService.improveText(this.documentId, this.selectedTextForImprove).subscribe({
+      next: (res) => {
+        this.improveResult.set(res.improvedText);
+        this.improveLoading.set(false);
+      },
+      error: (err) => {
+        console.error('Error improving text:', err);
+        this.improveError.set(
+          err.error?.message || 'Failed to improve text. Please try again.',
+        );
+        this.improveLoading.set(false);
+      },
+    });
+  }
+
+  applyImprovedText(): void {
+    const improvedText = this.improveResult();
+    if (!improvedText || !this.editor) return;
+
+    this.editor.replaceSelectedText(improvedText);
+    this.closeImproveModal();
+  }
+
+  copyImprovedText(): void {
+    const text = this.improveResult();
+    if (!text) return;
+
+    navigator.clipboard.writeText(text).then(() => {
+      this.improveCopied.set(true);
+      setTimeout(() => this.improveCopied.set(false), 3000);
+    });
+  }
+
+  closeImproveModal(): void {
+    this.showImproveModal.set(false);
   }
 }

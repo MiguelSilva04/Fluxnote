@@ -366,6 +366,9 @@ export class TextEditorComponent implements OnInit, AfterViewInit, OnDestroy {
       this.updateActiveFormats();
     });
 
+    // Emitir eventos de seleção para o componente pai (tooltip de Improve)
+    this.setupSelectionChangeEmitter();
+
     // Intercetar CTRL+V de imagens para fazer upload em vez de inserir base64
     this.quill.root.addEventListener('paste', (e: ClipboardEvent) => {
       if (!this.editable()) return;
@@ -750,5 +753,71 @@ export class TextEditorComponent implements OnInit, AfterViewInit, OnDestroy {
 
   setSaveStatus(status: SaveStatus): void {
     this.saveStatus.set(status);
+  }
+
+  /**
+   * Devolve o texto atualmente selecionado no editor Quill.
+   * @returns Texto selecionado ou string vazia se não houver seleção.
+   */
+  getSelectedText(): string {
+    if (!this.quill) return '';
+    const range = this.quill.getSelection();
+    if (!range || range.length === 0) return '';
+    return this.quill.getText(range.index, range.length);
+  }
+
+  /**
+   * Devolve os bounds (posição no ecrã) da seleção atual, útil para posicionar tooltips.
+   * @returns { top, left, width, height } relativo ao viewport, ou null se não houver seleção.
+   */
+  getSelectionBounds(): { top: number; left: number; width: number; height: number } | null {
+    if (!this.quill) return null;
+    const range = this.quill.getSelection();
+    if (!range || range.length === 0) return null;
+    const bounds = this.quill.getBounds(range.index, range.length) as {
+      top: number; left: number; width: number; height: number;
+    };
+    // Converter coordenadas relativas ao container do Quill para coordenadas do viewport
+    const containerRect = this.quill.root.closest('.ql-editor')?.getBoundingClientRect()
+      ?? this.quill.root.getBoundingClientRect();
+    return {
+      top: containerRect.top + bounds.top,
+      left: containerRect.left + bounds.left,
+      width: bounds.width,
+      height: bounds.height,
+    };
+  }
+
+  /**
+   * Substitui o texto atualmente selecionado no editor por um novo texto.
+   * @param newText Texto de substituição.
+   */
+  replaceSelectedText(newText: string): void {
+    if (!this.quill) return;
+    const range = this.quill.getSelection();
+    if (!range || range.length === 0) return;
+    this.quill.deleteText(range.index, range.length, 'user');
+    this.quill.insertText(range.index, newText, 'user');
+    // Selecionar o novo texto inserido
+    this.quill.setSelection(range.index, newText.length, 'silent');
+  }
+
+  /**
+   * Evento de seleção: emitido quando a seleção do utilizador muda.
+   */
+  selectionChange = output<{ text: string; bounds: { top: number; left: number; width: number; height: number } | null }>();
+
+  /** Emite eventos de seleção para o componente pai detetar seleções de texto. */
+  private setupSelectionChangeEmitter(): void {
+    if (!this.quill) return;
+    this.quill.on('selection-change', (range: any) => {
+      if (range && range.length > 0) {
+        const text = this.quill.getText(range.index, range.length);
+        const bounds = this.getSelectionBounds();
+        this.selectionChange.emit({ text, bounds });
+      } else {
+        this.selectionChange.emit({ text: '', bounds: null });
+      }
+    });
   }
 }
