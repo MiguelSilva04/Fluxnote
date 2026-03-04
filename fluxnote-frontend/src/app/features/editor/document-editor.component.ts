@@ -1449,10 +1449,12 @@ export class DocumentEditorComponent implements OnInit {
     if (event.text && event.text.trim().length > 0 && event.bounds) {
       this.selectedTextForImprove = event.text;
       this.selectionBounds = event.bounds;
-      // Posicionar o tooltip acima da seleção
+      // Posicionar o tooltip acima da seleção, com clamp para não sair da viewport
+      const tooltipWidth = 140;
+      const rawLeft = event.bounds.left + (event.bounds.width / 2) - (tooltipWidth / 2);
       this.improveTooltipPosition.set({
-        top: event.bounds.top - 40,
-        left: event.bounds.left + (event.bounds.width / 2) - 70,
+        top: Math.max(8, event.bounds.top - 40),
+        left: Math.max(8, Math.min(rawLeft, window.innerWidth - tooltipWidth - 8)),
       });
       this.showImproveTooltip.set(true);
     } else {
@@ -1475,11 +1477,17 @@ export class DocumentEditorComponent implements OnInit {
 
     // Posicionar o card inline abaixo da seleção
     const cardWidth = 400;
+    const cardHeight = 360;
     const cardMargin = 8;
     const rawLeft = this.selectionBounds.left + (this.selectionBounds.width / 2) - (cardWidth / 2);
     const clampedLeft = Math.max(cardMargin, Math.min(rawLeft, window.innerWidth - cardWidth - cardMargin));
+
+    // Preferir abaixo da seleção; se não couber, clamp para que o card não saia do ecrã
+    const belowTop = this.selectionBounds.top + this.selectionBounds.height + cardMargin;
+    const clampedTop = Math.min(belowTop, window.innerHeight - cardHeight - cardMargin);
+
     this.improveCardPosition.set({
-      top: this.selectionBounds.top + this.selectionBounds.height + cardMargin,
+      top: Math.max(cardMargin, clampedTop),
       left: clampedLeft,
     });
 
@@ -1557,11 +1565,17 @@ export class DocumentEditorComponent implements OnInit {
   onGenerateButtonClick(event: { viewportTop: number; viewportLeft: number; viewportHeight: number }): void {
     // Posicionar o card abaixo do cursor usando coords viewport frescas do clique
     const cardWidth = 440;
+    const cardHeight = 420;
     const cardMargin = 8;
     const rawLeft = event.viewportLeft - 20;
     const clampedLeft = Math.max(cardMargin, Math.min(rawLeft, window.innerWidth - cardWidth - cardMargin));
+
+    // Preferir abaixo do botão; se não couber, clamp para que o card não saia do ecrã
+    const belowTop = event.viewportTop + event.viewportHeight + cardMargin;
+    const clampedTop = Math.min(belowTop, window.innerHeight - cardHeight - cardMargin);
+
     this.generateCardPosition.set({
-      top: event.viewportTop + event.viewportHeight + cardMargin,
+      top: Math.max(cardMargin, clampedTop),
       left: clampedLeft,
     });
 
