@@ -11,12 +11,10 @@ namespace Fluxnote.Backend.Controllers;
 public class UploadsController : ControllerBase
 {
     private readonly IStorageService _storageService;
-    private readonly IWebHostEnvironment _env;
 
-    public UploadsController(IStorageService storageService, IWebHostEnvironment env)
+    public UploadsController(IStorageService storageService)
     {
         _storageService = storageService;
-        _env = env;
     }
 
     /// <summary>
@@ -45,39 +43,23 @@ public class UploadsController : ControllerBase
     }
 
     /// <summary>
-    /// Serve imagens guardadas localmente (apenas em Development).
-    /// Em produção, as imagens são servidas diretamente pelo Azure Blob Storage.
+    /// Serve imagens — em dev a partir do sistema de ficheiros local,
+    /// em produção via proxy ao Azure Blob Storage (sem necessidade de acesso anónimo ao blob).
     /// </summary>
     [HttpGet("images/{fileName}")]
     [AllowAnonymous]
-    public IActionResult GetImage(string fileName)
+    public async Task<IActionResult> GetImage(string fileName)
     {
-        if (!_env.IsDevelopment())
-            return NotFound();
-
         // Sanitizar o nome do ficheiro para prevenir path traversal
         fileName = Path.GetFileName(fileName);
+        if (string.IsNullOrEmpty(fileName))
+            return BadRequest();
 
-        var uploadsPath = _env.WebRootPath ?? Path.Combine(_env.ContentRootPath, "wwwroot");
-        var filePath = Path.Combine(uploadsPath, "uploads", fileName);
-
-        if (!System.IO.File.Exists(filePath))
+        var result = await _storageService.GetImageAsync(fileName);
+        if (result is null)
             return NotFound();
 
-        var contentType = GetContentType(fileName);
-        return PhysicalFile(filePath, contentType);
-    }
-
-    private static string GetContentType(string fileName)
-    {
-        var extension = Path.GetExtension(fileName).ToLowerInvariant();
-        return extension switch
-        {
-            ".jpg" or ".jpeg" => "image/jpeg",
-            ".png" => "image/png",
-            ".gif" => "image/gif",
-            ".webp" => "image/webp",
-            _ => "application/octet-stream"
-        };
+        var (stream, contentType) = result.Value;
+        return File(stream!, contentType, enableRangeProcessing: false);
     }
 }

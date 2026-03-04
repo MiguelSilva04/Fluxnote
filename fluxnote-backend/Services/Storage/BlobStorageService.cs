@@ -6,7 +6,9 @@ namespace Fluxnote.Backend.Services.Storage;
 
 /// <summary>
 /// Implementação de IStorageService para produção usando Azure Blob Storage.
-/// Imagens: container público, URL direta. Contexto: container privado, referência interna.
+/// Imagens: servidas via backend API (/api/uploads/images/{name}) para evitar dependência
+/// de acesso anónimo ao blob (desativado por defeito em contas Azure modernas).
+/// Contexto: container privado, referência interna.
 /// </summary>
 public class BlobStorageService : IStorageService
 {
@@ -31,7 +33,26 @@ public class BlobStorageService : IStorageService
 
         await blobClient.UploadAsync(stream, new BlobUploadOptions { HttpHeaders = headers });
 
-        return blobClient.Uri.ToString();
+        // Retorna URL relativa servida pelo UploadsController (não a URL direta do blob).
+        // Isto evita a dependência de "Allow Anonymous Blob Access" estar ativado
+        // na conta de armazenamento Azure (desativado por defeito em contas modernas).
+        return $"/api/uploads/images/{blobName}";
+    }
+
+    public async Task<(Stream? stream, string contentType)?> GetImageAsync(string fileName)
+    {
+        var client = new BlobServiceClient(_options.ConnectionString);
+        var container = client.GetBlobContainerClient(_options.ContainerName);
+        var blobClient = container.GetBlobClient(fileName);
+
+        if (!await blobClient.ExistsAsync())
+            return null;
+
+        var properties = await blobClient.GetPropertiesAsync();
+        var contentType = properties.Value.ContentType;
+
+        var download = await blobClient.DownloadStreamingAsync();
+        return (download.Value.Content, contentType);
     }
 
     public async Task<string> UploadContextFileAsync(Stream stream, string fileName, string contentType)

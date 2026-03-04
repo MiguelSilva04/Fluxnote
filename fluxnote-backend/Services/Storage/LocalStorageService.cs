@@ -36,6 +36,28 @@ public class LocalStorageService : IStorageService
         return $"/api/uploads/images/{uniqueName}";
     }
 
+    public Task<(Stream? stream, string contentType)?> GetImageAsync(string fileName)
+    {
+        var uploadsPath = _env.WebRootPath ?? Path.Combine(_env.ContentRootPath, "wwwroot");
+        var filePath = Path.Combine(uploadsPath, "uploads", fileName);
+
+        if (!File.Exists(filePath))
+            return Task.FromResult<(Stream? stream, string contentType)?>(null);
+
+        var ext = Path.GetExtension(fileName).ToLowerInvariant();
+        var mime = ext switch
+        {
+            ".jpg" or ".jpeg" => "image/jpeg",
+            ".png"            => "image/png",
+            ".gif"            => "image/gif",
+            ".webp"           => "image/webp",
+            _                 => "application/octet-stream"
+        };
+
+        Stream fs = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
+        return Task.FromResult<(Stream? stream, string contentType)?>((fs, mime));
+    }
+
     public async Task<string> UploadContextFileAsync(Stream stream, string fileName, string contentType)
     {
         var contextPath = Path.Combine(
