@@ -117,7 +117,7 @@ export class DocumentService {
    * @param id ID do documento
    * @param data Dados a atualizar
    */
-  updateDocument(id: number, data: { title?: string; content?: string }): Observable<DocumentDetailDto> {
+  updateDocument(id: number, data: { title?: string; content?: string; yDocSnapshot?: string }): Observable<DocumentDetailDto> {
     return this.http.put<DocumentDetailDto>(`/api/documents/${id}`, data).pipe(
       tap(doc => {
         this._currentDocument.set(doc);

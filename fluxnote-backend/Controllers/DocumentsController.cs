@@ -1000,6 +1000,19 @@ namespace Fluxnote.Backend.Controllers
                 document.PlainText = StripHtmlTags(request.Content);
             }
 
+            // Atualizar snapshot Y.Doc (CRDT) se fornecido
+            if (!string.IsNullOrEmpty(request.YDocSnapshot))
+            {
+                try
+                {
+                    document.YDocSnapshot = Convert.FromBase64String(request.YDocSnapshot);
+                }
+                catch (FormatException)
+                {
+                    // Ignorar snapshot inválido - não bloquear a atualização do conteúdo
+                }
+            }
+
             document.UpdatedAt = DateTime.UtcNow;
 
             await _context.SaveChangesAsync();

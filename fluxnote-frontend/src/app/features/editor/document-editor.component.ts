@@ -9,7 +9,7 @@ import {
   WorkInProgressComponent,
 } from '../../shared/components/ui';
 import { DocumentShareModalComponent } from '../../shared/components/document-share-modal/document-share-modal.component';
-import { DocumentService, DocumentInviteService } from '../../core/services';
+import { DocumentService, DocumentInviteService, CollaborationService } from '../../core/services';
 import { Collaborator, Version, Comment, AISuggestion, DocumentInviteDto, DocumentContextDto } from '../../core/models';
 import { TextEditorComponent } from './components/text-editor.component';
 
@@ -942,6 +942,7 @@ export class DocumentEditorComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private documentService = inject(DocumentService);
   private inviteService = inject(DocumentInviteService);
+  private collaborationService = inject(CollaborationService);
   private location = inject(Location);
 
   // ID do documento atual
@@ -1325,10 +1326,18 @@ export class DocumentEditorComponent implements OnInit {
       return;
     }
 
-    this.documentService.updateDocument(this.documentId, { content }).subscribe({
+    // Incluir snapshot Y.Doc no mesmo pedido HTTP para garantir que
+    // HTML e snapshot ficam sincronizados.
+    const snapshot = this.collaborationService.getSnapshotBase64() ?? undefined;
+
+    this.documentService.updateDocument(this.documentId, { content, yDocSnapshot: snapshot }).subscribe({
       next: () => {
         this.editor.setSaveStatus('saved');
         this.updateLastEdited();
+        // Voltar a idle após 2 segundos
+        setTimeout(() => {
+          if (this.editor.saveStatus() === 'saved') this.editor.setSaveStatus('idle');
+        }, 2000);
       },
       error: (err) => {
         console.error('Error saving document:', err);

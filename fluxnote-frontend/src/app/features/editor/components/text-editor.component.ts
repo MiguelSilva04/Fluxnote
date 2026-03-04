@@ -142,7 +142,6 @@ export class TextEditorComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     });
   };
-
   private uploadService = inject(UploadService);
   private collaborationService = inject(CollaborationService);
   private authService = inject(AuthService);
@@ -479,12 +478,9 @@ export class TextEditorComponent implements OnInit, AfterViewInit, OnDestroy {
   private triggerSave(content: string): void {
     this.saveStatus.set('saving');
     this.save.emit(content);
-    setTimeout(() => {
-      this.saveStatus.set('saved');
-      setTimeout(() => {
-        if (this.saveStatus() === 'saved') this.saveStatus.set('idle');
-      }, 2000);
-    }, 500);
+    // O snapshot Y.Doc é agora enviado junto com o HTML no pedido HTTP
+    // pelo document-editor.component (via documentService.updateDocument).
+    // O saveStatus é atualizado pelo parent (document-editor) via setSaveStatus().
   }
 
   format(formatType: string): void {
