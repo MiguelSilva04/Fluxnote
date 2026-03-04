@@ -232,6 +232,10 @@ export class TeamService {
     return this.http.delete<void>(`/api/teamMembers/${memberId}`);
   }
 
+  updateTeamName(id: number, name: string): Observable<void> {
+    return this.http.patch<void>(`/api/teams/${id}`, { name });
+  }
+
   /* updateTeam(id: number, updates: Partial<Team>, http: HttpClient): void {
     http.put<Team>(`/api/teams/${id}`, updates)
       .subscribe({
