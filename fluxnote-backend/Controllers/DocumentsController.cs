@@ -720,6 +720,100 @@ namespace Fluxnote.Backend.Controllers
         }
 
         /// <summary>
+        /// Gera conteúdo novo usando IA com base num prompt do utilizador.
+        /// O conteúdo do documento e os ficheiros de contexto são incluídos para informar a geração.
+        /// </summary>
+        /// <param name="id">ID do documento.</param>
+        /// <param name="request">Corpo com o prompt do utilizador.</param>
+        /// <returns>
+        /// <list type="bullet">
+        ///     <item><b>200 OK:</b> Conteúdo gerado com sucesso.</item>
+        ///     <item><b>400 Bad Request:</b> Prompt vazio.</item>
+        ///     <item><b>401 Unauthorized:</b> Token inválido.</item>
+        ///     <item><b>403 Forbidden:</b> Sem acesso ao documento.</item>
+        ///     <item><b>404 Not Found:</b> Documento não encontrado.</item>
+        ///     <item><b>429 Too Many Requests:</b> Rate limit da API Gemini excedido.</item>
+        ///     <item><b>500 Internal Server Error:</b> Erro no serviço de IA.</item>
+        /// </list>
+        /// </returns>
+        [HttpPost("{id}/generate")]
+        public async Task<ActionResult> GenerateContent(int id, [FromBody] Dtos.Documents.GenerateContentRequest request)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId is null)
+                return Unauthorized(new { message = "User not authenticated." });
+
+            var document = await _context.Document
+                .Include(d => d.ContextFiles)
+                .FirstOrDefaultAsync(d => d.Id == id && !d.IsDeleted);
+
+            if (document is null)
+                return NotFound(new { message = "Document not found." });
+
+            var userTeamMember = await _context.TeamMember
+                .FirstOrDefaultAsync(m => m.TeamId == document.TeamId && m.UserId == userId);
+
+            if (userTeamMember == null)
+            {
+                return StatusCode(StatusCodes.Status403Forbidden, new
+                {
+                    message = "Permission denied.",
+                    errors = new[] { "You are not a member of this team." }
+                });
+            }
+
+            bool isOwner = userTeamMember.Role == TeamRole.Owner;
+            if (!isOwner)
+            {
+                var hasPermission = await _context.DocumentPermission
+                    .AnyAsync(dp => dp.TeamMemberId == userTeamMember.Id && dp.DocumentId == document.Id);
+
+                if (!hasPermission)
+                {
+                    return StatusCode(StatusCodes.Status403Forbidden, new
+                    {
+                        message = "Permission denied.",
+                        errors = new[] { "You don't have access to this document." }
+                    });
+                }
+            }
+
+            try
+            {
+                var contextTexts = document.ContextFiles?
+                    .Where(cf => !string.IsNullOrWhiteSpace(cf.ExtractedText))
+                    .Select(cf => cf.ExtractedText!)
+                    .ToList();
+
+                var generatedContent = await _aiService.GenerateContentAsync(
+                    request.Prompt,
+                    document.PlainText ?? "",
+                    contextTexts
+                );
+
+                return Ok(new { generatedContent });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return StatusCode(StatusCodes.Status429TooManyRequests, new
+                {
+                    message = ex.Message
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    message = "Failed to generate content.",
+                    errors = new[] { ex.Message }
+                });
+            }
+        }
+
+        /// <summary>
         /// Obtém os detalhes completos de um documento, incluindo conteúdo.
         /// </summary>
         /// <param name="id">ID do documento.</param>

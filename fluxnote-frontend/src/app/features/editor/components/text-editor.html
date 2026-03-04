@@ -282,6 +282,22 @@
       <div class="max-w-4xl mx-auto bg-white shadow-sm border border-gray-200 rounded-xl min-h-[600px] relative">
         <div #editorContainer class="quill-editor-container"></div>
 
+        <!-- Generate with AI floating button (empty line) -->
+        @if (editable() && showGenerateButton()) {
+          <div
+            class="absolute left-3 z-30 animate-in fade-in"
+            [style.top.px]="generateButtonPos().top"
+          >
+            <button
+              (mousedown)="onGenerateButtonMousedown($event)"
+              class="group flex items-center justify-center w-7 h-7 rounded-lg border border-dashed border-gray-300 hover:border-purple-400 hover:bg-purple-50 transition-all"
+              title="Generate with AI"
+            >
+              <lucide-icon name="plus" class="h-4 w-4 text-gray-300 group-hover:text-purple-500 transition-colors"></lucide-icon>
+            </button>
+          </div>
+        }
+
         <!-- Image manipulation menu (editors only) -->
         @if (editable() && showImageMenu()) {
           <div 

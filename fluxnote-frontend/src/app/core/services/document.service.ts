@@ -206,6 +206,21 @@ export class DocumentService {
   }
 
   /**
+   * Gera conteúdo novo usando IA com base num prompt
+   * @param id ID do documento
+   * @param prompt Instrução do utilizador
+   * @returns Observable com o conteúdo gerado
+   */
+  generateContent(id: number, prompt: string): Observable<{ generatedContent: string }> {
+    return this.http.post<{ generatedContent: string }>(`/api/documents/${id}/generate`, { prompt }).pipe(
+      catchError(error => {
+        console.error('Error generating content:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  /**
    * Lista os ficheiros de contexto de um documento
    * @param documentId ID do documento
    */

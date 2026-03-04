@@ -199,6 +199,7 @@ import { TextEditorComponent } from './components/text-editor.component';
               (contentChange)="onContentChange($event)"
               (save)="onSave($event)"
               (selectionChange)="onSelectionChange($event)"
+              (generateButtonClick)="onGenerateButtonClick($event)"
             />
 
             <!-- Improve Text Tooltip (appears on text selection) -->
@@ -217,6 +218,8 @@ import { TextEditorComponent } from './components/text-editor.component';
                 </button>
               </div>
             }
+
+
           </main>
 
           <!-- AI Assistant Panel -->
@@ -250,6 +253,23 @@ import { TextEditorComponent } from './components/text-editor.component';
                       <div class="flex-1 min-w-0">
                         <p class="text-sm font-medium text-gray-900 mb-0.5">Generate Summary</p>
                         <p class="text-xs text-gray-500">Get a concise AI-generated summary of this document</p>
+                      </div>
+                    </div>
+                  </button>
+
+                  <!-- Generate Content (functional) -->
+                  <button
+                    (click)="openGeneratePanelModal()"
+                    [disabled]="generateLoading()"
+                    class="w-full p-4 border border-gray-200 rounded-lg hover:bg-blue-50 hover:border-blue-300 transition-colors text-left disabled:opacity-50 disabled:cursor-not-allowed group"
+                  >
+                    <div class="flex items-start gap-3">
+                      <div class="w-9 h-9 rounded-lg bg-blue-100 flex items-center justify-center shrink-0 group-hover:bg-blue-200 transition-colors">
+                        <lucide-icon name="pencil-line" class="h-5 w-5 text-blue-600"></lucide-icon>
+                      </div>
+                      <div class="flex-1 min-w-0">
+                        <p class="text-sm font-medium text-gray-900 mb-0.5">Generate Content</p>
+                        <p class="text-xs text-gray-500">Generate new content from a prompt using AI</p>
                       </div>
                     </div>
                   </button>
@@ -611,6 +631,101 @@ import { TextEditorComponent } from './components/text-editor.component';
         </div>
       }
 
+      <!-- AI Generate Content Panel Modal -->
+      @if (showGeneratePanelModal()) {
+        <div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div class="bg-white rounded-xl shadow-2xl w-full max-w-lg">
+            <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <lucide-icon name="sparkles" class="h-5 w-5 text-blue-600"></lucide-icon>
+                <h2 class="text-lg font-bold text-gray-900">Generate Content</h2>
+              </div>
+              <button
+                (click)="closeGeneratePanelModal()"
+                class="text-gray-400 hover:text-gray-600 text-2xl"
+              >
+                &times;
+              </button>
+            </div>
+
+            <div class="p-6">
+              <!-- Prompt input (shown before generation) -->
+              @if (!generateLoading() && !generateResult() && !generateError()) {
+                <textarea
+                  [(ngModel)]="generatePrompt"
+                  placeholder="Describe the content you want to generate..."
+                  rows="4"
+                  class="w-full text-sm border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-400 resize-none placeholder:text-gray-400"
+                ></textarea>
+                @if (contextFiles().length > 0) {
+                  <p class="text-xs text-gray-400 mt-2 flex items-center gap-1">
+                    <lucide-icon name="file-stack" class="h-3.5 w-3.5"></lucide-icon>
+                    {{ contextFiles().length }} context file{{ contextFiles().length > 1 ? 's' : '' }} will be included
+                  </p>
+                }
+              }
+
+              <!-- Loading -->
+              @if (generateLoading()) {
+                <div class="flex flex-col items-center justify-center py-8 gap-3">
+                  <lucide-icon name="loader-circle" class="h-8 w-8 text-blue-600 animate-spin"></lucide-icon>
+                  <p class="text-gray-600 text-sm">Generating content...</p>
+                </div>
+              }
+
+              <!-- Error -->
+              @if (generateError()) {
+                <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+                  <div class="flex items-center gap-2 text-red-700 mb-1">
+                    <lucide-icon name="circle-alert" class="h-5 w-5"></lucide-icon>
+                    <span class="font-medium">Error</span>
+                  </div>
+                  <p class="text-sm text-red-600">{{ generateError() }}</p>
+                </div>
+              }
+
+              <!-- Result -->
+              @if (!generateLoading() && !generateError() && generateResult()) {
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <p class="text-gray-800 text-sm leading-relaxed whitespace-pre-wrap">{{ generateResult() }}</p>
+                </div>
+              }
+            </div>
+
+            <div class="px-6 py-4 bg-gray-50 border-t border-gray-100 flex justify-end gap-3 rounded-b-xl">
+              @if (!generateLoading() && !generateResult() && !generateError()) {
+                <app-button
+                  variant="primary"
+                  size="sm"
+                  (onClick)="submitGeneratePrompt()"
+                  [disabled]="!generatePrompt.trim()"
+                >
+                  <lucide-icon name="sparkles" class="h-4 w-4 mr-1"></lucide-icon>
+                  Generate
+                </app-button>
+              }
+              @if (generateError()) {
+                <app-button variant="outline" size="sm" (onClick)="resetGeneratePanelModal()">
+                  Try again
+                </app-button>
+              }
+              @if (!generateLoading() && !generateError() && generateResult()) {
+                <app-button variant="outline" size="sm" (onClick)="copyGeneratedContent()">
+                  @if (generateCopied()) {
+                    <lucide-icon name="check" class="h-4 w-4 mr-1 text-green-600"></lucide-icon>
+                    Copied!
+                  } @else {
+                    <lucide-icon name="clipboard" class="h-4 w-4 mr-1"></lucide-icon>
+                    Copy
+                  }
+                </app-button>
+              }
+              <app-button variant="ghost" (onClick)="closeGeneratePanelModal()">Close</app-button>
+            </div>
+          </div>
+        </div>
+      }
+
       <!-- Work in Progress Modal -->
       <app-work-in-progress [show]="showWipModal()" (close)="showWipModal.set(false)" />
 
@@ -699,6 +814,123 @@ import { TextEditorComponent } from './components/text-editor.component';
           }
         </div>
       }
+
+      <!-- AI Generate Content Inline Card -->
+      @if (showGenerateCard()) {
+        <div
+          class="fixed z-50 bg-white rounded-xl shadow-2xl border border-blue-100 w-[440px] flex flex-col animate-in fade-in slide-in-from-top-2"
+          [style.top.px]="generateCardPosition().top"
+          [style.left.px]="generateCardPosition().left"
+          style="max-height: 420px;"
+        >
+          <!-- Card Header -->
+          <div class="px-4 py-3 flex items-center justify-between shrink-0 border-b border-gray-100">
+            <div class="flex items-center gap-2">
+              <div class="w-6 h-6 rounded-md bg-blue-100 flex items-center justify-center">
+                <lucide-icon name="sparkles" class="h-3.5 w-3.5 text-blue-600"></lucide-icon>
+              </div>
+              <span class="text-sm font-semibold text-gray-900">Generate with AI</span>
+            </div>
+            <button
+              (click)="closeGenerateCard()"
+              class="p-1 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+            >
+              <lucide-icon name="x" class="h-4 w-4"></lucide-icon>
+            </button>
+          </div>
+
+          <!-- Prompt Input -->
+          @if (!generateLoading() && !generateResult() && !generateError()) {
+            <div class="p-4">
+              <textarea
+                #generatePromptInput
+                [(ngModel)]="generatePrompt"
+                placeholder="Describe the content you want to generate..."
+                rows="3"
+                class="w-full text-sm border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-400 resize-none placeholder:text-gray-400"
+                (keydown.enter)="onGenerateKeydown($event)"
+              ></textarea>
+              <div class="flex items-center justify-between mt-3">
+                <p class="text-[10px] text-gray-400">
+                  @if (contextFiles().length > 0) {
+                    <lucide-icon name="file-stack" class="h-3 w-3 inline-block mr-0.5 -mt-0.5"></lucide-icon>
+                    {{ contextFiles().length }} context file{{ contextFiles().length > 1 ? 's' : '' }} included
+                  }
+                </p>
+                <button
+                  (click)="submitGeneratePrompt()"
+                  [disabled]="!generatePrompt.trim()"
+                  class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-[#155347] text-white rounded-lg hover:bg-[#0d3d31] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  <lucide-icon name="sparkles" class="h-3.5 w-3.5"></lucide-icon>
+                  Generate
+                </button>
+              </div>
+            </div>
+          }
+
+          <!-- Loading State -->
+          @if (generateLoading()) {
+            <div class="flex flex-col items-center justify-center py-10 gap-3">
+              <lucide-icon name="loader-circle" class="h-6 w-6 text-blue-600 animate-spin"></lucide-icon>
+              <p class="text-xs text-gray-500">Generating content...</p>
+            </div>
+          }
+
+          <!-- Error State -->
+          @if (generateError()) {
+            <div class="m-4 bg-red-50 border border-red-200 rounded-lg p-3 flex items-start gap-2">
+              <lucide-icon name="circle-alert" class="h-4 w-4 text-red-500 shrink-0 mt-0.5"></lucide-icon>
+              <p class="text-xs text-red-600">{{ generateError() }}</p>
+            </div>
+            <div class="px-4 pb-4 flex justify-end">
+              <button
+                (click)="resetGenerateCard()"
+                class="px-3 py-1.5 text-xs text-gray-500 hover:text-gray-700 rounded-lg hover:bg-gray-100 transition-colors"
+              >
+                Try again
+              </button>
+            </div>
+          }
+
+          <!-- Result State -->
+          @if (!generateLoading() && !generateError() && generateResult()) {
+            <div class="flex-1 overflow-y-auto">
+              <div class="px-4 py-3 bg-blue-50/60">
+                <p class="text-[10px] font-semibold text-blue-500 uppercase tracking-widest mb-1.5">Generated Content</p>
+                <p class="text-sm text-gray-800 leading-relaxed whitespace-pre-wrap">{{ generateResult() }}</p>
+              </div>
+            </div>
+            <div class="px-4 py-3 border-t border-gray-100 flex items-center justify-end gap-2 shrink-0">
+              <button
+                (click)="closeGenerateCard()"
+                class="px-3 py-1.5 text-xs text-gray-500 hover:text-gray-700 rounded-lg hover:bg-gray-100 transition-colors"
+              >
+                Discard
+              </button>
+              <button
+                (click)="copyGeneratedContent()"
+                class="px-3 py-1.5 text-xs border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-1.5"
+              >
+                @if (generateCopied()) {
+                  <lucide-icon name="check" class="h-3.5 w-3.5 text-green-600"></lucide-icon>
+                  <span>Copied!</span>
+                } @else {
+                  <lucide-icon name="clipboard" class="h-3.5 w-3.5"></lucide-icon>
+                  <span>Copy</span>
+                }
+              </button>
+              <button
+                (click)="insertGeneratedContent()"
+                class="px-3 py-1.5 text-xs bg-[#155347] text-white rounded-lg hover:bg-[#0d3d31] transition-colors flex items-center gap-1.5"
+              >
+                <lucide-icon name="check" class="h-3.5 w-3.5"></lucide-icon>
+                <span>Insert</span>
+              </button>
+            </div>
+          }
+        </div>
+      }
     </div>
   `,
 })
@@ -750,6 +982,16 @@ export class DocumentEditorComponent implements OnInit {
   improveCopied = signal(false);
   private selectedTextForImprove = '';
   private selectionBounds = { top: 0, left: 0, width: 0, height: 0 };
+
+  // AI Generate Content
+  showGeneratePanelModal = signal(false);
+  showGenerateCard = signal(false);
+  generateCardPosition = signal({ top: 0, left: 0 });
+  generatePrompt = '';
+  generateResult = signal('');
+  generateLoading = signal(false);
+  generateError = signal<string | null>(null);
+  generateCopied = signal(false);
 
   // AI Context
   contextFiles = signal<DocumentContextDto[]>([]);
@@ -1274,5 +1516,114 @@ export class DocumentEditorComponent implements OnInit {
 
   closeImproveModal(): void {
     this.showImproveModal.set(false);
+  }
+
+  // AI Generate Content
+  openGeneratePanelModal(): void {
+    this.showAIPanel.set(false);
+    this.generatePrompt = '';
+    this.generateResult.set('');
+    this.generateError.set(null);
+    this.generateLoading.set(false);
+    this.generateCopied.set(false);
+    this.showGeneratePanelModal.set(true);
+  }
+
+  closeGeneratePanelModal(): void {
+    this.showGeneratePanelModal.set(false);
+    this.generatePrompt = '';
+    this.generateResult.set('');
+    this.generateError.set(null);
+    this.generateLoading.set(false);
+    this.generateCopied.set(false);
+  }
+
+  resetGeneratePanelModal(): void {
+    this.generateError.set(null);
+    this.generateResult.set('');
+    this.generatePrompt = '';
+    this.generateLoading.set(false);
+  }
+
+  onGenerateButtonClick(event: { viewportTop: number; viewportLeft: number; viewportHeight: number }): void {
+    // Posicionar o card abaixo do cursor usando coords viewport frescas do clique
+    const cardWidth = 440;
+    const cardMargin = 8;
+    const rawLeft = event.viewportLeft - 20;
+    const clampedLeft = Math.max(cardMargin, Math.min(rawLeft, window.innerWidth - cardWidth - cardMargin));
+    this.generateCardPosition.set({
+      top: event.viewportTop + event.viewportHeight + cardMargin,
+      left: clampedLeft,
+    });
+
+    this.generatePrompt = '';
+    this.generateResult.set('');
+    this.generateError.set(null);
+    this.generateLoading.set(false);
+    this.generateCopied.set(false);
+    this.showGenerateCard.set(true);
+  }
+
+  onGenerateKeydown(event: Event): void {
+    const kbEvent = event as KeyboardEvent;
+    if (!kbEvent.shiftKey) {
+      kbEvent.preventDefault();
+      this.submitGeneratePrompt();
+    }
+  }
+
+  submitGeneratePrompt(): void {
+    if (!this.documentId || !this.generatePrompt.trim()) return;
+
+    this.generateResult.set('');
+    this.generateError.set(null);
+    this.generateLoading.set(true);
+
+    this.documentService.generateContent(this.documentId, this.generatePrompt.trim()).subscribe({
+      next: (res) => {
+        this.generateResult.set(res.generatedContent);
+        this.generateLoading.set(false);
+      },
+      error: (err) => {
+        console.error('Error generating content:', err);
+        this.generateError.set(
+          err.error?.message || 'Failed to generate content. Please try again.',
+        );
+        this.generateLoading.set(false);
+      },
+    });
+  }
+
+  insertGeneratedContent(): void {
+    const content = this.generateResult();
+    if (!content || !this.editor) return;
+
+    this.editor.insertTextAtCursor(content);
+    this.closeGenerateCard();
+  }
+
+  copyGeneratedContent(): void {
+    const text = this.generateResult();
+    if (!text) return;
+
+    navigator.clipboard.writeText(text).then(() => {
+      this.generateCopied.set(true);
+      setTimeout(() => this.generateCopied.set(false), 3000);
+    });
+  }
+
+  resetGenerateCard(): void {
+    this.generateError.set(null);
+    this.generateResult.set('');
+    this.generateLoading.set(false);
+  }
+
+  closeGenerateCard(): void {
+    this.showGenerateCard.set(false);
+    this.generatePrompt = '';
+    this.generateResult.set('');
+    this.generateError.set(null);
+    this.generateLoading.set(false);
+    this.generateCopied.set(false);
   }
 }
