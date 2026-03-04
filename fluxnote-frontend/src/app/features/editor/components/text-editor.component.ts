@@ -9,13 +9,38 @@ import {
   ViewChild,
   ElementRef,
   AfterViewInit,
-  effect,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { LucideAngularModule } from 'lucide-angular';
 import Quill from 'quill';
 import { Subject, debounceTime, takeUntil } from 'rxjs';
+
+// Custom image blot that persists inline styles (width, float, margins) inside the Quill Delta.
+// The default ImageBlot only stores `src`, so direct DOM style mutations bypass Yjs and are
+// lost on page reload / not synced to collaborators.
+// By storing `{ src, style }` in the Delta, every resize/align goes through Quill → Yjs → SignalR.
+const EmbedBlot = Quill.import('blots/embed') as any;
+class StyledImageBlot extends EmbedBlot {
+  static blotName = 'image';
+  static tagName = 'img';
+
+  static create(value: string | { src: string; style?: string }) {
+    const node = super.create() as HTMLImageElement;
+    const src = typeof value === 'string' ? value : (value?.src ?? '');
+    const style = typeof value === 'object' ? (value?.style ?? '') : '';
+    node.setAttribute('src', src);
+    if (style) node.setAttribute('style', style);
+    return node;
+  }
+
+  static value(node: HTMLImageElement) {
+    const src = node.getAttribute('src') ?? '';
+    const style = node.getAttribute('style') ?? '';
+    return style ? { src, style } : src;
+  }
+}
+Quill.register({ 'formats/image': StyledImageBlot }, true);
 import { UploadService, CollaborationService, AuthService } from '../../../core/services';
 import { CollaboratorState } from '../../../core/services/collaboration.service';
 
@@ -602,39 +627,87 @@ export class TextEditorComponent implements OnInit, AfterViewInit, OnDestroy {
   setImageSize(size: 'small' | 'medium' | 'large' | 'full'): void {
     const img = this.selectedImage();
     if (!img) return;
-    img.classList.remove('img-small', 'img-medium', 'img-large', 'img-full');
+
+    const blot = (Quill as any).find(img);
+    if (!blot) return;
+    const index = this.quill.getIndex(blot);
+    const src = img.getAttribute('src') ?? '';
+
     const widths = { small: '25%', medium: '50%', large: '75%', full: '100%' };
-    img.style.width = widths[size];
-    img.style.height = 'auto';
-    this.triggerContentChange();
+    const styleProps = this.parseInlineStyle(img.getAttribute('style') ?? '');
+    styleProps['width'] = widths[size];
+    styleProps['height'] = 'auto';
+    const style = this.buildInlineStyle(styleProps);
+
+    // Go through Quill API so the change is captured by QuillBinding → Yjs → SignalR
+    this.quill.deleteText(index, 1, 'user');
+    this.quill.insertEmbed(index, 'image', { src, style }, 'user');
+    this.deselectImage();
   }
 
   setImageAlign(align: 'left' | 'center' | 'right'): void {
     const img = this.selectedImage();
     if (!img) return;
-    img.style.display = 'block';
-    img.style.float = '';
-    img.style.marginLeft = '';
-    img.style.marginRight = '';
+
+    const blot = (Quill as any).find(img);
+    if (!blot) return;
+    const index = this.quill.getIndex(blot);
+    const src = img.getAttribute('src') ?? '';
+
+    const styleProps = this.parseInlineStyle(img.getAttribute('style') ?? '');
+    delete styleProps['float'];
+    delete styleProps['margin-left'];
+    delete styleProps['margin-right'];
+    styleProps['display'] = 'block';
+
     if (align === 'left') {
-      img.style.float = 'left';
-      img.style.marginRight = '1rem';
+      styleProps['float'] = 'left';
+      styleProps['margin-right'] = '1rem';
     } else if (align === 'center') {
-      img.style.marginLeft = 'auto';
-      img.style.marginRight = 'auto';
+      styleProps['margin-left'] = 'auto';
+      styleProps['margin-right'] = 'auto';
     } else {
-      img.style.float = 'right';
-      img.style.marginLeft = '1rem';
+      styleProps['float'] = 'right';
+      styleProps['margin-left'] = '1rem';
     }
-    this.triggerContentChange();
+
+    const style = this.buildInlineStyle(styleProps);
+
+    this.quill.deleteText(index, 1, 'user');
+    this.quill.insertEmbed(index, 'image', { src, style }, 'user');
+    this.deselectImage();
   }
 
   deleteImage(): void {
     const img = this.selectedImage();
     if (!img) return;
-    img.remove();
+
+    const blot = (Quill as any).find(img);
+    if (!blot) return;
+    const index = this.quill.getIndex(blot);
+
     this.deselectImage();
-    this.triggerContentChange();
+    this.quill.deleteText(index, 1, 'user');
+  }
+
+  private parseInlineStyle(style: string): Record<string, string> {
+    const result: Record<string, string> = {};
+    if (!style) return result;
+    for (const part of style.split(';')) {
+      const colonIdx = part.indexOf(':');
+      if (colonIdx === -1) continue;
+      const key = part.slice(0, colonIdx).trim();
+      const val = part.slice(colonIdx + 1).trim();
+      if (key && val) result[key] = val;
+    }
+    return result;
+  }
+
+  private buildInlineStyle(props: Record<string, string>): string {
+    return Object.entries(props)
+      .filter(([, v]) => v !== undefined && v !== '')
+      .map(([k, v]) => `${k}: ${v}`)
+      .join('; ');
   }
 
   private triggerContentChange(): void {

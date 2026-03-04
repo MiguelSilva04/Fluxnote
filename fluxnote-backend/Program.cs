@@ -338,12 +338,6 @@ var signalRBuilder = builder.Services.AddSignalR(options =>
     options.MaximumReceiveMessageSize = 512 * 1024; // 512 KB por update Yjs
 });
 
-// Em produção, usar Azure SignalR Service para WebSockets (funciona no Free tier do App Service).
-// Em dev (connection string não definida), usa WebSockets locais diretamente via Kestrel.
-var azureSignalRConnection = builder.Configuration["AzureSignalR:ConnectionString"];
-if (!string.IsNullOrEmpty(azureSignalRConnection))
-    signalRBuilder.AddAzureSignalR(azureSignalRConnection);
-
 // ==============================================================================
 // 6. CORS (Cross-Origin Resource Sharing)
 // ==============================================================================
