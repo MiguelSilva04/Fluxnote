@@ -88,6 +88,11 @@ namespace Fluxnote.Backend.Data
         public DbSet<Fluxnote.Backend.Models.DocumentContext> DocumentContext { get; set; } = default!;
 
         /// <summary>
+        /// DbSet para versões de documentos (criadas ao fechar sessão de edição).
+        /// </summary>
+        public DbSet<Fluxnote.Backend.Models.DocumentVersion> DocumentVersion { get; set; } = default!;
+
+        /// <summary>
         /// DbSet para refresh tokens de autenticação.
         /// </summary>
         public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
@@ -244,11 +249,38 @@ namespace Fluxnote.Backend.Data
                 entity.HasIndex(dc => dc.UploadedAt);
             });
 
+            builder.Entity<DocumentVersion>(entity =>
+            {
+                // Relação com Document (cascade delete — apagar documento apaga versões)
+                entity.HasOne(v => v.Document)
+                      .WithMany()
+                      .HasForeignKey(v => v.DocumentId)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+                // Relação com User (restrict delete — preservar referência ao autor)
+                entity.HasOne(v => v.Author)
+                      .WithMany()
+                      .HasForeignKey(v => v.AuthorId)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                // Índices para performance
+                entity.HasIndex(v => v.DocumentId);
+                entity.HasIndex(v => v.CreatedAt);
+            });
+
             // Configuração específica para SQL Server (SQLite usa BLOB por defeito)
             if (Database.IsSqlServer())
             {
                 builder.Entity<Document>()
                     .Property(d => d.Content)
+                    .HasColumnType("varbinary(max)");
+
+                builder.Entity<DocumentVersion>()
+                    .Property(v => v.YDocSnapshot)
+                    .HasColumnType("varbinary(max)");
+
+                builder.Entity<DocumentVersion>()
+                    .Property(v => v.ContentHtml)
                     .HasColumnType("varbinary(max)");
             }
         }

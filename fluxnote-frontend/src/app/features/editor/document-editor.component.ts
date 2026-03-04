@@ -1,5 +1,6 @@
 import { Component, inject, signal, ViewChild, ElementRef, OnInit, computed } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
@@ -10,9 +11,11 @@ import {
 } from '../../shared/components/ui';
 import { DocumentShareModalComponent } from '../../shared/components/document-share-modal/document-share-modal.component';
 import { DocumentService, DocumentInviteService } from '../../core/services';
-import { Collaborator, Version, Comment, AISuggestion, DocumentInviteDto, DocumentContextDto } from '../../core/models';
+import { Collaborator, Version, Comment, AISuggestion, DocumentInviteDto, DocumentContextDto, DocumentVersionDto, DocumentVersionDetailDto } from '../../core/models';
 import { TextEditorComponent } from './components/text-editor.component';
 
+import { forkJoin } from 'rxjs';
+import { diffWords } from 'diff';
 // import { HttpClient } from '@angular/common/http';
 // import { Observable, catchError, of } from 'rxjs';
 
@@ -108,7 +111,7 @@ import { TextEditorComponent } from './components/text-editor.component';
                 variant="outline"
                 size="sm"
                 [leftIcon]="true"
-                (onClick)="showWipModal.set(true)" customClass="hidden md:inline-flex"
+                (onClick)="toggleVersionHistory()" customClass="hidden md:inline-flex"
               >
                 <lucide-icon leftIcon name="clock" class="h-4 w-4"></lucide-icon>
                 History
@@ -199,7 +202,7 @@ import { TextEditorComponent } from './components/text-editor.component';
                       AI Assistance
                     </button>
                     <button
-                      (click)="showWipModal.set(true); showMobileMenu.set(false)"
+                      (click)="toggleVersionHistory(); showMobileMenu.set(false)"
                       class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors text-left"
                     >
                       <lucide-icon name="clock" class="h-4 w-4 shrink-0"></lucide-icon>
@@ -364,11 +367,14 @@ import { TextEditorComponent } from './components/text-editor.component';
 
           <!-- Version History Sidebar -->
           @if (showVersionHistory()) {
-            <aside class="w-96 bg-white border-l border-gray-200 flex flex-col shadow-xl">
+            <aside class="w-full md:w-96 bg-white border-l border-gray-200 flex flex-col shadow-xl">
               <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-                <h3 class="text-lg font-bold text-gray-900">Version History</h3>
+                <div class="flex items-center gap-2">
+                  <lucide-icon name="clock" class="h-5 w-5 text-[#155347]"></lucide-icon>
+                  <h3 class="text-lg font-bold text-gray-900">Version History</h3>
+                </div>
                 <button
-                  (click)="showVersionHistory.set(false)"
+                  (click)="showVersionHistory.set(false); selectedVersions.set([])"
                   class="p-1 hover:bg-gray-100 rounded"
                 >
                   <lucide-icon name="x" class="h-5 w-5 text-gray-500"></lucide-icon>
@@ -387,46 +393,71 @@ import { TextEditorComponent } from './components/text-editor.component';
                   </div>
                 }
 
-                <div class="space-y-4">
-                  @for (version of versions; track version.id) {
-                    <div
-                      [class]="
-                        'p-4 border-2 rounded-lg transition-colors ' +
-                        (selectedVersions().includes(version.id)
-                          ? 'border-[#155347] bg-[#e8f0ee]'
-                          : 'border-gray-200 hover:border-gray-300')
-                      "
-                    >
-                      <div class="flex items-start justify-between mb-2">
-                        <div>
-                          <h4 class="text-sm font-bold text-gray-900">
-                            Version {{ version.number }}
-                          </h4>
-                          <p class="text-xs text-gray-500">{{ version.timestamp }}</p>
+                @if (versionsLoading()) {
+                  <div class="flex flex-col items-center justify-center py-12 gap-3">
+                    <lucide-icon name="loader-circle" class="h-6 w-6 text-[#155347] animate-spin"></lucide-icon>
+                    <p class="text-sm text-gray-500">Loading versions...</p>
+                  </div>
+                } @else if (versionsError()) {
+                  <div class="p-4 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600">
+                    {{ versionsError() }}
+                  </div>
+                } @else if (documentVersions().length === 0) {
+                  <div class="flex flex-col items-center justify-center py-12 gap-2 text-center">
+                    <lucide-icon name="clock" class="h-8 w-8 text-gray-300"></lucide-icon>
+                    <p class="text-sm font-medium text-gray-500">No versions yet</p>
+                    <p class="text-xs text-gray-400">Versions are created when you close the editing session.</p>
+                  </div>
+                } @else {
+                  <div class="space-y-4">
+                    @for (version of documentVersions(); track version.id; let i = $index) {
+                      <div
+                        [class]="'p-4 border-2 rounded-lg transition-colors ' +
+                          (selectedVersions().includes(version.id)
+                            ? 'border-[#155347] bg-[#e8f0ee]'
+                            : 'border-gray-200 hover:border-gray-300')"
+                      >
+                        <div class="flex items-start justify-between mb-2">
+                          <div>
+                            <h4 class="text-sm font-bold text-gray-900">
+                              Version {{ documentVersions().length - i }}
+                            </h4>
+                            <p class="text-xs text-gray-500">{{ formatVersionDate(version.createdAt) }}</p>
+                          </div>
+                          <input
+                            type="checkbox"
+                            [checked]="selectedVersions().includes(version.id)"
+                            [disabled]="selectedVersions().length === 2 && !selectedVersions().includes(version.id)"
+                            (change)="handleVersionSelect(version.id)"
+                            class="mt-1 rounded border-gray-300 text-[#155347] focus:ring-[#155347] cursor-pointer disabled:cursor-not-allowed disabled:opacity-40"
+                          />
                         </div>
-                        <input
-                          type="checkbox"
-                          [checked]="selectedVersions().includes(version.id)"
-                          (change)="handleVersionSelect(version.id)"
-                          class="rounded border-gray-300 text-[#155347] focus:ring-[#155347]"
-                        />
+                        <p class="text-xs font-medium text-gray-900 mb-1">{{ version.authorName }} :</p>
+                        <p class="text-xs text-gray-700 mb-3">{{ version.summary }}</p>
+                        <div class="flex gap-2">
+                          <app-button
+                            variant="outline"
+                            size="sm"
+                            [leftIcon]="true"
+                            (onClick)="openVersionPreview(version, i)"
+                          >
+                            <lucide-icon leftIcon name="eye" class="h-3 w-3"></lucide-icon>
+                            View
+                          </app-button>
+                          <app-button
+                            variant="outline"
+                            size="sm"
+                            [leftIcon]="true"
+                            (onClick)="handleRestore(documentVersions().length - i)"
+                          >
+                            <lucide-icon leftIcon name="rotate-ccw" class="h-3 w-3"></lucide-icon>
+                            Restore
+                          </app-button>
+                        </div>
                       </div>
-                      <p class="text-xs font-medium text-gray-900 mb-1">{{ version.author }}:</p>
-                      <p class="text-xs text-gray-700 mb-3">{{ version.description }}</p>
-                      <div class="flex gap-2">
-                        <app-button
-                          variant="outline"
-                          size="sm"
-                          [leftIcon]="true"
-                          (onClick)="handleRestore(version.number)"
-                        >
-                          <lucide-icon leftIcon name="rotate-ccw" class="h-3 w-3"></lucide-icon>
-                          Restore
-                        </app-button>
-                      </div>
-                    </div>
-                  }
-                </div>
+                    }
+                  </div>
+                }
               </div>
             </aside>
           }
@@ -572,6 +603,100 @@ import { TextEditorComponent } from './components/text-editor.component';
       }
       <!-- End of @else (loading) -->
 
+      <!-- Version Preview Overlay -->
+      @if (versionPreview() || versionPreviewLoading()) {
+        <div class="fixed inset-0 bg-white z-50 flex flex-col">
+          <!-- Header -->
+          <div class="px-4 md:px-6 py-3 border-b border-gray-200 flex items-center gap-3 shrink-0 bg-white shadow-sm">
+            <button
+              (click)="closeVersionPreview()"
+              class="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            >
+              <lucide-icon name="arrow-left" class="h-5 w-5 text-gray-600"></lucide-icon>
+            </button>
+            @if (versionPreview(); as v) {
+              <div class="min-w-0 flex-1">
+                <p class="text-sm font-semibold text-gray-900 truncate">{{ documentTitle }}</p>
+                <p class="text-xs text-gray-500">
+                  {{ formatVersionDate(v.createdAt) }} &mdash; {{ v.authorName }}
+                </p>
+              </div>
+              <!-- View mode toggle -->
+              <div class="flex items-center bg-gray-100 rounded-lg p-0.5 shrink-0">
+                <button
+                  (click)="versionHasPrevious() && diffViewMode.set('diff')"
+                  [disabled]="!versionHasPrevious()"
+                  [title]="versionHasPrevious() ? '' : 'No previous version to compare against'"
+                  [class]="'px-3 py-1 text-xs font-medium rounded-md transition-colors ' + (diffViewMode() === 'diff' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-500 hover:text-gray-700') + (!versionHasPrevious() ? ' opacity-40 cursor-not-allowed' : '')"
+                >
+                  Changes
+                </button>
+                <button
+                  (click)="diffViewMode.set('full')"
+                  [class]="'px-3 py-1 text-xs font-medium rounded-md transition-colors ' + (diffViewMode() === 'full' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-500 hover:text-gray-700')"
+                >
+                  Full version
+                </button>
+              </div>
+            } @else {
+              <div class="flex items-center gap-2 flex-1">
+                <lucide-icon name="loader-circle" class="h-4 w-4 text-[#155347] animate-spin"></lucide-icon>
+                <span class="text-sm text-gray-500">Loading version...</span>
+              </div>
+            }
+            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-700 shrink-0">
+              <lucide-icon name="eye" class="h-3 w-3"></lucide-icon>
+              Read only
+            </span>
+          </div>
+          <!-- Content -->
+          <div class="flex-1 overflow-y-auto bg-gray-50 flex justify-center px-4 py-8">
+            @if (versionPreview(); as v) {
+              <div class="w-full max-w-3xl bg-white rounded-xl shadow-sm border border-gray-200 p-8 md:p-12">
+                @if (diffViewMode() === 'diff') {
+                  @if (!versionHasPrevious()) {
+                    <div class="flex flex-col items-center justify-center py-16 gap-3 text-center">
+                      <lucide-icon name="git-commit-horizontal" class="h-10 w-10 text-gray-300"></lucide-icon>
+                      <p class="text-gray-500 text-sm">This is the first version — no previous version to compare against.</p>
+                      <button
+                        (click)="diffViewMode.set('full')"
+                        class="text-xs text-[#155347] underline hover:no-underline"
+                      >Switch to Full version</button>
+                    </div>
+                  } @else if (versionDiff()) {
+                    <!-- Diff legend -->
+                    <div class="flex items-center gap-5 mb-6 pb-4 border-b border-gray-200 flex-wrap text-xs text-gray-600">
+                      <span class="flex items-center gap-1.5">
+                        <span class="inline-block w-3 h-3 rounded-sm bg-green-200"></span>
+                        Added
+                      </span>
+                      <span class="flex items-center gap-1.5">
+                        <span class="inline-block w-3 h-3 rounded-sm bg-yellow-200"></span>
+                        Modified
+                      </span>
+                      <span class="flex items-center gap-1.5">
+                        <span class="inline-block w-3 h-3 rounded-sm bg-red-200"></span>
+                        Removed
+                      </span>
+                    </div>
+                    <div [innerHTML]="versionDiff()"></div>
+                  }
+                } @else {
+                  @if (v.contentHtml) {
+                    <div class="ql-editor" [innerHTML]="safeHtml(v.contentHtml!)"></div>
+                  } @else {
+                    <div class="flex flex-col items-center justify-center py-16 gap-3 text-center">
+                      <lucide-icon name="file-x" class="h-10 w-10 text-gray-300"></lucide-icon>
+                      <p class="text-gray-500 text-sm">No content available for this version.</p>
+                    </div>
+                  }
+                }
+              </div>
+            }
+          </div>
+        </div>
+      }
+
       <!-- AI Summary Modal -->
       @if (showSummaryModal()) {
         <div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
@@ -648,6 +773,7 @@ export class DocumentEditorComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private documentService = inject(DocumentService);
   private inviteService = inject(DocumentInviteService);
+  private sanitizer = inject(DomSanitizer);
   private location = inject(Location);
 
   // ID do documento atual
@@ -659,6 +785,16 @@ export class DocumentEditorComponent implements OnInit {
 
   showVersionHistory = signal(false);
   showComments = signal(false);
+
+  // Histórico de versões
+  documentVersions = signal<DocumentVersionDto[]>([]);
+  versionsLoading = signal(false);
+  versionsError = signal<string | null>(null);
+  versionPreview = signal<DocumentVersionDetailDto | null>(null);
+  versionPreviewLoading = signal(false);
+  versionDiff = signal<SafeHtml | null>(null);
+  diffViewMode = signal<'diff' | 'full'>('diff');
+  versionHasPrevious = signal(false);
   showShareModal = signal(false);
   showAIPanel = signal(false);
   showWipModal = signal(false);
@@ -996,7 +1132,7 @@ export class DocumentEditorComponent implements OnInit {
     this.lastEditedText.set('Last edited just now');
   }
 
-  onContentChange(content: string): void {
+  onContentChange(_content: string): void {
     // Função que é chamada quando o conteúdo do editor muda,
     // fica aqui para se for preciso fazer algo em tempo real
   }
@@ -1032,9 +1168,128 @@ export class DocumentEditorComponent implements OnInit {
   }
 
   toggleVersionHistory(): void {
-    this.showVersionHistory.update((v) => !v);
+    const opening = !this.showVersionHistory();
+    this.showVersionHistory.set(opening);
     this.showComments.set(false);
     this.showAIPanel.set(false);
+    if (opening && this.documentId) {
+      this.loadVersions();
+    }
+  }
+
+  loadVersions(): void {
+    if (!this.documentId) return;
+    this.versionsLoading.set(true);
+    this.versionsError.set(null);
+    this.documentService.getDocumentVersions(this.documentId).subscribe({
+      next: (versions) => {
+        this.documentVersions.set(versions);
+        this.versionsLoading.set(false);
+      },
+      error: (err) => {
+        this.versionsError.set(err.error?.message || 'Error loading versions.');
+        this.versionsLoading.set(false);
+      }
+    });
+  }
+
+  openVersionPreview(version: DocumentVersionDto, index: number): void {
+    if (!this.documentId) return;
+    this.versionPreviewLoading.set(true);
+    this.versionPreview.set(null);
+    this.versionDiff.set(null);
+
+    const versions = this.documentVersions();
+    const previousVersion = versions[index + 1]; // list is DESC, so index+1 is the prior version
+    const hasPrevious = !!previousVersion;
+    this.versionHasPrevious.set(hasPrevious);
+    this.diffViewMode.set(hasPrevious ? 'diff' : 'full');
+
+    const current$ = this.documentService.getDocumentVersionDetail(this.documentId, version.id);
+
+    if (hasPrevious) {
+      const previous$ = this.documentService.getDocumentVersionDetail(this.documentId, previousVersion.id);
+      forkJoin({ current: current$, previous: previous$ }).subscribe({
+        next: ({ current, previous }) => {
+          this.versionPreview.set(current);
+          const diffHtml = this.computeVersionDiff(previous.contentHtml, current.contentHtml);
+          this.versionDiff.set(this.sanitizer.bypassSecurityTrustHtml(diffHtml));
+          this.versionPreviewLoading.set(false);
+        },
+        error: () => this.versionPreviewLoading.set(false),
+      });
+    } else {
+      current$.subscribe({
+        next: (current) => {
+          this.versionPreview.set(current);
+          this.versionPreviewLoading.set(false);
+        },
+        error: () => this.versionPreviewLoading.set(false),
+      });
+    }
+  }
+
+  closeVersionPreview(): void {
+    this.versionPreview.set(null);
+    this.versionDiff.set(null);
+    this.versionHasPrevious.set(false);
+  }
+
+  safeHtml(html: string): SafeHtml {
+    return this.sanitizer.bypassSecurityTrustHtml(html);
+  }
+
+  private htmlToText(html: string): string {
+    const withBreaks = html
+      .replace(/<img[^>]*>/gi, '[image]\n')    // placeholder visível para imagens
+      .replace(/<\/p>/gi, '\n')
+      .replace(/<\/h[1-6]>/gi, '\n')
+      .replace(/<\/li>/gi, '\n')
+      .replace(/<br\s*\/?>/gi, '\n')
+      .replace(/<\/div>/gi, '\n');
+    const el = document.createElement('div');
+    el.innerHTML = withBreaks;
+    return (el.textContent || '').replace(/\n{3,}/g, '\n\n').trim();
+  }
+
+  private computeVersionDiff(oldHtml: string | null, newHtml: string | null): string {
+    const oldText = this.htmlToText(oldHtml ?? '');
+    const newText = this.htmlToText(newHtml ?? '');
+    const parts = diffWords(oldText, newText);
+
+    const esc = (s: string) =>
+      s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>');
+
+    let html = '<div style="font-size:15px;line-height:1.8;word-break:break-word;">';
+    let i = 0;
+    while (i < parts.length) {
+      const part = parts[i];
+      const next = parts[i + 1];
+      if (part.removed && next?.added) {
+        html += `<mark style="background:#fee2e2;color:#991b1b;text-decoration:line-through;border-radius:2px;padding:0 2px;">${esc(part.value)}</mark>`;
+        html += `<mark style="background:#fef9c3;color:#854d0e;border-radius:2px;padding:0 2px;">${esc(next.value)}</mark>`;
+        i += 2;
+      } else if (part.added) {
+        html += `<mark style="background:#dcfce7;color:#166534;border-radius:2px;padding:0 2px;">${esc(part.value)}</mark>`;
+        i++;
+      } else if (part.removed) {
+        html += `<mark style="background:#fee2e2;color:#991b1b;text-decoration:line-through;border-radius:2px;padding:0 2px;">${esc(part.value)}</mark>`;
+        i++;
+      } else {
+        html += esc(part.value);
+        i++;
+      }
+    }
+    html += '</div>';
+    return html;
+  }
+
+  formatVersionDate(dateStr: string): string {
+    const date = new Date(dateStr);
+    return date.toLocaleString('pt-PT', {
+      day: '2-digit', month: 'short', year: 'numeric',
+      hour: '2-digit', minute: '2-digit'
+    });
   }
 
   toggleComments(): void {
@@ -1054,7 +1309,7 @@ export class DocumentEditorComponent implements OnInit {
 
   handleCompareVersions(): void {
     if (this.selectedVersions().length === 2) {
-      this.router.navigate(['/version-history']);
+      this.showWipModal.set(true);
     }
   }
 
@@ -1114,7 +1369,7 @@ export class DocumentEditorComponent implements OnInit {
     });
   }
 
-  handleAIAction(actionId: number): void {
+  handleAIAction(_actionId: number): void {
     this.aiGenerating.set(true);
     setTimeout(() => this.aiGenerating.set(false), 2000);
   }

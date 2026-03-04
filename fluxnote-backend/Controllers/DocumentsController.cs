@@ -1290,5 +1290,92 @@ namespace Fluxnote.Backend.Controllers
 
             return Ok(new { snapshot = (string?)null });
         }
+
+        // ─────────────────────────────────────────────────────────
+        // Histórico de versões
+        // ─────────────────────────────────────────────────────────
+
+        /// <summary>
+        /// Lista as versões de um documento (mais recente → mais antiga).
+        /// Acessível a Owner, TeamAdmin e Editores do documento.
+        /// </summary>
+        [HttpGet("{id}/versions")]
+        public async Task<ActionResult<IEnumerable<DocumentVersionDto>>> GetVersions(int id)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId is null) return Unauthorized(new { message = "User not authenticated." });
+
+            if (!await HasEditorAccess(userId, id)) return Forbid();
+
+            var versions = await _context.DocumentVersion
+                .Where(v => v.DocumentId == id)
+                .OrderByDescending(v => v.CreatedAt)
+                .Select(v => new DocumentVersionDto
+                {
+                    Id = v.Id,
+                    DocumentId = v.DocumentId,
+                    AuthorName = v.AuthorName,
+                    CreatedAt = v.CreatedAt,
+                    Summary = v.Summary
+                })
+                .ToListAsync();
+
+            return Ok(versions);
+        }
+
+        /// <summary>
+        /// Obtém o detalhe de uma versão específica, incluindo conteúdo HTML para visualização.
+        /// Acessível a Owner, TeamAdmin e Editores do documento.
+        /// </summary>
+        [HttpGet("{id}/versions/{versionId}")]
+        public async Task<ActionResult<DocumentVersionDetailDto>> GetVersionDetail(int id, int versionId)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId is null) return Unauthorized(new { message = "User not authenticated." });
+
+            if (!await HasEditorAccess(userId, id)) return Forbid();
+
+            var version = await _context.DocumentVersion
+                .FirstOrDefaultAsync(v => v.Id == versionId && v.DocumentId == id);
+
+            if (version is null) return NotFound(new { message = "Version not found." });
+
+            return Ok(new DocumentVersionDetailDto
+            {
+                Id = version.Id,
+                DocumentId = version.DocumentId,
+                AuthorName = version.AuthorName,
+                CreatedAt = version.CreatedAt,
+                Summary = version.Summary,
+                ContentHtml = version.ContentHtml is { Length: > 0 }
+                    ? System.Text.Encoding.UTF8.GetString(version.ContentHtml)
+                    : null
+            });
+        }
+
+        /// <summary>
+        /// Verifica se o utilizador tem acesso de editor ao documento
+        /// (Owner, TeamAdmin ou Editor explícito via DocumentPermission).
+        /// </summary>
+        private async Task<bool> HasEditorAccess(string userId, int documentId)
+        {
+            var doc = await _context.Document
+                .Include(d => d.Team)
+                    .ThenInclude(t => t.Members)
+                .Include(d => d.Permissions)
+                    .ThenInclude(p => p.TeamMember)
+                .FirstOrDefaultAsync(d => d.Id == documentId && !d.IsDeleted);
+
+            if (doc is null) return false;
+
+            var member = doc.Team.Members.FirstOrDefault(m => m.UserId == userId);
+            if (member is null) return false;
+
+            if (member.Role >= TeamRole.TeamAdmin) return true;
+
+            return doc.Permissions.Any(p =>
+                p.TeamMember.UserId == userId &&
+                p.Role == DocumentRole.Editor);
+        }
     }
 }

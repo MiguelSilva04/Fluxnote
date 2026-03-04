@@ -196,6 +196,9 @@ export class TextEditorComponent implements OnInit, AfterViewInit, OnDestroy {
       // Conectar ao documento (busca snapshot, liga Yjs ao Quill, inicia SignalR)
       await this.collaborationService.connect(documentId, this.quill);
 
+      // Snapshot inicial imediato (garante doc.Content actualizado desde o primeiro momento)
+      this.collaborationService.saveSnapshot(documentId);
+
       // Snapshot periódico a cada 30 segundos
       this.snapshotInterval = setInterval(() => {
         this.collaborationService.saveSnapshot(documentId);

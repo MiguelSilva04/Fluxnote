@@ -91,3 +91,17 @@ export interface DocumentContextDto {
   uploadedByName: string;
   hasExtractedText: boolean;
 }
+
+/** DTO para listagem de versões de um documento */
+export interface DocumentVersionDto {
+  id: number;
+  documentId: number;
+  authorName: string;
+  createdAt: string;
+  summary: string;
+}
+
+/** DTO para visualização de uma versão específica (inclui conteúdo HTML) */
+export interface DocumentVersionDetailDto extends DocumentVersionDto {
+  contentHtml: string | null;
+}
