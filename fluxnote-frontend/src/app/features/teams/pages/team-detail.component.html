@@ -7,26 +7,62 @@
     </div>
   }
   @else if (selectedTeam()) {
-    <div class="max-w-5xl">
+    <div class="max-w-5xl w-full">
 
       <!-- Header -->
-      <div class="flex items-center gap-4 mb-8">
-        <button (click)="goBack()" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+      <div class="flex items-center gap-3 mb-6 sm:mb-8">
+        <button (click)="goBack()" class="p-2 hover:bg-gray-100 rounded-lg transition-colors flex-shrink-0">
           <lucide-icon name="arrow-left" class="h-5 w-5 text-gray-600"></lucide-icon>
         </button>
 
-        <div class="flex items-center gap-4 flex-1">
-          <div class="h-16 w-16 rounded-full bg-[#155347] text-white flex items-center justify-center text-xl font-bold">
+        <div class="flex items-center gap-3 sm:gap-4 flex-1 min-w-0">
+          <div class="h-12 w-12 sm:h-16 sm:w-16 rounded-full bg-[#155347] text-white flex items-center justify-center text-base sm:text-xl font-bold flex-shrink-0">
             {{ getInitials(selectedTeam()?.name ?? '') }}
           </div>
 
-          <div>
-            <div class="flex items-center gap-3 mb-1">
-              <h1 class="text-2xl font-bold text-gray-900">{{ selectedTeam()?.name ?? '' }}</h1>
-              <app-badge variant="default">Team</app-badge>
+          <div class="min-w-0 flex-1">
+            <div class="flex items-center flex-wrap gap-2 mb-1">
+              @if (isEditingName()) {
+                <input
+                  class="text-xl sm:text-2xl font-bold text-gray-900 border-b-2 border-[#155347] bg-transparent outline-none min-w-0 flex-1"
+                  [(ngModel)]="editNameValue"
+                  (keydown.enter)="saveTeamName()"
+                  (keydown.escape)="cancelEditName()"
+                  [disabled]="isSavingName()"
+                  autofocus
+                />
+                <button
+                  (click)="saveTeamName()"
+                  [disabled]="isSavingName()"
+                  class="p-1 rounded hover:bg-gray-100 text-[#155347] transition-colors flex-shrink-0"
+                  title="Save"
+                >
+                  <lucide-icon name="check" class="h-4 w-4"></lucide-icon>
+                </button>
+                <button
+                  (click)="cancelEditName()"
+                  [disabled]="isSavingName()"
+                  class="p-1 rounded hover:bg-gray-100 text-gray-500 transition-colors flex-shrink-0"
+                  title="Cancel"
+                >
+                  <lucide-icon name="x" class="h-4 w-4"></lucide-icon>
+                </button>
+              } @else {
+                <h1 class="text-xl sm:text-2xl font-bold text-gray-900 truncate">{{ selectedTeam()?.name ?? '' }}</h1>
+                @if (isOwner()) {
+                  <button
+                    (click)="startEditName()"
+                    class="p-1 rounded hover:bg-gray-100 transition-colors flex-shrink-0"
+                    title="Rename team"
+                  >
+                    <lucide-icon name="pencil" class="h-4 w-4 text-gray-400 hover:text-[#155347]"></lucide-icon>
+                  </button>
+                }
+                <app-badge variant="default">Team</app-badge>
+              }
             </div>
 
-            <p class="text-gray-600">
+            <p class="text-sm text-gray-600">
               {{ selectedTeam()?.members?.length ?? 0 }} members
             </p>
           </div>
@@ -54,22 +90,22 @@
 
               <div class="space-y-3">
                 @for (member of selectedTeam()?.members ?? []; track member?.id ?? member?.email) {
-                  <div class="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                    <div class="flex items-center gap-3">
-                      <div class="h-8 w-8 rounded-full bg-gray-200 text-gray-700 flex items-center justify-center text-xs font-bold">
+                  <div class="flex items-center justify-between gap-3 p-4 border border-gray-200 rounded-lg">
+                    <div class="flex items-center gap-3 min-w-0 flex-1">
+                      <div class="h-8 w-8 rounded-full bg-gray-200 text-gray-700 flex items-center justify-center text-xs font-bold flex-shrink-0">
                         {{ getInitials(member?.name ?? '') }}
                       </div>
-                      <div>
-                        <p class="text-sm font-medium text-gray-900">
+                      <div class="min-w-0">
+                        <p class="text-sm font-medium text-gray-900 truncate">
                           {{ member?.name }}
                         </p>
-                        <p class="text-xs text-gray-500">
+                        <p class="text-xs text-gray-500 truncate">
                           {{ member.email }}
                         </p>
                       </div>
                     </div>
 
-                    <div class="flex items-center gap-2" data-tour="member-role">
+                    <div class="flex items-center gap-2 flex-shrink-0" data-tour="member-role">
                       <!-- Owner can change roles (except their own) -->
                       @if (isOwner() && member.role !== 2) {
                         <select
@@ -216,16 +252,16 @@
               <!-- Document Header (clickable to expand) -->
               <div
                 (click)="toggleDocPanel(doc.id)"
-                class="flex items-center justify-between p-4 cursor-pointer hover:bg-gray-50 transition-colors"
+                class="flex items-center justify-between gap-2 p-4 cursor-pointer hover:bg-gray-50 transition-colors"
               >
-                <div class="flex items-center gap-2">
-                  <lucide-icon name="file-text" class="h-4 w-4 text-gray-500"></lucide-icon>
-                  <span class="text-sm font-medium text-gray-900">{{ doc.title }}</span>
+                <div class="flex items-center gap-2 min-w-0 flex-1">
+                  <lucide-icon name="file-text" class="h-4 w-4 text-gray-500 flex-shrink-0"></lucide-icon>
+                  <span class="text-sm font-medium text-gray-900 truncate">{{ doc.title }}</span>
                   @if (getDocPermissionsForView(doc).length) {
-                    <span class="text-xs text-gray-400">({{ getDocPermissionsForView(doc).length }} members)</span>
+                    <span class="text-xs text-gray-400 flex-shrink-0">({{ getDocPermissionsForView(doc).length }})</span>
                   }
                 </div>
-                <div class="flex items-center gap-2">
+                <div class="flex items-center gap-2 flex-shrink-0">
                   @if (isOwnerOrAdmin()) {
                     <button
                       data-tour="share-btn"
@@ -259,17 +295,17 @@
                   @if (getDocPermissionsForView(doc).length) {
                     <div class="divide-y divide-gray-100 mb-3">
                       @for (perm of getDocPermissionsForView(doc); track perm.id ?? perm.teamMemberId) {
-                        <div class="flex items-center justify-between py-3 px-1">
-                          <div class="flex items-center gap-2">
-                            <div class="h-6 w-6 rounded-full bg-gray-200 text-gray-600 flex items-center justify-center text-[10px] font-bold">
+                        <div class="flex items-center justify-between gap-2 py-3 px-1">
+                          <div class="flex items-center gap-2 min-w-0 flex-1">
+                            <div class="h-6 w-6 rounded-full bg-gray-200 text-gray-600 flex items-center justify-center text-[10px] font-bold flex-shrink-0">
                               {{ getInitials(perm.memberName) }}
                             </div>
-                            <span class="text-sm text-gray-700">{{ perm.memberName }}</span>
+                            <span class="text-sm text-gray-700 truncate">{{ perm.memberName }}</span>
                             @if (perm.memberRole === 1) {
                               <span class="text-[10px] font-medium bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded-full">Team Admin</span>
                             }
                           </div>
-                          <div class="flex items-center gap-2">
+                          <div class="flex items-center gap-2 flex-shrink-0">
                             @if (canChangeDocRole(perm)) {
                               <select
                                 [ngModel]="perm.documentRole"
@@ -303,11 +339,11 @@
 
                   <!-- Add Member Form -->
                   @if (canManageDocPermissions() && addMemberDocId() === doc.id) {
-                    <div class="flex items-center gap-2 p-3 bg-white rounded border border-gray-200">
+                    <div class="flex flex-wrap items-center gap-2 p-3 bg-white rounded border border-gray-200">
                       <select
                         [ngModel]="addMemberSelectedId()"
                         (ngModelChange)="addMemberSelectedId.set($event)"
-                        class="text-xs border border-gray-300 rounded-md px-2 py-1 bg-white flex-1 focus:outline-none focus:ring-1 focus:ring-[#155347]"
+                        class="text-xs border border-gray-300 rounded-md px-2 py-1 bg-white flex-1 min-w-[120px] focus:outline-none focus:ring-1 focus:ring-[#155347]"
                       >
                         <option [ngValue]="null" disabled>Select member...</option>
                         @for (m of getAddableMembers(doc); track m.id) {
@@ -449,10 +485,10 @@
               <div class="space-y-2">
                 @if (visibleDocuments().length) {
                   @for (doc of visibleDocuments(); track doc.id) {
-                    <div class="flex items-center justify-between p-2 border-b hover:bg-gray-50 rounded">
+                    <div class="flex items-center justify-between gap-2 p-2 border-b hover:bg-gray-50 rounded">
                       <div
                         (click)="openDocument(doc.id)"
-                        class="text-sm cursor-pointer flex-1"
+                        class="text-sm cursor-pointer flex-1 min-w-0 truncate"
                       >
                         {{ doc.title }}
                       </div>
