@@ -1,8 +1,9 @@
-import { Injectable, signal, computed } from '@angular/core';
+import { Injectable, signal, computed, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { User } from '../models';
+import { LanguageService } from './language.service';
 
 /**
  * interface que representa a resposta do servidor após uma tentativa de registo.
@@ -236,6 +237,8 @@ export class AuthService {
    * @param http - cliente HTTP do Angular para realizar requisições ao backend
    */
   constructor(private router: Router, private http: HttpClient) { }
+
+  private languageService = inject(LanguageService);
 
   /**
    * inicia autenticação externa e redireciona o browser para o backend.
@@ -583,7 +586,7 @@ export class AuthService {
     this._isLoading.set(true);
     try {
       return await firstValueFrom(
-        this.http.post<RegisterResponse>(`${this.baseUrl}/register`, { fullName, email, password })
+        this.http.post<RegisterResponse>(`${this.baseUrl}/register`, { fullName, email, password, lang: this.languageService.currentLang })
       );
     } catch (error: any) {
       // extrai mensagens de erro diretamente do corpo da resposta HTTP
@@ -630,6 +633,24 @@ export class AuthService {
         )
       );
       return res.confirmationLink;
+    } catch {
+      return null;
+    }
+  }
+
+  /**
+   * [DEV] obtém o último link de reset de password enviado para um email.
+   */
+  async getDevLastResetLink(email: string): Promise<string | null> {
+    try {
+      const params = new HttpParams().set('email', email);
+      const res = await firstValueFrom(
+        this.http.get<{ resetLink: string }>(
+          `${this.baseUrl}/dev/last-reset-link`,
+          { params }
+        )
+      );
+      return res.resetLink;
     } catch {
       return null;
     }
@@ -757,13 +778,50 @@ export class AuthService {
    */
   async forgotPassword(email: string): Promise<boolean> {
     this._isLoading.set(true);
+    try {
+      await firstValueFrom(
+        this.http.post(`${this.baseUrl}/forgot-password`, { email, lang: this.languageService.currentLang })
+      );
+      return true;
+    } catch {
+      // Always return true for security (don't reveal if email exists)
+      return true;
+    } finally {
+      this._isLoading.set(false);
+    }
+  }
 
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        this._isLoading.set(false);
-        resolve(true);
-      }, 1500);
-    });
+  /**
+   * redefine a password do utilizador usando um token de reset válido.
+   *
+   * @param userId - ID do utilizador
+   * @param token - token de reset codificado em Base64Url
+   * @param newPassword - nova password
+   * @param confirmPassword - confirmação da nova password
+   * @returns Promise com o resultado da operação
+   */
+  async resetPassword(userId: string, token: string, newPassword: string, confirmPassword: string): Promise<ApiResult> {
+    this._isLoading.set(true);
+    try {
+      const res = await firstValueFrom(
+        this.http.post<{ message: string }>(`${this.baseUrl}/reset-password`, {
+          userId,
+          token,
+          newPassword,
+          confirmPassword,
+        })
+      );
+      return { success: true, message: res.message };
+    } catch (err: any) {
+      const body = err?.error;
+      return {
+        success: false,
+        message: body?.message ?? 'Password reset failed.',
+        errors: body?.errors ?? [],
+      };
+    } finally {
+      this._isLoading.set(false);
+    }
   }
 
   /**

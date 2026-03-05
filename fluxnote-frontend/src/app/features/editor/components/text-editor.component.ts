@@ -125,6 +125,7 @@ export class TextEditorComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // ─── Privados ───
   private quill!: Quill;
+  private isInitializing = false;
   private destroy$ = new Subject<void>();
   private contentChange$ = new Subject<string>();
   private snapshotInterval?: ReturnType<typeof setInterval>;
@@ -349,7 +350,10 @@ export class TextEditorComponent implements OnInit, AfterViewInit, OnDestroy {
 
     // Conteúdo inicial (HTML) — se não houver snapshot Yjs, fica aqui
     if (this.initialContent()) {
-      this.quill.root.innerHTML = this.initialContent();
+      this.isInitializing = true;
+      const delta = (this.quill as any).clipboard.convert({ html: this.initialContent() });
+      this.quill.setContents(delta, 'silent');
+      this.isInitializing = false;
     }
 
     if (!this.editable()) {
@@ -357,6 +361,7 @@ export class TextEditorComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     this.quill.on('text-change', () => {
+      if (this.isInitializing) return;
       this.triggerContentChange();
       this.saveStatus.set('idle');
     });
@@ -748,7 +753,12 @@ export class TextEditorComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   setContent(content: string): void {
-    if (this.quill) this.quill.root.innerHTML = content;
+    if (this.quill) {
+      this.isInitializing = true;
+      const delta = (this.quill as any).clipboard.convert({ html: content });
+      this.quill.setContents(delta, 'silent');
+      this.isInitializing = false;
+    }
   }
 
   setSaveStatus(status: SaveStatus): void {

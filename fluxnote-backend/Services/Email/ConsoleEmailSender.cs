@@ -52,12 +52,24 @@ public class ConsoleEmailSender : IEmailSender
     /// [DEV EMAIL] Link: http://localhost:4200/confirm-email?userId=...
     /// </code>
     /// </remarks>
-    public Task SendEmailConfirmationAsync(string toEmail, string confirmationLink)
+    public Task SendEmailConfirmationAsync(string toEmail, string confirmationLink, string lang = "en")
     {
         _store.Save(toEmail, confirmationLink);
         Console.WriteLine($"[DEV EMAIL] To: {toEmail}");
         Console.WriteLine($"[DEV EMAIL] Link: {confirmationLink}");
         _logger.LogInformation("Simulated sending email to {ToEmail} with confirmation link: {ConfirmationLink}", toEmail, confirmationLink);
+        return Task.CompletedTask;
+    }
+
+    /// <summary>
+    /// Simula o envio de um email de recuperação de password.
+    /// </summary>
+    public Task SendPasswordResetAsync(string toEmail, string resetLink, string lang = "en")
+    {
+        _store.Save(toEmail, resetLink);
+        Console.WriteLine($"[DEV EMAIL - PASSWORD RESET] To: {toEmail}");
+        Console.WriteLine($"[DEV EMAIL - PASSWORD RESET] Link: {resetLink}");
+        _logger.LogInformation("Simulated sending password reset email to {ToEmail} with link: {ResetLink}", toEmail, resetLink);
         return Task.CompletedTask;
     }
 }
