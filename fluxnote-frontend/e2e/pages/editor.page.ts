@@ -18,6 +18,11 @@ export class EditorPage {
   readonly changesTab: Locator;
   readonly fullVersionTab: Locator;
 
+  // Restore version modal
+  readonly restoreModal: Locator;
+  readonly restoreConfirmCheckbox: Locator;
+  readonly restoreConfirmButton: Locator;
+
   constructor(page: Page) {
     this.page = page;
     this.title = page.locator('header h1');
@@ -35,6 +40,11 @@ export class EditorPage {
     this.versionPreviewOverlay = page.locator('span').filter({ hasText: 'Read only' }).first();
     this.changesTab = page.getByRole('button', { name: 'Changes' });
     this.fullVersionTab = page.getByRole('button', { name: 'Full version' });
+
+    // Restore version modal
+    this.restoreModal = page.locator('div').filter({ hasText: /Restore Old Version/ }).first();
+    this.restoreConfirmCheckbox = page.locator('input[type="checkbox"]').last();
+    this.restoreConfirmButton = page.getByRole('button', { name: /Restore and Replace/i });
   }
 
   async waitForLoad() {
@@ -89,5 +99,22 @@ export class EditorPage {
 
   async isChangesTabDisabled(): Promise<boolean> {
     return this.changesTab.isDisabled();
+  }
+
+  /** Clica no botão Restore do cartão de versão no índice dado (0 = mais recente). */
+  async clickVersionRestore(index: number) {
+    const restoreButtons = this.versionHistoryPanel.getByRole('button', { name: /Restore/i });
+    await restoreButtons.nth(index).click();
+  }
+
+  /** Aguarda que o modal de restauro fique visível. */
+  async waitForRestoreModal() {
+    await this.restoreModal.waitFor({ state: 'visible', timeout: 5_000 });
+  }
+
+  /** Ativa o checkbox de confirmação e clica em "Restore and Replace". */
+  async confirmRestore() {
+    await this.restoreConfirmCheckbox.check();
+    await this.restoreConfirmButton.click();
   }
 }

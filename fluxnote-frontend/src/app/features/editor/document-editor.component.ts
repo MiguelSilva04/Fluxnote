@@ -1780,10 +1780,13 @@ export class DocumentEditorComponent implements OnInit {
 
   formatVersionSummary(summary: string): string {
     if (!summary) return '';
-    const prefix = 'Session by ';
-    if (summary.startsWith(prefix)) {
-      const name = summary.slice(prefix.length);
+    if (summary.startsWith('Session by ')) {
+      const name = summary.slice('Session by '.length);
       return this.translateService.instant('DOCUMENT_EDITOR.SESSION_BY') + ' ' + name;
+    }
+    if (summary.startsWith('RESTORED_BY|')) {
+      const name = summary.substring('RESTORED_BY|'.length);
+      return this.translateService.instant('DOCUMENT_EDITOR.SUMMARY_RESTORED_BY', { name });
     }
     return summary;
   }
@@ -1796,12 +1799,14 @@ export class DocumentEditorComponent implements OnInit {
     });
   }
 
-  formatVersionSummary(summary: string): string {
-    if (summary.startsWith('RESTORED_BY|')) {
-      const name = summary.substring('RESTORED_BY|'.length);
-      return this.translateService.instant('DOCUMENT_EDITOR.SUMMARY_RESTORED_BY', { name });
-    }
-    return summary;
+  getVersionNumber(versionId: number): number {
+    const idx = this.documentVersions().findIndex(v => v.id === versionId);
+    if (idx === -1) return 0;
+    return this.documentVersions().length - idx;
+  }
+
+  closeCompareOverlay(): void {
+    this.showCompareOverlay.set(false);
   }
 
   toggleComments(): void {
@@ -1820,9 +1825,37 @@ export class DocumentEditorComponent implements OnInit {
   }
 
   handleCompareVersions(): void {
-    if (this.selectedVersions().length === 2) {
-      this.showWipModal.set(true);
-    }
+    if (!this.documentId || this.selectedVersions().length !== 2) return;
+
+    const allVersions = this.documentVersions();
+    const [idA, idB] = this.selectedVersions();
+
+    // Determinar qual é a versão mais antiga (índice maior = mais antiga na lista DESC)
+    const idxA = allVersions.findIndex(v => v.id === idA);
+    const idxB = allVersions.findIndex(v => v.id === idB);
+    const olderVersionId = idxA > idxB ? idA : idB;
+    const newerVersionId = idxA > idxB ? idB : idA;
+
+    this.compareLoading.set(true);
+    this.compareOlderVersion.set(null);
+    this.compareNewerVersion.set(null);
+    this.compareDiffHtml.set(null);
+    this.compareViewMode.set('diff');
+    this.showCompareOverlay.set(true);
+
+    const older$ = this.documentService.getDocumentVersionDetail(this.documentId, olderVersionId);
+    const newer$ = this.documentService.getDocumentVersionDetail(this.documentId, newerVersionId);
+
+    forkJoin({ older: older$, newer: newer$ }).subscribe({
+      next: ({ older, newer }) => {
+        this.compareOlderVersion.set(older);
+        this.compareNewerVersion.set(newer);
+        const diffHtml = this.computeVersionDiff(older.contentHtml, newer.contentHtml);
+        this.compareDiffHtml.set(this.sanitizer.bypassSecurityTrustHtml(diffHtml));
+        this.compareLoading.set(false);
+      },
+      error: () => this.compareLoading.set(false),
+    });
   }
 
   handleRestore(versionId: number): void {

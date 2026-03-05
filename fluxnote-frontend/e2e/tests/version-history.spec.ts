@@ -341,3 +341,188 @@ test.describe('Version History – diff view (Changes tab)', () => {
     await expect(page.getByText('This is the full version content visible here')).toBeVisible({ timeout: 3_000 });
   });
 });
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Testes – Restaurar versão
+// ─────────────────────────────────────────────────────────────────────────────
+
+/** Mocka o endpoint de restauro de uma versão específica */
+async function mockRestoreApi(page: Page, docId: number, versionId: number): Promise<void> {
+  await page.route(`**/api/documents/${docId}/versions/${versionId}/restore`, (route) => {
+    route.fulfill({ status: 204, body: '' });
+  });
+}
+
+test.describe('Version History – restore', () => {
+  test('should NOT show Restore button on the most recent version', async ({ authenticatedPage: page }) => {
+    const ts = Date.now();
+    const docId = await createDocAndGetId(page, `VH RestoreBtn ${ts}`, `VH RestoreBtn Team ${ts}`);
+    const v1 = makeVersion(1, docId, 60_000);
+    const v2 = makeVersion(2, docId, 0);
+    // v2 é o mais recente (índice 0), v1 é o mais antigo (índice 1)
+    await mockVersionsApi(page, docId, [v2, v1], new Map([
+      [1, makeDetail(v1, '<p>Old content</p>')],
+      [2, makeDetail(v2, '<p>New content</p>')],
+    ]));
+
+    const editor = new EditorPage(page);
+    await editor.waitForLoad();
+    await editor.openVersionHistory();
+    await expect(page.getByText('Version 2')).toBeVisible({ timeout: 5_000 });
+
+    // O cartão da versão mais recente (Version 2) não deve ter botão de restauro
+    const cards = editor.versionHistoryPanel.locator('div.p-4.border-2');
+    const firstCard = cards.first();
+    await expect(firstCard.getByRole('button', { name: /Restore/i })).not.toBeVisible();
+  });
+
+  test('should show Restore button on older versions', async ({ authenticatedPage: page }) => {
+    const ts = Date.now();
+    const docId = await createDocAndGetId(page, `VH RestoreOld ${ts}`, `VH RestoreOld Team ${ts}`);
+    const v1 = makeVersion(1, docId, 60_000);
+    const v2 = makeVersion(2, docId, 0);
+    await mockVersionsApi(page, docId, [v2, v1], new Map([
+      [1, makeDetail(v1, '<p>Old content</p>')],
+      [2, makeDetail(v2, '<p>New content</p>')],
+    ]));
+
+    const editor = new EditorPage(page);
+    await editor.waitForLoad();
+    await editor.openVersionHistory();
+    await expect(page.getByText('Version 1')).toBeVisible({ timeout: 5_000 });
+
+    // O cartão da versão mais antiga (Version 1, índice 1) deve ter o botão de restauro
+    const cards = editor.versionHistoryPanel.locator('div.p-4.border-2');
+    const secondCard = cards.nth(1);
+    await expect(secondCard.getByRole('button', { name: /Restore/i })).toBeVisible({ timeout: 3_000 });
+  });
+
+  test('should open the restore confirmation modal when clicking Restore', async ({ authenticatedPage: page }) => {
+    const ts = Date.now();
+    const docId = await createDocAndGetId(page, `VH RestoreModal ${ts}`, `VH RestoreModal Team ${ts}`);
+    const v1 = makeVersion(1, docId, 60_000);
+    const v2 = makeVersion(2, docId, 0);
+    await mockVersionsApi(page, docId, [v2, v1], new Map([
+      [1, makeDetail(v1, '<p>Old</p>')],
+      [2, makeDetail(v2, '<p>New</p>')],
+    ]));
+
+    const editor = new EditorPage(page);
+    await editor.waitForLoad();
+    await editor.openVersionHistory();
+    await expect(page.getByText('Version 1')).toBeVisible({ timeout: 5_000 });
+
+    // Clicar no botão Restore da versão mais antiga (índice 0 dos botões Restore)
+    await editor.clickVersionRestore(0);
+    await editor.waitForRestoreModal();
+    await expect(editor.restoreModal).toBeVisible();
+  });
+
+  test('should have the Restore button disabled until checkbox is checked', async ({ authenticatedPage: page }) => {
+    const ts = Date.now();
+    const docId = await createDocAndGetId(page, `VH RestoreDisabled ${ts}`, `VH RestoreDisabled Team ${ts}`);
+    const v1 = makeVersion(1, docId, 60_000);
+    const v2 = makeVersion(2, docId, 0);
+    await mockVersionsApi(page, docId, [v2, v1], new Map([
+      [1, makeDetail(v1, '<p>Old</p>')],
+      [2, makeDetail(v2, '<p>New</p>')],
+    ]));
+
+    const editor = new EditorPage(page);
+    await editor.waitForLoad();
+    await editor.openVersionHistory();
+    await expect(page.getByText('Version 1')).toBeVisible({ timeout: 5_000 });
+
+    await editor.clickVersionRestore(0);
+    await editor.waitForRestoreModal();
+
+    // Antes de marcar o checkbox, o botão de confirmar deve estar desativado
+    await expect(editor.restoreConfirmButton).toBeDisabled();
+
+    // Após marcar o checkbox, o botão fica ativo
+    await editor.restoreConfirmCheckbox.check();
+    await expect(editor.restoreConfirmButton).not.toBeDisabled();
+  });
+
+  test('should close the modal when clicking Cancel', async ({ authenticatedPage: page }) => {
+    const ts = Date.now();
+    const docId = await createDocAndGetId(page, `VH RestoreCancel ${ts}`, `VH RestoreCancel Team ${ts}`);
+    const v1 = makeVersion(1, docId, 60_000);
+    const v2 = makeVersion(2, docId, 0);
+    await mockVersionsApi(page, docId, [v2, v1], new Map([
+      [1, makeDetail(v1, '<p>Old</p>')],
+      [2, makeDetail(v2, '<p>New</p>')],
+    ]));
+
+    const editor = new EditorPage(page);
+    await editor.waitForLoad();
+    await editor.openVersionHistory();
+    await expect(page.getByText('Version 1')).toBeVisible({ timeout: 5_000 });
+
+    await editor.clickVersionRestore(0);
+    await editor.waitForRestoreModal();
+    await expect(editor.restoreModal).toBeVisible();
+
+    await page.getByRole('button', { name: /Cancel/i }).click();
+    await expect(editor.restoreModal).not.toBeVisible({ timeout: 3_000 });
+  });
+
+  test('should call the restore API and close modal on confirm', async ({ authenticatedPage: page }) => {
+    const ts = Date.now();
+    const docId = await createDocAndGetId(page, `VH RestoreConfirm ${ts}`, `VH RestoreConfirm Team ${ts}`);
+    const v1 = makeVersion(1, docId, 60_000);
+    const v2 = makeVersion(2, docId, 0);
+    await mockVersionsApi(page, docId, [v2, v1], new Map([
+      [1, makeDetail(v1, '<p>Old content</p>')],
+      [2, makeDetail(v2, '<p>New content</p>')],
+    ]));
+    await mockRestoreApi(page, docId, v1.id);
+
+    const editor = new EditorPage(page);
+    await editor.waitForLoad();
+    await editor.openVersionHistory();
+    await expect(page.getByText('Version 1')).toBeVisible({ timeout: 5_000 });
+
+    // Monitorizar o pedido de restauro
+    const restoreRequest = page.waitForRequest(
+      req => req.url().includes(`/api/documents/${docId}/versions/${v1.id}/restore`) && req.method() === 'POST'
+    );
+
+    await editor.clickVersionRestore(0);
+    await editor.waitForRestoreModal();
+    await editor.confirmRestore();
+
+    // Verificar que o pedido foi feito
+    await restoreRequest;
+
+    // Modal deve fechar após o restauro
+    await expect(editor.restoreModal).not.toBeVisible({ timeout: 5_000 });
+  });
+
+  test('should show translated summary RESTORED_BY for a restored version', async ({ authenticatedPage: page }) => {
+    const ts = Date.now();
+    const docId = await createDocAndGetId(page, `VH RestoreSummary ${ts}`, `VH RestoreSummary Team ${ts}`);
+
+    const restoreVersion: FakeVersion = {
+      id: 10,
+      documentId: docId,
+      authorName: 'Test Owner',
+      createdAt: new Date(Date.now() - 5_000).toISOString(),
+      summary: 'RESTORED_BY|Test Owner',
+    };
+    const v1 = makeVersion(1, docId, 120_000);
+
+    await mockVersionsApi(page, docId, [restoreVersion, v1], new Map([
+      [1,  makeDetail(v1, '<p>Original</p>')],
+      [10, makeDetail(restoreVersion, '<p>Original</p>')],
+    ]));
+
+    const editor = new EditorPage(page);
+    await editor.waitForLoad();
+    await editor.openVersionHistory();
+
+    // O summary deve aparecer traduzido, não como chave bruta
+    await expect(page.getByText('RESTORED_BY|Test Owner')).not.toBeVisible({ timeout: 3_000 });
+    await expect(page.getByText(/Restored by Test Owner|Restaurado por Test Owner/)).toBeVisible({ timeout: 3_000 });
+  });
+});
