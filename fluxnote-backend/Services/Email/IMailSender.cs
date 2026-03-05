@@ -29,5 +29,18 @@ public interface IEmailSender
     /// O link deve apontar para o frontend, que depois chama o endpoint /auth/confirm-email.<br/>
     /// Formato típico: {FrontendBaseUrl}/confirm-email?userId={id}&amp;token={encodedToken}
     /// </remarks>
-    Task SendEmailConfirmationAsync(string toEmail, string confirmationLink);
+    Task SendEmailConfirmationAsync(string toEmail, string confirmationLink, string lang = "en");
+
+    /// <summary>
+    /// Envia um email de recuperação de password para um utilizador.
+    /// </summary>
+    /// <param name="toEmail">Endereço de email do destinatário.</param>
+    /// <param name="resetLink">URL completo do link de reset de password.</param>
+    /// <param name="lang">Idioma do email ("en" ou "pt"). Por defeito "en".</param>
+    /// <returns>Task que completa quando o email é enviado (ou simulado).</returns>
+    /// <remarks>
+    /// O link deve apontar para o frontend, que depois chama o endpoint /auth/reset-password.<br/>
+    /// Formato típico: {FrontendBaseUrl}/reset-password?userId={id}&amp;token={encodedToken}
+    /// </remarks>
+    Task SendPasswordResetAsync(string toEmail, string resetLink, string lang = "en");
 }

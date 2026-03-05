@@ -199,6 +199,21 @@
       "SUCCESS": "Conta criada com sucesso! Verifique o seu email para confirmar.",
       "FAILED": "Falha ao criar conta. Por favor, tente novamente."
     },
+    "CONFIRM_EMAIL": {
+      "TITLE": "Confirmação de Email",
+      "LOADING": "A confirmar o seu email...",
+      "SUCCESS": "Email confirmado com sucesso!",
+      "GO_TO_LOGIN": "Ir para Login",
+      "INVALID_PARAMS": "Link de confirmação inválido (parâmetros em falta).",
+      "FAILED": "Falha ao confirmar email."
+    },
+    "PENDING_EMAIL": {
+      "TITLE": "Confirme o seu email",
+      "SUBTITLE": "Enviámos um link de confirmação para",
+      "LOADING": "A carregar...",
+      "CONFIRM_BTN": "Confirmar email",
+      "CHECK_INBOX": "Verifique a sua caixa de entrada e clique no link de confirmação para ativar a sua conta."
+    },
     "FORGOT_PASSWORD": {
       "BACK_LOGIN": "Voltar ao Login",
       "TITLE": "Recuperar Palavra-passe",
@@ -208,9 +223,27 @@
       "CHECK_EMAIL": "Verifique o seu email",
       "SENT_TO": "Enviámos um link de redefinição de palavra-passe para",
       "TRY_ANOTHER": "Tentar outro email",
+      "OPEN_RESET_LINK": "Abrir Link de Reset",
       "PRIVACY": "Política de Privacidade",
       "TERMS": "Termos de Serviço",
       "CONTACT": "Contactar Suporte"
+    },
+    "RESET_PASSWORD": {
+      "BACK_LOGIN": "Voltar ao Login",
+      "TITLE": "Definir Nova Palavra-passe",
+      "SUBTITLE": "Introduza a sua nova palavra-passe abaixo.",
+      "NEW_PASSWORD": "Nova Palavra-passe",
+      "NEW_PASSWORD_PLACEHOLDER": "Introduza a nova palavra-passe",
+      "CONFIRM_PASSWORD": "Confirmar Palavra-passe",
+      "CONFIRM_PASSWORD_PLACEHOLDER": "Confirme a nova palavra-passe",
+      "PASSWORD_REQUIREMENTS": "Mín. 8 caracteres, 1 maiúscula, 1 minúscula, 1 dígito, 1 caractere especial.",
+      "SUBMIT": "Redefinir Palavra-passe",
+      "SUCCESS_TITLE": "Palavra-passe Redefinida!",
+      "SUCCESS_DESC": "A sua palavra-passe foi redefinida com sucesso. Já pode iniciar sessão com a nova palavra-passe.",
+      "GO_TO_LOGIN": "Ir para Login",
+      "INVALID_LINK": "Link Inválido ou Expirado",
+      "INVALID_LINK_DESC": "Este link de redefinição de palavra-passe é inválido ou expirou. Solicite um novo.",
+      "REQUEST_NEW": "Solicitar Novo Link"
     }
   },
   "SIDEBAR": {
@@ -381,7 +414,12 @@
     "DELETE": "Eliminar",
     "PERMANENT_DELETE": "Eliminar Permanentemente",
     "PERMANENT_CONFIRM": "Tem a certeza que deseja eliminar permanentemente este documento?",
-    "PERMANENT_WARNING": "Esta ação não pode ser revertida."
+    "PERMANENT_WARNING": "Esta ação não pode ser revertida.",
+    "DATE_JUST_NOW": "agora mesmo",
+    "DATE_HOUR_AGO": "há 1 hora",
+    "DATE_HOURS_AGO": "há {{count}} horas",
+    "DATE_YESTERDAY": "ontem",
+    "DATE_DAYS_AGO": "há {{count}} dias"
   },
   "ROLES": {
     "MEMBER": "Membro",
@@ -824,5 +862,34 @@
     "EXPIRES_ON": "expira",
     "VIEW_LINK": "Ver link",
     "REVOKE": "Revogar"
+  },
+  "EASTER_EGG": {
+    "LOADING": "A carregar os teus dados...",
+    "NO_DATA": "Dados insuficientes para jogar!",
+    "NO_DATA_DESC": "Cria documentos e junta-te a equipas para desbloquear este minijogo.",
+    "INTRO": "Desembaralha palavras dos teus documentos, equipas e colegas!",
+    "RULES_TIME": "15 segundos por palavra",
+    "RULES_HINT": "Uma dica aparece após 10 segundos",
+    "RULES_SCORE": "Respostas mais rápidas = mais pontos",
+    "START": "Começar Jogo",
+    "CATEGORY_DOCUMENT": "Documento",
+    "CATEGORY_TEAM": "Equipa",
+    "CATEGORY_MEMBER": "Membro",
+    "HINT_PREFIX": "Começa com",
+    "YOUR_GUESS": "O teu palpite...",
+    "CHECK": "Verificar",
+    "SKIP": "Passar",
+    "ROUND": "Ronda",
+    "OF": "de",
+    "SCORE": "Pontuação",
+    "GAME_OVER": "Fim de Jogo!",
+    "FINAL_SCORE": "Pontuação Final",
+    "CORRECT_ANSWERS": "respostas corretas",
+    "PLAY_AGAIN": "Jogar Outra Vez",
+    "CLOSE": "Fechar",
+    "RATING_MASTER": "Mestre do FluxNote!",
+    "RATING_GREAT": "Muito bem!",
+    "RATING_GOOD": "Nada mau!",
+    "RATING_TRY": "Continua a praticar!"
   }
 }

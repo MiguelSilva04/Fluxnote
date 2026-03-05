@@ -173,16 +173,12 @@ public class AuthController : ControllerBase
         var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
         var tokenEncoded = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
 
-        // Deteta automaticamente o URL do frontend a partir do header Origin do pedido,
-        // com fallback para a configuração ou localhost.
-        var origin = Request.Headers.Origin.FirstOrDefault();
-        var frontendBaseUrl = !string.IsNullOrEmpty(origin)
-            ? origin.TrimEnd('/')
-            : _configuration["Frontend:BaseUrl"] ?? _configuration["Frontend:Url"] ?? "http://localhost:4200";
+        var frontendBaseUrl = _configuration["Frontend:BaseUrl"] ?? _configuration["Frontend:Url"] ?? "http://localhost:4200";
         var confirmationLink =
             $"{frontendBaseUrl}/confirm-email?userId={Uri.EscapeDataString(user.Id)}&token={Uri.EscapeDataString(tokenEncoded)}";
 
-        await _emailSender.SendEmailConfirmationAsync(user.Email!, confirmationLink);
+        var lang = string.IsNullOrEmpty(request.Lang) ? "en" : request.Lang;
+        await _emailSender.SendEmailConfirmationAsync(user.Email!, confirmationLink, lang);
 
         return Ok(new
         {
@@ -1678,6 +1674,125 @@ public class AuthController : ControllerBase
 
     [HttpPost("ping")]
     public IActionResult Ping() => Ok("pong");
+
+    /// <summary>
+    /// Inicia o fluxo de recuperação de password.
+    /// Gera um token de reset e envia email com link (prod) ou guarda em memória (dev).
+    /// </summary>
+    /// <param name="request">Email do utilizador.</param>
+    /// <returns>200 OK sempre (para não revelar se o email existe).</returns>
+    /// <remarks>
+    /// <b>Rate Limit:</b> Recomendado 3 pedidos por hora por IP.<br/>
+    /// <b>Segurança:</b> Resposta sempre igual independentemente de o email existir ou não.
+    /// </remarks>
+    [HttpPost("forgot-password")]
+    public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequest request)
+    {
+        // Resposta genérica para não revelar se o email existe
+        var genericResponse = new
+        {
+            message = "If an account with that email exists, a password reset link has been sent."
+        };
+
+        var user = await _userManager.FindByEmailAsync(request.Email);
+        if (user == null || !user.EmailConfirmed)
+        {
+            // Não revelar que o email não existe — retornar a mesma resposta
+            return Ok(genericResponse);
+        }
+
+        var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+        var tokenEncoded = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
+
+        var frontendBaseUrl = _configuration["Frontend:BaseUrl"] ?? _configuration["Frontend:Url"] ?? "http://localhost:4200";
+
+        var resetLink =
+            $"{frontendBaseUrl}/reset-password?userId={Uri.EscapeDataString(user.Id)}&token={Uri.EscapeDataString(tokenEncoded)}";
+
+        var lang = string.IsNullOrEmpty(request.Lang) ? "en" : request.Lang;
+        await _emailSender.SendPasswordResetAsync(user.Email!, resetLink, lang);
+
+        return Ok(genericResponse);
+    }
+
+    /// <summary>
+    /// Redefine a password do utilizador usando um token válido.
+    /// </summary>
+    /// <param name="request">UserId, Token, NewPassword, ConfirmPassword.</param>
+    /// <returns>
+    /// <list type="bullet">
+    ///     <item><b>200 OK:</b> Password redefinida com sucesso.</item>
+    ///     <item><b>400 Bad Request:</b> Token inválido/expirado ou password não cumpre requisitos.</item>
+    /// </list>
+    /// </returns>
+    [HttpPost("reset-password")]
+    public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest request)
+    {
+        var user = await _userManager.FindByIdAsync(request.UserId);
+        if (user == null)
+        {
+            return BadRequest(new
+            {
+                message = "Invalid or expired reset link.",
+                errors = new[] { "The password reset link is invalid or has expired. Please request a new one." }
+            });
+        }
+
+        string tokenDecoded;
+        try
+        {
+            var tokenBytes = WebEncoders.Base64UrlDecode(request.Token);
+            tokenDecoded = Encoding.UTF8.GetString(tokenBytes);
+        }
+        catch
+        {
+            return BadRequest(new
+            {
+                message = "Invalid or expired reset link.",
+                errors = new[] { "The password reset token format is invalid." }
+            });
+        }
+
+        var result = await _userManager.ResetPasswordAsync(user, tokenDecoded, request.NewPassword);
+        if (!result.Succeeded)
+        {
+            return BadRequest(new
+            {
+                message = "Password reset failed.",
+                errors = result.Errors.Select(e => e.Description)
+            });
+        }
+
+        // Invalidar todas as sessões existentes por segurança
+        var sessions = await _db.RefreshTokens
+            .Where(rt => rt.UserId == user.Id && rt.RevokedAt == null)
+            .ToListAsync();
+        foreach (var session in sessions)
+        {
+            session.RevokedAt = DateTime.UtcNow;
+        }
+        await _db.SaveChangesAsync();
+
+        return Ok(new
+        {
+            message = "Password has been reset successfully. You can now log in with your new password."
+        });
+    }
+
+    /// <summary>
+    /// [DESENVOLVIMENTO] Obtém o último link de reset de password enviado para um email.
+    /// </summary>
+    [HttpGet("dev/last-reset-link")]
+    public IActionResult DevLastResetLink([FromQuery] string email, [FromServices] IDevEmailStore store)
+    {
+        if (!HttpContext.RequestServices.GetRequiredService<IWebHostEnvironment>().IsDevelopment())
+            return NotFound();
+
+        var link = store.Get(email);
+        if (link is null) return NotFound(new { message = "No link found for this email." });
+
+        return Ok(new { resetLink = link });
+    }
 
 
     //// GET: api/users

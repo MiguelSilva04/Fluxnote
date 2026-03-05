@@ -157,13 +157,13 @@ import { diffWords } from 'diff';
                             <div class="font-medium text-gray-900 dark:text-gray-100">
                               {{ inv.role === 1 ? ('DOCUMENT_EDITOR.EDITOR_INVITE' | translate) : ('DOCUMENT_EDITOR.VIEWER_INVITE' | translate) }}
                             </div>
-                            <div class="text-xs text-gray-500">
-                              {{ 'DOCUMENT_EDITOR.EXPIRES' | translate }} {{ inv.expiresAt | date: 'MMM d, y' }}
+                            <div class="text-xs text-gray-500 dark:text-gray-400">
+                              {{ 'DOCUMENT_EDITOR.EXPIRES' | translate }} {{ inv.expiresAt | date: 'dd/MM/yyyy' }}
                             </div>
                           </div>
                           <button
                             (click)="copyInviteUrl(inv.id, inv.inviteUrl)"
-                            class="text-xs font-medium text-gray-700 hover:text-gray-900"
+                            class="text-xs font-medium text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-gray-100"
                           >
                             {{ lastCopiedInviteId() === inv.id ? ('DOCUMENT_EDITOR.COPIED' | translate) : ('DOCUMENT_EDITOR.COPY_LINK' | translate) }}
                           </button>
@@ -1780,6 +1780,10 @@ export class DocumentEditorComponent implements OnInit {
 
   formatVersionSummary(summary: string): string {
     if (!summary) return '';
+    if (summary.startsWith('RESTORED_BY|')) {
+      const name = summary.substring('RESTORED_BY|'.length);
+      return this.translateService.instant('DOCUMENT_EDITOR.SUMMARY_RESTORED_BY', { name });
+    }
     if (summary.startsWith('Session by ')) {
       const name = summary.slice('Session by '.length);
       return this.translateService.instant('DOCUMENT_EDITOR.SESSION_BY') + ' ' + name;
@@ -1799,14 +1803,18 @@ export class DocumentEditorComponent implements OnInit {
     });
   }
 
-  getVersionNumber(versionId: number): number {
-    const idx = this.documentVersions().findIndex(v => v.id === versionId);
-    if (idx === -1) return 0;
-    return this.documentVersions().length - idx;
-  }
-
   closeCompareOverlay(): void {
     this.showCompareOverlay.set(false);
+    this.compareOlderVersion.set(null);
+    this.compareNewerVersion.set(null);
+    this.compareDiffHtml.set(null);
+    this.selectedVersions.set([]);
+  }
+
+  getVersionNumber(id: number): number {
+    const versions = this.documentVersions();
+    const index = versions.findIndex((v) => v.id === id);
+    return index === -1 ? 0 : versions.length - index;
   }
 
   toggleComments(): void {

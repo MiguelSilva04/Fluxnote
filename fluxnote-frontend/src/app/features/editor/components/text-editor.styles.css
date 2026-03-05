@@ -154,6 +154,11 @@
     right: 3rem;
   }
 
+  /* Safety net: hide placeholder if ql-blank class was not removed in time */
+  :host ::ng-deep .ql-editor:not(.ql-blank)::before {
+    content: none;
+  }
+
   :host-context(.dark) ::ng-deep .ql-editor.ql-blank::before {
     color: #6b7280; /* gray-500 — placeholder text */
   }

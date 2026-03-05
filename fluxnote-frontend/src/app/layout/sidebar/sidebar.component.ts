@@ -4,12 +4,13 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
 import { AuthService, PanelStateService } from '../../core/services';
 import { ModalComponent, ButtonComponent } from '../../shared/components/ui';
+import { EasterEggGameComponent } from '../../shared/components/easter-egg/easter-egg-game.component';
 import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [CommonModule, RouterLink, RouterLinkActive, LucideAngularModule, ModalComponent, ButtonComponent, TranslateModule],
+  imports: [CommonModule, RouterLink, RouterLinkActive, LucideAngularModule, ModalComponent, ButtonComponent, EasterEggGameComponent, TranslateModule],
   template: `
     <!-- Backdrop (mobile/tablet) — fecha o sidebar ao clicar fora -->
     @if (panelState.isSidebarOpen()) {
@@ -24,7 +25,7 @@ import { TranslateModule } from '@ngx-translate/core';
                (panelState.isSidebarOpen() ? 'translate-x-0' : '-translate-x-full') +
                ' lg:translate-x-0'"
     >
-      <a routerLink="/dashboard" (click)="panelState.closeSidebar()" class="p-6 border-b border-gray-100 dark:border-gray-700 flex items-center justify-center">
+      <a routerLink="/dashboard" (click)="panelState.closeSidebar(); onLogoClick($event)" class="p-6 border-b border-gray-100 dark:border-gray-700 flex items-center justify-center">
         <img src="assets/textIcon.png" alt="Fluxnote" class="h-auto w-auto dark:brightness-0 dark:invert" />
       </a>
 
@@ -139,6 +140,12 @@ import { TranslateModule } from '@ngx-translate/core';
         </app-button>
       </div>
     </app-modal>
+
+    <!-- Easter Egg Game -->
+    <app-easter-egg-game
+      [isOpen]="showEasterEgg()"
+      (onClose)="showEasterEgg.set(false)"
+    />
   `
 })
 export class SidebarComponent {
@@ -146,6 +153,25 @@ export class SidebarComponent {
   panelState = inject(PanelStateService);
 
   showLogoutModal = signal(false);
+  showEasterEgg = signal(false);
+
+  private easterEggClicks = 0;
+  private easterEggTimer: ReturnType<typeof setTimeout> | null = null;
+
+  onLogoClick(event: MouseEvent): void {
+    this.easterEggClicks++;
+    if (this.easterEggTimer) clearTimeout(this.easterEggTimer);
+
+    if (this.easterEggClicks >= 7) {
+      event.preventDefault();
+      this.easterEggClicks = 0;
+      this.showEasterEgg.set(true);
+    } else {
+      this.easterEggTimer = setTimeout(() => {
+        this.easterEggClicks = 0;
+      }, 3000);
+    }
+  }
 
   confirmLogout(): void {
     this.showLogoutModal.set(false);
