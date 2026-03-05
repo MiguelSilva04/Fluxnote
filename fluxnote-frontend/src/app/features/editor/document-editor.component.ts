@@ -1780,6 +1780,10 @@ export class DocumentEditorComponent implements OnInit {
 
   formatVersionSummary(summary: string): string {
     if (!summary) return '';
+    if (summary.startsWith('RESTORED_BY|')) {
+      const name = summary.substring('RESTORED_BY|'.length);
+      return this.translateService.instant('DOCUMENT_EDITOR.SUMMARY_RESTORED_BY', { name });
+    }
     const prefix = 'Session by ';
     if (summary.startsWith(prefix)) {
       const name = summary.slice(prefix.length);
@@ -1796,12 +1800,18 @@ export class DocumentEditorComponent implements OnInit {
     });
   }
 
-  formatVersionSummary(summary: string): string {
-    if (summary.startsWith('RESTORED_BY|')) {
-      const name = summary.substring('RESTORED_BY|'.length);
-      return this.translateService.instant('DOCUMENT_EDITOR.SUMMARY_RESTORED_BY', { name });
-    }
-    return summary;
+  closeCompareOverlay(): void {
+    this.showCompareOverlay.set(false);
+    this.compareOlderVersion.set(null);
+    this.compareNewerVersion.set(null);
+    this.compareDiffHtml.set(null);
+    this.selectedVersions.set([]);
+  }
+
+  getVersionNumber(id: number): number {
+    const versions = this.documentVersions();
+    const index = versions.findIndex((v) => v.id === id);
+    return index === -1 ? 0 : versions.length - index;
   }
 
   toggleComments(): void {
