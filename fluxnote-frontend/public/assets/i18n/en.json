@@ -414,7 +414,12 @@
     "DELETE": "Delete",
     "PERMANENT_DELETE": "Permanently Delete",
     "PERMANENT_CONFIRM": "Are you sure you want to permanently delete this document?",
-    "PERMANENT_WARNING": "This action cannot be undone."
+    "PERMANENT_WARNING": "This action cannot be undone.",
+    "DATE_JUST_NOW": "just now",
+    "DATE_HOUR_AGO": "1 hour ago",
+    "DATE_HOURS_AGO": "{{count}} hours ago",
+    "DATE_YESTERDAY": "yesterday",
+    "DATE_DAYS_AGO": "{{count}} days ago"
   },
   "ROLES": {
     "MEMBER": "Member",

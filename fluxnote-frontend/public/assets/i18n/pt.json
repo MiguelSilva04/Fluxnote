@@ -414,7 +414,12 @@
     "DELETE": "Eliminar",
     "PERMANENT_DELETE": "Eliminar Permanentemente",
     "PERMANENT_CONFIRM": "Tem a certeza que deseja eliminar permanentemente este documento?",
-    "PERMANENT_WARNING": "Esta ação não pode ser revertida."
+    "PERMANENT_WARNING": "Esta ação não pode ser revertida.",
+    "DATE_JUST_NOW": "agora mesmo",
+    "DATE_HOUR_AGO": "há 1 hora",
+    "DATE_HOURS_AGO": "há {{count}} horas",
+    "DATE_YESTERDAY": "ontem",
+    "DATE_DAYS_AGO": "há {{count}} dias"
   },
   "ROLES": {
     "MEMBER": "Membro",

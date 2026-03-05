@@ -2,7 +2,7 @@ import { Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { DashboardLayoutComponent } from '../../../layout/dashboard-layout/dashboard-layout.component';
 import { ButtonComponent, CardComponent, CardContentComponent, ModalComponent } from '../../../shared/components/ui';
 import { DocumentService } from '../../../core/services';
@@ -133,6 +133,7 @@ import { DocumentDto } from '../../../core/models';
 export class TrashComponent implements OnInit {
   private router = inject(Router);
   private documentService = inject(DocumentService);
+  private translate = inject(TranslateService);
 
   // State
   trashDocuments = signal<DocumentDto[]>([]);
@@ -206,10 +207,11 @@ export class TrashComponent implements OnInit {
     const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
     const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
 
-    if (diffHours < 1) return 'just now';
-    if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
-    if (diffDays === 1) return 'yesterday';
-    if (diffDays < 7) return `${diffDays} days ago`;
+    if (diffHours < 1) return this.translate.instant('TRASH.DATE_JUST_NOW');
+    if (diffHours === 1) return this.translate.instant('TRASH.DATE_HOUR_AGO');
+    if (diffHours < 24) return this.translate.instant('TRASH.DATE_HOURS_AGO', { count: diffHours });
+    if (diffDays === 1) return this.translate.instant('TRASH.DATE_YESTERDAY');
+    if (diffDays < 7) return this.translate.instant('TRASH.DATE_DAYS_AGO', { count: diffDays });
     return date.toLocaleDateString();
   }
 }
