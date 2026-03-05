@@ -63,11 +63,17 @@ export interface Version {
   timestamp: string;
 }
 
+export interface CommentAnchor {
+  start: number; // posição no texto total
+  end: number;   // posição final
+}
+
 export interface Comment {
   id: number;
-  author: string;
-  avatar: string;
-  color: string;
+  anchor?: CommentAnchor;
+  author?: string;
+  avatar?: string;
+  color?: string;
   time: string;
   text: string;
   replies: Comment[];

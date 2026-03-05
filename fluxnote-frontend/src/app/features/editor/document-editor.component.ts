@@ -12,6 +12,7 @@ import { DocumentShareModalComponent } from '../../shared/components/document-sh
 import { DocumentService, DocumentInviteService, CollaborationService } from '../../core/services';
 import { Collaborator, Version, Comment, AISuggestion, DocumentInviteDto, DocumentContextDto } from '../../core/models';
 import { TextEditorComponent } from './components/text-editor.component';
+import { AuthService } from '../../core/services';
 
 // import { HttpClient } from '@angular/common/http';
 // import { Observable, catchError, of } from 'rxjs';
@@ -117,7 +118,7 @@ import { TextEditorComponent } from './components/text-editor.component';
                 variant="outline"
                 size="sm"
                 [leftIcon]="true"
-                (onClick)="showWipModal.set(true)" customClass="hidden md:inline-flex"
+                (onClick)="toggleComments()" customClass="hidden md:inline-flex"
               >
                 <lucide-icon leftIcon name="message-square" class="h-4 w-4"></lucide-icon>
                 Comments
@@ -256,6 +257,13 @@ import { TextEditorComponent } from './components/text-editor.component';
                 >
                   <lucide-icon name="sparkles" class="h-3.5 w-3.5 text-purple-300"></lucide-icon>
                   Improve with AI
+                </button>
+                <button
+                  (mousedown)="addCommentSelection($event)"
+                  class="flex items-center gap-1.5 px-2 py-1 rounded-md hover:bg-white/20 transition-colors text-xs font-medium"
+                >
+                  <lucide-icon name="message-square" class="h-3.5 w-3.5 text-blue-300"></lucide-icon>
+                  Add comment
                 </button>
               </div>
             }
@@ -474,7 +482,7 @@ import { TextEditorComponent } from './components/text-editor.component';
               <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
                 <div class="flex items-center gap-2">
                   <h3 class="text-lg font-bold text-gray-900">Comments</h3>
-                  <app-badge customClass="bg-red-500 text-white">2</app-badge>
+                  <app-badge customClass="bg-red-500 text-white">{{ comments.length }}</app-badge>
                 </div>
                 <button (click)="showComments.set(false)" class="p-1 hover:bg-gray-100 rounded">
                   <lucide-icon name="x" class="h-5 w-5 text-gray-500"></lucide-icon>
@@ -493,6 +501,7 @@ import { TextEditorComponent } from './components/text-editor.component';
                     size="sm"
                     customClass="bg-[#155347] hover:bg-[#0d3d31]"
                     [leftIcon]="true"
+                    (onClick)="addComment()"
                   >
                     <lucide-icon leftIcon name="send" class="h-3 w-3"></lucide-icon>
                     Post
@@ -505,10 +514,8 @@ import { TextEditorComponent } from './components/text-editor.component';
                   <div class="space-y-2">
                     <div class="flex gap-3">
                       <div
-                        [class]="
-                          'h-8 w-8 rounded-full text-white flex items-center justify-center text-xs font-medium shrink-0 ' +
-                          comment.color
-                        "
+                        class="h-8 w-8 rounded-full text-white flex items-center justify-center text-xs font-medium shrink-0"
+                        [style.background-color] = "comment.color"
                       >
                         {{ comment.avatar }}
                       </div>
@@ -520,11 +527,65 @@ import { TextEditorComponent } from './components/text-editor.component';
                           <span class="text-xs text-gray-500">{{ comment.time }}</span>
                         </div>
                         <p class="text-sm text-gray-700">{{ comment.text }}</p>
-                        <button class="text-xs text-gray-500 hover:text-[#155347] mt-2">
+                        <button class="text-xs text-gray-500 hover:text-[#155347] mt-2"
+                        (click)="toggleReply(comment.id)">
                           Reply
                         </button>
+                        @if (activeReplyId === comment.id) {
+                        <div class="mt-3 ml-11">
+                          <textarea
+                            [(ngModel)]="replyText"
+                            placeholder="Write a reply..."
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#155347] text-sm resize-none"
+                            rows="2"
+                          ></textarea>
+
+                          <div class="flex justify-end mt-2 gap-2">
+                            <button
+                              class="text-xs text-gray-500 hover:text-gray-700"
+                              (click)="toggleReply(comment.id)"
+                            >
+                              Cancel
+                            </button>
+
+                            <button
+                              class="text-xs bg-[#155347] text-white px-3 py-1 rounded-md hover:bg-[#0d3d31]"
+                              (click)="addReply(comment)"
+                            >
+                              Reply
+                            </button>
+                          </div>
+                        </div>
+                      }
                       </div>
                     </div>
+                    @if (comment.replies.length > 0) {
+                    <div class="ml-11 mt-3 space-y-3">
+                      @for (reply of comment.replies; track reply.id) {
+                        <div class="flex gap-3">
+                        <div
+                            class="h-8 w-8 rounded-full text-white flex items-center justify-center text-xs font-medium shrink-0"
+                            [style.background-color] = "reply.color"
+                          >
+                            {{ reply.avatar }}
+                          </div>
+                          <div>
+                            <div class="flex items-center gap-2 mb-1">
+                              <span class="text-sm font-medium text-gray-900">
+                                {{ reply.author }}
+                              </span>
+                              <span class="text-xs text-gray-500">
+                                {{ reply.time }}
+                              </span>
+                            </div>
+                            <p class="text-sm text-gray-700">
+                              {{ reply.text }}
+                            </p>
+                          </div>
+                        </div>
+                      }
+                    </div>
+                  }
                   </div>
                 }
               </div>
@@ -1075,6 +1136,13 @@ export class DocumentEditorComponent implements OnInit {
 
   lastEditedText = signal('Last edited just now');
 
+
+  //comentários
+  private authService = inject(AuthService);
+  user = this.authService.currentUser;
+  activeReplyId: number | null = null;
+  replyText: string = '';
+
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
@@ -1513,6 +1581,77 @@ export class DocumentEditorComponent implements OnInit {
     this.showImproveTooltip.set(false);
     this.triggerImproveRequest();
   }
+
+  //---------------- comentarios------------------
+  addCommentSelection(event: MouseEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (!this.documentId || !this.selectedTextForImprove.trim()) return;
+
+    this.showImproveTooltip.set(false);
+    //this.triggerImproveRequest();
+  }
+
+  addComment() {
+    if (!this.newComment.trim()) return;
+    /* var currentUser = {
+      name: 'João Silva',
+      avatar: 'JS',
+      color: 'bg-[#155347]'
+    }; */
+    
+    const comment: Comment = {
+      id: Date.now(), // id simples
+      author: this.user()?.fullName,
+      avatar: this.user()?.initials,
+      color:this.user()?.color,
+      time: 'Agora mesmo',
+      text: this.newComment.trim(),
+      replies: [],
+      resolved: false
+    };
+    //console.log(comment.color);
+
+    this.comments = [comment, ...this.comments]; // adiciona no topo
+    this.newComment = '';
+  }
+
+  toggleReply(commentId: number) {
+    if (this.activeReplyId === commentId) {
+      this.activeReplyId = null;
+      this.replyText = '';
+    } else {
+      this.activeReplyId = commentId;
+    }
+  }
+
+  addReply(parent: Comment) {
+    if (!this.replyText.trim()) return;
+
+    /* var currentUser = {
+      name: 'João Silva',
+      avatar: 'JS',
+      color: 'bg-[#155347]'
+    }; */
+
+    const reply: Comment = {
+      id: Date.now(),
+      author: this.user()?.fullName,
+      avatar: this.user()?.initials,
+      color:this.user()?.color,
+      time: 'Agora mesmo',
+      text: this.replyText.trim(),
+      replies: []
+    };
+
+    parent.replies.push(reply);
+
+    this.replyText = '';
+    this.activeReplyId = null;
+  }
+  //---------------- comentarios------------------
+
 
   private triggerImproveRequest(): void {
     if (!this.documentId || !this.selectedTextForImprove.trim()) return;
