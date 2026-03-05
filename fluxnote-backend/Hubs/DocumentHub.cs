@@ -36,6 +36,9 @@ namespace Fluxnote.Backend.Hubs
         // Marca conexões que fizeram pelo menos uma edição (SendUpdate ou SaveSnapshot)
         private static readonly ConcurrentDictionary<string, bool> _connectionEdited = new();
 
+        // Timer de 1 hora por conexão: garante que sessões longas guardam versão a cada hora
+        private static readonly ConcurrentDictionary<string, CancellationTokenSource> _connectionTimers = new();
+
         public DocumentHub(FluxnoteServerContext db, ILogger<DocumentHub> logger)
         {
             _db = db;
@@ -63,6 +66,9 @@ namespace Fluxnote.Backend.Hubs
                 "Utilizador {UserId} entrou no documento {DocumentId}", userId, documentId);
 
             await Clients.OthersInGroup(group).SendAsync("UserJoined", userId);
+
+            // Iniciar timer de 1 hora: se a sessão ficar aberta, guarda versão a cada hora
+            StartSessionTimer(Context.ConnectionId, userId, documentId);
         }
 
         // ─────────────────────────────────────────────────────────
@@ -73,6 +79,9 @@ namespace Fluxnote.Backend.Hubs
         {
             var connId = Context.ConnectionId;
             var userId = GetUserId();
+
+            // Cancelar o timer de 1 hora antes de criar versão (evita duplicados)
+            CancelSessionTimer(connId);
 
             // Criar versão se houve edições nesta sessão
             if (_connectionEdited.TryRemove(connId, out _))
@@ -155,6 +164,9 @@ namespace Fluxnote.Backend.Hubs
             {
                 _connectionUsers.TryGetValue(connId, out var userId);
 
+                // Cancelar o timer de 1 hora antes de criar versão (evita duplicados)
+                CancelSessionTimer(connId);
+
                 // Criar versão se houve edições nesta sessão
                 if (_connectionEdited.TryRemove(connId, out _) && userId is not null)
                     await CreateVersionAsync(userId, documentId);
@@ -171,6 +183,52 @@ namespace Fluxnote.Backend.Hubs
             }
 
             await base.OnDisconnectedAsync(exception);
+        }
+
+        // ─────────────────────────────────────────────────────────
+        // Timer de sessão: cria versão a cada hora se houver edições
+        // ─────────────────────────────────────────────────────────
+
+        private void StartSessionTimer(string connId, string userId, int documentId)
+        {
+            CancelSessionTimer(connId);
+
+            var cts = new CancellationTokenSource();
+            _connectionTimers[connId] = cts;
+
+            _ = Task.Run(async () =>
+            {
+                try
+                {
+                    while (!cts.Token.IsCancellationRequested && _connectionDocuments.ContainsKey(connId))
+                    {
+                        await Task.Delay(TimeSpan.FromHours(1), cts.Token);
+
+                        // Verificar se a conexão ainda está ativa após 1 hora
+                        if (!_connectionDocuments.ContainsKey(connId)) break;
+
+                        // Criar versão se houve edições nesta hora
+                        if (_connectionEdited.TryRemove(connId, out _))
+                        {
+                            _logger.LogInformation(
+                                "Sessão longa detectada para documento {DocumentId} — a criar versão após 1 hora",
+                                documentId);
+                            await CreateVersionAsync(userId, documentId);
+                        }
+                        // Continuar o loop para a próxima hora
+                    }
+                }
+                catch (OperationCanceledException) { /* desconexão normal */ }
+            });
+        }
+
+        private static void CancelSessionTimer(string connId)
+        {
+            if (_connectionTimers.TryRemove(connId, out var cts))
+            {
+                cts.Cancel();
+                cts.Dispose();
+            }
         }
 
         // ─────────────────────────────────────────────────────────

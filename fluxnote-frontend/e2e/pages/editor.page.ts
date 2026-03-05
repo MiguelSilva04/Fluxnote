@@ -11,6 +11,13 @@ export class EditorPage {
   readonly viewOnlyBadge: Locator;
   readonly lastEditedText: Locator;
 
+  // Version history
+  readonly historyButton: Locator;
+  readonly versionHistoryPanel: Locator;
+  readonly versionPreviewOverlay: Locator;
+  readonly changesTab: Locator;
+  readonly fullVersionTab: Locator;
+
   constructor(page: Page) {
     this.page = page;
     this.title = page.locator('header h1');
@@ -21,6 +28,13 @@ export class EditorPage {
     this.editorArea = page.locator('.ql-editor');
     this.viewOnlyBadge = page.getByText('View only');
     this.lastEditedText = page.locator('header').getByText('Last edited');
+
+    // Version history
+    this.historyButton = page.getByRole('button', { name: /History/i }).first();
+    this.versionHistoryPanel = page.locator('aside').filter({ has: page.getByText('Version History') });
+    this.versionPreviewOverlay = page.locator('span').filter({ hasText: 'Read only' }).first();
+    this.changesTab = page.getByRole('button', { name: 'Changes' });
+    this.fullVersionTab = page.getByRole('button', { name: 'Full version' });
   }
 
   async waitForLoad() {
@@ -45,5 +59,34 @@ export class EditorPage {
 
   async goBack() {
     await this.backButton.click();
+  }
+
+  async openVersionHistory() {
+    await this.historyButton.click();
+    await this.versionHistoryPanel.waitFor({ state: 'visible', timeout: 5_000 });
+  }
+
+  async closeVersionHistory() {
+    // X button is inside the panel header (the only button in that flex row with the title)
+    await this.versionHistoryPanel.locator('div').first().getByRole('button').click();
+    await this.versionHistoryPanel.waitFor({ state: 'hidden', timeout: 5_000 });
+  }
+
+  async clickVersionView(index: number) {
+    const viewButtons = this.versionHistoryPanel.getByRole('button', { name: 'View' });
+    await viewButtons.nth(index).click();
+  }
+
+  async closeVersionPreview() {
+    // Back button is the first button in the preview overlay header
+    await this.page.locator('div').filter({ has: this.versionPreviewOverlay }).getByRole('button').first().click();
+  }
+
+  async waitForVersionPreview() {
+    await this.versionPreviewOverlay.waitFor({ state: 'visible', timeout: 10_000 });
+  }
+
+  async isChangesTabDisabled(): Promise<boolean> {
+    return this.changesTab.isDisabled();
   }
 }
