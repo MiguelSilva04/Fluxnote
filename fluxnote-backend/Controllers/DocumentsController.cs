@@ -1,5 +1,6 @@
 using Fluxnote.Backend.Data;
 using Fluxnote.Backend.Dtos.Documents;
+using Fluxnote.Backend.Hubs;
 using Fluxnote.Backend.Models;
 using Fluxnote.Backend.Services.AI;
 using Fluxnote.Backend.Services.Storage;
@@ -7,6 +8,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
@@ -59,6 +61,7 @@ namespace Fluxnote.Backend.Controllers
         private readonly IAIService _aiService;
         private readonly IStorageService _storageService;
         private readonly ITextExtractionService _textExtractionService;
+        private readonly IHubContext<DocumentHub> _hubContext;
 
         /// <summary>
         /// Limite de documentos para o plano Free.
@@ -78,13 +81,15 @@ namespace Fluxnote.Backend.Controllers
             UserManager<User> userManager,
             IAIService aiService,
             IStorageService storageService,
-            ITextExtractionService textExtractionService)
+            ITextExtractionService textExtractionService,
+            IHubContext<DocumentHub> hubContext)
         {
             _context = context;
             _userManager = userManager;
             _aiService = aiService;
             _storageService = storageService;
             _textExtractionService = textExtractionService;
+            _hubContext = hubContext;
         }
 
         /// <summary>
@@ -899,7 +904,8 @@ namespace Fluxnote.Backend.Controllers
                 IsDeleted = document.IsDeleted,
                 Content = document.Content != null ? System.Text.Encoding.UTF8.GetString(document.Content) : null,
                 PlainText = document.PlainText,
-                Role = effectiveRole
+                Role = effectiveRole,
+                IsOwner = isOwner
             };
 
             return Ok(dto);
@@ -1030,7 +1036,8 @@ namespace Fluxnote.Backend.Controllers
                 IsDeleted = document.IsDeleted,
                 Content = document.Content != null ? System.Text.Encoding.UTF8.GetString(document.Content) : null,
                 PlainText = document.PlainText,
-                Role = effectiveRole
+                Role = effectiveRole,
+                IsOwner = isOwner
             };
 
             return Ok(dto);
@@ -1556,6 +1563,58 @@ namespace Fluxnote.Backend.Controllers
                     ? System.Text.Encoding.UTF8.GetString(version.ContentHtml)
                     : null
             });
+        }
+
+        /// <summary>
+        /// Restaura o conteúdo do documento para uma versão anterior.
+        /// Apenas o Owner da equipa pode executar esta operação.
+        /// Cria uma nova entrada de versão com o conteúdo restaurado e notifica os clientes via SignalR.
+        /// </summary>
+        [HttpPost("{id}/versions/{versionId}/restore")]
+        public async Task<IActionResult> RestoreVersion(int id, int versionId)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId is null) return Unauthorized(new { message = "User not authenticated." });
+
+            var doc = await _context.Document
+                .Include(d => d.Team)
+                    .ThenInclude(t => t.Members)
+                .FirstOrDefaultAsync(d => d.Id == id && !d.IsDeleted);
+
+            if (doc is null) return NotFound(new { message = "Document not found." });
+
+            var member = doc.Team.Members.FirstOrDefault(m => m.UserId == userId);
+            if (member is null || member.Role != TeamRole.Owner)
+                return StatusCode(403, new { message = "Only the team owner can restore versions." });
+
+            var version = await _context.DocumentVersion
+                .FirstOrDefaultAsync(v => v.Id == versionId && v.DocumentId == id);
+
+            if (version is null) return NotFound(new { message = "Version not found." });
+
+            var user = await _context.Users.FindAsync(userId);
+            var authorName = user?.FullName ?? user?.UserName ?? "Unknown";
+
+            doc.YDocSnapshot = version.YDocSnapshot;
+            doc.Content = version.ContentHtml;
+            doc.UpdatedAt = DateTime.UtcNow;
+
+            _context.DocumentVersion.Add(new DocumentVersion
+            {
+                DocumentId = id,
+                AuthorId = userId,
+                AuthorName = authorName,
+                CreatedAt = DateTime.UtcNow,
+                Summary = $"RESTORED_BY|{authorName}",
+                YDocSnapshot = version.YDocSnapshot,
+                ContentHtml = version.ContentHtml
+            });
+
+            await _context.SaveChangesAsync();
+
+            await _hubContext.Clients.Group($"doc-{id}").SendAsync("DocumentRestored");
+
+            return NoContent();
         }
 
         /// <summary>

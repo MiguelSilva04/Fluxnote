@@ -601,6 +601,7 @@
     "RESTORE_NOTE": "Esta ação não pode ser revertida. Certifique-se que quer continuar.",
     "RESTORE_CONFIRM_CHECK": "Entendo que esta ação é irreversível.",
     "RESTORE_AND_REPLACE": "Restaurar e Substituir",
+    "SUMMARY_RESTORED_BY": "Restaurado por {{name}}",
     "COMMENTS_TITLE": "Comentários",
     "ADD_COMMENT": "Adicionar um comentário...",
     "POST": "Publicar",

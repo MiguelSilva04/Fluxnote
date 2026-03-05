@@ -471,8 +471,7 @@ import { diffWords } from 'diff';
                             class="mt-1 rounded border-gray-300 text-[#155347] dark:text-emerald-400 focus:ring-[#155347] cursor-pointer disabled:cursor-not-allowed disabled:opacity-40"
                           />
                         </div>
-                        <p class="text-xs font-medium text-gray-900 dark:text-gray-100 mb-1">{{ version.authorName }} :</p>
-                        <p class="text-xs text-gray-700 dark:text-gray-400 mb-3">{{ version.summary }}</p>
+                        <p class="text-xs text-gray-700 dark:text-gray-400 mb-3">{{ formatVersionSummary(version.summary) }}</p>
                         <div class="flex gap-2">
                           <app-button
                             variant="outline"
@@ -483,15 +482,17 @@ import { diffWords } from 'diff';
                             <lucide-icon leftIcon name="eye" class="h-3 w-3"></lucide-icon>
                             {{ 'DOCUMENT_EDITOR.VIEW' | translate }}
                           </app-button>
-                          <app-button
-                            variant="outline"
-                            size="sm"
-                            [leftIcon]="true"
-                            (onClick)="handleRestore(documentVersions().length - i)"
-                          >
-                            <lucide-icon leftIcon name="rotate-ccw" class="h-3 w-3"></lucide-icon>
-                            {{ 'DOCUMENT_EDITOR.RESTORE' | translate }}
-                          </app-button>
+                          @if (isOwner() && i > 0) {
+                            <app-button
+                              variant="outline"
+                              size="sm"
+                              [leftIcon]="true"
+                              (onClick)="handleRestore(version.id)"
+                            >
+                              <lucide-icon leftIcon name="rotate-ccw" class="h-3 w-3"></lucide-icon>
+                              {{ 'DOCUMENT_EDITOR.RESTORE' | translate }}
+                            </app-button>
+                          }
                         </div>
                       </div>
                     }
@@ -629,10 +630,10 @@ import { diffWords } from 'diff';
                 <app-button variant="ghost" (onClick)="closeRestoreModal()">{{ 'COMMON.CANCEL' | translate }}</app-button>
                 <app-button
                   (onClick)="confirmRestore()"
-                  [disabled]="!restoreConfirmed"
+                  [disabled]="!restoreConfirmed || isRestoring()"
                   customClass="bg-red-600 hover:bg-red-700 disabled:bg-gray-300 disabled:cursor-not-allowed"
                 >
-                  {{ 'DOCUMENT_EDITOR.RESTORE_AND_REPLACE' | translate }}
+                  {{ isRestoring() ? ('COMMON.LOADING' | translate) : ('DOCUMENT_EDITOR.RESTORE_AND_REPLACE' | translate) }}
                 </app-button>
               </div>
             </div>
@@ -1139,6 +1140,7 @@ export class DocumentEditorComponent implements OnInit {
   showWipModal = signal(false);
   showMobileMenu = signal(false);
   isRestoreModalOpen = signal(false);
+  isRestoring = signal(false);
   versionToRestore = signal<number | null>(null);
   newComment = '';
   selectedVersions = signal<number[]>([]);
@@ -1195,6 +1197,7 @@ export class DocumentEditorComponent implements OnInit {
   // Team Owners/Admins recebem "Editor" via bypass no backend
   documentRole = signal<string>('Viewer');
   canEdit = computed(() => this.documentRole() === 'Editor');
+  isOwner = signal(false);
 
   // TODO: Implementar colaboração em tempo real
   collaborators: Collaborator[] = [];
@@ -1237,6 +1240,7 @@ export class DocumentEditorComponent implements OnInit {
         this.lastEdited.set(new Date(doc.updatedAt));
         this.lastEditedText.set(this.formatLastEdited(new Date(doc.updatedAt)));
         this.documentRole.set(doc.role || 'Viewer');
+        this.isOwner.set(doc.isOwner ?? false);
         this.isLoading.set(false);
         this.loadDocumentInvites(doc.id);
         if (doc.role === 'Editor') {
@@ -1662,6 +1666,14 @@ export class DocumentEditorComponent implements OnInit {
     });
   }
 
+  formatVersionSummary(summary: string): string {
+    if (summary.startsWith('RESTORED_BY|')) {
+      const name = summary.substring('RESTORED_BY|'.length);
+      return this.translateService.instant('DOCUMENT_EDITOR.SUMMARY_RESTORED_BY', { name });
+    }
+    return summary;
+  }
+
   toggleComments(): void {
     this.showComments.update((v) => !v);
     this.showVersionHistory.set(false);
@@ -1683,8 +1695,8 @@ export class DocumentEditorComponent implements OnInit {
     }
   }
 
-  handleRestore(versionNumber: number): void {
-    this.versionToRestore.set(versionNumber);
+  handleRestore(versionId: number): void {
+    this.versionToRestore.set(versionId);
     this.isRestoreModalOpen.set(true);
   }
 
@@ -1694,12 +1706,22 @@ export class DocumentEditorComponent implements OnInit {
   }
 
   confirmRestore(): void {
-    if (this.restoreConfirmed) {
-      this.closeRestoreModal();
-      this.closeVersionPreview();
-      this.showVersionHistory.set(false);
-      this.showWipModal.set(true);
-    }
+    if (!this.restoreConfirmed || !this.versionToRestore() || !this.documentId) return;
+
+    this.isRestoring.set(true);
+    this.documentService.restoreDocumentVersion(this.documentId, this.versionToRestore()!).subscribe({
+      next: () => {
+        this.isRestoring.set(false);
+        this.closeRestoreModal();
+        this.closeVersionPreview();
+        this.showVersionHistory.set(false);
+        this.collaborationService.reconnectAfterRestore();
+      },
+      error: (err) => {
+        this.isRestoring.set(false);
+        console.error('Error restoring version:', err);
+      }
+    });
   }
 
   generateSummary(): void {
