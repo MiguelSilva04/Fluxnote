@@ -2,6 +2,19 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Dark mode scrollbar styling */
+.dark ::-webkit-scrollbar-track {
+  background: #1f2937;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #4b5563;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #6b7280;
+}
+
 /* Custom scrollbar styling */
 ::-webkit-scrollbar {
   width: 8px;
@@ -52,9 +65,36 @@ del.diffmod {
   padding: 0 2px;
 }
 
+/* Dark mode diff highlighting */
+.dark ins.diffins {
+  background: #064e3b;
+  color: #6ee7b7;
+}
+.dark del.diffdel {
+  background: #7f1d1d;
+  color: #fca5a5;
+}
+.dark ins.diffmod {
+  background: #713f12;
+  color: #fde68a;
+}
+.dark del.diffmod {
+  background: #7f1d1d;
+  color: #fca5a5;
+}
+
 /* Base styles */
 body {
   font-family: 'Inter', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+html.dark {
+  color-scheme: dark;
+}
+
+html.dark body {
+  background-color: #111827;
+  color: #f3f4f6;
 }

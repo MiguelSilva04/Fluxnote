@@ -27,17 +27,17 @@ import { ButtonComponent, CardComponent, CardContentComponent } from '../../../s
           <div class="inline-flex items-center justify-center w-16 h-16 bg-[#155347] rounded-full mb-4">
             <lucide-icon name="badge-question-mark" class="h-8 w-8 text-white"></lucide-icon>
           </div>
-          <h1 class="text-4xl font-bold text-gray-900 mb-4">{{ 'HELP.TITLE' | translate }}</h1>
-          <p class="text-lg text-gray-600 mb-8">{{ 'HELP.SUBTITLE' | translate }}</p>
+          <h1 class="text-4xl font-bold text-gray-900 dark:text-gray-100 mb-4">{{ 'HELP.TITLE' | translate }}</h1>
+          <p class="text-lg text-gray-600 dark:text-gray-400 mb-8">{{ 'HELP.SUBTITLE' | translate }}</p>
 
           <!-- Search Bar -->
           <div class="max-w-2xl mx-auto relative">
-            <lucide-icon name="search" class="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400"></lucide-icon>
+            <lucide-icon name="search" class="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 dark:text-gray-500"></lucide-icon>
             <input
               type="text"
               [placeholder]="'HELP.SEARCH_PLACEHOLDER' | translate"
               [(ngModel)]="searchQuery"
-              class="w-full h-14 pl-12 pr-4 rounded-xl border-2 border-gray-200 focus:border-[#155347] focus:outline-none text-base shadow-sm"
+              class="w-full h-14 pl-12 pr-4 rounded-xl border-2 border-gray-200 dark:border-gray-700 focus:border-[#155347] focus:outline-none text-base shadow-sm"
             />
           </div>
         </div>
@@ -46,33 +46,33 @@ import { ButtonComponent, CardComponent, CardContentComponent } from '../../../s
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
           <app-card customClass="hover:shadow-lg transition-shadow cursor-pointer">
             <app-card-content customClass="p-6 text-center">
-              <div class="inline-flex items-center justify-center w-12 h-12 bg-blue-100 rounded-full mb-4">
+              <div class="inline-flex items-center justify-center w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-full mb-4">
                 <lucide-icon name="book" class="h-6 w-6 text-blue-600"></lucide-icon>
               </div>
-              <h3 class="text-lg font-bold text-gray-900 mb-2">{{ 'HELP.DOCUMENTATION' | translate }}</h3>
-              <p class="text-sm text-gray-600 mb-4">{{ 'HELP.DOCS_DESC' | translate }}</p>
+              <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100 mb-2">{{ 'HELP.DOCUMENTATION' | translate }}</h3>
+              <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">{{ 'HELP.DOCS_DESC' | translate }}</p>
               <app-button variant="outline" size="sm" customClass="w-full">{{ 'HELP.VIEW_DOCS' | translate }}</app-button>
             </app-card-content>
           </app-card>
 
           <app-card customClass="hover:shadow-lg transition-shadow cursor-pointer">
             <app-card-content customClass="p-6 text-center">
-              <div class="inline-flex items-center justify-center w-12 h-12 bg-green-100 rounded-full mb-4">
+              <div class="inline-flex items-center justify-center w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-full mb-4">
                 <lucide-icon name="message-circle" class="h-6 w-6 text-green-600"></lucide-icon>
               </div>
-              <h3 class="text-lg font-bold text-gray-900 mb-2">{{ 'HELP.LIVE_CHAT' | translate }}</h3>
-              <p class="text-sm text-gray-600 mb-4">{{ 'HELP.CHAT_DESC' | translate }}</p>
+              <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100 mb-2">{{ 'HELP.LIVE_CHAT' | translate }}</h3>
+              <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">{{ 'HELP.CHAT_DESC' | translate }}</p>
               <app-button variant="outline" size="sm" customClass="w-full">{{ 'HELP.START_CHAT' | translate }}</app-button>
             </app-card-content>
           </app-card>
 
           <app-card customClass="hover:shadow-lg transition-shadow cursor-pointer">
             <app-card-content customClass="p-6 text-center">
-              <div class="inline-flex items-center justify-center w-12 h-12 bg-purple-100 rounded-full mb-4">
+              <div class="inline-flex items-center justify-center w-12 h-12 bg-purple-100 dark:bg-purple-900/30 rounded-full mb-4">
                 <lucide-icon name="mail" class="h-6 w-6 text-purple-600"></lucide-icon>
               </div>
-              <h3 class="text-lg font-bold text-gray-900 mb-2">{{ 'HELP.EMAIL_SUPPORT' | translate }}</h3>
-              <p class="text-sm text-gray-600 mb-4">{{ 'HELP.EMAIL_DESC' | translate }}</p>
+              <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100 mb-2">{{ 'HELP.EMAIL_SUPPORT' | translate }}</h3>
+              <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">{{ 'HELP.EMAIL_DESC' | translate }}</p>
               <app-button variant="outline" size="sm" customClass="w-full">{{ 'HELP.CONTACT_US' | translate }}</app-button>
             </app-card-content>
           </app-card>
@@ -80,7 +80,7 @@ import { ButtonComponent, CardComponent, CardContentComponent } from '../../../s
 
         <!-- Categories -->
         <div class="mb-12">
-          <h2 class="text-2xl font-bold text-gray-900 mb-6">{{ 'HELP.BROWSE_CATEGORY' | translate }}</h2>
+          <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6">{{ 'HELP.BROWSE_CATEGORY' | translate }}</h2>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             @for (category of categories; track category.id) {
               <app-card customClass="hover:shadow-lg transition-shadow cursor-pointer">
@@ -88,11 +88,11 @@ import { ButtonComponent, CardComponent, CardContentComponent } from '../../../s
                   <div class="flex items-start gap-4">
                     <div class="text-4xl">{{ category.icon }}</div>
                     <div class="flex-1">
-                      <h3 class="text-lg font-bold text-gray-900 mb-1">{{ category.nameKey | translate }}</h3>
-                      <p class="text-sm text-gray-600 mb-2">{{ category.descKey | translate }}</p>
-                      <p class="text-xs text-gray-500">{{ category.articles }} articles</p>
+                      <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100 mb-1">{{ category.nameKey | translate }}</h3>
+                      <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">{{ category.descKey | translate }}</p>
+                      <p class="text-xs text-gray-500 dark:text-gray-400">{{ category.articles }} articles</p>
                     </div>
-                    <lucide-icon name="chevron-right" class="h-5 w-5 text-gray-400"></lucide-icon>
+                    <lucide-icon name="chevron-right" class="h-5 w-5 text-gray-400 dark:text-gray-500"></lucide-icon>
                   </div>
                 </app-card-content>
               </app-card>
@@ -102,20 +102,20 @@ import { ButtonComponent, CardComponent, CardContentComponent } from '../../../s
 
         <!-- Popular Articles -->
         <div class="mb-12">
-          <h2 class="text-2xl font-bold text-gray-900 mb-6">{{ 'HELP.POPULAR_ARTICLES' | translate }}</h2>
+          <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6">{{ 'HELP.POPULAR_ARTICLES' | translate }}</h2>
           <app-card>
             <app-card-content customClass="p-0">
-              <div class="divide-y divide-gray-100">
+              <div class="divide-y divide-gray-100 dark:divide-gray-700">
                 @for (article of popularArticles; track article.id) {
-                  <div class="p-4 hover:bg-gray-50 transition-colors cursor-pointer flex items-center justify-between">
+                  <div class="p-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer flex items-center justify-between">
                     <div class="flex-1">
-                      <h4 class="text-sm font-medium text-gray-900 mb-1">{{ article.title }}</h4>
-                      <div class="flex items-center gap-3 text-xs text-gray-500">
-                        <span class="px-2 py-1 bg-gray-100 rounded">{{ article.category }}</span>
+                      <h4 class="text-sm font-medium text-gray-900 dark:text-gray-100 mb-1">{{ article.title }}</h4>
+                      <div class="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400">
+                        <span class="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded">{{ article.category }}</span>
                         <span>{{ article.views }}</span>
                       </div>
                     </div>
-                    <lucide-icon name="chevron-right" class="h-5 w-5 text-gray-400"></lucide-icon>
+                    <lucide-icon name="chevron-right" class="h-5 w-5 text-gray-400 dark:text-gray-500"></lucide-icon>
                   </div>
                 }
               </div>
@@ -125,13 +125,13 @@ import { ButtonComponent, CardComponent, CardContentComponent } from '../../../s
 
         <!-- FAQs -->
         <div class="mb-12">
-          <h2 class="text-2xl font-bold text-gray-900 mb-6">{{ 'HELP.FAQ_TITLE' | translate }}</h2>
+          <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6">{{ 'HELP.FAQ_TITLE' | translate }}</h2>
           <div class="space-y-4">
             @for (faq of faqs; track faq.question) {
               <app-card>
                 <app-card-content customClass="p-6">
-                  <h4 class="text-base font-bold text-gray-900 mb-2">{{ faq.question }}</h4>
-                  <p class="text-sm text-gray-600">{{ faq.answer }}</p>
+                  <h4 class="text-base font-bold text-gray-900 dark:text-gray-100 mb-2">{{ faq.question }}</h4>
+                  <p class="text-sm text-gray-600 dark:text-gray-400">{{ faq.answer }}</p>
                 </app-card-content>
               </app-card>
             }
@@ -144,7 +144,7 @@ import { ButtonComponent, CardComponent, CardContentComponent } from '../../../s
             <h2 class="text-2xl font-bold mb-4">{{ 'HELP.STILL_NEED_HELP' | translate }}</h2>
             <p class="text-white/90 mb-6">{{ 'HELP.STILL_HELP_DESC' | translate }}</p>
             <div class="flex items-center justify-center gap-4">
-              <app-button variant="outline" customClass="bg-white text-[#155347] hover:bg-gray-100">{{ 'HELP.CONTACT_SUPPORT' | translate }}</app-button>
+              <app-button variant="outline" customClass="bg-white dark:bg-gray-800 text-[#155347] hover:bg-gray-100 dark:hover:bg-gray-700">{{ 'HELP.CONTACT_SUPPORT' | translate }}</app-button>
               <app-button variant="outline" customClass="bg-transparent border-white text-white hover:bg-white/10">{{ 'HELP.SCHEDULE_CALL' | translate }}</app-button>
             </div>
           </app-card-content>

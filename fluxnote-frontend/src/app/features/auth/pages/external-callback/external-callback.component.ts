@@ -9,15 +9,15 @@ import { CardComponent, CardContentComponent } from '../../../../shared/componen
   standalone: true,
   imports: [CommonModule, CardComponent, CardContentComponent],
   template: `
-    <div class="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+    <div class="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center p-4">
       <app-card customClass="w-full max-w-md shadow-xl border-0">
         <app-card-content customClass="p-8 text-center">
           @if (loading()) {
-            <h2 class="text-xl font-bold text-gray-900 mb-2">Processing authentication...</h2>
-            <p class="text-sm text-gray-500">Wait while we finish your authentication with google.</p>
+            <h2 class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2">Processing authentication...</h2>
+            <p class="text-sm text-gray-500 dark:text-gray-400">Wait while we finish your authentication with google.</p>
           } @else if (error()) {
             <h2 class="text-xl font-bold text-red-600 mb-2">Fail on authentication</h2>
-            <p class="text-sm text-gray-600">{{ error() }}</p>
+            <p class="text-sm text-gray-600 dark:text-gray-400">{{ error() }}</p>
           }
         </app-card-content>
       </app-card>

@@ -8,25 +8,25 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
   standalone: true,
   imports: [CommonModule, TranslateModule],
   template: `
-    <section id="funcionalidades" class="py-20 bg-gray-50">
+    <section id="funcionalidades" class="py-20 bg-gray-50 dark:bg-gray-900">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-16">
-          <h2 class="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+          <h2 class="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-gray-100 mb-4">
             {{ 'LANDING.FEATURES.TITLE' | translate }}
           </h2>
-          <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+          <p class="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
             {{ 'LANDING.FEATURES.SUBTITLE' | translate }}
           </p>
         </div>
 
         <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
           @for (feature of features; track feature.titleKey) {
-            <div class="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-shadow">
-              <div class="text-[#155347] mb-4" [innerHTML]="feature.icon"></div>
-              <h3 class="text-xl font-semibold text-gray-900 mb-3">
+            <div class="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg hover:shadow-xl transition-shadow">
+              <div class="text-[#155347] dark:text-emerald-400 mb-4" [innerHTML]="feature.icon"></div>
+              <h3 class="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-3">
                 {{ feature.titleKey | translate }}
               </h3>
-              <p class="text-gray-600">
+              <p class="text-gray-600 dark:text-gray-400">
                 {{ feature.descKey | translate }}
               </p>
             </div>

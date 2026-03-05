@@ -14,11 +14,11 @@ import { Subject, debounceTime, takeUntil, distinctUntilChanged } from 'rxjs';
   standalone: true,
   imports: [CommonModule, FormsModule, LucideAngularModule, WorkInProgressComponent, TranslateModule],
   template: `
-    <header class="h-14 md:h-16 bg-white border-b border-gray-200 px-3 md:px-6 flex items-center gap-2 md:gap-4 shrink-0">
+    <header class="h-14 md:h-16 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-3 md:px-6 flex items-center gap-2 md:gap-4 shrink-0">
       <!-- Hamburger (mobile only) -->
       <button
         (click)="panelState.toggleSidebar()"
-        class="lg:hidden flex-shrink-0 p-2 text-gray-500 hover:bg-gray-100 rounded-lg transition-colors"
+        class="lg:hidden flex-shrink-0 p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
         aria-label="Toggle sidebar"
       >
         <lucide-icon name="menu" class="h-5 w-5"></lucide-icon>
@@ -34,12 +34,12 @@ import { Subject, debounceTime, takeUntil, distinctUntilChanged } from 'rxjs';
             (input)="onSearchInput()"
             (focus)="showResults.set(true)"
             (blur)="onBlur()"
-            class="w-full h-10 pl-12 pr-4 rounded-lg border border-gray-200 bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#155347] focus:border-transparent text-sm"
+            class="w-full h-10 pl-12 pr-4 rounded-lg border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 dark:text-gray-200 focus:bg-white dark:focus:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-[#155347] focus:border-transparent text-sm"
           />
           
           <!-- Dropdown de resultados -->
           @if (showResults() && searchQuery.length >= 2) {
-            <div class="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-96 overflow-y-auto">
+            <div class="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50 max-h-96 overflow-y-auto">
               @if (isSearching()) {
                 <div class="p-4 text-center text-gray-500">
                   <lucide-icon name="loader-circle" class="h-5 w-5 animate-spin mx-auto mb-2"></lucide-icon>
@@ -58,12 +58,12 @@ import { Subject, debounceTime, takeUntil, distinctUntilChanged } from 'rxjs';
                   @for (doc of searchResults(); track doc.id) {
                     <button
                       (mousedown)="openDocument(doc)"
-                      class="w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors border-b border-gray-100 last:border-b-0"
+                      class="w-full px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors border-b border-gray-100 dark:border-gray-700 last:border-b-0"
                     >
                       <div class="flex items-start gap-3">
                         <lucide-icon name="file-text" class="h-5 w-5 text-gray-400 mt-0.5 shrink-0"></lucide-icon>
                         <div class="flex-1 min-w-0">
-                          <p class="text-sm font-medium text-gray-900 truncate">{{ doc.title }}</p>
+                          <p class="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">{{ doc.title }}</p>
                           <p class="text-xs text-gray-500 mt-0.5">{{ doc.teamName }}</p>
                           @if (doc.preview) {
                             <p 
@@ -84,14 +84,14 @@ import { Subject, debounceTime, takeUntil, distinctUntilChanged } from 'rxjs';
       <div class="flex items-center gap-1 md:gap-2 flex-shrink-0">
         <button
           (click)="showWipModal.set(true)"
-          class="relative p-2 text-gray-500 hover:bg-gray-100 rounded-lg transition-colors"
+          class="relative p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
         >
           <lucide-icon name="bell" class="h-5 w-5"></lucide-icon>
           <span class="absolute top-1.5 right-1.5 h-2 w-2 bg-red-500 rounded-full"></span>
         </button>
         <button
           (click)="panelState.openSettingsPanel()"
-          class="p-2 text-gray-500 hover:bg-gray-100 rounded-lg transition-colors"
+          class="p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
         >
           <lucide-icon name="settings" class="h-5 w-5"></lucide-icon>
         </button>

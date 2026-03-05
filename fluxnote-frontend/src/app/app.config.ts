@@ -9,6 +9,7 @@ import { routes } from './app.routes';
 import { AuthInterceptor } from './core/services/auth.interceptor';
 import { AuthService } from './core/services';
 import { LanguageService } from './core/services/language.service';
+import { ThemeService } from './core/services/theme.service';
 
 const lucideProviders = LucideAngularModule.pick(icons).providers ?? [];
 
@@ -29,6 +30,10 @@ export const appConfig: ApplicationConfig = {
     provideAppInitializer(() => {
       const lang = inject(LanguageService);
       lang.init();
+    }),
+    provideAppInitializer(() => {
+      const theme = inject(ThemeService);
+      theme.init();
     }),
     {
       provide: HTTP_INTERCEPTORS,

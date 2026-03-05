@@ -24,7 +24,7 @@ import { ToastService, Toast, ToastType } from '../../../services/toast.service'
           </div>
           <button
             (click)="removeToast(toast.id)"
-            class="text-gray-400 hover:text-gray-600 transition-colors shrink-0"
+            class="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transition-colors shrink-0"
           >
             <lucide-icon name="x" class="h-4 w-4"></lucide-icon>
           </button>
@@ -66,10 +66,10 @@ export class ToastComponent {
   getToastClasses(type: ToastType): string {
     const baseClasses = 'border';
     const typeClasses = {
-      success: 'bg-green-50 border-green-200',
-      error: 'bg-red-50 border-red-200',
-      info: 'bg-blue-50 border-blue-200',
-      warning: 'bg-yellow-50 border-yellow-200'
+      success: 'bg-green-50 border-green-200 dark:bg-green-900/20 dark:border-green-800',
+      error: 'bg-red-50 border-red-200 dark:bg-red-900/20 dark:border-red-800',
+      info: 'bg-blue-50 border-blue-200 dark:bg-blue-900/20 dark:border-blue-800',
+      warning: 'bg-yellow-50 border-yellow-200 dark:bg-yellow-900/20 dark:border-yellow-800'
     };
     return `${baseClasses} ${typeClasses[type]}`;
   }
@@ -86,10 +86,10 @@ export class ToastComponent {
 
   getTextClasses(type: ToastType): string {
     const typeClasses = {
-      success: 'text-green-800',
-      error: 'text-red-800',
-      info: 'text-blue-800',
-      warning: 'text-yellow-800'
+      success: 'text-green-800 dark:text-green-200',
+      error: 'text-red-800 dark:text-red-200',
+      info: 'text-blue-800 dark:text-blue-200',
+      warning: 'text-yellow-800 dark:text-yellow-200'
     };
     return typeClasses[type];
   }

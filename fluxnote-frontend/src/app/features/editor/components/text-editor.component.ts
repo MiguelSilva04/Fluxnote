@@ -739,8 +739,8 @@ export class TextEditorComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   getToolbarButtonClass(isActive: boolean | string | undefined): string {
-    const base = 'p-2 rounded hover:bg-gray-100 transition-colors';
-    return isActive ? `${base} bg-[#e8f0ee] text-[#155347]` : `${base} text-gray-600`;
+    const base = 'p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors';
+    return isActive ? `${base} bg-[#e8f0ee] dark:bg-[#155347]/20 text-[#155347] dark:text-[#4ade80]` : `${base} text-gray-600 dark:text-gray-400`;
   }
 
   getContent(): string {

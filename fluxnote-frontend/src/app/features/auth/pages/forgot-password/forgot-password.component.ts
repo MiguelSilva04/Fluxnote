@@ -22,24 +22,24 @@ import { TranslateModule } from '@ngx-translate/core';
     TranslateModule
   ],
   template: `
-    <div class="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
+    <div class="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col items-center justify-center p-4">
       <div class="mb-8 text-center">
         <div class="inline-flex items-center justify-center p-3 bg-[#155347] rounded-xl mb-4 shadow-lg shadow-[#155347]/20">
           <lucide-icon name="file-text" class="h-8 w-8 text-white"></lucide-icon>
         </div>
-        <h1 class="text-3xl font-bold text-gray-900">FluxNote</h1>
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-gray-100">FluxNote</h1>
       </div>
 
       <app-card customClass="w-full max-w-md shadow-xl border-0">
         <app-card-content customClass="p-8">
-          <a routerLink="/login" class="inline-flex items-center text-sm text-gray-500 hover:text-gray-900 mb-6 transition-colors">
+          <a routerLink="/login" class="inline-flex items-center text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 mb-6 transition-colors">
             <lucide-icon name="arrow-left" class="h-4 w-4 mr-1"></lucide-icon>
             {{ 'AUTH.FORGOT_PASSWORD.BACK_LOGIN' | translate }}
           </a>
 
           @if (!isSubmitted()) {
-            <h2 class="text-2xl font-bold text-gray-900 mb-2">{{ 'AUTH.FORGOT_PASSWORD.TITLE' | translate }}</h2>
-            <p class="text-gray-600 mb-8">
+            <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">{{ 'AUTH.FORGOT_PASSWORD.TITLE' | translate }}</h2>
+            <p class="text-gray-600 dark:text-gray-400 mb-8">
               {{ 'AUTH.FORGOT_PASSWORD.SUBTITLE' | translate }}
             </p>
 
@@ -62,13 +62,13 @@ import { TranslateModule } from '@ngx-translate/core';
             </form>
           } @else {
             <div class="text-center py-4">
-              <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-6">
+              <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 dark:bg-green-900/30 mb-6">
                 <lucide-icon name="badge-check" class="h-8 w-8 text-green-600"></lucide-icon>
               </div>
-              <h2 class="text-2xl font-bold text-gray-900 mb-2">{{ 'AUTH.FORGOT_PASSWORD.CHECK_EMAIL' | translate }}</h2>
-              <p class="text-gray-600 mb-8">
+              <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">{{ 'AUTH.FORGOT_PASSWORD.CHECK_EMAIL' | translate }}</h2>
+              <p class="text-gray-600 dark:text-gray-400 mb-8">
                 {{ 'AUTH.FORGOT_PASSWORD.SENT_TO' | translate }}
-                <span class="font-medium text-gray-900">{{ email }}</span>
+                <span class="font-medium text-gray-900 dark:text-gray-100">{{ email }}</span>
               </p>
               <app-button variant="outline" customClass="w-full" (onClick)="isSubmitted.set(false)">
                 {{ 'AUTH.FORGOT_PASSWORD.TRY_ANOTHER' | translate }}
@@ -78,10 +78,10 @@ import { TranslateModule } from '@ngx-translate/core';
         </app-card-content>
       </app-card>
 
-      <div class="mt-8 flex gap-6 text-sm text-gray-500">
-        <a href="#" class="hover:text-gray-900">{{ 'AUTH.FORGOT_PASSWORD.PRIVACY' | translate }}</a>
-        <a href="#" class="hover:text-gray-900">{{ 'AUTH.FORGOT_PASSWORD.TERMS' | translate }}</a>
-        <a href="#" class="hover:text-gray-900">{{ 'AUTH.FORGOT_PASSWORD.CONTACT' | translate }}</a>
+      <div class="mt-8 flex gap-6 text-sm text-gray-500 dark:text-gray-400">
+        <a href="#" class="hover:text-gray-900 dark:hover:text-gray-100">{{ 'AUTH.FORGOT_PASSWORD.PRIVACY' | translate }}</a>
+        <a href="#" class="hover:text-gray-900 dark:hover:text-gray-100">{{ 'AUTH.FORGOT_PASSWORD.TERMS' | translate }}</a>
+        <a href="#" class="hover:text-gray-900 dark:hover:text-gray-100">{{ 'AUTH.FORGOT_PASSWORD.CONTACT' | translate }}</a>
       </div>
     </div>
   `

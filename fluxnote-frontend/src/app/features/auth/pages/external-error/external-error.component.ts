@@ -8,11 +8,11 @@ import { CardComponent, CardContentComponent, ButtonComponent } from '../../../.
   standalone: true,
   imports: [CommonModule, CardComponent, CardContentComponent, ButtonComponent],
   template: `
-    <div class="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+    <div class="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center p-4">
       <app-card customClass="w-full max-w-md shadow-xl border-0">
         <app-card-content customClass="p-8 text-center">
-          <h1 class="text-2xl font-bold text-gray-900 mb-3">{{ title }}</h1>
-          <p class="text-sm text-gray-600 mb-6">{{ message }}</p>
+          <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-3">{{ title }}</h1>
+          <p class="text-sm text-gray-600 dark:text-gray-400 mb-6">{{ message }}</p>
           <app-button customClass="w-full" (onClick)="goToLogin()">Go back to login</app-button>
         </app-card-content>
       </app-card>

@@ -23,18 +23,18 @@ import { ToastService } from '../../../../shared/services/toast.service';
     TranslateModule,
   ],
   template: `
-    <div class="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
+    <div class="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col items-center justify-center p-4">
       <div class="mb-8 text-center">
         <div class="inline-flex items-center justify-center p-3 bg-[#155347] rounded-xl mb-4 shadow-lg shadow-[#155347]/20">
         <img src="assets/white_icon.png" alt="FluxNote" class="h-10 w-10" />
         </div>
-        <h1 class="text-3xl font-bold text-gray-900">{{ 'AUTH.LOGIN.TITLE' | translate }}</h1>
-        <p class="text-gray-500 mt-2">{{ 'AUTH.LOGIN.SUBTITLE' | translate }}</p>
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-gray-100">{{ 'AUTH.LOGIN.TITLE' | translate }}</h1>
+        <p class="text-gray-500 dark:text-gray-400 mt-2">{{ 'AUTH.LOGIN.SUBTITLE' | translate }}</p>
       </div>
 
       <app-card customClass="w-full max-w-md shadow-xl border-0">
         <app-card-content customClass="p-8">
-          <h2 class="text-2xl font-bold text-center text-gray-900 mb-8">{{ 'AUTH.LOGIN.HEADING' | translate }}</h2>
+          <h2 class="text-2xl font-bold text-center text-gray-900 dark:text-gray-100 mb-8">{{ 'AUTH.LOGIN.HEADING' | translate }}</h2>
 
           <form (ngSubmit)="handleSubmit()" class="space-y-5">
             <div class="relative">
@@ -66,7 +66,7 @@ import { ToastService } from '../../../../shared/services/toast.service';
               <button
                 type="button"
                 (click)="showPassword.set(!showPassword())"
-                class="absolute right-3 top-[38px] text-gray-400 hover:text-gray-600"
+                class="absolute right-3 top-[38px] text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
               >
                 <lucide-icon [name]="showPassword() ? 'eye-off' : 'eye'" class="h-4 w-4"></lucide-icon>
               </button>
@@ -74,8 +74,8 @@ import { ToastService } from '../../../../shared/services/toast.service';
 
             <div class="flex items-center justify-between text-sm">
               <label class="flex items-center gap-2 cursor-pointer">
-                <input name="rememberMe" [(ngModel)]="formData.rememberMe" type="checkbox" class="rounded border-gray-300 text-[#155347] focus:ring-[#155347]" />
-                <span class="text-gray-600">{{ 'AUTH.LOGIN.REMEMBER_ME' | translate }}</span>
+                <input name="rememberMe" [(ngModel)]="formData.rememberMe" type="checkbox" class="rounded border-gray-300 dark:border-gray-600 text-[#155347] focus:ring-[#155347]" />
+                <span class="text-gray-600 dark:text-gray-400">{{ 'AUTH.LOGIN.REMEMBER_ME' | translate }}</span>
               </label>
               <a routerLink="/forgot-password" class="text-[#155347] hover:underline font-medium">
                 {{ 'AUTH.LOGIN.FORGOT_PASSWORD' | translate }}
@@ -90,10 +90,10 @@ import { ToastService } from '../../../../shared/services/toast.service';
           <div class="mt-8">
             <div class="relative">
               <div class="absolute inset-0 flex items-center">
-                <span class="w-full border-t border-gray-200"></span>
+                <span class="w-full border-t border-gray-200 dark:border-gray-700"></span>
               </div>
               <div class="relative flex justify-center text-xs uppercase">
-                <span class="bg-white px-2 text-gray-500">{{ 'AUTH.LOGIN.OR_CONTINUE' | translate }}</span>
+                <span class="bg-white dark:bg-gray-800 px-2 text-gray-500 dark:text-gray-400">{{ 'AUTH.LOGIN.OR_CONTINUE' | translate }}</span>
               </div>
             </div>
 
@@ -130,7 +130,7 @@ import { ToastService } from '../../../../shared/services/toast.service';
             </div>
           </div>
 
-          <p class="mt-8 text-center text-sm text-gray-600">
+          <p class="mt-8 text-center text-sm text-gray-600 dark:text-gray-400">
             {{ 'AUTH.LOGIN.NO_ACCOUNT' | translate }}
             <a routerLink="/register" class="font-medium text-[#155347] hover:underline ml-1">
               {{ 'AUTH.LOGIN.CREATE_ACCOUNT' | translate }}

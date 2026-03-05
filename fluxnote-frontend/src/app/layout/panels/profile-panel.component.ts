@@ -19,13 +19,13 @@ import { TeamGet } from '../../core/models';
            (click)="panelState.closeProfilePanel()"></div>
 
       <!-- Side Panel -->
-      <aside class="fixed right-0 top-0 h-full w-full sm:w-96 bg-white shadow-2xl z-50 flex flex-col transition-transform duration-300 ease-in-out"
+      <aside class="fixed right-0 top-0 h-full w-full sm:w-96 bg-white dark:bg-gray-800 shadow-2xl z-50 flex flex-col transition-transform duration-300 ease-in-out"
              [class.translate-x-full]="!panelState.isProfilePanelOpen()"
              [attr.inert]="!panelState.isProfilePanelOpen() ? '' : null">
-        <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-          <h2 class="text-lg font-bold text-gray-900">{{ 'PROFILE_PANEL.TITLE' | translate }}</h2>
-          <button (click)="panelState.closeProfilePanel()" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-            <lucide-icon name="x" class="h-5 w-5 text-gray-500"></lucide-icon>
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+          <h2 class="text-lg font-bold text-gray-900 dark:text-gray-100">{{ 'PROFILE_PANEL.TITLE' | translate }}</h2>
+          <button (click)="panelState.closeProfilePanel()" class="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">
+            <lucide-icon name="x" class="h-5 w-5 text-gray-500 dark:text-gray-400"></lucide-icon>
           </button>
         </div>
 
@@ -45,42 +45,42 @@ import { TeamGet } from '../../core/models';
                   {{ user()?.initials }}
                 </div>
               }
-              <div class="absolute bottom-1 right-1 h-5 w-5 rounded-full bg-green-500 border-4 border-white"></div>
+              <div class="absolute bottom-1 right-1 h-5 w-5 rounded-full bg-green-500 border-4 border-white dark:border-gray-800"></div>
             </div>
-            <h3 class="text-xl font-bold text-gray-900 mb-1">{{ user()?.fullName }}</h3>
+            <h3 class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-1">{{ user()?.fullName }}</h3>
             @if (user()?.userName) {
-              <p class="text-sm text-[#155347] font-medium mb-1">{{'@' + user()?.userName}}</p>
+              <p class="text-sm text-[#155347] dark:text-emerald-400 font-medium mb-1">{{'@' + user()?.userName}}</p>
             }
-            <p class="text-sm text-gray-600">{{ user()?.email }}</p>
+            <p class="text-sm text-gray-600 dark:text-gray-400">{{ user()?.email }}</p>
             @if (user()?.bio) {
-              <p class="text-sm text-gray-500 mt-2 italic">"{{ user()?.bio }}"</p>
+              <p class="text-sm text-gray-500 dark:text-gray-400 mt-2 italic">"{{ user()?.bio }}"</p>
             }
           </div>
 
           <!-- Quick Info -->
           <div class="space-y-3">
-            <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-              <lucide-icon name="badge-euro" class="h-5 w-5 text-gray-500"></lucide-icon>
+            <div class="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+              <lucide-icon name="badge-euro" class="h-5 w-5 text-gray-500 dark:text-gray-400"></lucide-icon>
               <div>
-                <p class="text-xs text-gray-500">{{ 'PROFILE_PANEL.PLAN' | translate }}</p>
-                <p class="text-sm font-medium text-gray-900">{{ 'PROFILE_PANEL.PLAN_VALUE' | translate }}</p>
+                <p class="text-xs text-gray-500 dark:text-gray-400">{{ 'PROFILE_PANEL.PLAN' | translate }}</p>
+                <p class="text-sm font-medium text-gray-900 dark:text-gray-100">{{ 'PROFILE_PANEL.PLAN_VALUE' | translate }}</p>
               </div>
             </div>
             @if (user()?.createdAt) {
-              <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                <lucide-icon name="calendar" class="h-5 w-5 text-gray-500"></lucide-icon>
+              <div class="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                <lucide-icon name="calendar" class="h-5 w-5 text-gray-500 dark:text-gray-400"></lucide-icon>
                 <div>
-                  <p class="text-xs text-gray-500">{{ 'PROFILE_PANEL.MEMBER_SINCE' | translate }}</p>
-                  <p class="text-sm font-medium text-gray-900">{{ formatDate(user()?.createdAt) }}</p>
+                  <p class="text-xs text-gray-500 dark:text-gray-400">{{ 'PROFILE_PANEL.MEMBER_SINCE' | translate }}</p>
+                  <p class="text-sm font-medium text-gray-900 dark:text-gray-100">{{ formatDate(user()?.createdAt) }}</p>
                 </div>
               </div>
             }
             @if (user()?.timezone) {
-              <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                <lucide-icon name="clock" class="h-5 w-5 text-gray-500"></lucide-icon>
+              <div class="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                <lucide-icon name="clock" class="h-5 w-5 text-gray-500 dark:text-gray-400"></lucide-icon>
                 <div>
-                  <p class="text-xs text-gray-500">{{ 'PROFILE_PANEL.TIMEZONE' | translate }}</p>
-                  <p class="text-sm font-medium text-gray-900">{{ user()?.timezone }}</p>
+                  <p class="text-xs text-gray-500 dark:text-gray-400">{{ 'PROFILE_PANEL.TIMEZONE' | translate }}</p>
+                  <p class="text-sm font-medium text-gray-900 dark:text-gray-100">{{ user()?.timezone }}</p>
                 </div>
               </div>
             }
@@ -89,23 +89,23 @@ import { TeamGet } from '../../core/models';
           <!-- Associated Teams -->
           <div>
             <div class="flex items-center gap-2 mb-3">
-              <lucide-icon name="users" class="h-5 w-5 text-gray-600"></lucide-icon>
-              <h4 class="text-base font-bold text-gray-900">{{ 'PROFILE_PANEL.TEAMS' | translate }}</h4>
+              <lucide-icon name="users" class="h-5 w-5 text-gray-600 dark:text-gray-400"></lucide-icon>
+              <h4 class="text-base font-bold text-gray-900 dark:text-gray-100">{{ 'PROFILE_PANEL.TEAMS' | translate }}</h4>
             </div>
             <div class="space-y-2">
               @if (isLoadingTeams()) {
                 <div class="flex items-center justify-center py-4">
-                  <lucide-icon name="loader-circle" class="h-5 w-5 text-[#155347] animate-spin"></lucide-icon>
+                  <lucide-icon name="loader-circle" class="h-5 w-5 text-[#155347] dark:text-emerald-400 animate-spin"></lucide-icon>
                 </div>
               } @else if (userTeams().length === 0) {
-                <p class="text-sm text-gray-500 text-center py-4">{{ 'PROFILE_PANEL.NO_TEAMS' | translate }}</p>
+                <p class="text-sm text-gray-500 dark:text-gray-400 text-center py-4">{{ 'PROFILE_PANEL.NO_TEAMS' | translate }}</p>
               } @else {
                 @for (team of userTeams(); track team.id) {
                   <div 
                     (click)="goToTeam(team.id)"
-                    class="flex items-center justify-between p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
+                    class="flex items-center justify-between p-3 border border-gray-200 dark:border-gray-700 rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                   >
-                    <span class="text-sm font-medium text-gray-900">{{ team.name }}</span>
+                    <span class="text-sm font-medium text-gray-900 dark:text-gray-100">{{ team.name }}</span>
                     <app-badge
                       [variant]="team.currentUserRole === 2 ? 'default' : 'outline'"
                       [customClass]="team.currentUserRole === 2 ? 'bg-[#155347]' : ''"
@@ -123,15 +123,15 @@ import { TeamGet } from '../../core/models';
             <a
               routerLink="/profile"
               (click)="panelState.closeProfilePanel()"
-              class="w-full flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-left cursor-pointer"
+              class="w-full flex items-center gap-3 p-3 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-left cursor-pointer"
             >
-              <lucide-icon name="user" class="h-5 w-5 text-gray-500"></lucide-icon>
-              <span class="text-sm font-medium text-gray-900">{{ 'PROFILE_PANEL.ACCOUNT_SETTINGS' | translate }}</span>
+              <lucide-icon name="user" class="h-5 w-5 text-gray-500 dark:text-gray-400"></lucide-icon>
+              <span class="text-sm font-medium text-gray-900 dark:text-gray-100">{{ 'PROFILE_PANEL.ACCOUNT_SETTINGS' | translate }}</span>
             </a>
           </div>
         </div>
 
-        <div class="p-6 border-t border-gray-200">
+        <div class="p-6 border-t border-gray-200 dark:border-gray-700">
           <app-button variant="outline" (onClick)="panelState.closeProfilePanel()" customClass="w-full">
             {{ 'PROFILE_PANEL.CLOSE' | translate }}
           </app-button>

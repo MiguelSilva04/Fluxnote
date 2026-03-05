@@ -35,12 +35,12 @@ import { firstValueFrom } from 'rxjs';
   template: `
     <app-dashboard-layout>
       <div class="max-w-4xl">
-        <h1 class="text-3xl font-bold text-gray-900 mb-8">{{ 'PROFILE.TITLE' | translate }}</h1>
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-8">{{ 'PROFILE.TITLE' | translate }}</h1>
 
         <!-- Success/Error Messages -->
         @if (successMessage()) {
           <div
-            class="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg flex items-center gap-2 text-green-800"
+            class="mb-4 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg flex items-center gap-2 text-green-800 dark:text-green-300"
           >
             <lucide-icon name="circle-check" class="h-5 w-5"></lucide-icon>
             <span>{{ successMessage() }}</span>
@@ -48,7 +48,7 @@ import { firstValueFrom } from 'rxjs';
         }
         @if (errorMessage()) {
           <div
-            class="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2 text-red-800"
+            class="mb-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg flex items-center gap-2 text-red-800 dark:text-red-300"
           >
             <lucide-icon name="circle-alert" class="h-5 w-5"></lucide-icon>
             <span>{{ errorMessage() }}</span>
@@ -83,15 +83,15 @@ import { firstValueFrom } from 'rxjs';
                     <lucide-icon name="camera" class="h-4 w-4"></lucide-icon>
                   </button>
                 </div>
-                <h2 class="text-xl font-bold text-gray-900 mb-1">
+                <h2 class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-1">
                   {{ formData().fullName || user()?.fullName || '' }}
                 </h2>
                 @if (formData().userName || user()?.userName) {
-                  <p class="text-sm text-[#155347] font-medium mb-1">
+                  <p class="text-sm text-[#155347] dark:text-emerald-400 font-medium mb-1">
                     {{ '@' + (formData().userName || user()?.userName) }}
                   </p>
                 }
-                <p class="text-sm text-gray-600 mb-2">{{ user()?.email || '' }}</p>
+                <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">{{ user()?.email || '' }}</p>
                 @if (user()?.createdAt) {
                   <p class="text-xs text-gray-400 mb-4">
                     {{ 'PROFILE.MEMBER_SINCE' | translate }} {{ formatDate(user()?.createdAt) }}
@@ -106,10 +106,10 @@ import { firstValueFrom } from 'rxjs';
           <div class="lg:col-span-2 space-y-6">
             <app-card>
               <app-card-content customClass="p-6">
-                <h3 class="text-lg font-bold text-gray-900 mb-4">{{ 'PROFILE.PERSONAL_INFO' | translate }}</h3>
+                <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4">{{ 'PROFILE.PERSONAL_INFO' | translate }}</h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">{{ 'PROFILE.FULL_NAME' | translate }}</label>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{{ 'PROFILE.FULL_NAME' | translate }}</label>
                     <input
                       type="text"
                       [ngModel]="formData().fullName"
@@ -119,7 +119,7 @@ import { firstValueFrom } from 'rxjs';
                         'w-full h-10 px-4 rounded-lg border focus:outline-none focus:ring-2 text-sm ' +
                         (formErrors()['fullName']
                           ? 'border-red-400 focus:ring-red-400'
-                          : 'border-gray-300 focus:ring-[#155347]')
+                          : 'border-gray-300 dark:border-gray-600 focus:ring-[#155347]')
                       "
                     />
                     @if (formErrors()['fullName']) {
@@ -127,7 +127,7 @@ import { firstValueFrom } from 'rxjs';
                     }
                   </div>
                   <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       {{ 'PROFILE.USERNAME' | translate }}
                       @if (user()?.usernameChangesRemaining !== undefined) {
                         <span class="text-xs text-gray-400 font-normal ml-2">
@@ -151,8 +151,8 @@ import { firstValueFrom } from 'rxjs';
                           'w-full h-10 pl-8 pr-4 rounded-lg border focus:outline-none focus:ring-2 focus:ring-[#155347] text-sm ' +
                           (user()?.usernameChangesRemaining === 0 &&
                           formData().userName === originalData.userName
-                            ? 'border-gray-200 bg-gray-50 text-gray-500 cursor-not-allowed'
-                            : 'border-gray-300')
+                            ? 'border-gray-200 bg-gray-50 dark:bg-gray-800 text-gray-500 cursor-not-allowed'
+                            : 'border-gray-300 dark:border-gray-600')
                         "
                       />
                     </div>
@@ -166,16 +166,16 @@ import { firstValueFrom } from 'rxjs';
                     }
                   </div>
                   <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">{{ 'PROFILE.EMAIL' | translate }}</label>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{{ 'PROFILE.EMAIL' | translate }}</label>
                     <input
                       type="email"
                       [value]="user()?.email || ''"
                       disabled
-                      class="w-full h-10 px-4 rounded-lg border border-gray-200 bg-gray-50 text-gray-500 text-sm cursor-not-allowed"
+                      class="w-full h-10 px-4 rounded-lg border border-gray-200 bg-gray-50 dark:bg-gray-800 dark:border-gray-700 text-gray-500 text-sm cursor-not-allowed"
                     />
                   </div>
                   <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">{{ 'PROFILE.PHONE' | translate }}</label>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{{ 'PROFILE.PHONE' | translate }}</label>
                     <input
                       type="tel"
                       maxlength="20"
@@ -186,7 +186,7 @@ import { firstValueFrom } from 'rxjs';
                         'w-full h-10 px-4 rounded-lg border focus:outline-none focus:ring-2 text-sm ' +
                         (formErrors()['phoneNumber']
                           ? 'border-red-400 focus:ring-red-400'
-                          : 'border-gray-300 focus:ring-[#155347]')
+                          : 'border-gray-300 dark:border-gray-600 focus:ring-[#155347]')
                       "
                     />
                     @if (formErrors()['phoneNumber']) {
@@ -194,7 +194,7 @@ import { firstValueFrom } from 'rxjs';
                     }
                   </div>
                   <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">{{ 'PROFILE.LOCATION' | translate }}</label>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{{ 'PROFILE.LOCATION' | translate }}</label>
                     <div class="relative">
                       <input
                         type="text"
@@ -209,12 +209,12 @@ import { firstValueFrom } from 'rxjs';
                           'w-full h-10 px-4 rounded-lg border focus:outline-none focus:ring-2 text-sm ' +
                           (formErrors()['location']
                             ? 'border-red-400 focus:ring-red-400'
-                            : 'border-gray-300 focus:ring-[#155347]')
+                            : 'border-gray-300 dark:border-gray-600 focus:ring-[#155347]')
                         "
                       />
                       @if (showCityDropdown()) {
                         <div
-                          class="absolute z-50 w-full bg-white border border-gray-200 rounded-lg shadow-lg mt-1 max-h-52 overflow-y-auto"
+                          class="absolute z-50 w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg mt-1 max-h-52 overflow-y-auto"
                         >
                           @for (city of cityResults(); track city; let i = $index) {
                             <button
@@ -224,7 +224,7 @@ import { firstValueFrom } from 'rxjs';
                                 'w-full text-left px-4 py-2 text-sm transition-colors ' +
                                 (highlightedCityIndex() === i
                                   ? 'bg-[#155347] text-white'
-                                  : 'text-gray-700 hover:bg-gray-50')
+                                  : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700')
                               "
                             >
                               {{ city }}
@@ -238,11 +238,11 @@ import { firstValueFrom } from 'rxjs';
                     }
                   </div>
                   <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">{{ 'PROFILE.TIMEZONE' | translate }}</label>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{{ 'PROFILE.TIMEZONE' | translate }}</label>
                     <select
                       [ngModel]="formData().timezone"
                       (ngModelChange)="updateFormField('timezone', $event)"
-                      class="w-full h-10 px-4 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#155347] text-sm bg-white"
+                      class="w-full h-10 px-4 rounded-lg border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-[#155347] text-sm bg-white dark:bg-gray-700 dark:text-gray-100"
                     >
                       <option value="">{{ 'PROFILE.SELECT_TIMEZONE' | translate }}</option>
                       <option value="UTC-12:00">UTC-12:00 (Baker Island)</option>
@@ -274,14 +274,14 @@ import { firstValueFrom } from 'rxjs';
                     </select>
                   </div>
                   <div class="md:col-span-2">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">{{ 'PROFILE.BIO' | translate }}</label>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{{ 'PROFILE.BIO' | translate }}</label>
                     <textarea
                       [ngModel]="formData().bio"
                       (ngModelChange)="updateFormField('bio', $event)"
                       [placeholder]="'PROFILE.BIO_PLACEHOLDER' | translate"
                       maxlength="500"
                       rows="3"
-                      class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#155347] text-sm resize-none"
+                      class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#155347] text-sm resize-none"
                     ></textarea>
                     <p class="text-xs text-gray-400 mt-1 text-right">
                       {{ formData().bio.length }}/500
@@ -307,10 +307,10 @@ import { firstValueFrom } from 'rxjs';
 
             <app-card>
               <app-card-content customClass="p-6">
-                <h3 class="text-lg font-bold text-gray-900 mb-4">{{ 'PROFILE.CONNECTED_ACCOUNTS' | translate }}</h3>
+                <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4">{{ 'PROFILE.CONNECTED_ACCOUNTS' | translate }}</h3>
                 <div class="space-y-3">
                   <div
-                    class="flex items-center justify-between p-4 border border-gray-200 rounded-lg"
+                    class="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg"
                   >
                     <div class="flex items-center gap-3">
                       <svg class="h-6 w-6" viewBox="0 0 24 24">
@@ -332,8 +332,8 @@ import { firstValueFrom } from 'rxjs';
                         />
                       </svg>
                       <div>
-                        <p class="text-sm font-medium text-gray-900">Google</p>
-                        <p class="text-xs text-gray-500">
+                        <p class="text-sm font-medium text-gray-900 dark:text-gray-100">Google</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">
                         {{ googleConnected() ? ('PROFILE.CONNECTED' | translate) : ('PROFILE.NOT_CONNECTED' | translate) }}
                         </p>
                       </div>
@@ -348,7 +348,7 @@ import { firstValueFrom } from 'rxjs';
                     </app-button>
                   </div>
                   <div
-                    class="flex items-center justify-between p-4 border border-gray-200 rounded-lg"
+                    class="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg"
                   >
                     <div class="flex items-center gap-3">
                       <svg class="h-6 w-6" viewBox="0 0 23 23">
@@ -359,8 +359,8 @@ import { firstValueFrom } from 'rxjs';
                         <path fill="#ffba08" d="M12 12h10v10H12z" />
                       </svg>
                       <div>
-                        <p class="text-sm font-medium text-gray-900">Microsoft</p>
-                        <p class="text-xs text-gray-500">
+                        <p class="text-sm font-medium text-gray-900 dark:text-gray-100">Microsoft</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">
                         {{ microsoftConnected() ? ('PROFILE.CONNECTED' | translate) : ('PROFILE.NOT_CONNECTED' | translate) }}
                         </p>
                       </div>
@@ -380,15 +380,15 @@ import { firstValueFrom } from 'rxjs';
 
             <app-card>
               <app-card-content customClass="p-6">
-                <h3 class="text-lg font-bold text-gray-900 mb-4">{{ 'PROFILE.SECURITY' | translate }}</h3>
+                <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4">{{ 'PROFILE.SECURITY' | translate }}</h3>
                 <button
                   (click)="showPasswordModal.set(true)"
-                  class="w-full flex items-center gap-3 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-left"
+                  class="w-full flex items-center gap-3 p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors text-left"
                 >
-                  <lucide-icon name="key" class="h-5 w-5 text-gray-500"></lucide-icon>
+                  <lucide-icon name="key" class="h-5 w-5 text-gray-500 dark:text-gray-400"></lucide-icon>
                   <div>
-                    <p class="text-sm font-medium text-gray-900">{{ 'PROFILE.CHANGE_PASSWORD' | translate }}</p>
-                    <p class="text-xs text-gray-500">
+                    <p class="text-sm font-medium text-gray-900 dark:text-gray-100">{{ 'PROFILE.CHANGE_PASSWORD' | translate }}</p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">
                       {{ 'PROFILE.CHANGE_PASSWORD_DESC' | translate }}
                     </p>
                   </div>
@@ -406,25 +406,25 @@ import { firstValueFrom } from 'rxjs';
           (click)="closeAvatarModal()"
         >
           <div
-            class="bg-white rounded-xl shadow-xl max-w-md w-full mx-4 p-6"
+            class="bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-md w-full mx-4 p-6"
             (click)="$event.stopPropagation()"
           >
             <div class="flex items-center justify-between mb-4">
-              <h3 class="text-lg font-bold text-gray-900">{{ 'PROFILE.UPDATE_PICTURE' | translate }}</h3>
-              <button (click)="closeAvatarModal()" class="text-gray-400 hover:text-gray-600">
+              <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100">{{ 'PROFILE.UPDATE_PICTURE' | translate }}</h3>
+              <button (click)="closeAvatarModal()" class="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300">
                 <lucide-icon name="x" class="h-5 w-5"></lucide-icon>
               </button>
             </div>
 
             <!-- Tabs -->
-            <div class="flex border-b border-gray-200 mb-4">
+            <div class="flex border-b border-gray-200 dark:border-gray-700 mb-4">
               <button
                 (click)="uploadMode.set('file')"
                 [class]="
                   'flex-1 py-2 text-sm font-medium border-b-2 transition-colors ' +
                   (uploadMode() === 'file'
-                    ? 'border-[#155347] text-[#155347]'
-                    : 'border-transparent text-gray-500 hover:text-gray-700')
+                    ? 'border-[#155347] text-[#155347] dark:text-emerald-400'
+                    : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200')
                 "
               >
                 {{ 'PROFILE.UPLOAD_FILE' | translate }}
@@ -434,8 +434,8 @@ import { firstValueFrom } from 'rxjs';
                 [class]="
                   'flex-1 py-2 text-sm font-medium border-b-2 transition-colors ' +
                   (uploadMode() === 'url'
-                    ? 'border-[#155347] text-[#155347]'
-                    : 'border-transparent text-gray-500 hover:text-gray-700')
+                    ? 'border-[#155347] text-[#155347] dark:text-emerald-400'
+                    : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200')
                 "
               >
                 {{ 'PROFILE.IMAGE_URL_TAB' | translate }}
@@ -446,13 +446,13 @@ import { firstValueFrom } from 'rxjs';
               <!-- File Upload Mode -->
               @if (uploadMode() === 'file') {
                 <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2">Choose Image</label>
+                  <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Choose Image</label>
                   <div
                     [class]="
                       'border-2 border-dashed rounded-lg p-6 text-center transition-colors cursor-pointer ' +
                       (isDragging()
                         ? 'border-[#155347] bg-[#155347]/5'
-                        : 'border-gray-300 hover:border-[#155347]')
+                        : 'border-gray-300 dark:border-gray-600 hover:border-[#155347]')
                     "
                     (click)="fileInput.click()"
                     (dragover)="onDragOver($event)"
@@ -470,10 +470,10 @@ import { firstValueFrom } from 'rxjs';
                       [name]="isDragging() ? 'image' : 'upload'"
                       [class]="
                         'h-8 w-8 mx-auto mb-2 ' +
-                        (isDragging() ? 'text-[#155347]' : 'text-gray-400')
+                        (isDragging() ? 'text-[#155347] dark:text-emerald-400' : 'text-gray-400')
                       "
                     ></lucide-icon>
-                    <p class="text-sm text-gray-600">
+                    <p class="text-sm text-gray-600 dark:text-gray-400">
                       {{ isDragging() ? ('PROFILE.DROP_IMAGE' | translate) : ('PROFILE.CLICK_OR_DRAG' | translate) }}
                     </p>
                     <p class="text-xs text-gray-400 mt-1">{{ 'PROFILE.FILE_CONSTRAINTS' | translate }}</p>
@@ -486,11 +486,11 @@ import { firstValueFrom } from 'rxjs';
 
                 @if (filePreview()) {
                   <div class="text-center">
-                    <p class="text-sm text-gray-500 mb-2">{{ 'PROFILE.PREVIEW' | translate }}</p>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-2">{{ 'PROFILE.PREVIEW' | translate }}</p>
                     <img
                       [src]="filePreview()"
                       alt="Preview"
-                      class="h-20 w-20 rounded-full object-cover mx-auto border-2 border-gray-200"
+                      class="h-20 w-20 rounded-full object-cover mx-auto border-2 border-gray-200 dark:border-gray-700"
                     />
                     @if (selectedFile()) {
                       <p class="text-xs text-gray-400 mt-2">{{ selectedFile()?.name }}</p>
@@ -502,22 +502,22 @@ import { firstValueFrom } from 'rxjs';
               <!-- URL Mode -->
               @if (uploadMode() === 'url') {
                 <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2">Image URL</label>
+                  <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Image URL</label>
                   <input
                     type="url"
                     [(ngModel)]="avatarUrl"
                     placeholder="https://example.com/image.jpg"
-                    class="w-full h-10 px-4 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#155347] text-sm"
+                    class="w-full h-10 px-4 rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#155347] text-sm"
                   />
                 </div>
 
                 @if (avatarUrl) {
                   <div class="text-center">
-                    <p class="text-sm text-gray-500 mb-2">{{ 'PROFILE.PREVIEW' | translate }}</p>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-2">{{ 'PROFILE.PREVIEW' | translate }}</p>
                     <img
                       [src]="avatarUrl"
                       alt="Preview"
-                      class="h-20 w-20 rounded-full object-cover mx-auto border-2 border-gray-200"
+                      class="h-20 w-20 rounded-full object-cover mx-auto border-2 border-gray-200 dark:border-gray-700"
                       (error)="avatarUrlError.set(true)"
                       (load)="avatarUrlError.set(false)"
                     />
@@ -557,36 +557,36 @@ import { firstValueFrom } from 'rxjs';
           (click)="closePasswordModal()"
         >
           <div
-            class="bg-white rounded-xl shadow-xl max-w-md w-full mx-4 p-6"
+            class="bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-md w-full mx-4 p-6"
             (click)="$event.stopPropagation()"
           >
             <div class="flex items-center justify-between mb-4">
-              <h3 class="text-lg font-bold text-gray-900">{{ 'PROFILE.CHANGE_PASSWORD' | translate }}</h3>
-              <button (click)="closePasswordModal()" class="text-gray-400 hover:text-gray-600">
+              <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100">{{ 'PROFILE.CHANGE_PASSWORD' | translate }}</h3>
+              <button (click)="closePasswordModal()" class="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300">
                 <lucide-icon name="x" class="h-5 w-5"></lucide-icon>
               </button>
             </div>
 
             @if (passwordError()) {
-              <div class="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+              <div class="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-red-700 dark:text-red-300 text-sm">
                 {{ passwordError() }}
               </div>
             }
 
             <div class="space-y-4">
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">{{ 'PROFILE.CURRENT_PASSWORD' | translate }}</label>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{{ 'PROFILE.CURRENT_PASSWORD' | translate }}</label>
                 <div class="relative">
                   <input
                     [type]="showCurrentPassword() ? 'text' : 'password'"
                     [ngModel]="currentPassword()"
                     (ngModelChange)="currentPassword.set($event)"
-                    class="w-full h-10 px-4 pr-10 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#155347] text-sm"
+                    class="w-full h-10 px-4 pr-10 rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#155347] text-sm"
                   />
                   <button
                     type="button"
                     (click)="showCurrentPassword.set(!showCurrentPassword())"
-                    class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300"
                   >
                     <lucide-icon
                       [name]="showCurrentPassword() ? 'eye-off' : 'eye'"
@@ -597,18 +597,18 @@ import { firstValueFrom } from 'rxjs';
               </div>
 
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">{{ 'PROFILE.NEW_PASSWORD' | translate }}</label>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{{ 'PROFILE.NEW_PASSWORD' | translate }}</label>
                 <div class="relative">
                   <input
                     [type]="showNewPassword() ? 'text' : 'password'"
                     [ngModel]="newPassword()"
                     (ngModelChange)="newPassword.set($event)"
-                    class="w-full h-10 px-4 pr-10 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#155347] text-sm"
+                    class="w-full h-10 px-4 pr-10 rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#155347] text-sm"
                   />
                   <button
                     type="button"
                     (click)="showNewPassword.set(!showNewPassword())"
-                    class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300"
                   >
                     <lucide-icon
                       [name]="showNewPassword() ? 'eye-off' : 'eye'"
@@ -627,7 +627,7 @@ import { firstValueFrom } from 'rxjs';
                     @if (passwordValidations().length) {
                       <lucide-icon name="check" class="h-3 w-3"></lucide-icon>
                     } @else {
-                      <div class="h-3 w-3 rounded-full border border-gray-300"></div>
+                      <div class="h-3 w-3 rounded-full border border-gray-300 dark:border-gray-600"></div>
                     }
                     <span>{{ 'PROFILE.MIN_CHARS' | translate }}</span>
                   </div>
@@ -640,7 +640,7 @@ import { firstValueFrom } from 'rxjs';
                     @if (passwordValidations().number) {
                       <lucide-icon name="check" class="h-3 w-3"></lucide-icon>
                     } @else {
-                      <div class="h-3 w-3 rounded-full border border-gray-300"></div>
+                      <div class="h-3 w-3 rounded-full border border-gray-300 dark:border-gray-600"></div>
                     }
                     <span>{{ 'PROFILE.AT_LEAST_NUMBER' | translate }}</span>
                   </div>
@@ -653,7 +653,7 @@ import { firstValueFrom } from 'rxjs';
                     @if (passwordValidations().special) {
                       <lucide-icon name="check" class="h-3 w-3"></lucide-icon>
                     } @else {
-                      <div class="h-3 w-3 rounded-full border border-gray-300"></div>
+                      <div class="h-3 w-3 rounded-full border border-gray-300 dark:border-gray-600"></div>
                     }
                     <span>{{ 'PROFILE.ONE_SPECIAL' | translate }}</span>
                   </div>
@@ -666,7 +666,7 @@ import { firstValueFrom } from 'rxjs';
                     @if (passwordValidations().match) {
                       <lucide-icon name="check" class="h-3 w-3"></lucide-icon>
                     } @else {
-                      <div class="h-3 w-3 rounded-full border border-gray-300"></div>
+                      <div class="h-3 w-3 rounded-full border border-gray-300 dark:border-gray-600"></div>
                     }
                     <span>{{ 'PROFILE.PASSWORDS_MATCH' | translate }}</span>
                   </div>
@@ -674,7 +674,7 @@ import { firstValueFrom } from 'rxjs';
               </div>
 
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2"
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
                   >{{ 'PROFILE.CONFIRM_NEW_PASSWORD' | translate }}</label
                 >
                 <div class="relative">
@@ -683,16 +683,16 @@ import { firstValueFrom } from 'rxjs';
                     [ngModel]="confirmNewPassword()"
                     (ngModelChange)="confirmNewPassword.set($event)"
                     [class]="
-                      'w-full h-10 px-4 pr-10 rounded-lg border focus:outline-none focus:ring-2 focus:ring-[#155347] text-sm ' +
+                      'w-full h-10 px-4 pr-10 rounded-lg border focus:outline-none focus:ring-2 focus:ring-[#155347] text-sm dark:bg-gray-700 dark:text-gray-100 ' +
                       (confirmNewPassword() && !passwordValidations().match
                         ? 'border-red-300'
-                        : 'border-gray-300')
+                        : 'border-gray-300 dark:border-gray-600')
                     "
                   />
                   <button
                     type="button"
                     (click)="showConfirmPassword.set(!showConfirmPassword())"
-                    class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300"
                   >
                     <lucide-icon
                       [name]="showConfirmPassword() ? 'eye-off' : 'eye'"
@@ -726,17 +726,17 @@ import { firstValueFrom } from 'rxjs';
           (click)="showPasswordConfirmModal.set(false)"
         >
           <div
-            class="bg-white rounded-xl shadow-xl max-w-sm w-full mx-4 p-6"
+            class="bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-sm w-full mx-4 p-6"
             (click)="$event.stopPropagation()"
           >
             <div class="text-center mb-4">
               <div
-                class="h-12 w-12 rounded-full bg-yellow-100 flex items-center justify-center mx-auto mb-4"
+                class="h-12 w-12 rounded-full bg-yellow-100 dark:bg-yellow-900/30 flex items-center justify-center mx-auto mb-4"
               >
                 <lucide-icon name="key" class="h-6 w-6 text-yellow-600"></lucide-icon>
               </div>
-              <h3 class="text-lg font-bold text-gray-900 mb-2">{{ 'PROFILE.CONFIRM_PASSWORD_CHANGE' | translate }}</h3>
-              <p class="text-sm text-gray-600">
+              <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100 mb-2">{{ 'PROFILE.CONFIRM_PASSWORD_CHANGE' | translate }}</h3>
+              <p class="text-sm text-gray-600 dark:text-gray-400">
                 {{ 'PROFILE.CONFIRM_PASSWORD_DESC' | translate }}
               </p>
             </div>
@@ -772,11 +772,11 @@ import { firstValueFrom } from 'rxjs';
       >
         <div class="space-y-4">
           <div
-            class="flex items-center justify-center w-12 h-12 mx-auto bg-yellow-100 rounded-full"
+            class="flex items-center justify-center w-12 h-12 mx-auto bg-yellow-100 dark:bg-yellow-900/30 rounded-full"
           >
             <lucide-icon name="triangle-alert" class="h-6 w-6 text-yellow-600"></lucide-icon>
           </div>
-          <p class="text-center text-gray-600">
+          <p class="text-center text-gray-600 dark:text-gray-400">
             @if (unlinkLastExternalDeletesAccount()) {
               {{ 'PROFILE.DISCONNECT_GOOGLE_ONLY' | translate }}
             } @else {
@@ -821,17 +821,17 @@ import { firstValueFrom } from 'rxjs';
           (click)="showConfirmModal.set(false)"
         >
           <div
-            class="bg-white rounded-xl shadow-xl max-w-sm w-full mx-4 p-6"
+            class="bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-sm w-full mx-4 p-6"
             (click)="$event.stopPropagation()"
           >
             <div class="text-center mb-4">
               <div
-                class="h-12 w-12 rounded-full bg-yellow-100 flex items-center justify-center mx-auto mb-4"
+                class="h-12 w-12 rounded-full bg-yellow-100 dark:bg-yellow-900/30 flex items-center justify-center mx-auto mb-4"
               >
                 <lucide-icon name="triangle-alert" class="h-6 w-6 text-yellow-600"></lucide-icon>
               </div>
-              <h3 class="text-lg font-bold text-gray-900 mb-2">{{ 'PROFILE.SAVE_CONFIRM_TITLE' | translate }}</h3>
-              <p class="text-sm text-gray-600">
+              <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100 mb-2">{{ 'PROFILE.SAVE_CONFIRM_TITLE' | translate }}</h3>
+              <p class="text-sm text-gray-600 dark:text-gray-400">
                 {{ 'PROFILE.SAVE_CONFIRM_DESC' | translate }}
               </p>
             </div>

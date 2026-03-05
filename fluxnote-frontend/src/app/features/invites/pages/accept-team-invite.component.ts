@@ -17,14 +17,14 @@ import { TeamInviteDto, AcceptTeamInviteResponse } from '../../../core/models/te
     CardContentComponent
   ],
   template: `
-    <div class="min-h-screen bg-[#f5f7f6] flex items-center justify-center p-6">
+    <div class="min-h-screen bg-[#f5f7f6] dark:bg-gray-900 flex items-center justify-center p-6">
       <div class="w-full max-w-md">
         <div class="text-center mb-6">
           <div class="mx-auto h-12 w-12 rounded-full bg-[#155347] text-white flex items-center justify-center">
             <lucide-icon name="file-text" class="h-6 w-6"></lucide-icon>
           </div>
-          <h1 class="mt-4 text-xl font-bold text-gray-900">Team Invite</h1>
-          <p class="text-sm text-gray-500">Access your team in seconds.</p>
+          <h1 class="mt-4 text-xl font-bold text-gray-900 dark:text-gray-100">Team Invite</h1>
+          <p class="text-sm text-gray-500 dark:text-gray-400">Access your team in seconds.</p>
         </div>
 
         @if (loading()) {
@@ -32,7 +32,7 @@ import { TeamInviteDto, AcceptTeamInviteResponse } from '../../../core/models/te
             <app-card-content>
               <div class="flex flex-col items-center justify-center py-8 gap-3">
                 <lucide-icon name="loader-circle" class="h-8 w-8 text-[#155347] animate-spin"></lucide-icon>
-                <p class="text-sm text-gray-500">Loading invite...</p>
+                <p class="text-sm text-gray-500 dark:text-gray-400">Loading invite...</p>
               </div>
             </app-card-content>
           </app-card>
@@ -43,8 +43,8 @@ import { TeamInviteDto, AcceptTeamInviteResponse } from '../../../core/models/te
             <app-card-content>
               <div class="text-center py-8">
                 <lucide-icon name="circle-alert" class="h-10 w-10 text-red-500 mx-auto mb-4"></lucide-icon>
-                <h2 class="text-lg font-semibold text-gray-900 mb-2">Invite Not Available</h2>
-                <p class="text-sm text-gray-500 mb-6">{{ error() }}</p>
+                <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">Invite Not Available</h2>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">{{ error() }}</p>
                 <app-button (click)="goToDashboard()">Go to Dashboard</app-button>
               </div>
             </app-card-content>
@@ -60,19 +60,19 @@ import { TeamInviteDto, AcceptTeamInviteResponse } from '../../../core/models/te
                     <lucide-icon name="mail" class="h-5 w-5"></lucide-icon>
                   </div>
                   <div>
-                    <h2 class="text-lg font-semibold text-gray-900">You’ve been invited</h2>
-                    <p class="text-sm text-gray-500">Join the team below.</p>
+                    <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100">You've been invited</h2>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Join the team below.</p>
                   </div>
                 </div>
-                <div class="bg-gray-50 rounded-lg p-4 mb-6 text-left space-y-3">
+                <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4 mb-6 text-left space-y-3">
                   <div>
-                    <span class="text-xs text-gray-500">Team</span>
-                    <p class="font-medium text-gray-900">{{ invite()!.teamName }}</p>
+                    <span class="text-xs text-gray-500 dark:text-gray-400">Team</span>
+                    <p class="font-medium text-gray-900 dark:text-gray-100">{{ invite()!.teamName }}</p>
                   </div>
                   @if(invite()!.createdByName){
                   <div>
-                    <span class="text-xs text-gray-500">Invited by</span>
-                    <p class="font-medium text-gray-900">{{ invite()!.createdByName }}</p>
+                    <span class="text-xs text-gray-500 dark:text-gray-400">Invited by</span>
+                    <p class="font-medium text-gray-900 dark:text-gray-100">{{ invite()!.createdByName }}</p>
                   </div>
                   }
                 </div>
@@ -92,8 +92,8 @@ import { TeamInviteDto, AcceptTeamInviteResponse } from '../../../core/models/te
             <app-card-content>
               <div class="text-center py-8">
                 <lucide-icon name="badge-check" class="h-10 w-10 text-emerald-600 mx-auto mb-4"></lucide-icon>
-                <h2 class="text-lg font-semibold text-gray-900 mb-2">Invite accepted</h2>
-                <p class="text-sm text-gray-500 mb-2">
+                <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">Invite accepted</h2>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mb-2">
                   You now have access to <strong>{{ acceptResult()!.teamName }}</strong>
                 </p>                
                 <div class="flex gap-3 justify-center">
