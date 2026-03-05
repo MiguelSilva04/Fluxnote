@@ -199,6 +199,21 @@
       "SUCCESS": "Account created successfully! Please check your email to confirm.",
       "FAILED": "Failed to create account. Please try again."
     },
+    "CONFIRM_EMAIL": {
+      "TITLE": "Email Confirmation",
+      "LOADING": "Confirming your email...",
+      "SUCCESS": "Email confirmed successfully!",
+      "GO_TO_LOGIN": "Go to Login",
+      "INVALID_PARAMS": "Invalid confirmation link (missing parameters).",
+      "FAILED": "Failed to confirm email."
+    },
+    "PENDING_EMAIL": {
+      "TITLE": "Confirm your email",
+      "SUBTITLE": "We've sent a confirmation link to",
+      "LOADING": "Loading...",
+      "CONFIRM_BTN": "Confirm email",
+      "CHECK_INBOX": "Check your inbox and click the confirmation link to activate your account."
+    },
     "FORGOT_PASSWORD": {
       "BACK_LOGIN": "Back to Login",
       "TITLE": "Reset Password",

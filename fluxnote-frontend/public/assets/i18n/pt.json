@@ -199,6 +199,21 @@
       "SUCCESS": "Conta criada com sucesso! Verifique o seu email para confirmar.",
       "FAILED": "Falha ao criar conta. Por favor, tente novamente."
     },
+    "CONFIRM_EMAIL": {
+      "TITLE": "Confirmação de Email",
+      "LOADING": "A confirmar o seu email...",
+      "SUCCESS": "Email confirmado com sucesso!",
+      "GO_TO_LOGIN": "Ir para Login",
+      "INVALID_PARAMS": "Link de confirmação inválido (parâmetros em falta).",
+      "FAILED": "Falha ao confirmar email."
+    },
+    "PENDING_EMAIL": {
+      "TITLE": "Confirme o seu email",
+      "SUBTITLE": "Enviámos um link de confirmação para",
+      "LOADING": "A carregar...",
+      "CONFIRM_BTN": "Confirmar email",
+      "CHECK_INBOX": "Verifique a sua caixa de entrada e clique no link de confirmação para ativar a sua conta."
+    },
     "FORGOT_PASSWORD": {
       "BACK_LOGIN": "Voltar ao Login",
       "TITLE": "Recuperar Palavra-passe",

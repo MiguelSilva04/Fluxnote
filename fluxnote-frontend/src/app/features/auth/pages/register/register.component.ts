@@ -140,18 +140,30 @@ import { ToastService } from '../../../../shared/services/toast.service';
             </div>
 
             <div class="space-y-2">
-              <app-input
-                [label]="'AUTH.REGISTER.CONFIRM_PASSWORD' | translate"
-                type="password"
-                [placeholder]="'AUTH.LOGIN.PASSWORD_PLACEHOLDER' | translate"
-                [ngModel]="confirmPassword()"
-                (ngModelChange)="confirmPassword.set($event)"
-                name="confirmPassword"
-                [required]="true"
-                [customClass]="
-                  !validations().match && confirmPassword() ? 'border-red-300' : ''
-                "
-              ></app-input>
+              <div class="relative">
+                <app-input
+                  [label]="'AUTH.REGISTER.CONFIRM_PASSWORD' | translate"
+                  [type]="showConfirmPassword() ? 'text' : 'password'"
+                  [placeholder]="'AUTH.LOGIN.PASSWORD_PLACEHOLDER' | translate"
+                  [ngModel]="confirmPassword()"
+                  (ngModelChange)="confirmPassword.set($event)"
+                  name="confirmPassword"
+                  [required]="true"
+                  [customClass]="
+                    !validations().match && confirmPassword() ? 'border-red-300' : ''
+                  "
+                ></app-input>
+                <button
+                  type="button"
+                  (click)="showConfirmPassword.set(!showConfirmPassword())"
+                  class="absolute right-3 top-[38px] text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                >
+                  <lucide-icon
+                    [name]="showConfirmPassword() ? 'eye-off' : 'eye'"
+                    class="h-4 w-4"
+                  ></lucide-icon>
+                </button>
+              </div>
               @if (confirmPassword() && !validations().match) {
                 <p class="text-xs text-red-500 pl-1">{{ 'AUTH.REGISTER.PASSWORDS_NO_MATCH' | translate }}</p>
               }
@@ -241,6 +253,7 @@ export class RegisterComponent {
   private translateService = inject(TranslateService);
 
   showPassword = signal(false);
+  showConfirmPassword = signal(false);
   isLoading = this.authService.isLoading;
   
   // Campos reativos usando signals
@@ -299,7 +312,7 @@ export class RegisterComponent {
       this.toastService.error(result.message || this.translateService.instant('TOASTS.REGISTER_FAILED'));
     } else {
       // sucesso
-      this.toastService.success(result.message || this.translateService.instant('TOASTS.REGISTER_SUCCESS'));
+      this.toastService.success(this.translateService.instant('TOASTS.REGISTER_SUCCESS'));
       this.router.navigate(['/pending-email'], {
         queryParams: { email: this.email() },
         state: { fromRegistration: true }

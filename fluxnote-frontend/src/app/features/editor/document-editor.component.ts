@@ -157,13 +157,13 @@ import { diffWords } from 'diff';
                             <div class="font-medium text-gray-900 dark:text-gray-100">
                               {{ inv.role === 1 ? ('DOCUMENT_EDITOR.EDITOR_INVITE' | translate) : ('DOCUMENT_EDITOR.VIEWER_INVITE' | translate) }}
                             </div>
-                            <div class="text-xs text-gray-500">
-                              {{ 'DOCUMENT_EDITOR.EXPIRES' | translate }} {{ inv.expiresAt | date: 'MMM d, y' }}
+                            <div class="text-xs text-gray-500 dark:text-gray-400">
+                              {{ 'DOCUMENT_EDITOR.EXPIRES' | translate }} {{ inv.expiresAt | date: 'dd/MM/yyyy' }}
                             </div>
                           </div>
                           <button
                             (click)="copyInviteUrl(inv.id, inv.inviteUrl)"
-                            class="text-xs font-medium text-gray-700 hover:text-gray-900"
+                            class="text-xs font-medium text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-gray-100"
                           >
                             {{ lastCopiedInviteId() === inv.id ? ('DOCUMENT_EDITOR.COPIED' | translate) : ('DOCUMENT_EDITOR.COPY_LINK' | translate) }}
                           </button>
