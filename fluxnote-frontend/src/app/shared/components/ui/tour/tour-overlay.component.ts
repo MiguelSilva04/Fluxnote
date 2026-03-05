@@ -10,6 +10,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LucideAngularModule } from 'lucide-angular';
+import { TranslateModule } from '@ngx-translate/core';
 import { TourService } from '../../../services/tour.service';
 import { TourPosition, ScreenPosition } from './tour.models';
 
@@ -28,7 +29,7 @@ interface TooltipPos {
 @Component({
   selector: 'app-tour-overlay',
   standalone: true,
-  imports: [CommonModule, LucideAngularModule],
+  imports: [CommonModule, LucideAngularModule, TranslateModule],
   template: `
     @if (tourService.isActive()) {
       <!-- Overlay SVG com recorte de spotlight -->
@@ -39,12 +40,7 @@ interface TooltipPos {
         (click)="onBackdropClick()"
         role="dialog"
         aria-modal="true"
-        [attr.aria-label]="
-          'Guided tour step ' +
-          (tourService.currentStepIndex() + 1) +
-          ' of ' +
-          tourService.totalSteps()
-        "
+        [attr.aria-label]="'TOUR.ARIA_LABEL' | translate:{ current: tourService.currentStepIndex() + 1, total: tourService.totalSteps() }"
       >
         <svg
           class="absolute inset-0 w-full h-full"
@@ -116,7 +112,7 @@ interface TooltipPos {
                 <button
                   (click)="tourService.skip()"
                   class="text-gray-400 hover:text-gray-600 transition-colors p-1 rounded-md hover:bg-gray-100 -mt-1 -mr-1"
-                  aria-label="Skip tour"
+                  [attr.aria-label]="'TOUR.SKIP' | translate"
                 >
                   <lucide-icon name="x" [size]="16"></lucide-icon>
                 </button>
@@ -132,8 +128,7 @@ interface TooltipPos {
               <!-- Rodapé -->
               <div class="flex items-center justify-between">
                 <span class="text-xs text-gray-400 font-medium">
-                  {{ tourService.currentStepIndex() + 1 }} of
-                  {{ tourService.totalSteps() }}
+                  {{ 'TOUR.STEP_OF' | translate:{ current: tourService.currentStepIndex() + 1, total: tourService.totalSteps() } }}
                 </span>
 
                 <div class="flex items-center gap-2">
@@ -142,7 +137,7 @@ interface TooltipPos {
                       (click)="tourService.previous()"
                       class="px-3 py-1.5 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
                     >
-                      Previous
+                      {{ 'TOUR.PREVIOUS' | translate }}
                     </button>
                   }
 
@@ -151,14 +146,14 @@ interface TooltipPos {
                       (click)="tourService.finish()"
                       class="px-4 py-1.5 text-sm font-medium text-white bg-primary hover:bg-primary/90 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
                     >
-                      Finish
+                      {{ 'TOUR.FINISH' | translate }}
                     </button>
                   } @else {
                     <button
                       (click)="tourService.next()"
                       class="inline-flex items-center px-4 py-1.5 text-sm font-medium text-white bg-primary hover:bg-primary/90 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
                     >
-                      Next
+                      {{ 'TOUR.NEXT' | translate }}
                       <lucide-icon
                         name="arrow-right"
                         [size]="14"

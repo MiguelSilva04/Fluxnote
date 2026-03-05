@@ -13,7 +13,7 @@ import { TourOverlayComponent } from './shared/components/ui/tour/tour-overlay.c
     <!-- Loading bar durante navegação -->
     @if (isNavigating()) {
       <div class="fixed top-0 left-0 right-0 z-[9999]">
-        <div class="h-1 bg-[#155347] animate-loading-bar"></div>
+        <div class="h-1 bg-[#155347] dark:bg-emerald-400 animate-loading-bar"></div>
       </div>
     }
     <router-outlet></router-outlet>

@@ -7,16 +7,16 @@ import { LandingHeaderComponent, LandingFooterComponent } from '../components';
   standalone: true,
   imports: [CommonModule, LandingHeaderComponent, LandingFooterComponent],
   template: `
-    <div class="min-h-screen bg-white">
+    <div class="min-h-screen bg-white dark:bg-gray-900">
       <app-landing-header></app-landing-header>
 
-      <section class="py-20 bg-gradient-to-br from-[#155347]/10 to-white">
+      <section class="py-20 bg-gradient-to-br from-[#155347]/10 to-white dark:to-gray-900">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div class="text-center mb-16">
-            <h1 class="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
+            <h1 class="text-4xl lg:text-5xl font-bold text-gray-900 dark:text-gray-100 mb-6">
               Fluxnote Blog
             </h1>
-            <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+            <p class="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
               Insights, tips, and updates on collaboration, artificial intelligence,
               and productivity in modern work.
             </p>
@@ -27,7 +27,7 @@ import { LandingHeaderComponent, LandingFooterComponent } from '../components';
             @for (category of categories; track category) {
               <button
                 (click)="selectCategory(category)"
-                [class]="'px-6 py-2 rounded-full font-medium transition-colors cursor-pointer ' + (selectedCategory() === category ? 'bg-[#155347] text-white' : 'bg-white text-gray-600 hover:bg-[#155347]/10 hover:text-[#155347] border border-gray-200')"
+                [class]="'px-6 py-2 rounded-full font-medium transition-colors cursor-pointer ' + (selectedCategory() === category ? 'bg-[#155347] text-white' : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-[#155347]/10 hover:text-[#155347] dark:hover:text-emerald-400 border border-gray-200 dark:border-gray-700')"
               >
                 {{ category }}
               </button>
@@ -36,7 +36,7 @@ import { LandingHeaderComponent, LandingFooterComponent } from '../components';
 
           <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             @for (post of filteredPosts(); track post.title) {
-              <article class="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-shadow overflow-hidden">
+              <article class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-xl transition-shadow overflow-hidden">
                 <div class="relative">
                   <img
                     [src]="post.image"
@@ -51,21 +51,21 @@ import { LandingHeaderComponent, LandingFooterComponent } from '../components';
                 </div>
 
                 <div class="p-6">
-                  <div class="flex items-center text-sm text-gray-500 mb-3">
+                  <div class="flex items-center text-sm text-gray-500 dark:text-gray-400 mb-3">
                     <span>{{ post.date }}</span>
                     <span class="mx-2">•</span>
                     <span>{{ post.readTime }} read</span>
                   </div>
 
-                  <h2 class="text-xl font-bold text-gray-900 mb-3 line-clamp-2">
+                  <h2 class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-3 line-clamp-2">
                     {{ post.title }}
                   </h2>
 
-                  <p class="text-gray-600 mb-4 line-clamp-3">
+                  <p class="text-gray-600 dark:text-gray-400 mb-4 line-clamp-3">
                     {{ post.excerpt }}
                   </p>
 
-                  <button class="text-[#155347] font-semibold hover:text-[#155347] transition-colors cursor-pointer">
+                  <button class="text-[#155347] dark:text-emerald-400 font-semibold hover:text-[#155347] dark:hover:text-emerald-400 transition-colors cursor-pointer">
                     Read more →
                   </button>
                 </div>
@@ -73,8 +73,8 @@ import { LandingHeaderComponent, LandingFooterComponent } from '../components';
             }
           </div>
 
-          <div class="mt-16 bg-gray-50 rounded-2xl p-8 text-center">
-            <h2 class="text-2xl font-bold text-gray-900 mb-4">
+          <div class="mt-16 bg-gray-50 dark:bg-gray-800 rounded-2xl p-8 text-center">
+            <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">
               Don’t miss a post
             </h2>
             <p class="text-black mb-6">
@@ -84,7 +84,7 @@ import { LandingHeaderComponent, LandingFooterComponent } from '../components';
               <input
                 type="email"
                 placeholder="Your email"
-                class="flex-1 px-4 py-3 border text-black border-gray-300 rounded-l-xl focus:outline-none focus:ring-2 focus:ring-[#155347]"
+                class="flex-1 px-4 py-3 border text-black border-gray-300 dark:border-gray-600 rounded-l-xl focus:outline-none focus:ring-2 focus:ring-[#155347]"
               />
               <button class="bg-[#155347] text-white px-6 py-3 rounded-r-xl font-semibold hover:bg-[#155347] transition-colors cursor-pointer">
                 Subscribe

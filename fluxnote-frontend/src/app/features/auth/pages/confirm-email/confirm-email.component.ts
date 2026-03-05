@@ -9,13 +9,13 @@ import { CardComponent, CardContentComponent, ButtonComponent } from '../../../.
   standalone: true,
   imports: [CommonModule, RouterLink, CardComponent, CardContentComponent, ButtonComponent],
   template: `
-    <div class="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+    <div class="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center p-4">
       <app-card customClass="w-full max-w-md shadow-xl border-0">
         <app-card-content customClass="p-8">
-          <h1 class="text-2xl font-bold text-gray-900 mb-2">Email confirmation</h1>
+          <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">Email confirmation</h1>
 
           @if (loading()) {
-            <p class="text-gray-600">Confirming...</p>
+            <p class="text-gray-600 dark:text-gray-400">Confirming...</p>
           } @else if (error()) {
             <p class="text-red-600">{{ error() }}</p>
           } @else {

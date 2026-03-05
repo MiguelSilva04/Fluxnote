@@ -17,7 +17,7 @@ import { LucideAngularModule } from 'lucide-angular';
   template: `
     <div class="w-full">
       @if (label) {
-        <label [for]="inputId" class="block text-sm font-medium text-gray-700 mb-1.5">
+        <label [for]="inputId" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
           {{ label }}
         </label>
       }
@@ -84,15 +84,15 @@ export class InputComponent implements ControlValueAccessor {
   onTouched: () => void = () => {};
 
   get inputClasses(): string {
-    const baseClasses = 'flex h-10 w-full rounded-lg border bg-white px-3 py-2 text-sm ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 transition-all';
+    const baseClasses = 'flex h-10 w-full rounded-lg border bg-white dark:bg-gray-700 px-3 py-2 text-sm ring-offset-white dark:ring-offset-gray-900 file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-500 dark:placeholder:text-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 transition-all';
     const paddingLeft = this.hasLeftIcon ? 'pl-10' : '';
     const paddingRight = this.hasRightIcon ? 'pr-10' : '';
 
-    let stateClasses = 'border-gray-300 focus-visible:ring-[#155347] text-gray-900';
+    let stateClasses = 'border-gray-300 dark:border-gray-600 focus-visible:ring-[#155347] text-gray-900 dark:text-gray-100';
     if (this.error) {
-      stateClasses = 'border-red-300 focus-visible:ring-red-500 text-red-900';
+      stateClasses = 'border-red-300 dark:border-red-600 focus-visible:ring-red-500 text-red-900 dark:text-red-400';
     } else if (this.success) {
-      stateClasses = 'border-green-300 focus-visible:ring-green-500 text-green-900';
+      stateClasses = 'border-green-300 dark:border-green-600 focus-visible:ring-green-500 text-green-900 dark:text-green-400';
     }
 
     return `${baseClasses} ${paddingLeft} ${paddingRight} ${stateClasses} ${this.customClass}`;

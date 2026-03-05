@@ -13,6 +13,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { LucideAngularModule } from 'lucide-angular';
+import { TranslateModule } from '@ngx-translate/core';
 import Quill from 'quill';
 import { Subject, debounceTime, takeUntil } from 'rxjs';
 
@@ -87,7 +88,7 @@ const COLLABORATOR_COLORS = [
 @Component({
   selector: 'app-rich-text-editor',
   standalone: true,
-  imports: [CommonModule, FormsModule, LucideAngularModule],
+  imports: [CommonModule, FormsModule, LucideAngularModule, TranslateModule],
   templateUrl: './text-editor.html',
   styleUrls: ['./text-editor.styles.css'],
 })
@@ -738,8 +739,8 @@ export class TextEditorComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   getToolbarButtonClass(isActive: boolean | string | undefined): string {
-    const base = 'p-2 rounded hover:bg-gray-100 transition-colors';
-    return isActive ? `${base} bg-[#e8f0ee] text-[#155347]` : `${base} text-gray-600`;
+    const base = 'p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors';
+    return isActive ? `${base} bg-[#e8f0ee] dark:bg-[#155347]/20 text-[#155347] dark:text-[#4ade80]` : `${base} text-gray-600 dark:text-gray-400`;
   }
 
   getContent(): string {

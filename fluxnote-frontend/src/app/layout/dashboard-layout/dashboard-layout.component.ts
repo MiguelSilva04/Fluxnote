@@ -16,7 +16,7 @@ import { SettingsPanelComponent, ProfilePanelComponent, NotificationsPanelCompon
     NotificationsPanelComponent
   ],
   template: `
-    <div class="min-h-screen bg-gray-50 flex">
+    <div class="min-h-screen bg-gray-50 dark:bg-gray-900 flex">
       <app-sidebar></app-sidebar>
       <div class="flex-1 flex flex-col lg:ml-64 min-w-0">
         <app-header></app-header>

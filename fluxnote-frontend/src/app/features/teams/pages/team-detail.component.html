@@ -1,8 +1,8 @@
 <app-dashboard-layout>
   @if (loading()) {
     <div class="flex items-center justify-center h-[60vh]">
-      <div class="text-gray-500 text-sm animate-pulse">
-        Loading team details...
+      <div class="text-gray-500 dark:text-gray-400 text-sm animate-pulse">
+        {{ 'TEAM_DETAIL.LOADING' | translate }}
       </div>
     </div>
   }
@@ -11,8 +11,8 @@
 
       <!-- Header -->
       <div class="flex items-center gap-3 mb-6 sm:mb-8">
-        <button (click)="goBack()" class="p-2 hover:bg-gray-100 rounded-lg transition-colors flex-shrink-0">
-          <lucide-icon name="arrow-left" class="h-5 w-5 text-gray-600"></lucide-icon>
+        <button (click)="goBack()" class="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors flex-shrink-0">
+          <lucide-icon name="arrow-left" class="h-5 w-5 text-gray-600 dark:text-gray-400"></lucide-icon>
         </button>
 
         <div class="flex items-center gap-3 sm:gap-4 flex-1 min-w-0">
@@ -24,7 +24,7 @@
             <div class="flex items-center flex-wrap gap-2 mb-1">
               @if (isEditingName()) {
                 <input
-                  class="text-xl sm:text-2xl font-bold text-gray-900 border-b-2 border-[#155347] bg-transparent outline-none min-w-0 flex-1"
+                  class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100 border-b-2 border-[#155347] bg-transparent outline-none min-w-0 flex-1"
                   [(ngModel)]="editNameValue"
                   (keydown.enter)="saveTeamName()"
                   (keydown.escape)="cancelEditName()"
@@ -34,36 +34,36 @@
                 <button
                   (click)="saveTeamName()"
                   [disabled]="isSavingName()"
-                  class="p-1 rounded hover:bg-gray-100 text-[#155347] transition-colors flex-shrink-0"
-                  title="Save"
+                  class="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-[#155347] dark:text-emerald-400 transition-colors flex-shrink-0"
+                  [title]="'TEAM_DETAIL.SAVE' | translate"
                 >
                   <lucide-icon name="check" class="h-4 w-4"></lucide-icon>
                 </button>
                 <button
                   (click)="cancelEditName()"
                   [disabled]="isSavingName()"
-                  class="p-1 rounded hover:bg-gray-100 text-gray-500 transition-colors flex-shrink-0"
-                  title="Cancel"
+                  class="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 transition-colors flex-shrink-0"
+                  [title]="'TEAM_DETAIL.CANCEL_EDIT' | translate"
                 >
                   <lucide-icon name="x" class="h-4 w-4"></lucide-icon>
                 </button>
               } @else {
-                <h1 class="text-xl sm:text-2xl font-bold text-gray-900 truncate">{{ selectedTeam()?.name ?? '' }}</h1>
+                <h1 class="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100 truncate">{{ selectedTeam()?.name ?? '' }}</h1>
                 @if (isOwner()) {
                   <button
                     (click)="startEditName()"
-                    class="p-1 rounded hover:bg-gray-100 transition-colors flex-shrink-0"
-                    title="Rename team"
+                    class="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors flex-shrink-0"
+                    [title]="'TEAM_DETAIL.RENAME_TEAM' | translate"
                   >
-                    <lucide-icon name="pencil" class="h-4 w-4 text-gray-400 hover:text-[#155347]"></lucide-icon>
+                    <lucide-icon name="pencil" class="h-4 w-4 text-gray-400 hover:text-[#155347] dark:hover:text-emerald-400"></lucide-icon>
                   </button>
                 }
-                <app-badge variant="default">Team</app-badge>
+                <app-badge variant="default">{{ 'TEAM_DETAIL.TEAM_BADGE' | translate }}</app-badge>
               }
             </div>
 
-            <p class="text-sm text-gray-600">
-              {{ selectedTeam()?.members?.length ?? 0 }} members
+            <p class="text-sm text-gray-600 dark:text-gray-400">
+              {{ 'TEAM_DETAIL.N_MEMBERS' | translate:{count: selectedTeam()?.members?.length ?? 0} }}
             </p>
           </div>
         </div>
@@ -76,30 +76,30 @@
           <app-card data-tour="team-members-section">
             <app-card-content customClass="p-6">
               <div class="flex items-center justify-between mb-6">
-                <h2 class="text-lg font-bold text-gray-900">Team Members</h2>
+                <h2 class="text-lg font-bold text-gray-900 dark:text-gray-100">{{ 'TEAM_DETAIL.MEMBERS_HEADING' | translate }}</h2>
                 @if (isOwnerOrAdmin()) {  
                 <button (click)="openTeamShareModal() "
                     class="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-white bg-[#155347] rounded-md hover:opacity-90 transition"
-                    title="Invite member"
+                    [title]="'TEAM_DETAIL.INVITE_TO_TEAM' | translate"
                   >
                   <lucide-icon name="user-plus" class="h-4 w-4"></lucide-icon>
-                    Invite to Team
+                    {{ 'TEAM_DETAIL.INVITE_TO_TEAM' | translate }}
                   </button>
                 }
               </div>
 
               <div class="space-y-3">
                 @for (member of selectedTeam()?.members ?? []; track member?.id ?? member?.email) {
-                  <div class="flex items-center justify-between gap-3 p-4 border border-gray-200 rounded-lg">
+                  <div class="flex items-center justify-between gap-3 p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
                     <div class="flex items-center gap-3 min-w-0 flex-1">
-                      <div class="h-8 w-8 rounded-full bg-gray-200 text-gray-700 flex items-center justify-center text-xs font-bold flex-shrink-0">
+                      <div class="h-8 w-8 rounded-full bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300 flex items-center justify-center text-xs font-bold flex-shrink-0">
                         {{ getInitials(member?.name ?? '') }}
                       </div>
                       <div class="min-w-0">
-                        <p class="text-sm font-medium text-gray-900 truncate">
+                        <p class="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
                           {{ member?.name }}
                         </p>
-                        <p class="text-xs text-gray-500 truncate">
+                        <p class="text-xs text-gray-500 dark:text-gray-400 truncate">
                           {{ member.email }}
                         </p>
                       </div>
@@ -111,14 +111,14 @@
                         <select
                           [ngModel]="member.role"
                           (ngModelChange)="onTeamRoleChange(member, $event)"
-                          class="text-xs border border-gray-300 rounded-md px-2 py-1 bg-white focus:outline-none focus:ring-1 focus:ring-[#155347]"
+                          class="text-xs border border-gray-300 dark:border-gray-600 rounded-md px-2 py-1 bg-white dark:bg-gray-700 dark:text-gray-100 focus:outline-none focus:ring-1 focus:ring-[#155347]"
                         >
-                          <option [ngValue]="0">Member</option>
-                          <option [ngValue]="1">Team Admin</option>
+                          <option [ngValue]="0">{{ 'ROLES.MEMBER' | translate }}</option>
+                          <option [ngValue]="1">{{ 'ROLES.TEAM_ADMIN' | translate }}</option>
                         </select>
                       } @else {
                         <app-badge variant="outline">
-                          {{ roleNames[member.role] }}
+                          {{ teamRoleKey(member.role) | translate }}
                         </app-badge>
                       }
 
@@ -127,7 +127,7 @@
                         <button
                           (click)="removeMember(member)"
                           class="p-1 text-gray-400 hover:text-red-500 transition-colors"
-                          title="Remove member"
+                          [title]="'TEAM_DETAIL.REMOVE_MEMBER_TITLE' | translate"
                         >
                           <lucide-icon name="x" class="h-4 w-4"></lucide-icon>
                         </button>
@@ -143,13 +143,13 @@
           @if (visibleDocuments().length) {
             <app-card data-tour="doc-permissions-section">
               <app-card-content customClass="p-6">
-                <h2 class="text-lg font-bold text-gray-900 mb-4">Document Permissions</h2>
+                <h2 class="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4">{{ 'TEAM_DETAIL.DOC_PERMS_HEADING' | translate }}</h2>
 
                 <div class="space-y-3">
                   <!-- Folders with documents -->
                   @for (folder of getVisibleFolders(); track folder.id) {
                     <div
-                      class="border border-gray-200 rounded-lg overflow-hidden transition-colors"
+                      class="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden transition-colors"
                       [class.ring-2]="dragOverTarget() === folder.id"
                       [class.ring-[#155347]]="dragOverTarget() === folder.id"
                       [class.bg-[#155347]/5]="dragOverTarget() === folder.id"
@@ -160,7 +160,7 @@
                       <!-- Folder Header -->
                       <div
                         (click)="togglePermFolder(folder.id)"
-                        class="flex items-center justify-between p-3 cursor-pointer hover:bg-gray-50 transition-colors bg-gray-50/50"
+                        class="flex items-center justify-between p-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors bg-gray-50/50 dark:bg-gray-800/50"
                       >
                         <div class="flex items-center gap-2.5">
                           <lucide-icon
@@ -171,14 +171,14 @@
                             [name]="isPermFolderExpanded(folder.id) ? 'folder-open' : 'folder'"
                             class="h-4 w-4 text-amber-500"
                           ></lucide-icon>
-                          <span class="text-sm font-medium text-gray-900">{{ folder.name }}</span>
+                          <span class="text-sm font-medium text-gray-900 dark:text-gray-100">{{ folder.name }}</span>
                           <span class="text-xs text-gray-400">({{ getVisibleDocsInFolder(folder.id).length }})</span>
                         </div>
                       </div>
 
                       <!-- Documents inside folder -->
                       @if (isPermFolderExpanded(folder.id)) {
-                        <div class="border-t border-gray-200">
+                        <div class="border-t border-gray-200 dark:border-gray-700">
                           @for (doc of getVisibleDocsInFolder(folder.id); track doc.id) {
                             <ng-container *ngTemplateOutlet="docPermissionPanel; context: { $implicit: doc }"></ng-container>
                           }
@@ -192,7 +192,7 @@
                     @if (hasAnyFolderStructure()) {
                       <!-- Show as a collapsible group when folders exist -->
                       <div
-                        class="border border-gray-200 rounded-lg overflow-hidden transition-colors"
+                        class="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden transition-colors"
                         [class.ring-2]="dragOverTarget() === 'root'"
                         [class.ring-dashed]="dragOverTarget() === 'root'"
                         [class.ring-gray-400]="dragOverTarget() === 'root'"
@@ -203,7 +203,7 @@
                       >
                         <div
                           (click)="togglePermFolder('root')"
-                          class="flex items-center justify-between p-3 cursor-pointer hover:bg-gray-50 transition-colors bg-gray-50/50"
+                          class="flex items-center justify-between p-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors bg-gray-50/50 dark:bg-gray-800/50"
                         >
                           <div class="flex items-center gap-2.5">
                             <lucide-icon
@@ -211,7 +211,7 @@
                               class="h-3.5 w-3.5 text-gray-400"
                             ></lucide-icon>
                             <lucide-icon name="file-text" class="h-4 w-4 text-gray-400"></lucide-icon>
-                            <span class="text-sm font-medium text-gray-900">No Folder</span>
+                            <span class="text-sm font-medium text-gray-900 dark:text-gray-100">{{ 'TEAM_DETAIL.NO_FOLDER' | translate }}</span>
                             <span class="text-xs text-gray-400">({{ getVisibleUnfolderedDocs().length }})</span>
                           </div>
                           <lucide-icon
@@ -221,7 +221,7 @@
                         </div>
 
                         @if (isPermFolderExpanded('root')) {
-                          <div class="border-t border-gray-200">
+                          <div class="border-t border-gray-200 dark:border-gray-700">
                             @for (doc of getVisibleUnfolderedDocs(); track doc.id) {
                               <ng-container *ngTemplateOutlet="docPermissionPanel; context: { $implicit: doc }"></ng-container>
                             }
@@ -243,7 +243,7 @@
           <!-- Reusable Document Permission Panel Template -->
           <ng-template #docPermissionPanel let-doc>
             <div
-              class="border border-gray-200 rounded-lg overflow-hidden transition-opacity"
+              class="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden transition-opacity"
               [class.opacity-50]="draggingDocId() === doc.id"
               [attr.draggable]="isOwnerOrAdmin() ? 'true' : null"
               (dragstart)="onDragStart($event, doc.id)"
@@ -252,11 +252,11 @@
               <!-- Document Header (clickable to expand) -->
               <div
                 (click)="toggleDocPanel(doc.id)"
-                class="flex items-center justify-between gap-2 p-4 cursor-pointer hover:bg-gray-50 transition-colors"
+                class="flex items-center justify-between gap-2 p-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
               >
                 <div class="flex items-center gap-2 min-w-0 flex-1">
                   <lucide-icon name="file-text" class="h-4 w-4 text-gray-500 flex-shrink-0"></lucide-icon>
-                  <span class="text-sm font-medium text-gray-900 truncate">{{ doc.title }}</span>
+                  <span class="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">{{ doc.title }}</span>
                   @if (getDocPermissionsForView(doc).length) {
                     <span class="text-xs text-gray-400 flex-shrink-0">({{ getDocPermissionsForView(doc).length }})</span>
                   }
@@ -269,15 +269,15 @@
                       class="inline-flex items-center gap-1 text-xs text-emerald-700 bg-emerald-50 hover:bg-emerald-100 px-2 py-1 rounded-md font-medium transition-colors"
                     >
                       <lucide-icon name="share-2" [size]="12"></lucide-icon>
-                      Share
+                      {{ 'TEAM_DETAIL.SHARE' | translate }}
                     </button>
                   }
                   @if (isCurrentUserMember()) {
                     <button
                       (click)="openDocument(doc.id); $event.stopPropagation()"
-                      class="text-xs text-[#155347] hover:underline"
+                      class="text-xs text-[#155347] dark:text-emerald-400 hover:underline"
                     >
-                      Open
+                      {{ 'TEAM_DETAIL.OPEN' | translate }}
                     </button>
                   }
                   <lucide-icon
@@ -289,20 +289,20 @@
 
               <!-- Expanded: Member permissions list -->
               @if (isDocExpanded(doc.id)) {
-                <div class="border-t border-gray-200 p-4 bg-gray-50">
+                <div class="border-t border-gray-200 dark:border-gray-700 p-4 bg-gray-50 dark:bg-gray-800/50">
 
                   <!-- Existing permissions -->
                   @if (getDocPermissionsForView(doc).length) {
-                    <div class="divide-y divide-gray-100 mb-3">
+                    <div class="divide-y divide-gray-100 dark:divide-gray-700 mb-3">
                       @for (perm of getDocPermissionsForView(doc); track perm.id ?? perm.teamMemberId) {
                         <div class="flex items-center justify-between gap-2 py-3 px-1">
                           <div class="flex items-center gap-2 min-w-0 flex-1">
-                            <div class="h-6 w-6 rounded-full bg-gray-200 text-gray-600 flex items-center justify-center text-[10px] font-bold flex-shrink-0">
+                            <div class="h-6 w-6 rounded-full bg-gray-200 dark:bg-gray-600 text-gray-600 dark:text-gray-300 flex items-center justify-center text-[10px] font-bold flex-shrink-0">
                               {{ getInitials(perm.memberName) }}
                             </div>
-                            <span class="text-sm text-gray-700 truncate">{{ perm.memberName }}</span>
+                            <span class="text-sm text-gray-700 dark:text-gray-300 truncate">{{ perm.memberName }}</span>
                             @if (perm.memberRole === 1) {
-                              <span class="text-[10px] font-medium bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded-full">Team Admin</span>
+                              <span class="text-[10px] font-medium bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded-full">{{ 'ROLES.TEAM_ADMIN' | translate }}</span>
                             }
                           </div>
                           <div class="flex items-center gap-2 flex-shrink-0">
@@ -310,21 +310,21 @@
                               <select
                                 [ngModel]="perm.documentRole"
                                 (ngModelChange)="onDocRoleChange(perm, $event)"
-                                class="text-xs border border-gray-300 rounded-md px-2 py-1 bg-white focus:outline-none focus:ring-1 focus:ring-[#155347]"
+                                class="text-xs border border-gray-300 dark:border-gray-600 rounded-md px-2 py-1 bg-white dark:bg-gray-700 dark:text-gray-100 focus:outline-none focus:ring-1 focus:ring-[#155347]"
                               >
-                                <option [ngValue]="0">Viewer</option>
-                                <option [ngValue]="1">Editor</option>
+                                <option [ngValue]="0">{{ 'ROLES.VIEWER' | translate }}</option>
+                                <option [ngValue]="1">{{ 'ROLES.EDITOR' | translate }}</option>
                               </select>
                             } @else {
                               <app-badge variant="outline">
-                                {{ docRoleNames[perm.documentRole] }}
+                                {{ docRoleKey(perm.documentRole) | translate }}
                               </app-badge>
                             }
                             @if (canRemoveDocPermission(perm)) {
                               <button
                                 (click)="removeDocPermission(doc.id, doc.title, perm)"
                                 class="p-1 text-gray-400 hover:text-red-500 transition-colors"
-                                title="Remove access"
+                              [title]="'TEAM_DETAIL.REMOVE_ACCESS' | translate"
                               >
                                 <lucide-icon name="x" class="h-3.5 w-3.5"></lucide-icon>
                               </button>
@@ -334,32 +334,32 @@
                       }
                     </div>
                   } @else {
-                    <p class="text-xs text-gray-500 mb-3">No members have explicit access to this document yet.</p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-3">{{ 'TEAM_DETAIL.NO_EXPLICIT_ACCESS' | translate }}</p>
                   }
 
                   <!-- Add Member Form -->
                   @if (canManageDocPermissions() && addMemberDocId() === doc.id) {
-                    <div class="flex flex-wrap items-center gap-2 p-3 bg-white rounded border border-gray-200">
+                    <div class="flex flex-wrap items-center gap-2 p-3 bg-white dark:bg-gray-700 rounded border border-gray-200 dark:border-gray-600">
                       <select
                         [ngModel]="addMemberSelectedId()"
                         (ngModelChange)="addMemberSelectedId.set($event)"
-                        class="text-xs border border-gray-300 rounded-md px-2 py-1 bg-white flex-1 min-w-[120px] focus:outline-none focus:ring-1 focus:ring-[#155347]"
+                        class="text-xs border border-gray-300 dark:border-gray-600 rounded-md px-2 py-1 bg-white dark:bg-gray-700 dark:text-gray-100 flex-1 min-w-[120px] focus:outline-none focus:ring-1 focus:ring-[#155347]"
                       >
-                        <option [ngValue]="null" disabled>Select member...</option>
+                        <option [ngValue]="null" disabled>{{ 'TEAM_DETAIL.SELECT_MEMBER' | translate }}</option>
                         @for (m of getAddableMembers(doc); track m.id) {
-                          <option [ngValue]="m.id">{{ m.name }}{{ m.role === 1 ? ' (Team Admin)' : '' }}</option>
+                          <option [ngValue]="m.id">{{ memberOptionLabel(m.name, m.role) }}</option>
                         }
                       </select>
                       @if (isSelectedMemberAdmin()) {
-                        <span class="text-xs font-medium text-gray-500 bg-gray-100 px-2 py-1 rounded-md">Editor</span>
+                            <span class="text-xs font-medium text-gray-500 bg-gray-100 px-2 py-1 rounded-md">{{ 'ROLES.EDITOR' | translate }}</span>
                       } @else {
                         <select
                           [ngModel]="addMemberSelectedRole()"
                           (ngModelChange)="addMemberSelectedRole.set($event)"
-                          class="text-xs border border-gray-300 rounded-md px-2 py-1 bg-white focus:outline-none focus:ring-1 focus:ring-[#155347]"
+                          class="text-xs border border-gray-300 dark:border-gray-600 rounded-md px-2 py-1 bg-white dark:bg-gray-700 dark:text-gray-100 focus:outline-none focus:ring-1 focus:ring-[#155347]"
                         >
-                          <option [ngValue]="0">Viewer</option>
-                          <option [ngValue]="1">Editor</option>
+                          <option [ngValue]="0">{{ 'ROLES.VIEWER' | translate }}</option>
+                          <option [ngValue]="1">{{ 'ROLES.EDITOR' | translate }}</option>
                         </select>
                       }
                       <button
@@ -367,7 +367,7 @@
                         [disabled]="!addMemberSelectedId()"
                         class="px-3 py-1 text-xs font-medium text-white bg-[#155347] rounded-md hover:bg-[#0e3d33] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                       >
-                        Add
+                        {{ 'TEAM_DETAIL.ADD' | translate }}
                       </button>
                       <button
                         (click)="closeAddMemberForm()"
@@ -380,10 +380,10 @@
                     @if (canManageDocPermissions() && getAddableMembers(doc).length > 0) {
                       <button
                         (click)="openAddMemberForm(doc.id)"
-                        class="flex items-center gap-1 text-xs text-[#155347] hover:text-[#0e3d33] font-medium transition-colors"
+                        class="flex items-center gap-1 text-xs text-[#155347] dark:text-emerald-400 hover:text-[#0e3d33] dark:hover:text-emerald-300 font-medium transition-colors"
                       >
                         <lucide-icon name="plus" class="h-3.5 w-3.5"></lucide-icon>
-                        Add Member
+                        {{ 'TEAM_DETAIL.ADD_MEMBER' | translate }}
                       </button>
                     }
                   }
@@ -398,26 +398,26 @@
 
           <app-card>
             <app-card-content customClass="p-6">
-              <h3 class="text-sm font-semibold text-gray-900 mb-4">Team Stats</h3>
+              <h3 class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-4">{{ 'TEAM_DETAIL.TEAM_STATS' | translate }}</h3>
 
               <div class="space-y-4">
                 <div class="flex items-center justify-between">
-                  <span class="text-sm text-gray-600">Documents</span>
-                  <span class="text-sm font-bold text-gray-900">
+                  <span class="text-sm text-gray-600 dark:text-gray-400">{{ 'TEAM_DETAIL.STATS_DOCUMENTS' | translate }}</span>
+                  <span class="text-sm font-bold text-gray-900 dark:text-gray-100">
                     {{ visibleDocuments().length }}
                   </span>
                 </div>
 
                 <div class="flex items-center justify-between">
-                  <span class="text-sm text-gray-600">Members</span>
-                  <span class="text-sm font-bold text-gray-900">
+                  <span class="text-sm text-gray-600 dark:text-gray-400">{{ 'TEAM_DETAIL.STATS_MEMBERS' | translate }}</span>
+                  <span class="text-sm font-bold text-gray-900 dark:text-gray-100">
                     {{ selectedTeam()?.members?.length ?? 0 }}
                   </span>
                 </div>
 
                 <div class="flex items-center justify-between">
-                  <span class="text-sm text-gray-600">Created</span>
-                  <span class="text-sm font-bold text-gray-900">
+                  <span class="text-sm text-gray-600 dark:text-gray-400">{{ 'TEAM_DETAIL.STATS_CREATED' | translate }}</span>
+                  <span class="text-sm font-bold text-gray-900 dark:text-gray-100">
                     {{ selectedTeam()?.createdAt ? (selectedTeam()?.createdAt | date) : '' }}
                   </span>
                 </div>
@@ -430,24 +430,24 @@
             <app-card>
               <app-card-content customClass="p-6">
                 <div class="flex items-center justify-between mb-4">
-                  <h3 class="text-sm font-semibold text-gray-900">Folders</h3>
+                  <h3 class="text-sm font-semibold text-gray-900 dark:text-gray-100">{{ 'TEAM_DETAIL.FOLDERS_HEADING' | translate }}</h3>
                   @if (isOwnerOrAdmin()) {
                     <button
                       (click)="openCreateFolderModal()"
-                      class="flex items-center gap-1 text-xs text-[#155347] hover:text-[#0e3d33] font-medium transition-colors"
+                      class="flex items-center gap-1 text-xs text-[#155347] dark:text-emerald-400 hover:text-[#0e3d33] dark:hover:text-emerald-300 font-medium transition-colors"
                     >
                       <lucide-icon name="folder-plus" class="h-3.5 w-3.5"></lucide-icon>
-                      New
+                      {{ 'TEAM_DETAIL.NEW_FOLDER_BTN' | translate }}
                     </button>
                   }
                 </div>
 
                 <div class="space-y-2">
                   @for (folder of getSidebarFolders(); track folder.id) {
-                    <div class="flex items-center justify-between p-2 border border-gray-200 rounded-lg">
+                    <div class="flex items-center justify-between p-2 border border-gray-200 dark:border-gray-700 rounded-lg">
                       <div class="flex items-center gap-2">
                         <lucide-icon name="folder" class="h-4 w-4 text-amber-500"></lucide-icon>
-                        <span class="text-sm text-gray-900">{{ folder.name }}</span>
+                        <span class="text-sm text-gray-900 dark:text-gray-100">{{ folder.name }}</span>
                         <span class="text-xs text-gray-400">({{ getVisibleDocsInFolder(folder.id).length }})</span>
                       </div>
                       @if (isOwnerOrAdmin()) {
@@ -455,14 +455,14 @@
                           <button
                             (click)="openRenameFolderModal(folder)"
                             class="p-1 text-gray-400 hover:text-gray-600 transition-colors"
-                            title="Rename folder"
+                          [title]="'TEAM_DETAIL.RENAME_FOLDER_TITLE' | translate"
                           >
                             <lucide-icon name="pencil" class="h-3.5 w-3.5"></lucide-icon>
                           </button>
                           <button
                             (click)="openDeleteFolderModal(folder)"
                             class="p-1 text-gray-400 hover:text-red-500 transition-colors"
-                            title="Delete folder"
+                          [title]="'TEAM_DETAIL.DELETE_FOLDER_TITLE' | translate"
                           >
                             <lucide-icon name="trash-2" class="h-3.5 w-3.5"></lucide-icon>
                           </button>
@@ -470,7 +470,7 @@
                       }
                     </div>
                   } @empty {
-                    <p class="text-xs text-gray-500">No folders yet.</p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">{{ 'TEAM_DETAIL.NO_FOLDERS' | translate }}</p>
                   }
                 </div>
               </app-card-content>
@@ -480,12 +480,12 @@
           <!-- Documents Quick List with Folder Assignment -->
           <app-card>
             <app-card-content customClass="p-6">
-              <h3 class="text-sm font-semibold text-gray-900 mb-4">Documents</h3>
+              <h3 class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-4">{{ 'TEAM_DETAIL.DOCS_HEADING' | translate }}</h3>
 
               <div class="space-y-2">
                 @if (visibleDocuments().length) {
                   @for (doc of visibleDocuments(); track doc.id) {
-                    <div class="flex items-center justify-between gap-2 p-2 border-b hover:bg-gray-50 rounded">
+                    <div class="flex items-center justify-between gap-2 p-2 border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 rounded">
                       <div
                         (click)="openDocument(doc.id)"
                         class="text-sm cursor-pointer flex-1 min-w-0 truncate"
@@ -496,9 +496,9 @@
                         <select
                           [ngModel]="doc.folderId ?? null"
                           (ngModelChange)="moveDocToFolder(doc, $event)"
-                          class="text-[10px] border border-gray-200 rounded px-1.5 py-0.5 bg-white focus:outline-none focus:ring-1 focus:ring-[#155347] max-w-[100px]"
+                          class="text-[10px] border border-gray-200 dark:border-gray-600 rounded px-1.5 py-0.5 bg-white dark:bg-gray-700 dark:text-gray-100 focus:outline-none focus:ring-1 focus:ring-[#155347] max-w-[100px]"
                         >
-                          <option [ngValue]="null">No folder</option>
+                          <option [ngValue]="null">{{ 'TEAM_DETAIL.NO_FOLDER_OPTION' | translate }}</option>
                           @for (folder of selectedTeam()!.folders; track folder.id) {
                             <option [ngValue]="folder.id">{{ folder.name }}</option>
                           }
@@ -507,8 +507,8 @@
                     </div>
                   }
                 } @else {
-                  <p class="text-xs text-gray-500">
-                    You don't have access to any document on this team.
+                  <p class="text-xs text-gray-500 dark:text-gray-400">
+                    {{ 'TEAM_DETAIL.NO_DOC_ACCESS' | translate }}
                   </p>
                 }
               </div>
@@ -520,16 +520,16 @@
           @if (selectedTeam()?.currentUserRole === 2) {
             <app-card data-tour="danger-zone">
               <app-card-content customClass="p-6">
-                <h3 class="text-sm font-semibold text-gray-900 mb-4">Danger Zone</h3>
-                <p class="text-xs text-gray-500 mb-4">
-                  Once you delete a team, there is no going back. Please be certain.
+                <h3 class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-4">{{ 'TEAM_DETAIL.DANGER_ZONE' | translate }}</h3>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mb-4">
+                  {{ 'TEAM_DETAIL.DANGER_DESC' | translate }}
                 </p>
                 <button
                   (click)="openDeleteModal()"
                   class="w-full flex items-center justify-center gap-2 px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 transition-colors"
                 >
                   <lucide-icon name="trash-2" class="h-4 w-4"></lucide-icon>
-                  Delete Team
+                  {{ 'TEAM_DETAIL.DELETE_TEAM_BTN' | translate }}
                 </button>
               </app-card-content>
             </app-card>
@@ -555,7 +555,7 @@
   <!-- Delete Team Modal -->
   <app-modal
     [isOpen]="isDeleteModalOpen()"
-    title="Delete Team"
+    [title]="'TEAM_DETAIL.DELETE_TEAM_TITLE' | translate"
     maxWidth="sm"
     [hasFooter]="true"
     (onClose)="closeDeleteModal()"
@@ -564,9 +564,8 @@
       <div class="flex items-center justify-center w-12 h-12 mx-auto bg-red-100 rounded-full">
         <lucide-icon name="triangle-alert" class="h-6 w-6 text-red-600"></lucide-icon>
       </div>
-      <p class="text-center text-gray-600">
-        Are you sure you want to delete <strong>{{ selectedTeam()?.name }}</strong>?
-        This action cannot be undone and all documents in this team will be permanently deleted.
+      <p class="text-center text-gray-600 dark:text-gray-400">
+        {{ 'TEAM_DETAIL.DELETE_TEAM_CONFIRM_1' | translate }}<strong>{{ selectedTeam()?.name }}</strong>{{ 'TEAM_DETAIL.DELETE_TEAM_CONFIRM_2' | translate }}
       </p>
     </div>
 
@@ -577,7 +576,7 @@
         customClass="flex-1"
         [disabled]="isDeleting()"
       >
-        Cancel
+        {{ 'COMMON.CANCEL' | translate }}
       </app-button>
       <app-button
         (onClick)="confirmDeleteTeam()"
@@ -586,9 +585,9 @@
       >
         @if (isDeleting()) {
           <lucide-icon name="loader-circle" class="h-4 w-4 animate-spin mr-2"></lucide-icon>
-          Deleting...
+          {{ 'TEAM_DETAIL.DELETING' | translate }}
         } @else {
-          Delete Team
+          {{ 'TEAM_DETAIL.DELETE_TEAM_BTN' | translate }}
         }
       </app-button>
     </div>
@@ -597,7 +596,7 @@
   <!-- Remove Team Member Modal -->
   <app-modal
     [isOpen]="isRemoveMemberModalOpen()"
-    title="Remove Member"
+    [title]="'TEAM_DETAIL.REMOVE_MEMBER_TITLE' | translate"
     maxWidth="sm"
     [hasFooter]="true"
     (onClose)="closeRemoveMemberModal()"
@@ -606,10 +605,10 @@
       <div class="flex items-center justify-center w-12 h-12 mx-auto bg-red-100 rounded-full">
         <lucide-icon name="triangle-alert" class="h-6 w-6 text-red-600"></lucide-icon>
       </div>
-      <p class="text-center text-gray-600">
-        Are you sure you want to remove
+      <p class="text-center text-gray-600 dark:text-gray-400">
+        {{ 'TEAM_DETAIL.REMOVE_MEMBER_CONFIRM_1' | translate }}
         <strong>{{ memberToRemove()?.name }}</strong>
-        from this team?
+        {{ 'TEAM_DETAIL.REMOVE_MEMBER_CONFIRM_2' | translate }}
       </p>
     </div>
 
@@ -620,7 +619,7 @@
         customClass="flex-1"
         [disabled]="isRemovingMember()"
       >
-        Cancel
+        {{ 'COMMON.CANCEL' | translate }}
       </app-button>
       <app-button
         (onClick)="confirmRemoveMember()"
@@ -629,9 +628,9 @@
       >
         @if (isRemovingMember()) {
           <lucide-icon name="loader-circle" class="h-4 w-4 animate-spin mr-2"></lucide-icon>
-          Removing...
+          {{ 'TEAM_DETAIL.REMOVING' | translate }}
         } @else {
-          Remove Member
+          {{ 'TEAM_DETAIL.REMOVE_MEMBER_BTN' | translate }}
         }
       </app-button>
     </div>
@@ -661,56 +660,56 @@
   <!-- Create Folder Modal -->
   <app-modal
     [isOpen]="isCreateFolderModalOpen()"
-    title="Create New Folder"
+    [title]="'TEAM_DETAIL.CREATE_FOLDER_TITLE' | translate"
     maxWidth="sm"
     [hasFooter]="true"
     (onClose)="closeCreateFolderModal()"
   >
     <div class="space-y-4">
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">Folder Name</label>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ 'TEAM_DETAIL.FOLDER_NAME_LABEL' | translate }}</label>
         <input
           type="text"
           [(ngModel)]="newFolderName"
-          placeholder="e.g. Marketing Documents"
-          class="w-full h-10 px-3 rounded-lg border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-[#155347] focus:border-transparent text-sm"
+          [placeholder]="'TEAM_DETAIL.FOLDER_PLACEHOLDER' | translate"
+          class="w-full h-10 px-3 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#155347] focus:border-transparent text-sm"
         />
       </div>
     </div>
     <div footer class="flex gap-3">
-      <app-button variant="ghost" (onClick)="closeCreateFolderModal()">Cancel</app-button>
-      <app-button (onClick)="createFolder()">Create Folder</app-button>
+      <app-button variant="ghost" (onClick)="closeCreateFolderModal()">{{ 'COMMON.CANCEL' | translate }}</app-button>
+      <app-button (onClick)="createFolder()">{{ 'TEAM_DETAIL.CREATE_FOLDER_BTN' | translate }}</app-button>
     </div>
   </app-modal>
 
   <!-- Rename Folder Modal -->
   <app-modal
     [isOpen]="isRenameFolderModalOpen()"
-    title="Rename Folder"
+    [title]="'TEAM_DETAIL.RENAME_FOLDER_TITLE' | translate"
     maxWidth="sm"
     [hasFooter]="true"
     (onClose)="closeRenameFolderModal()"
   >
     <div class="space-y-4">
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">Folder Name</label>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ 'TEAM_DETAIL.FOLDER_NAME_LABEL' | translate }}</label>
         <input
           type="text"
           [(ngModel)]="renameFolderName"
-          class="w-full h-10 px-3 rounded-lg border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-[#155347] focus:border-transparent text-sm"
+          class="w-full h-10 px-3 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#155347] focus:border-transparent text-sm"
         />
       </div>
     </div>
     <div footer class="flex gap-3">
-      <app-button variant="ghost" (onClick)="closeRenameFolderModal()">Cancel</app-button>
-      <app-button (onClick)="confirmRenameFolder()">Rename</app-button>
+      <app-button variant="ghost" (onClick)="closeRenameFolderModal()">{{ 'COMMON.CANCEL' | translate }}</app-button>
+      <app-button (onClick)="confirmRenameFolder()">{{ 'TEAM_DETAIL.RENAME_BTN' | translate }}</app-button>
     </div>
   </app-modal>
 
   <!-- Delete Folder Modal -->
   <app-modal
     [isOpen]="isDeleteFolderModalOpen()"
-    title="Delete Folder"
+    [title]="'TEAM_DETAIL.DELETE_FOLDER_TITLE' | translate"
     maxWidth="sm"
     [hasFooter]="true"
     (onClose)="closeDeleteFolderModal()"
@@ -719,10 +718,8 @@
       <div class="flex items-center justify-center w-12 h-12 mx-auto bg-red-100 rounded-full">
         <lucide-icon name="triangle-alert" class="h-6 w-6 text-red-600"></lucide-icon>
       </div>
-      <p class="text-center text-gray-600">
-        Are you sure you want to delete the folder
-        <strong>{{ deleteFolderTarget()?.name }}</strong>?
-        Documents inside will not be deleted, they will be moved out of the folder.
+      <p class="text-center text-gray-600 dark:text-gray-400">
+        {{ 'TEAM_DETAIL.DELETE_FOLDER_CONFIRM_1' | translate }}<strong>{{ deleteFolderTarget()?.name }}</strong>{{ 'TEAM_DETAIL.DELETE_FOLDER_CONFIRM_2' | translate }}
       </p>
     </div>
     <div footer class="flex gap-3">
@@ -732,7 +729,7 @@
         customClass="flex-1"
         [disabled]="isDeletingFolder()"
       >
-        Cancel
+        {{ 'COMMON.CANCEL' | translate }}
       </app-button>
       <app-button
         (onClick)="confirmDeleteFolder()"
@@ -741,9 +738,9 @@
       >
         @if (isDeletingFolder()) {
           <lucide-icon name="loader-circle" class="h-4 w-4 animate-spin mr-2"></lucide-icon>
-          Deleting...
+          {{ 'TEAM_DETAIL.DELETING' | translate }}
         } @else {
-          Delete Folder
+          {{ 'TEAM_DETAIL.DELETE_FOLDER_TITLE' | translate }}
         }
       </app-button>
     </div>
@@ -771,7 +768,7 @@
   <!-- Remove Document Permission Modal -->
   <app-modal
     [isOpen]="isRemoveDocPermissionModalOpen()"
-    title="Remove Permission"
+    [title]="'TEAM_DETAIL.REMOVE_PERM_TITLE' | translate"
     maxWidth="sm"
     [hasFooter]="true"
     (onClose)="closeRemoveDocPermissionModal()"
@@ -780,10 +777,10 @@
       <div class="flex items-center justify-center w-12 h-12 mx-auto bg-red-100 rounded-full">
         <lucide-icon name="triangle-alert" class="h-6 w-6 text-red-600"></lucide-icon>
       </div>
-      <p class="text-center text-gray-600">
-        Are you sure you want to remove
+      <p class="text-center text-gray-600 dark:text-gray-400">
+        {{ 'TEAM_DETAIL.REMOVE_PERM_CONFIRM_1' | translate }}
         <strong>{{ docPermissionToRemove()?.permission?.memberName }}</strong>
-        from <strong>{{ docPermissionToRemove()?.docTitle }}</strong>?
+        {{ 'TEAM_DETAIL.REMOVE_PERM_CONFIRM_2' | translate }} <strong>{{ docPermissionToRemove()?.docTitle }}</strong>{{ 'TEAM_DETAIL.REMOVE_PERM_CONFIRM_3' | translate }}
       </p>
     </div>
 
@@ -794,7 +791,7 @@
         customClass="flex-1"
         [disabled]="isRemovingDocPermission()"
       >
-        Cancel
+        {{ 'COMMON.CANCEL' | translate }}
       </app-button>
       <app-button
         (onClick)="confirmRemoveDocPermission()"
@@ -803,9 +800,9 @@
       >
         @if (isRemovingDocPermission()) {
           <lucide-icon name="loader-circle" class="h-4 w-4 animate-spin mr-2"></lucide-icon>
-          Removing...
+          {{ 'TEAM_DETAIL.REMOVING' | translate }}
         } @else {
-          Remove Permission
+          {{ 'TEAM_DETAIL.REMOVE_PERM_BTN' | translate }}
         }
       </app-button>
     </div>

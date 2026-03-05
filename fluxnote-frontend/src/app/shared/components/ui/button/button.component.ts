@@ -46,10 +46,10 @@ export class ButtonComponent {
 
     const variants: Record<string, string> = {
       primary: 'bg-[#155347] text-white hover:bg-[#0d3d31] focus:ring-[#155347]',
-      secondary: 'bg-[#e8f0ee] text-[#155347] hover:bg-[#d1e0dd] focus:ring-[#155347]',
-      ghost: 'hover:bg-gray-100 text-gray-700 focus:ring-gray-500',
+      secondary: 'bg-[#e8f0ee] text-[#155347] hover:bg-[#d1e0dd] focus:ring-[#155347] dark:bg-[#155347]/20 dark:text-[#6ee7b7] dark:hover:bg-[#155347]/30',
+      ghost: 'hover:bg-gray-100 text-gray-700 focus:ring-gray-500 dark:text-gray-300 dark:hover:bg-gray-700',
       destructive: 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-600',
-      outline: 'border border-gray-300 bg-transparent hover:bg-gray-50 text-gray-700 focus:ring-[#155347]'
+      outline: 'border border-gray-300 dark:border-gray-600 bg-transparent hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 focus:ring-[#155347]'
     };
 
     const sizes: Record<string, string> = {

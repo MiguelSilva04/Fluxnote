@@ -8,16 +8,16 @@ import { LandingHeaderComponent, LandingFooterComponent } from '../components';
   standalone: true,
   imports: [CommonModule, FormsModule, LandingHeaderComponent, LandingFooterComponent],
   template: `
-    <div class="min-h-screen bg-white">
+    <div class="min-h-screen bg-white dark:bg-gray-900">
       <app-landing-header></app-landing-header>
 
-      <section class="py-20 bg-gradient-to-br from-[#155347]/10 to-white">
+      <section class="py-20 bg-gradient-to-br from-[#155347]/10 to-white dark:to-gray-900">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div class="text-center mb-16">
-            <h1 class="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
+            <h1 class="text-4xl lg:text-5xl font-bold text-gray-900 dark:text-gray-100 mb-6">
               Contact us
             </h1>
-            <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+            <p class="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
               Have a question, suggestion, or need help? We’re here for you.
               Reach out using any of the methods below.
             </p>
@@ -25,19 +25,19 @@ import { LandingHeaderComponent, LandingFooterComponent } from '../components';
 
           <div class="grid lg:grid-cols-2 gap-12">
             <!-- Contact Form -->
-            <div class="bg-white rounded-2xl shadow-lg p-8">
-              <h2 class="text-2xl font-bold text-gray-900 mb-6">Send us a message</h2>
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8">
+              <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6">Send us a message</h2>
 
               @if (submitStatus() === 'success') {
                 <div class="mb-6 p-4 bg-[#155347]/10 border border-[#155347]/30 rounded-lg">
-                  <p class="text-[#155347] font-medium">
+                  <p class="text-[#155347] dark:text-emerald-400 font-medium">
                     Message sent successfully! We’ll get back to you soon.
                   </p>
                 </div>
               }
 
               @if (submitStatus() === 'error') {
-                <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+                <div class="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
                   <p class="text-red-800">
                     There was an error sending your message. Please try again.
                   </p>
@@ -47,7 +47,7 @@ import { LandingHeaderComponent, LandingFooterComponent } from '../components';
               <form (submit)="handleSubmit($event)" class="space-y-6">
                 <div class="grid md:grid-cols-2 gap-6">
                   <div>
-                    <label for="name" class="block text-sm font-medium text-gray-700 mb-2">
+                    <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Full name
                     </label>
                     <input
@@ -55,13 +55,13 @@ import { LandingHeaderComponent, LandingFooterComponent } from '../components';
                       type="text"
                       [(ngModel)]="formData.name"
                       name="name"
-                      class="text-black w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#155347]"
+                      class="text-black w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#155347]"
                       required
                     />
                   </div>
 
                   <div>
-                    <label for="email" class="block text-sm font-medium text-gray-700 mb-2">
+                    <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Email
                     </label>
                     <input
@@ -69,21 +69,21 @@ import { LandingHeaderComponent, LandingFooterComponent } from '../components';
                       type="email"
                       [(ngModel)]="formData.email"
                       name="email"
-                      class="text-black w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#155347]"
+                      class="text-black w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#155347]"
                       required
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label for="subject" class="block text-sm font-medium text-gray-700 mb-2">
+                  <label for="subject" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Subject
                   </label>
                   <select
                     id="subject"
                     [(ngModel)]="formData.subject"
                     name="subject"
-                    class="text-black w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#155347]"
+                    class="text-black w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#155347]"
                     required
                   >
                     <option value="">Select a subject</option>
@@ -96,7 +96,7 @@ import { LandingHeaderComponent, LandingFooterComponent } from '../components';
                 </div>
 
                 <div>
-                  <label for="message" class="block text-sm font-medium text-gray-700 mb-2">
+                  <label for="message" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Message
                   </label>
                   <textarea
@@ -104,7 +104,7 @@ import { LandingHeaderComponent, LandingFooterComponent } from '../components';
                     rows="6"
                     [(ngModel)]="formData.message"
                     name="message"
-                    class="text-black w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#155347]"
+                    class="text-black w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#155347]"
                     placeholder="Describe your question or message..."
                     required
                   ></textarea>
@@ -130,23 +130,23 @@ import { LandingHeaderComponent, LandingFooterComponent } from '../components';
             <!-- Contact Methods -->
             <div class="space-y-8">
               <div>
-                <h2 class="text-2xl font-bold text-gray-900 mb-6">Other ways to reach us</h2>
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6">Other ways to reach us</h2>
                 <div class="space-y-6">
                   @for (method of contactMethods; track method.title) {
-                    <div class="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-shadow">
+                    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 hover:shadow-xl transition-shadow">
                       <div class="flex items-start">
                         <div class="text-3xl mr-4">{{ method.icon }}</div>
                         <div class="flex-1">
-                          <h3 class="text-lg font-semibold text-gray-900 mb-2">
+                          <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
                             {{ method.title }}
                           </h3>
-                          <p class="text-gray-600 mb-3">
+                          <p class="text-gray-600 dark:text-gray-400 mb-3">
                             {{ method.description }}
                           </p>
-                          <p class="text-[#155347] font-medium mb-3">
+                          <p class="text-[#155347] dark:text-emerald-400 font-medium mb-3">
                             {{ method.contact }}
                           </p>
-                          <button class="text-[#155347] font-semibold hover:text-[#155347] transition-colors cursor-pointer">
+                          <button class="text-[#155347] dark:text-emerald-400 font-semibold hover:text-[#155347] dark:hover:text-emerald-400 transition-colors cursor-pointer">
                             {{ method.action }} →
                           </button>
                         </div>
@@ -157,9 +157,9 @@ import { LandingHeaderComponent, LandingFooterComponent } from '../components';
               </div>
 
               <!-- Office Info -->
-              <div class="bg-gray-50 rounded-2xl p-6">
-                <h3 class="text-lg font-semibold text-gray-900 mb-4">Office</h3>
-                <div class="space-y-2 text-gray-700">
+              <div class="bg-gray-50 dark:bg-gray-800 rounded-2xl p-6">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Office</h3>
+                <div class="space-y-2 text-gray-700 dark:text-gray-300">
                   <p><strong>Address:</strong></p>
                   <p>Innovation Street, 123</p>
                   <p>1000-001 Lisboa, Portugal</p>
@@ -171,10 +171,10 @@ import { LandingHeaderComponent, LandingFooterComponent } from '../components';
 
               <!-- FAQ Link -->
               <div class="bg-[#155347]/10 rounded-2xl p-6">
-                <h3 class="text-lg font-semibold text-gray-900 mb-3">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">
                   Before you contact us
                 </h3>
-                <p class="text-gray-700 mb-4">
+                <p class="text-gray-700 dark:text-gray-300 mb-4">
                   Check our FAQ—you might find your answer faster.
                 </p>
                 <button class="text-[#155347] font-semibold hover:text-[#155347] transition-colors">

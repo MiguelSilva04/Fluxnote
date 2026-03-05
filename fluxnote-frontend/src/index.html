@@ -41,7 +41,25 @@
     @keyframes spin {
       to { transform: rotate(360deg); }
     }
+    /* Dark mode */
+    html.dark .app-loading {
+      background: #111827;
+    }
+    html.dark .app-loading .spinner {
+      border-color: #374151;
+      border-top-color: #34d399;
+    }
   </style>
+  <script>
+    /* Apply saved theme before Angular loads to avoid flash */
+    (function() {
+      var theme = localStorage.getItem('fluxnote-theme');
+      var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      if (theme === 'dark' || (theme === 'auto' && prefersDark)) {
+        document.documentElement.classList.add('dark');
+      }
+    })();
+  </script>
 </head>
 <body class="font-sans antialiased text-gray-900">
   <app-root>

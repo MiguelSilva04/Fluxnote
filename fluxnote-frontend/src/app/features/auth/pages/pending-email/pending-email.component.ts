@@ -9,15 +9,15 @@ import { AuthService } from '../../../../core/services';
   standalone: true,
   imports: [CommonModule, CardComponent, CardContentComponent],
   template: `
-    <div class="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+    <div class="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center p-4">
       <app-card customClass="w-full max-w-md shadow-xl border-0">
         <app-card-content customClass="p-8">
-          <h1 class="text-2xl font-bold text-gray-900 mb-2">Confirm your email</h1>
-          <p class="text-gray-600 mb-6">
+          <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">Confirm your email</h1>
+          <p class="text-gray-600 dark:text-gray-400 mb-6">
             We've sent a confirmation link to <b>{{ email }}</b>.
           </p>
           @if (loading) {
-            <p class="text-gray-400 text-sm">Loading...</p>
+            <p class="text-gray-400 dark:text-gray-500 text-sm">Loading...</p>
           } @else if (isDev) {
             @if (link) {
               <button
@@ -28,10 +28,10 @@ import { AuthService } from '../../../../core/services';
                 Confirm email
               </button>
             } @else {
-              <p class="text-sm text-gray-500 mb-2 cursor-pointer">Click here to reveal the button🪄</p>
+              <p class="text-sm text-gray-500 dark:text-gray-400 mb-2 cursor-pointer">Click here to reveal the button🪄</p>
             }
           } @else {
-            <p class="text-gray-500 text-sm">
+            <p class="text-gray-500 dark:text-gray-400 text-sm">
               Check your inbox and click the confirmation link to activate your account.
             </p>
           }
