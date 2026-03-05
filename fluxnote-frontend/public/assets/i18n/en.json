@@ -31,7 +31,8 @@
     "UNIT_MONTHS": "months",
     "UNIT_YEAR": "year",
     "UNIT_YEARS": "years",
-    "TIME_AGO_SUFFIX": "ago"
+    "TIME_AGO_SUFFIX": "ago",
+    "YESTERDAY": "yesterday"
   },
   "LANDING": {
     "HEADER": {

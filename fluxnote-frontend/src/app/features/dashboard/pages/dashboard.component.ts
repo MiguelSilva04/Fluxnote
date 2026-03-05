@@ -574,11 +574,14 @@ export class DashboardComponent implements OnInit {
     const diffMs = now.getTime() - date.getTime();
     const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
     const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    const ago = this.translateService.instant('COMMON.TIME_AGO_SUFFIX');
 
-    if (diffHours < 1) return 'Just now';
-    if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
-    if (diffDays === 1) return 'Yesterday';
-    if (diffDays < 7) return `${diffDays} days ago`;
+    if (diffHours < 1) return this.translateService.instant('COMMON.JUST_NOW');
+    const unitHour = this.translateService.instant(diffHours === 1 ? 'COMMON.UNIT_HOUR' : 'COMMON.UNIT_HOURS');
+    if (diffHours < 24) return `${diffHours} ${unitHour} ${ago}`;
+    if (diffDays === 1) return this.translateService.instant('COMMON.YESTERDAY');
+    const unitDay = this.translateService.instant('COMMON.UNIT_DAYS');
+    if (diffDays < 7) return `${diffDays} ${unitDay} ${ago}`;
     return date.toLocaleDateString();
   }
 }
