@@ -208,9 +208,27 @@
       "CHECK_EMAIL": "Check your email",
       "SENT_TO": "We've sent a password reset link to",
       "TRY_ANOTHER": "Try another email",
+      "OPEN_RESET_LINK": "Open Reset Link",
       "PRIVACY": "Privacy Policy",
       "TERMS": "Terms of Service",
       "CONTACT": "Contact Support"
+    },
+    "RESET_PASSWORD": {
+      "BACK_LOGIN": "Back to Login",
+      "TITLE": "Set New Password",
+      "SUBTITLE": "Enter your new password below.",
+      "NEW_PASSWORD": "New Password",
+      "NEW_PASSWORD_PLACEHOLDER": "Enter new password",
+      "CONFIRM_PASSWORD": "Confirm Password",
+      "CONFIRM_PASSWORD_PLACEHOLDER": "Confirm new password",
+      "PASSWORD_REQUIREMENTS": "Min. 8 characters, 1 uppercase, 1 lowercase, 1 digit, 1 special character.",
+      "SUBMIT": "Reset Password",
+      "SUCCESS_TITLE": "Password Reset!",
+      "SUCCESS_DESC": "Your password has been reset successfully. You can now log in with your new password.",
+      "GO_TO_LOGIN": "Go to Login",
+      "INVALID_LINK": "Invalid or Expired Link",
+      "INVALID_LINK_DESC": "This password reset link is invalid or has expired. Please request a new one.",
+      "REQUEST_NEW": "Request New Link"
     }
   },
   "SIDEBAR": {
@@ -823,5 +841,34 @@
     "EXPIRES_ON": "expires",
     "VIEW_LINK": "View link",
     "REVOKE": "Revoke"
+  },
+  "EASTER_EGG": {
+    "LOADING": "Loading your data...",
+    "NO_DATA": "Not enough data to play!",
+    "NO_DATA_DESC": "Create some documents and join teams to unlock this minigame.",
+    "INTRO": "Unscramble words from your documents, teams and colleagues!",
+    "RULES_TIME": "15 seconds per word",
+    "RULES_HINT": "A hint appears after 10 seconds",
+    "RULES_SCORE": "Faster answers = more points",
+    "START": "Start Game",
+    "CATEGORY_DOCUMENT": "Document",
+    "CATEGORY_TEAM": "Team",
+    "CATEGORY_MEMBER": "Member",
+    "HINT_PREFIX": "Starts with",
+    "YOUR_GUESS": "Your guess...",
+    "CHECK": "Check",
+    "SKIP": "Skip",
+    "ROUND": "Round",
+    "OF": "of",
+    "SCORE": "Score",
+    "GAME_OVER": "Game Over!",
+    "FINAL_SCORE": "Final Score",
+    "CORRECT_ANSWERS": "correct answers",
+    "PLAY_AGAIN": "Play Again",
+    "CLOSE": "Close",
+    "RATING_MASTER": "FluxNote Master!",
+    "RATING_GREAT": "Great job!",
+    "RATING_GOOD": "Not bad!",
+    "RATING_TRY": "Keep practicing!"
   }
 }

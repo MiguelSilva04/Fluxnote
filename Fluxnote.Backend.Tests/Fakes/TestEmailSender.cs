@@ -6,11 +6,19 @@ public class TestEmailSender : IEmailSender
 {
     public string? LastToEmail { get; private set; }
     public string? LastConfirmationLink { get; private set; }
+    public string? LastResetLink { get; private set; }
 
-    public Task SendEmailConfirmationAsync(string toEmail, string confirmationLink)
+    public Task SendEmailConfirmationAsync(string toEmail, string confirmationLink, string lang = "en")
     {
         LastToEmail = toEmail;
         LastConfirmationLink = confirmationLink;
+        return Task.CompletedTask;
+    }
+
+    public Task SendPasswordResetAsync(string toEmail, string resetLink, string lang = "en")
+    {
+        LastToEmail = toEmail;
+        LastResetLink = resetLink;
         return Task.CompletedTask;
     }
 }

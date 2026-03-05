@@ -56,7 +56,7 @@ import { TranslateModule } from '@ngx-translate/core';
                 <lucide-icon leftIcon name="mail" class="h-4 w-4"></lucide-icon>
               </app-input>
 
-              <app-button type="submit" customClass="w-full" size="lg" [isLoading]="isLoading()">
+              <app-button type="submit" customClass="w-full mt-5" size="lg" [isLoading]="isLoading()">
                 {{ 'AUTH.FORGOT_PASSWORD.SEND_LINK' | translate }}
               </app-button>
             </form>
@@ -73,6 +73,18 @@ import { TranslateModule } from '@ngx-translate/core';
               <app-button variant="outline" customClass="w-full" (onClick)="isSubmitted.set(false)">
                 {{ 'AUTH.FORGOT_PASSWORD.TRY_ANOTHER' | translate }}
               </app-button>
+
+              @if (devResetLink()) {
+                <div class="mt-6 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg text-left">
+                  <p class="text-xs font-semibold text-amber-600 dark:text-amber-400 mb-2">DEV MODE — Reset Link</p>
+                  <button
+                    (click)="navigateDevLink()"
+                    class="w-full py-2 px-4 rounded-md bg-[#155347] text-white text-sm font-medium hover:bg-[#0f3f35] transition-colors"
+                  >
+                    {{ 'AUTH.FORGOT_PASSWORD.OPEN_RESET_LINK' | translate }}
+                  </button>
+                </div>
+              }
             </div>
           }
         </app-card-content>
@@ -92,11 +104,23 @@ export class ForgotPasswordComponent {
   email = '';
   isLoading = signal(false);
   isSubmitted = signal(false);
+  devResetLink = signal<string | null>(null);
 
   async handleSubmit(): Promise<void> {
     this.isLoading.set(true);
     await this.authService.forgotPassword(this.email);
     this.isLoading.set(false);
     this.isSubmitted.set(true);
+
+    // In dev mode, try to fetch the reset link from the dev store
+    const devLink = await this.authService.getDevLastResetLink(this.email);
+    if (devLink) {
+      this.devResetLink.set(devLink);
+    }
+  }
+
+  navigateDevLink(): void {
+    const link = this.devResetLink();
+    if (link) window.location.assign(link);
   }
 }
