@@ -149,6 +149,11 @@
     color: #4ade80; /* green-400, matches active toolbar accent */
   }
 
+  :host ::ng-deep .ql-editor.ql-blank::before {
+    left: 3rem;
+    right: 3rem;
+  }
+
   :host-context(.dark) ::ng-deep .ql-editor.ql-blank::before {
     color: #6b7280; /* gray-500 — placeholder text */
   }

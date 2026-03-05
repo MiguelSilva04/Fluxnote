@@ -1,7 +1,7 @@
 import { Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LucideAngularModule } from 'lucide-angular';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { AuthService, PanelStateService, TeamService } from '../../core/services';
 import { ButtonComponent, BadgeComponent, WorkInProgressComponent } from '../../shared/components/ui';
 import { Router, RouterLink } from "@angular/router";
@@ -146,6 +146,7 @@ export class ProfilePanelComponent implements OnInit {
   user = inject(AuthService).currentUser;
   private teamService = inject(TeamService);
   private router = inject(Router);
+  private translateService = inject(TranslateService);
   
   showWipModal = signal(false);
   userTeams = signal<TeamGet[]>([]);
@@ -186,6 +187,8 @@ export class ProfilePanelComponent implements OnInit {
   formatDate(dateString?: string): string {
     if (!dateString) return '';
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+    const lang = this.translateService.getCurrentLang();
+    const locale = lang === 'pt' ? 'pt-PT' : 'en-US';
+    return date.toLocaleDateString(locale, { month: 'long', year: 'numeric' });
   }
 }

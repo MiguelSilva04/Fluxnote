@@ -239,7 +239,7 @@ import { diffWords } from 'diff';
               #editor
               [initialContent]="initialContent"
               [documentId]="documentId"
-              placeholder="Start writing your document..."
+              [placeholder]="'DOCUMENT_EDITOR.PLACEHOLDER' | translate"
               [autoSaveDelay]="2000"
               [editable]="canEdit()"
               (contentChange)="onContentChange($event)"
@@ -416,7 +416,7 @@ import { diffWords } from 'diff';
                   (click)="showVersionHistory.set(false); selectedVersions.set([])"
                   class="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
                 >
-                  <lucide-icon name="x" class="h-5 w-5 text-gray-500"></lucide-icon>
+                  <lucide-icon name="x" class="h-5 w-5 text-gray-500 dark:text-gray-400"></lucide-icon>
                 </button>
               </div>
 
@@ -435,7 +435,7 @@ import { diffWords } from 'diff';
                 @if (versionsLoading()) {
                   <div class="flex flex-col items-center justify-center py-12 gap-3">
                     <lucide-icon name="loader-circle" class="h-6 w-6 text-[#155347] dark:text-emerald-400 animate-spin"></lucide-icon>
-                    <p class="text-sm text-gray-500">{{ 'DOCUMENT_EDITOR.LOADING_VERSIONS' | translate }}</p>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">{{ 'DOCUMENT_EDITOR.LOADING_VERSIONS' | translate }}</p>
                   </div>
                 } @else if (versionsError()) {
                   <div class="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-sm text-red-600 dark:text-red-400">
@@ -443,9 +443,9 @@ import { diffWords } from 'diff';
                   </div>
                 } @else if (documentVersions().length === 0) {
                   <div class="flex flex-col items-center justify-center py-12 gap-2 text-center">
-                    <lucide-icon name="clock" class="h-8 w-8 text-gray-300"></lucide-icon>
-                    <p class="text-sm font-medium text-gray-500">{{ 'DOCUMENT_EDITOR.NO_VERSIONS' | translate }}</p>
-                    <p class="text-xs text-gray-400">{{ 'DOCUMENT_EDITOR.NO_VERSIONS_DESC' | translate }}</p>
+                    <lucide-icon name="clock" class="h-8 w-8 text-gray-300 dark:text-gray-600"></lucide-icon>
+                    <p class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ 'DOCUMENT_EDITOR.NO_VERSIONS' | translate }}</p>
+                    <p class="text-xs text-gray-400 dark:text-gray-500">{{ 'DOCUMENT_EDITOR.NO_VERSIONS_DESC' | translate }}</p>
                   </div>
                 } @else {
                   <div class="space-y-4">
@@ -454,23 +454,24 @@ import { diffWords } from 'diff';
                         [class]="'p-4 border-2 rounded-lg transition-colors ' +
                           (selectedVersions().includes(version.id)
                             ? 'border-[#155347] bg-[#e8f0ee] dark:bg-[#155347]/20'
-                            : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600')"
+                            : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 bg-white dark:bg-gray-700/40 hover:bg-gray-50 dark:hover:bg-gray-700/70')"
                       >
                         <div class="flex items-start justify-between mb-2">
                           <div>
                             <h4 class="text-sm font-bold text-gray-900 dark:text-gray-100">
-                              Version {{ documentVersions().length - i }}
+                              {{ 'DOCUMENT_EDITOR.VERSION_N' | translate: {n: documentVersions().length - i} }}
                             </h4>
-                            <p class="text-xs text-gray-500">{{ formatVersionDate(version.createdAt) }}</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">{{ formatVersionDate(version.createdAt) }}</p>
                           </div>
                           <input
                             type="checkbox"
                             [checked]="selectedVersions().includes(version.id)"
                             [disabled]="selectedVersions().length === 2 && !selectedVersions().includes(version.id)"
                             (change)="handleVersionSelect(version.id)"
-                            class="mt-1 rounded border-gray-300 text-[#155347] dark:text-emerald-400 focus:ring-[#155347] cursor-pointer disabled:cursor-not-allowed disabled:opacity-40"
+                            class="mt-1 rounded border-gray-300 dark:border-gray-500 bg-white dark:bg-gray-600 text-[#155347] dark:text-emerald-400 focus:ring-[#155347] dark:focus:ring-emerald-500 cursor-pointer disabled:cursor-not-allowed disabled:opacity-40"
                           />
                         </div>
+                        <p class="text-xs font-medium text-gray-900 dark:text-gray-100 mb-1">{{ 'DOCUMENT_EDITOR.SAVED_BY' | translate }} {{ version.authorName }}</p>
                         <p class="text-xs text-gray-700 dark:text-gray-400 mb-3">{{ formatVersionSummary(version.summary) }}</p>
                         <div class="flex gap-2">
                           <app-button
@@ -657,7 +658,7 @@ import { diffWords } from 'diff';
             @if (versionPreview(); as v) {
               <div class="min-w-0 flex-1">
                 <p class="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">{{ documentTitle }}</p>
-                <p class="text-xs text-gray-500">
+                <p class="text-xs text-gray-500 dark:text-gray-400">
                   {{ formatVersionDate(v.createdAt) }} &mdash; {{ v.authorName }}
                 </p>
               </div>
@@ -667,13 +668,13 @@ import { diffWords } from 'diff';
                   (click)="versionHasPrevious() && diffViewMode.set('diff')"
                   [disabled]="!versionHasPrevious()"
                   [title]="versionHasPrevious() ? '' : ('DOCUMENT_EDITOR.NO_PREV_VERSION' | translate)"
-                  [class]="'px-3 py-1 text-xs font-medium rounded-md transition-colors ' + (diffViewMode() === 'diff' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-500 hover:text-gray-700') + (!versionHasPrevious() ? ' opacity-40 cursor-not-allowed' : '')"
+                  [class]="'px-3 py-1 text-xs font-medium rounded-md transition-colors ' + (diffViewMode() === 'diff' ? 'bg-white dark:bg-gray-600 shadow-sm text-gray-900 dark:text-gray-100' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200') + (!versionHasPrevious() ? ' opacity-40 cursor-not-allowed' : '')"
                 >
                   {{ 'DOCUMENT_EDITOR.CHANGES' | translate }}
                 </button>
                 <button
                   (click)="diffViewMode.set('full')"
-                  [class]="'px-3 py-1 text-xs font-medium rounded-md transition-colors ' + (diffViewMode() === 'full' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-500 hover:text-gray-700')"
+                  [class]="'px-3 py-1 text-xs font-medium rounded-md transition-colors ' + (diffViewMode() === 'full' ? 'bg-white dark:bg-gray-600 shadow-sm text-gray-900 dark:text-gray-100' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200')"
                 >
                   {{ 'DOCUMENT_EDITOR.FULL_VERSION' | translate }}
                 </button>
@@ -681,10 +682,10 @@ import { diffWords } from 'diff';
             } @else {
               <div class="flex items-center gap-2 flex-1">
                 <lucide-icon name="loader-circle" class="h-4 w-4 text-[#155347] dark:text-emerald-400 animate-spin"></lucide-icon>
-                <span class="text-sm text-gray-500">{{ 'DOCUMENT_EDITOR.LOADING_VERSION' | translate }}</span>
+                <span class="text-sm text-gray-500 dark:text-gray-400">{{ 'DOCUMENT_EDITOR.LOADING_VERSION' | translate }}</span>
               </div>
             }
-            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-700 shrink-0">
+            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-400 shrink-0">
               <lucide-icon name="eye" class="h-3 w-3"></lucide-icon>
               {{ 'DOCUMENT_EDITOR.READ_ONLY' | translate }}
             </span>
@@ -696,8 +697,8 @@ import { diffWords } from 'diff';
                 @if (diffViewMode() === 'diff') {
                   @if (!versionHasPrevious()) {
                     <div class="flex flex-col items-center justify-center py-16 gap-3 text-center">
-                      <lucide-icon name="git-commit-horizontal" class="h-10 w-10 text-gray-300"></lucide-icon>
-                      <p class="text-gray-500 text-sm">{{ 'DOCUMENT_EDITOR.FIRST_VERSION' | translate }}</p>
+                      <lucide-icon name="git-commit-horizontal" class="h-10 w-10 text-gray-300 dark:text-gray-600"></lucide-icon>
+                      <p class="text-gray-500 dark:text-gray-400 text-sm">{{ 'DOCUMENT_EDITOR.FIRST_VERSION' | translate }}</p>
                       <button
                         (click)="diffViewMode.set('full')"
                         class="text-xs text-[#155347] dark:text-emerald-400 underline hover:no-underline"
@@ -705,17 +706,17 @@ import { diffWords } from 'diff';
                     </div>
                   } @else if (versionDiff()) {
                     <!-- Diff legend -->
-                    <div class="flex items-center gap-5 mb-6 pb-4 border-b border-gray-200 flex-wrap text-xs text-gray-600">
+                    <div class="flex items-center gap-5 mb-6 pb-4 border-b border-gray-200 dark:border-gray-700 flex-wrap text-xs text-gray-600 dark:text-gray-400">
                       <span class="flex items-center gap-1.5">
-                        <span class="inline-block w-3 h-3 rounded-sm bg-green-200"></span>
+                        <span class="inline-block w-3 h-3 rounded-sm bg-green-200 dark:bg-green-800"></span>
                         {{ 'DOCUMENT_EDITOR.DIFF_ADDED' | translate }}
                       </span>
                       <span class="flex items-center gap-1.5">
-                        <span class="inline-block w-3 h-3 rounded-sm bg-yellow-200"></span>
+                        <span class="inline-block w-3 h-3 rounded-sm bg-yellow-200 dark:bg-yellow-800"></span>
                         {{ 'DOCUMENT_EDITOR.DIFF_MODIFIED' | translate }}
                       </span>
                       <span class="flex items-center gap-1.5">
-                        <span class="inline-block w-3 h-3 rounded-sm bg-red-200"></span>
+                        <span class="inline-block w-3 h-3 rounded-sm bg-red-200 dark:bg-red-800"></span>
                         {{ 'DOCUMENT_EDITOR.DIFF_REMOVED' | translate }}
                       </span>
                     </div>
@@ -726,11 +727,124 @@ import { diffWords } from 'diff';
                     <div class="ql-editor" [innerHTML]="safeHtml(v.contentHtml!)"></div>
                   } @else {
                     <div class="flex flex-col items-center justify-center py-16 gap-3 text-center">
-                      <lucide-icon name="file-x" class="h-10 w-10 text-gray-300"></lucide-icon>
-                      <p class="text-gray-500 text-sm">{{ 'DOCUMENT_EDITOR.NO_CONTENT' | translate }}</p>
+                      <lucide-icon name="file-x" class="h-10 w-10 text-gray-300 dark:text-gray-600"></lucide-icon>
+                      <p class="text-gray-500 dark:text-gray-400 text-sm">{{ 'DOCUMENT_EDITOR.NO_CONTENT' | translate }}</p>
                     </div>
                   }
                 }
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+      <!-- Compare Versions Overlay -->
+      @if (showCompareOverlay()) {
+        <div class="fixed inset-0 bg-white dark:bg-gray-900 z-50 flex flex-col">
+          <!-- Header -->
+          <div class="px-4 md:px-6 py-3 border-b border-gray-200 dark:border-gray-700 flex items-center gap-3 shrink-0 bg-white dark:bg-gray-800 shadow-sm">
+            <button
+              (click)="closeCompareOverlay()"
+              class="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+            >
+              <lucide-icon name="arrow-left" class="h-5 w-5 text-gray-600 dark:text-gray-400"></lucide-icon>
+            </button>
+            <div class="min-w-0 flex-1">
+              <p class="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">{{ 'DOCUMENT_EDITOR.COMPARING_VERSIONS' | translate }}</p>
+              @if (compareOlderVersion(); as older) {
+                <p class="text-xs text-gray-500 dark:text-gray-400">
+                  {{ 'DOCUMENT_EDITOR.VERSION_N' | translate: {n: getVersionNumber(older.id)} }}
+                  &rarr;
+                  {{ 'DOCUMENT_EDITOR.VERSION_N' | translate: {n: getVersionNumber(compareNewerVersion()!.id)} }}
+                </p>
+              }
+            </div>
+            <!-- View mode toggle -->
+            <div class="flex items-center bg-gray-100 dark:bg-gray-700 rounded-lg p-0.5 shrink-0">
+              <button
+                (click)="compareViewMode.set('diff')"
+                [class]="'px-3 py-1 text-xs font-medium rounded-md transition-colors ' + (compareViewMode() === 'diff' ? 'bg-white dark:bg-gray-600 shadow-sm text-gray-900 dark:text-gray-100' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200')"
+              >
+                {{ 'DOCUMENT_EDITOR.UNIFIED_DIFF' | translate }}
+              </button>
+              <button
+                (click)="compareViewMode.set('side')"
+                [class]="'px-3 py-1 text-xs font-medium rounded-md transition-colors ' + (compareViewMode() === 'side' ? 'bg-white dark:bg-gray-600 shadow-sm text-gray-900 dark:text-gray-100' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200')"
+              >
+                {{ 'DOCUMENT_EDITOR.SIDE_BY_SIDE' | translate }}
+              </button>
+            </div>
+            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-400 shrink-0">
+              <lucide-icon name="eye" class="h-3 w-3"></lucide-icon>
+              {{ 'DOCUMENT_EDITOR.READ_ONLY' | translate }}
+            </span>
+          </div>
+          <!-- Content -->
+          <div class="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-900 px-4 py-8">
+            @if (compareLoading()) {
+              <div class="flex flex-col items-center justify-center py-24 gap-3">
+                <lucide-icon name="loader-circle" class="h-6 w-6 text-[#155347] dark:text-emerald-400 animate-spin"></lucide-icon>
+                <p class="text-sm text-gray-500 dark:text-gray-400">{{ 'DOCUMENT_EDITOR.LOADING_COMPARISON' | translate }}</p>
+              </div>
+            } @else if (compareViewMode() === 'diff') {
+              <!-- Unified diff -->
+              <div class="max-w-3xl mx-auto bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-8 md:p-12">
+                <!-- Diff legend -->
+                <div class="flex items-center gap-5 mb-6 pb-4 border-b border-gray-200 dark:border-gray-700 flex-wrap text-xs text-gray-600 dark:text-gray-400">
+                  <span class="flex items-center gap-1.5">
+                    <span class="inline-block w-3 h-3 rounded-sm bg-green-200 dark:bg-green-800"></span>
+                    {{ 'DOCUMENT_EDITOR.DIFF_ADDED' | translate }}
+                  </span>
+                  <span class="flex items-center gap-1.5">
+                    <span class="inline-block w-3 h-3 rounded-sm bg-yellow-200 dark:bg-yellow-800"></span>
+                    {{ 'DOCUMENT_EDITOR.DIFF_MODIFIED' | translate }}
+                  </span>
+                  <span class="flex items-center gap-1.5">
+                    <span class="inline-block w-3 h-3 rounded-sm bg-red-200 dark:bg-red-800"></span>
+                    {{ 'DOCUMENT_EDITOR.DIFF_REMOVED' | translate }}
+                  </span>
+                </div>
+                @if (compareDiffHtml()) {
+                  <div [innerHTML]="compareDiffHtml()"></div>
+                }
+              </div>
+            } @else {
+              <!-- Side-by-side -->
+              <div class="max-w-7xl mx-auto grid grid-cols-2 gap-4">
+                <!-- Older version -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col overflow-hidden">
+                  <div class="px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/80">
+                    <p class="text-sm font-semibold text-gray-900 dark:text-gray-100">
+                      {{ 'DOCUMENT_EDITOR.VERSION_N' | translate: {n: getVersionNumber(compareOlderVersion()!.id)} }}
+                      <span class="text-xs font-normal text-gray-500 dark:text-gray-400 ml-2">{{ 'DOCUMENT_EDITOR.OLDER' | translate }}</span>
+                    </p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">{{ formatVersionDate(compareOlderVersion()!.createdAt) }} &mdash; {{ compareOlderVersion()!.authorName }}</p>
+                  </div>
+                  <div class="p-6 md:p-8 overflow-y-auto flex-1">
+                    @if (compareOlderVersion()!.contentHtml) {
+                      <div class="ql-editor" [innerHTML]="safeHtml(compareOlderVersion()!.contentHtml!)"></div>
+                    } @else {
+                      <p class="text-sm text-gray-400 dark:text-gray-500 italic">{{ 'DOCUMENT_EDITOR.NO_CONTENT' | translate }}</p>
+                    }
+                  </div>
+                </div>
+                <!-- Newer version -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col overflow-hidden">
+                  <div class="px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/80">
+                    <p class="text-sm font-semibold text-gray-900 dark:text-gray-100">
+                      {{ 'DOCUMENT_EDITOR.VERSION_N' | translate: {n: getVersionNumber(compareNewerVersion()!.id)} }}
+                      <span class="text-xs font-normal text-gray-500 dark:text-gray-400 ml-2">{{ 'DOCUMENT_EDITOR.NEWER' | translate }}</span>
+                    </p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">{{ formatVersionDate(compareNewerVersion()!.createdAt) }} &mdash; {{ compareNewerVersion()!.authorName }}</p>
+                  </div>
+                  <div class="p-6 md:p-8 overflow-y-auto flex-1">
+                    @if (compareNewerVersion()!.contentHtml) {
+                      <div class="ql-editor" [innerHTML]="safeHtml(compareNewerVersion()!.contentHtml!)"></div>
+                    } @else {
+                      <p class="text-sm text-gray-400 dark:text-gray-500 italic">{{ 'DOCUMENT_EDITOR.NO_CONTENT' | translate }}</p>
+                    }
+                  </div>
+                </div>
               </div>
             }
           </div>
@@ -1144,6 +1258,12 @@ export class DocumentEditorComponent implements OnInit {
   versionToRestore = signal<number | null>(null);
   newComment = '';
   selectedVersions = signal<number[]>([]);
+  showCompareOverlay = signal(false);
+  compareLoading = signal(false);
+  compareOlderVersion = signal<DocumentVersionDetailDto | null>(null);
+  compareNewerVersion = signal<DocumentVersionDetailDto | null>(null);
+  compareDiffHtml = signal<SafeHtml | null>(null);
+  compareViewMode = signal<'diff' | 'side'>('diff');
   aiGenerating = signal(false);
   restoreConfirmed = false;
 
@@ -1656,6 +1776,16 @@ export class DocumentEditorComponent implements OnInit {
     }
     html += '</div>';
     return html;
+  }
+
+  formatVersionSummary(summary: string): string {
+    if (!summary) return '';
+    const prefix = 'Session by ';
+    if (summary.startsWith(prefix)) {
+      const name = summary.slice(prefix.length);
+      return this.translateService.instant('DOCUMENT_EDITOR.SESSION_BY') + ' ' + name;
+    }
+    return summary;
   }
 
   formatVersionDate(dateStr: string): string {

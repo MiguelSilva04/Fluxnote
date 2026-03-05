@@ -2,7 +2,7 @@ import { Component, inject, signal, computed, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { LucideAngularModule } from 'lucide-angular';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { DashboardLayoutComponent } from '../../../layout/dashboard-layout/dashboard-layout.component';
 import {
   ButtonComponent,
@@ -856,6 +856,7 @@ import { firstValueFrom } from 'rxjs';
 export class ProfileComponent {
   private authService = inject(AuthService);
   private uploadService = inject(UploadService);
+  private translateService = inject(TranslateService);
 
   user = this.authService.currentUser;
 
@@ -1405,7 +1406,8 @@ export class ProfileComponent {
   formatDate(dateString?: string): string {
     if (!dateString) return '';
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+    const locale = this.translateService.getCurrentLang();
+    return date.toLocaleDateString(locale, { month: 'long', year: 'numeric' });
   }
 
   confirmLogout(): void {

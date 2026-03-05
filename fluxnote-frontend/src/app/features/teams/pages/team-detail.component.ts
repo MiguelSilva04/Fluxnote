@@ -84,6 +84,12 @@ export class TeamDetailComponent {
     return role === 1 ? 'ROLES.EDITOR' : 'ROLES.VIEWER';
   }
 
+  formatCreatedDate(dateString?: string): string {
+    if (!dateString) return '';
+    const locale = this.translateService.getCurrentLang();
+    return new Date(dateString).toLocaleDateString(locale, { day: 'numeric', month: 'long', year: 'numeric' });
+  }
+
   memberOptionLabel(name: string, role: number): string {
     if (role === 1) return `${name} (${this.translateService.instant('ROLES.TEAM_ADMIN')})`;
     return name;
