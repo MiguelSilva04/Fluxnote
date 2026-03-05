@@ -648,6 +648,7 @@ import { diffWords } from 'diff';
           <div class="px-4 md:px-6 py-3 border-b border-gray-200 dark:border-gray-700 flex items-center gap-3 shrink-0 bg-white dark:bg-gray-800 shadow-sm">
             <button
               (click)="closeVersionPreview()"
+              data-testid="version-preview-back"
               class="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
             >
               <lucide-icon name="arrow-left" class="h-5 w-5 text-gray-600 dark:text-gray-400"></lucide-icon>

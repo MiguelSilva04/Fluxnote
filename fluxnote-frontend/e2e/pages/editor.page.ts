@@ -78,8 +78,9 @@ export class EditorPage {
   }
 
   async closeVersionPreview() {
-    // Back button is the first button in the preview overlay header
-    await this.page.locator('div').filter({ has: this.versionPreviewOverlay }).getByRole('button').first().click();
+    // The preview overlay is a fixed full-screen div (div.fixed.inset-0)
+    // Its first button is the back arrow (the main header back button is outside this div)
+    await this.page.locator('div.fixed.inset-0').getByRole('button').first().click();
   }
 
   async waitForVersionPreview() {
