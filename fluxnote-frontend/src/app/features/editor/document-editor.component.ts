@@ -736,6 +736,119 @@ import { diffWords } from 'diff';
         </div>
       }
 
+      <!-- Compare Versions Overlay -->
+      @if (showCompareOverlay()) {
+        <div class="fixed inset-0 bg-white dark:bg-gray-900 z-50 flex flex-col">
+          <!-- Header -->
+          <div class="px-4 md:px-6 py-3 border-b border-gray-200 dark:border-gray-700 flex items-center gap-3 shrink-0 bg-white dark:bg-gray-800 shadow-sm">
+            <button
+              (click)="closeCompareOverlay()"
+              class="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+            >
+              <lucide-icon name="arrow-left" class="h-5 w-5 text-gray-600 dark:text-gray-400"></lucide-icon>
+            </button>
+            <div class="min-w-0 flex-1">
+              <p class="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">{{ 'DOCUMENT_EDITOR.COMPARING_VERSIONS' | translate }}</p>
+              @if (compareOlderVersion(); as older) {
+                <p class="text-xs text-gray-500 dark:text-gray-400">
+                  {{ 'DOCUMENT_EDITOR.VERSION_N' | translate: {n: getVersionNumber(older.id)} }}
+                  &rarr;
+                  {{ 'DOCUMENT_EDITOR.VERSION_N' | translate: {n: getVersionNumber(compareNewerVersion()!.id)} }}
+                </p>
+              }
+            </div>
+            <!-- View mode toggle -->
+            <div class="flex items-center bg-gray-100 dark:bg-gray-700 rounded-lg p-0.5 shrink-0">
+              <button
+                (click)="compareViewMode.set('diff')"
+                [class]="'px-3 py-1 text-xs font-medium rounded-md transition-colors ' + (compareViewMode() === 'diff' ? 'bg-white dark:bg-gray-600 shadow-sm text-gray-900 dark:text-gray-100' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200')"
+              >
+                {{ 'DOCUMENT_EDITOR.UNIFIED_DIFF' | translate }}
+              </button>
+              <button
+                (click)="compareViewMode.set('side')"
+                [class]="'px-3 py-1 text-xs font-medium rounded-md transition-colors ' + (compareViewMode() === 'side' ? 'bg-white dark:bg-gray-600 shadow-sm text-gray-900 dark:text-gray-100' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200')"
+              >
+                {{ 'DOCUMENT_EDITOR.SIDE_BY_SIDE' | translate }}
+              </button>
+            </div>
+            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-400 shrink-0">
+              <lucide-icon name="eye" class="h-3 w-3"></lucide-icon>
+              {{ 'DOCUMENT_EDITOR.READ_ONLY' | translate }}
+            </span>
+          </div>
+          <!-- Content -->
+          <div class="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-900 px-4 py-8">
+            @if (compareLoading()) {
+              <div class="flex flex-col items-center justify-center py-24 gap-3">
+                <lucide-icon name="loader-circle" class="h-6 w-6 text-[#155347] dark:text-emerald-400 animate-spin"></lucide-icon>
+                <p class="text-sm text-gray-500 dark:text-gray-400">{{ 'DOCUMENT_EDITOR.LOADING_COMPARISON' | translate }}</p>
+              </div>
+            } @else if (compareViewMode() === 'diff') {
+              <!-- Unified diff -->
+              <div class="max-w-3xl mx-auto bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-8 md:p-12">
+                <!-- Diff legend -->
+                <div class="flex items-center gap-5 mb-6 pb-4 border-b border-gray-200 dark:border-gray-700 flex-wrap text-xs text-gray-600 dark:text-gray-400">
+                  <span class="flex items-center gap-1.5">
+                    <span class="inline-block w-3 h-3 rounded-sm bg-green-200 dark:bg-green-800"></span>
+                    {{ 'DOCUMENT_EDITOR.DIFF_ADDED' | translate }}
+                  </span>
+                  <span class="flex items-center gap-1.5">
+                    <span class="inline-block w-3 h-3 rounded-sm bg-yellow-200 dark:bg-yellow-800"></span>
+                    {{ 'DOCUMENT_EDITOR.DIFF_MODIFIED' | translate }}
+                  </span>
+                  <span class="flex items-center gap-1.5">
+                    <span class="inline-block w-3 h-3 rounded-sm bg-red-200 dark:bg-red-800"></span>
+                    {{ 'DOCUMENT_EDITOR.DIFF_REMOVED' | translate }}
+                  </span>
+                </div>
+                @if (compareDiffHtml()) {
+                  <div [innerHTML]="compareDiffHtml()"></div>
+                }
+              </div>
+            } @else {
+              <!-- Side-by-side -->
+              <div class="max-w-7xl mx-auto grid grid-cols-2 gap-4">
+                <!-- Older version -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col overflow-hidden">
+                  <div class="px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/80">
+                    <p class="text-sm font-semibold text-gray-900 dark:text-gray-100">
+                      {{ 'DOCUMENT_EDITOR.VERSION_N' | translate: {n: getVersionNumber(compareOlderVersion()!.id)} }}
+                      <span class="text-xs font-normal text-gray-500 dark:text-gray-400 ml-2">{{ 'DOCUMENT_EDITOR.OLDER' | translate }}</span>
+                    </p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">{{ formatVersionDate(compareOlderVersion()!.createdAt) }} &mdash; {{ compareOlderVersion()!.authorName }}</p>
+                  </div>
+                  <div class="p-6 md:p-8 overflow-y-auto flex-1">
+                    @if (compareOlderVersion()!.contentHtml) {
+                      <div class="ql-editor" [innerHTML]="safeHtml(compareOlderVersion()!.contentHtml!)"></div>
+                    } @else {
+                      <p class="text-sm text-gray-400 dark:text-gray-500 italic">{{ 'DOCUMENT_EDITOR.NO_CONTENT' | translate }}</p>
+                    }
+                  </div>
+                </div>
+                <!-- Newer version -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col overflow-hidden">
+                  <div class="px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/80">
+                    <p class="text-sm font-semibold text-gray-900 dark:text-gray-100">
+                      {{ 'DOCUMENT_EDITOR.VERSION_N' | translate: {n: getVersionNumber(compareNewerVersion()!.id)} }}
+                      <span class="text-xs font-normal text-gray-500 dark:text-gray-400 ml-2">{{ 'DOCUMENT_EDITOR.NEWER' | translate }}</span>
+                    </p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">{{ formatVersionDate(compareNewerVersion()!.createdAt) }} &mdash; {{ compareNewerVersion()!.authorName }}</p>
+                  </div>
+                  <div class="p-6 md:p-8 overflow-y-auto flex-1">
+                    @if (compareNewerVersion()!.contentHtml) {
+                      <div class="ql-editor" [innerHTML]="safeHtml(compareNewerVersion()!.contentHtml!)"></div>
+                    } @else {
+                      <p class="text-sm text-gray-400 dark:text-gray-500 italic">{{ 'DOCUMENT_EDITOR.NO_CONTENT' | translate }}</p>
+                    }
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
       <!-- AI Summary Modal -->
       @if (showSummaryModal()) {
         <div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
@@ -1142,6 +1255,12 @@ export class DocumentEditorComponent implements OnInit {
   versionToRestore = signal<number | null>(null);
   newComment = '';
   selectedVersions = signal<number[]>([]);
+  showCompareOverlay = signal(false);
+  compareLoading = signal(false);
+  compareOlderVersion = signal<DocumentVersionDetailDto | null>(null);
+  compareNewerVersion = signal<DocumentVersionDetailDto | null>(null);
+  compareDiffHtml = signal<SafeHtml | null>(null);
+  compareViewMode = signal<'diff' | 'side'>('diff');
   aiGenerating = signal(false);
   restoreConfirmed = false;
 
@@ -1688,9 +1807,48 @@ export class DocumentEditorComponent implements OnInit {
   }
 
   handleCompareVersions(): void {
-    if (this.selectedVersions().length === 2) {
-      this.showWipModal.set(true);
-    }
+    if (this.selectedVersions().length !== 2 || !this.documentId) return;
+    const ids = this.selectedVersions();
+    const versions = this.documentVersions();
+    const idxA = versions.findIndex(v => v.id === ids[0]);
+    const idxB = versions.findIndex(v => v.id === ids[1]);
+    const [olderIdx, newerIdx] = idxA > idxB ? [idxA, idxB] : [idxB, idxA];
+    const olderMeta = versions[olderIdx];
+    const newerMeta = versions[newerIdx];
+
+    this.showCompareOverlay.set(true);
+    this.compareLoading.set(true);
+    this.compareDiffHtml.set(null);
+    this.compareOlderVersion.set(null);
+    this.compareNewerVersion.set(null);
+    this.compareViewMode.set('diff');
+
+    const older$ = this.documentService.getDocumentVersionDetail(this.documentId, olderMeta.id);
+    const newer$ = this.documentService.getDocumentVersionDetail(this.documentId, newerMeta.id);
+
+    forkJoin({ older: older$, newer: newer$ }).subscribe({
+      next: ({ older, newer }) => {
+        this.compareOlderVersion.set(older);
+        this.compareNewerVersion.set(newer);
+        const diffHtml = this.computeVersionDiff(older.contentHtml, newer.contentHtml);
+        this.compareDiffHtml.set(this.sanitizer.bypassSecurityTrustHtml(diffHtml));
+        this.compareLoading.set(false);
+      },
+      error: () => this.compareLoading.set(false),
+    });
+  }
+
+  closeCompareOverlay(): void {
+    this.showCompareOverlay.set(false);
+    this.compareDiffHtml.set(null);
+    this.compareOlderVersion.set(null);
+    this.compareNewerVersion.set(null);
+  }
+
+  getVersionNumber(versionId: number): number {
+    const versions = this.documentVersions();
+    const idx = versions.findIndex(v => v.id === versionId);
+    return idx >= 0 ? versions.length - idx : 0;
   }
 
   handleRestore(versionNumber: number): void {
