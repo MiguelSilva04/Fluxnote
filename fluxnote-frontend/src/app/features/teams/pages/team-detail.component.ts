@@ -1,8 +1,9 @@
-import { Component, inject, signal } from '@angular/core';
+﻿import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
+import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import { DashboardLayoutComponent } from '../../../layout/dashboard-layout/dashboard-layout.component';
 import { ButtonComponent, CardComponent, CardContentComponent, BadgeComponent, ModalComponent } from '../../../shared/components/ui';
 import { DocumentShareModalComponent } from '../../../shared/components/document-share-modal/document-share-modal.component';
@@ -27,7 +28,8 @@ import { TeamMemberToPost, TeamDocument, DocumentPermissionSummary, DocumentInvi
     BadgeComponent,
     ModalComponent,
     DocumentShareModalComponent,
-    TeamShareModalComponent
+    TeamShareModalComponent,
+    TranslateModule
   ],
   templateUrl: `./team-detail.component.html`
 })
@@ -38,6 +40,7 @@ export class TeamDetailComponent {
   private docPermissionService = inject(DocumentPermissionService);
   private authService = inject(AuthService);
   private toastService = inject(ToastService);
+  private translateService = inject(TranslateService);
   private documentService = inject(DocumentService);
 
   private documentInviteService = inject(DocumentInviteService);
@@ -60,15 +63,31 @@ export class TeamDetailComponent {
   selectedTeam = this.teamService.selectedTeam;
 
   roleNames: { [key: number]: string } = {
-    0: 'Member',
-    1: 'Team Admin',
-    2: 'Owner'
+    0: 'ROLES.MEMBER',
+    1: 'ROLES.TEAM_ADMIN',
+    2: 'ROLES.OWNER'
   };
 
   docRoleNames: { [key: number]: string } = {
-    0: 'Viewer',
-    1: 'Editor'
+    0: 'ROLES.VIEWER',
+    1: 'ROLES.EDITOR'
   };
+
+  teamRoleKey(role: number): string {
+    const keys: { [key: number]: string } = {
+      0: 'ROLES.MEMBER', 1: 'ROLES.TEAM_ADMIN', 2: 'ROLES.OWNER'
+    };
+    return keys[role] ?? 'ROLES.MEMBER';
+  }
+
+  docRoleKey(role: number): string {
+    return role === 1 ? 'ROLES.EDITOR' : 'ROLES.VIEWER';
+  }
+
+  memberOptionLabel(name: string, role: number): string {
+    if (role === 1) return `${name} (${this.translateService.instant('ROLES.TEAM_ADMIN')})`;
+    return name;
+  }
 
   loading = signal(true);
   isDeleteModalOpen = signal(false);
@@ -229,11 +248,11 @@ export class TeamDetailComponent {
         this.selectedTeam.set({ ...team, name });
         this.isEditingName.set(false);
         this.isSavingName.set(false);
-        this.toastService.success('Team name updated.');
+        this.toastService.success(this.translateService.instant('TOASTS.TEAM_NAME_UPDATED'));
       },
       error: () => {
         this.isSavingName.set(false);
-        this.toastService.error('Failed to update team name.');
+        this.toastService.error(this.translateService.instant('TOASTS.TEAM_NAME_UPDATE_FAILED'));
       }
     });
   }
@@ -324,7 +343,7 @@ export class TeamDetailComponent {
   onTeamRoleChange(member: TeamMemberToPost, newRole: number): void {
     this.teamService.updateMemberRole(member.id!, newRole).subscribe({
       next: () => {
-        this.toastService.success('Role updated successfully.');
+        this.toastService.success(this.translateService.instant('TOASTS.ROLE_UPDATED'));
         // Recarregar equipa para atualizar documentos e permissões
         const team = this.selectedTeam();
         if (team) {
@@ -333,7 +352,7 @@ export class TeamDetailComponent {
       },
       error: (err) => {
         console.error('Error updating member role:', err);
-        this.toastService.error('Failed to update role. Please try again.');
+        this.toastService.error(this.translateService.instant('TOASTS.ROLE_UPDATE_FAILED'));
       }
     });
   }
@@ -368,7 +387,7 @@ export class TeamDetailComponent {
     this.isRemovingMember.set(true);
     this.teamService.removeMember(member.id).subscribe({
       next: () => {
-        this.toastService.success('Member removed from team.');
+        this.toastService.success(this.translateService.instant('TOASTS.MEMBER_REMOVED'));
         const team = this.selectedTeam();
         if (team) {
           const updated = {
@@ -388,7 +407,7 @@ export class TeamDetailComponent {
         console.error('Error removing member:', err);
         this.isRemovingMember.set(false);
         this.closeRemoveMemberModal();
-        this.toastService.error('Failed to remove member. Please try again.');
+        this.toastService.error(this.translateService.instant('TOASTS.MEMBER_REMOVE_FAILED'));
       }
     });
   }
@@ -414,7 +433,7 @@ export class TeamDetailComponent {
   onDocRoleChange(permission: DocumentPermissionSummary, newRole: number): void {
     this.docPermissionService.updatePermission(permission.id, newRole).subscribe({
       next: () => {
-        this.toastService.success('Document role updated successfully.');
+        this.toastService.success(this.translateService.instant('TOASTS.DOC_ROLE_UPDATED'));
         // Update local state
         const team = this.selectedTeam();
         if (team) {
@@ -432,7 +451,7 @@ export class TeamDetailComponent {
       },
       error: (err) => {
         console.error('Error updating document permission:', err);
-        this.toastService.error('Failed to update document role. Please try again.');
+        this.toastService.error(this.translateService.instant('TOASTS.DOC_ROLE_UPDATE_FAILED'));
       }
     });
   }
@@ -453,7 +472,7 @@ export class TeamDetailComponent {
     this.isRemovingDocPermission.set(true);
     this.docPermissionService.removePermission(target.permission.id).subscribe({
       next: () => {
-        this.toastService.success('User removed from document.');
+        this.toastService.success(this.translateService.instant('TOASTS.USER_REMOVED_FROM_DOC'));
         const team = this.selectedTeam();
         if (team) {
           const updated = {
@@ -477,7 +496,7 @@ export class TeamDetailComponent {
         console.error('Error removing document permission:', err);
         this.isRemovingDocPermission.set(false);
         this.closeRemoveDocPermissionModal();
-        this.toastService.error('Failed to remove user from document. Please try again.');
+        this.toastService.error(this.translateService.instant('TOASTS.USER_REMOVE_FROM_DOC_FAILED'));
       }
     });
   }
@@ -548,7 +567,7 @@ export class TeamDetailComponent {
       role: role
     }).subscribe({
       next: (newPermission) => {
-        this.toastService.success('User added to document.');
+        this.toastService.success(this.translateService.instant('TOASTS.USER_ADDED_TO_DOC'));
         // Find the member name for local state update
         if (team) {
           const permSummary: DocumentPermissionSummary = {
@@ -577,7 +596,7 @@ export class TeamDetailComponent {
       },
       error: (err) => {
         console.error('Error adding document permission:', err);
-        this.toastService.error('Failed to add user to document. Please try again.');
+        this.toastService.error(this.translateService.instant('TOASTS.USER_ADD_TO_DOC_FAILED'));
       }
     });
   }
@@ -619,7 +638,7 @@ export class TeamDetailComponent {
       },
       error: (err) => {
         console.error('Error creating invite:', err);
-        this.toastService.error('Error creating invite.');
+        this.toastService.error(this.translateService.instant('TOASTS.INVITE_CREATE_FAILED'));
         this.shareLoading.set(false);
       }
     });
@@ -631,7 +650,7 @@ export class TeamDetailComponent {
 
     navigator.clipboard.writeText(url).then(() => {
       this.shareCopied.set(true);
-      this.toastService.success('Link copied!');
+      this.toastService.success(this.translateService.instant('TOASTS.LINK_COPIED'));
       setTimeout(() => this.shareCopied.set(false), 3000);
     });
   }
@@ -646,12 +665,12 @@ export class TeamDetailComponent {
   revokeDocumentInvite(inviteId: number): void {
     this.documentInviteService.revokeInvite(inviteId).subscribe({
       next: () => {
-        this.toastService.success('Invite revoked.');
+        this.toastService.success(this.translateService.instant('TOASTS.INVITE_REVOKED'));
         const docId = this.shareDocId();
         if (docId) this.loadDocumentInvites(docId);
       },
       error: () => {
-        this.toastService.error('Error revoking invite.');
+        this.toastService.error(this.translateService.instant('TOASTS.INVITE_REVOKE_FAILED'));
       }
     });
   }
@@ -669,7 +688,7 @@ export class TeamDetailComponent {
           if (completed === usedInvites.length) {
             const docId = this.shareDocId();
             if (docId) this.loadDocumentInvites(docId);
-            if (!hadError) this.toastService.success('Used invites cleared.');
+            if (!hadError) this.toastService.success(this.translateService.instant('TOASTS.INVITES_CLEARED'));
           }
         },
         error: () => {
@@ -678,7 +697,7 @@ export class TeamDetailComponent {
           if (completed === usedInvites.length) {
             const docId = this.shareDocId();
             if (docId) this.loadDocumentInvites(docId);
-            this.toastService.error('Failed to clear some invites.');
+            this.toastService.error(this.translateService.instant('TOASTS.INVITES_CLEAR_FAILED'));
           }
         }
       });
@@ -709,12 +728,12 @@ export class TeamDetailComponent {
     this.folderService.createFolder(this.newFolderName.trim(), team.id).subscribe({
       next: () => {
         this.closeCreateFolderModal();
-        this.toastService.success('Folder created.');
+        this.toastService.success(this.translateService.instant('TOASTS.FOLDER_CREATED'));
         this.loadTeam(team.id);
       },
       error: (err) => {
         console.error('Error creating folder:', err);
-        this.toastService.error('Failed to create folder.');
+        this.toastService.error(this.translateService.instant('TOASTS.FOLDER_CREATE_FAILED'));
       }
     });
   }
@@ -738,13 +757,13 @@ export class TeamDetailComponent {
     this.folderService.updateFolder(folder.id, this.renameFolderName.trim()).subscribe({
       next: () => {
         this.closeRenameFolderModal();
-        this.toastService.success('Folder renamed.');
+        this.toastService.success(this.translateService.instant('TOASTS.FOLDER_RENAME_SUCCESS'));
         const team = this.selectedTeam();
         if (team) this.loadTeam(team.id);
       },
       error: (err) => {
         console.error('Error renaming folder:', err);
-        this.toastService.error('Failed to rename folder.');
+        this.toastService.error(this.translateService.instant('TOASTS.FOLDER_RENAME_FAILED'));
       }
     });
   }
@@ -768,14 +787,14 @@ export class TeamDetailComponent {
       next: () => {
         this.isDeletingFolder.set(false);
         this.closeDeleteFolderModal();
-        this.toastService.success('Folder deleted. Documents moved out.');
+        this.toastService.success(this.translateService.instant('TOASTS.FOLDER_DELETE_SUCCESS'));
         const team = this.selectedTeam();
         if (team) this.loadTeam(team.id);
       },
       error: (err) => {
         this.isDeletingFolder.set(false);
         console.error('Error deleting folder:', err);
-        this.toastService.error('Failed to delete folder.');
+        this.toastService.error(this.translateService.instant('TOASTS.FOLDER_DELETE_FAILED'));
       }
     });
   }
@@ -790,23 +809,23 @@ export class TeamDetailComponent {
       if (!currentFolderId) return;
       this.folderService.removeDocumentFromFolder(currentFolderId, doc.id).subscribe({
         next: () => {
-          this.toastService.success('Document removed from folder.');
+          this.toastService.success(this.translateService.instant('TOASTS.DOC_REMOVED_FROM_FOLDER'));
           this.loadTeam(team.id);
         },
         error: (err) => {
           console.error('Error removing document from folder:', err);
-          this.toastService.error('Failed to move document.');
+          this.toastService.error(this.translateService.instant('TOASTS.DOC_MOVE_FAILED'));
         }
       });
     } else {
       this.folderService.moveDocumentToFolder(folderId, doc.id).subscribe({
         next: () => {
-          this.toastService.success('Document moved to folder.');
+          this.toastService.success(this.translateService.instant('TOASTS.DOC_MOVED_TO_FOLDER'));
           this.loadTeam(team.id);
         },
         error: (err) => {
           console.error('Error moving document to folder:', err);
-          this.toastService.error('Failed to move document.');
+          this.toastService.error(this.translateService.instant('TOASTS.DOC_MOVE_FAILED'));
         }
       });
     }
@@ -901,12 +920,12 @@ export class TeamDetailComponent {
 
     this.folderService.moveDocumentToFolder(folderId, docId).subscribe({
       next: () => {
-        this.toastService.success('Document moved to folder.');
+        this.toastService.success(this.translateService.instant('TOASTS.DOC_MOVED_TO_FOLDER'));
         this.loadTeam(team.id);
       },
       error: (err) => {
         console.error('Error moving document to folder:', err);
-        this.toastService.error('Failed to move document.');
+        this.toastService.error(this.translateService.instant('TOASTS.DOC_MOVE_FAILED'));
       }
     });
   }
@@ -926,12 +945,12 @@ export class TeamDetailComponent {
 
     this.folderService.removeDocumentFromFolder(doc.folderId, docId).subscribe({
       next: () => {
-        this.toastService.success('Document removed from folder.');
+        this.toastService.success(this.translateService.instant('TOASTS.DOC_REMOVED_FROM_FOLDER'));
         this.loadTeam(team.id);
       },
       error: (err) => {
         console.error('Error removing document from folder:', err);
-        this.toastService.error('Failed to move document.');
+        this.toastService.error(this.translateService.instant('TOASTS.DOC_MOVE_FAILED'));
       }
     });
   }
@@ -974,7 +993,7 @@ export class TeamDetailComponent {
       },
       error: (err) => {
         console.error('Error creating invite:', err);
-        this.toastService.error('Error creating invite.');
+        this.toastService.error(this.translateService.instant('TOASTS.INVITE_CREATE_FAILED'));
         this.shareLoading.set(false);
       }
     });
@@ -991,12 +1010,12 @@ export class TeamDetailComponent {
   revokeTeamInvite(inviteId: number): void {
     this.teamInviteService.revokeInvite(inviteId).subscribe({
       next: () => {
-        this.toastService.success('Invite revoked.');
+        this.toastService.success(this.translateService.instant('TOASTS.INVITE_REVOKED'));
         const teamId = this.shareTeamId();
         if (teamId) this.loadTeamInvites(teamId);
       },
       error: () => {
-        this.toastService.error('Error revoking invite.');
+        this.toastService.error(this.translateService.instant('TOASTS.INVITE_REVOKE_FAILED'));
       }
     });
   }
@@ -1014,7 +1033,7 @@ export class TeamDetailComponent {
           if (completed === usedInvites.length) {
             const teamId = this.shareTeamId();
             if (teamId) this.loadTeamInvites(teamId);
-            if (!hadError) this.toastService.success('Used invites cleared.');
+            if (!hadError) this.toastService.success(this.translateService.instant('TOASTS.INVITES_CLEARED'));
           }
         },
         error: () => {
@@ -1023,7 +1042,7 @@ export class TeamDetailComponent {
           if (completed === usedInvites.length) {
             const teamId = this.shareTeamId();
             if (teamId) this.loadTeamInvites(teamId);
-            this.toastService.error('Failed to clear some invites.');
+            this.toastService.error(this.translateService.instant('TOASTS.INVITES_CLEAR_FAILED'));
           }
         }
       });
@@ -1031,26 +1050,24 @@ export class TeamDetailComponent {
   }
 
   startTour(): void {
+    const t = (key: string) => this.translateService.instant(key);
     const steps: TourStep[] = [
       {
         targetSelector: '[data-tour="team-members-section"]',
-        title: 'Team Members',
-        description:
-          'Here you can see all the members of this team, their roles and manage their access.',
+        title: t('TOUR.TEAM.MEMBERS_TITLE'),
+        description: t('TOUR.TEAM.MEMBERS_DESC'),
         position: 'right',
       },
       {
         targetSelector: '[data-tour="member-role"]',
-        title: 'Team Roles',
-        description:
-          'Each member has a role: Owner has full permissions over the team; Team Admin can add/remove members, is an Editor on all documents they belong to, and can share documents and change other members\' roles; Member has basic access to assigned documents only.',
+        title: t('TOUR.TEAM.ROLES_TITLE'),
+        description: t('TOUR.TEAM.ROLES_DESC'),
         position: 'left',
       },
       {
         targetSelector: '[data-tour="doc-permissions-section"]',
-        title: 'Document Permissions',
-        description:
-          'This section shows per-document permissions. Expand any document to see which members have access and their role (Viewer or Editor).',
+        title: t('TOUR.TEAM.DOC_PERMS_TITLE'),
+        description: t('TOUR.TEAM.DOC_PERMS_DESC'),
         position: 'right',
       },
     ];
@@ -1061,16 +1078,14 @@ export class TeamDetailComponent {
       steps.push(
         {
           targetSelector: '[data-tour="share-btn"]',
-          title: 'Share Button',
-          description:
-            'Clicking this button allows you to generate shareable links for this document, where you can set the role and expiration date.',
+          title: t('TOUR.TEAM.SHARE_BTN_TITLE'),
+          description: t('TOUR.TEAM.SHARE_BTN_DESC'),
           position: 'bottom',
         },
         { 
-          title: 'Share Documents',
+          title: t('TOUR.TEAM.SHARE_DOC_TITLE'),
           screenPosition: 'top',
-          description:
-            'Choose a role (Viewer/Editor) and an expiration date, then share the generated link with the person you want to invite.',
+          description: t('TOUR.TEAM.SHARE_DOC_DESC'),
           position: 'bottom',
           onActivate: () => {
             if (firstDoc) {
@@ -1088,9 +1103,8 @@ export class TeamDetailComponent {
     if (this.isOwner()) {
       steps.push({
         targetSelector: '[data-tour="danger-zone"]',
-        title: 'Delete Team',
-        description:
-          'As the Owner, you can permanently delete this team. This will remove all documents and members - this action cannot be undone.',
+        title: t('TOUR.TEAM.DANGER_TITLE'),
+        description: t('TOUR.TEAM.DANGER_DESC'),
         position: 'left',
       });
     }

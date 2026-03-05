@@ -1,25 +1,25 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-hero-section',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, TranslateModule],
   template: `
     <section class="bg-gradient-to-br from-[#155347]/10 to-white py-20 lg:py-32 relative overflow-hidden">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="grid lg:grid-cols-2 gap-12 items-center">
           <div class="text-center lg:text-left">
             <h1 class="text-4xl lg:text-6xl font-bold text-gray-900 mb-6">
-              Create documents with
-              <span class="text-[#155347]"> AI</span> &
-              <span class="text-[#155347]"> real-time collaboration</span>
+              {{ 'LANDING.HERO.TITLE_1' | translate }}
+              <span class="text-[#155347]"> {{ 'LANDING.HERO.TITLE_AI' | translate }}</span> {{ 'LANDING.HERO.TITLE_AND' | translate }}
+              <span class="text-[#155347]"> {{ 'LANDING.HERO.TITLE_COLLAB' | translate }}</span>
             </h1>
 
             <p class="text-xl text-gray-600 mb-8 max-w-2xl">
-              Transform the way your team creates documents. With built-in AI and instant collaboration,
-              producing high-quality content has never been easier.
+              {{ 'LANDING.HERO.SUBTITLE' | translate }}
             </p>
 
             <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
@@ -27,13 +27,13 @@ import { Router } from '@angular/router';
                 (click)="goToLogin()"
                 class="bg-[#155347] text-white px-8 py-4 rounded-xl text-lg font-semibold hover:bg-[#155347] transition-colors shadow-lg cursor-pointer"
               >
-                Get started
+                {{ 'LANDING.HERO.GET_STARTED' | translate }}
               </button>
               <button
                 (click)="goToDemo()"
                 class="border-2 border-[#155347] text-[#155347] px-8 py-4 rounded-xl text-lg font-semibold hover:bg-[#155347]/10 transition-colors cursor-pointer"
               >
-                View demo
+                {{ 'LANDING.HERO.VIEW_DEMO' | translate }}
               </button>
             </div>
           </div>
@@ -52,7 +52,7 @@ import { Router } from '@angular/router';
               <div class="flex items-center space-x-2">
                 <div class="w-3 h-3 bg-[#155347] rounded-full"></div>
                 <span class="text-sm font-medium text-gray-700">
-                  AI active
+                  {{ 'LANDING.HERO.AI_ACTIVE' | translate }}
                 </span>
               </div>
             </div>
@@ -61,7 +61,7 @@ import { Router } from '@angular/router';
               <div class="flex items-center space-x-2">
                 <div class="w-3 h-3 bg-blue-500 rounded-full"></div>
                 <span class="text-sm font-medium text-gray-700">
-                  3 collaborators
+                  {{ 'LANDING.HERO.COLLABORATORS' | translate }}
                 </span>
               </div>
             </div>

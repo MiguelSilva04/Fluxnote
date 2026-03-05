@@ -1,9 +1,11 @@
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LucideAngularModule } from 'lucide-angular';
+import { TranslateModule } from '@ngx-translate/core';
 import { DashboardLayoutComponent } from '../../../layout/dashboard-layout/dashboard-layout.component';
 import { ButtonComponent, CardComponent, CardContentComponent, WorkInProgressComponent } from '../../../shared/components/ui';
-import { AuthService } from '../../../core/services';
+import { AuthService, LanguageService } from '../../../core/services';
+import { AppLanguage } from '../../../core/services/language.service';
 
 @Component({
   selector: 'app-settings',
@@ -11,6 +13,7 @@ import { AuthService } from '../../../core/services';
   imports: [
     CommonModule,
     LucideAngularModule,
+    TranslateModule,
     DashboardLayoutComponent,
     ButtonComponent,
     CardComponent,
@@ -20,7 +23,7 @@ import { AuthService } from '../../../core/services';
   template: `
     <app-dashboard-layout>
       <div class="max-w-4xl">
-        <h1 class="text-3xl font-bold text-gray-900 mb-8">Settings</h1>
+        <h1 class="text-3xl font-bold text-gray-900 mb-8">{{ 'SETTINGS.TITLE' | translate }}</h1>
 
         <div class="space-y-6">
           <!-- Language Settings -->
@@ -28,15 +31,32 @@ import { AuthService } from '../../../core/services';
             <app-card-content customClass="p-6">
               <div class="flex items-center gap-3 mb-4">
                 <lucide-icon name="globe" class="h-5 w-5 text-gray-600"></lucide-icon>
-                <h2 class="text-lg font-bold text-gray-900">Language</h2>
+                <h2 class="text-lg font-bold text-gray-900">{{ 'SETTINGS.LANGUAGE.TITLE' | translate }}</h2>
               </div>
-              <p class="text-sm text-gray-600 mb-4">Choose your preferred language for the interface</p>
-              <div
-                (click)="showWipModal.set(true)"
-                class="w-full max-w-xs h-10 px-4 rounded-lg border border-gray-300 text-sm bg-white flex items-center justify-between cursor-pointer hover:bg-gray-50"
-              >
-                <span class="text-gray-900">English (US)</span>
-                <lucide-icon name="chevron-down" class="h-4 w-4 text-gray-500"></lucide-icon>
+              <p class="text-sm text-gray-600 mb-4">{{ 'SETTINGS.LANGUAGE.DESC' | translate }}</p>
+              <div class="relative w-full max-w-xs">
+                <div
+                  (click)="toggleLanguageDropdown()"
+                  class="w-full h-10 px-4 rounded-lg border border-gray-300 text-sm bg-white flex items-center justify-between cursor-pointer hover:bg-gray-50"
+                >
+                  <span class="text-gray-900">{{ languageService.getLabel(languageService.currentLang) }}</span>
+                  <lucide-icon name="chevron-down" class="h-4 w-4 text-gray-500"></lucide-icon>
+                </div>
+                @if (showLanguageDropdown()) {
+                  <div class="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
+                    @for (lang of availableLanguages; track lang.code) {
+                      <button
+                        (click)="selectLanguage(lang.code)"
+                        [class]="'w-full px-4 py-2.5 text-left text-sm hover:bg-gray-50 flex items-center justify-between ' + (languageService.currentLang === lang.code ? 'bg-[#155347]/5 text-[#155347] font-medium' : 'text-gray-700')"
+                      >
+                        <span>{{ lang.label }}</span>
+                        @if (languageService.currentLang === lang.code) {
+                          <lucide-icon name="check" class="h-4 w-4 text-[#155347]"></lucide-icon>
+                        }
+                      </button>
+                    }
+                  </div>
+                }
               </div>
             </app-card-content>
           </app-card>
@@ -46,9 +66,9 @@ import { AuthService } from '../../../core/services';
             <app-card-content customClass="p-6">
               <div class="flex items-center gap-3 mb-4">
                 <lucide-icon name="palette" class="h-5 w-5 text-gray-600"></lucide-icon>
-                <h2 class="text-lg font-bold text-gray-900">Theme</h2>
+                <h2 class="text-lg font-bold text-gray-900">{{ 'SETTINGS.THEME.TITLE' | translate }}</h2>
               </div>
-              <p class="text-sm text-gray-600 mb-4">Select your preferred color theme</p>
+              <p class="text-sm text-gray-600 mb-4">{{ 'SETTINGS.THEME.DESC' | translate }}</p>
               <div class="space-y-3 max-w-xs">
                 @for (option of themeOptions; track option.value) {
                   <div
@@ -60,7 +80,7 @@ import { AuthService } from '../../../core/services';
                         <div class="w-2 h-2 rounded-full bg-[#155347]"></div>
                       }
                     </div>
-                    <span class="text-sm font-medium text-gray-900">{{ option.label }}</span>
+                    <span class="text-sm font-medium text-gray-900">{{ option.labelKey | translate }}</span>
                   </div>
                 }
               </div>
@@ -72,13 +92,13 @@ import { AuthService } from '../../../core/services';
             <app-card-content customClass="p-6">
               <div class="flex items-center gap-3 mb-4">
                 <lucide-icon name="bell" class="h-5 w-5 text-gray-600"></lucide-icon>
-                <h2 class="text-lg font-bold text-gray-900">Notification Preferences</h2>
+                <h2 class="text-lg font-bold text-gray-900">{{ 'SETTINGS.NOTIFICATIONS.TITLE' | translate }}</h2>
               </div>
-              <p class="text-sm text-gray-600 mb-4">Manage how you receive notifications</p>
+              <p class="text-sm text-gray-600 mb-4">{{ 'SETTINGS.NOTIFICATIONS.DESC' | translate }}</p>
               <div class="space-y-3">
                 @for (notif of notificationOptions; track notif.key) {
                   <div class="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                    <span class="text-sm font-medium text-gray-900">{{ notif.label }}</span>
+                    <span class="text-sm font-medium text-gray-900">{{ notif.labelKey | translate }}</span>
                     <button
                       (click)="showWipModal.set(true)"
                       [class]="'relative inline-flex h-6 w-11 items-center rounded-full transition-colors cursor-pointer ' + (notifications[notif.key] ? 'bg-[#155347]' : 'bg-gray-200')"
@@ -95,7 +115,7 @@ import { AuthService } from '../../../core/services';
 
           <app-card>
               <app-card-content customClass="p-6">
-                <h3 class="text-lg font-bold text-gray-900 mb-4">Session</h3>
+                <h3 class="text-lg font-bold text-gray-900 mb-4">{{ 'SETTINGS.SESSION.TITLE' | translate }}</h3>
                 <div class="space-y-3">
                   <button
                     (click)="showLogoutModal.set(true)"
@@ -103,8 +123,8 @@ import { AuthService } from '../../../core/services';
                   >
                     <lucide-icon name="log-out" class="h-5 w-5 text-gray-500 group-hover:text-red-500"></lucide-icon>
                     <div>
-                      <p class="text-sm font-medium text-gray-900 group-hover:text-red-600">Logout</p>
-                      <p class="text-xs text-gray-500">Sign out of your current session</p>
+                      <p class="text-sm font-medium text-gray-900 group-hover:text-red-600">{{ 'SETTINGS.SESSION.LOGOUT' | translate }}</p>
+                      <p class="text-xs text-gray-500">{{ 'SETTINGS.SESSION.LOGOUT_DESC' | translate }}</p>
                     </div>
                   </button>
                   <button
@@ -113,8 +133,8 @@ import { AuthService } from '../../../core/services';
                   >
                     <lucide-icon name="log-out" class="h-5 w-5 text-red-500"></lucide-icon>
                     <div>
-                      <p class="text-sm font-medium text-red-600">Logout from All Devices</p>
-                      <p class="text-xs text-gray-500">Sign out of all sessions on all devices</p>
+                      <p class="text-sm font-medium text-red-600">{{ 'SETTINGS.SESSION.LOGOUT_ALL' | translate }}</p>
+                      <p class="text-xs text-gray-500">{{ 'SETTINGS.SESSION.LOGOUT_ALL_DESC' | translate }}</p>
                     </div>
                   </button>
                 </div>
@@ -122,7 +142,7 @@ import { AuthService } from '../../../core/services';
             </app-card>
 
           <div class="flex justify-end">
-            <app-button (click)="showWipModal.set(true)" customClass="bg-[#155347] hover:bg-[#0d3d31]">Save Changes</app-button>
+            <app-button (click)="showWipModal.set(true)" customClass="bg-[#155347] hover:bg-[#0d3d31]">{{ 'COMMON.SAVE_CHANGES' | translate }}</app-button>
           </div>
         </div>
       </div>
@@ -137,19 +157,19 @@ import { AuthService } from '../../../core/services';
               <div class="h-12 w-12 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4">
                 <lucide-icon name="log-out" class="h-6 w-6 text-red-600"></lucide-icon>
               </div>
-              <h3 class="text-lg font-bold text-gray-900 mb-2">Confirm Logout</h3>
-              <p class="text-sm text-gray-600">Are you sure you want to sign out of your current session?</p>
+              <h3 class="text-lg font-bold text-gray-900 mb-2">{{ 'SETTINGS.CONFIRM_LOGOUT' | translate }}</h3>
+              <p class="text-sm text-gray-600">{{ 'SETTINGS.CONFIRM_LOGOUT_MSG' | translate }}</p>
             </div>
 
             <div class="flex gap-2">
               <app-button variant="outline" class="flex-1" (onClick)="showLogoutModal.set(false)">
-                Cancel
+                {{ 'COMMON.CANCEL' | translate }}
               </app-button>
               <app-button
                 customClass="flex-1 bg-red-600 hover:bg-red-700"
                 (onClick)="confirmLogout()"
               >
-                Logout
+                {{ 'SETTINGS.LOGOUT_BTN' | translate }}
               </app-button>
             </div>
           </div>
@@ -164,19 +184,19 @@ import { AuthService } from '../../../core/services';
               <div class="h-12 w-12 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4">
                 <lucide-icon name="triangle-alert" class="h-6 w-6 text-red-600"></lucide-icon>
               </div>
-              <h3 class="text-lg font-bold text-gray-900 mb-2">Logout from All Devices</h3>
-              <p class="text-sm text-gray-600">This will sign you out from all devices and sessions. You will need to log in again on each device.</p>
+              <h3 class="text-lg font-bold text-gray-900 mb-2">{{ 'SETTINGS.LOGOUT_ALL_TITLE' | translate }}</h3>
+              <p class="text-sm text-gray-600">{{ 'SETTINGS.LOGOUT_ALL_MSG' | translate }}</p>
             </div>
 
             <div class="flex gap-2">
               <app-button variant="outline" class="flex-1" (onClick)="showLogoutAllModal.set(false)">
-                Cancel
+                {{ 'COMMON.CANCEL' | translate }}
               </app-button>
               <app-button
                 customClass="flex-1 bg-red-600 hover:bg-red-700"
                 (onClick)="confirmLogoutAll()"
               >
-                Logout All
+                {{ 'SETTINGS.LOGOUT_ALL_BTN' | translate }}
               </app-button>
             </div>
           </div>
@@ -186,24 +206,40 @@ import { AuthService } from '../../../core/services';
   `
 })
 export class SettingsComponent {
+  languageService = inject(LanguageService);
   theme = 'light';
   notifications: Record<string, boolean> = { email: true, push: true, desktop: false };
   showWipModal = signal(false);
+  showLanguageDropdown = signal(false);
   private authService = inject(AuthService);
   showLogoutModal = signal(false);
   showLogoutAllModal = signal(false);
 
+  availableLanguages: { code: AppLanguage; label: string }[] = [
+    { code: 'en', label: 'English' },
+    { code: 'pt', label: 'Português' }
+  ];
+
   themeOptions = [
-    { value: 'light', label: 'Light' },
-    { value: 'dark', label: 'Dark' },
-    { value: 'auto', label: 'Auto (System)' }
+    { value: 'light', labelKey: 'SETTINGS.THEME.LIGHT' },
+    { value: 'dark', labelKey: 'SETTINGS.THEME.DARK' },
+    { value: 'auto', labelKey: 'SETTINGS.THEME.AUTO' }
   ];
 
   notificationOptions = [
-    { key: 'email', label: 'Email Notifications' },
-    { key: 'push', label: 'Push Notifications' },
-    { key: 'desktop', label: 'Desktop Notifications' }
+    { key: 'email', labelKey: 'SETTINGS.NOTIFICATIONS.EMAIL' },
+    { key: 'push', labelKey: 'SETTINGS.NOTIFICATIONS.PUSH' },
+    { key: 'desktop', labelKey: 'SETTINGS.NOTIFICATIONS.DESKTOP' }
   ];
+
+  toggleLanguageDropdown(): void {
+    this.showLanguageDropdown.update(v => !v);
+  }
+
+  selectLanguage(lang: AppLanguage): void {
+    this.languageService.setLanguage(lang);
+    this.showLanguageDropdown.set(false);
+  }
 
   confirmLogout(): void {
     this.showLogoutModal.set(false);

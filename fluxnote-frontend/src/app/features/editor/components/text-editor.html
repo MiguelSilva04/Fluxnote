@@ -8,7 +8,7 @@
           type="button"
           (click)="format('bold')"
           [class]="getToolbarButtonClass(formats.bold)"
-          title="Bold (Ctrl+B)"
+          title="{{ 'TEXT_EDITOR.BOLD' | translate }}"
         >
           <lucide-icon name="bold" class="h-4 w-4"></lucide-icon>
         </button>
@@ -16,7 +16,7 @@
           type="button"
           (click)="format('italic')"
           [class]="getToolbarButtonClass(formats.italic)"
-          title="Italic (Ctrl+I)"
+          title="{{ 'TEXT_EDITOR.ITALIC' | translate }}"
         >
           <lucide-icon name="italic" class="h-4 w-4"></lucide-icon>
         </button>
@@ -24,7 +24,7 @@
           type="button"
           (click)="format('underline')"
           [class]="getToolbarButtonClass(formats.underline)"
-          title="Underline (Ctrl+U)"
+          title="{{ 'TEXT_EDITOR.UNDERLINE' | translate }}"
         >
           <lucide-icon name="underline" class="h-4 w-4"></lucide-icon>
         </button>
@@ -32,7 +32,7 @@
           type="button"
           (click)="format('strike')"
           [class]="getToolbarButtonClass(formats.strike)"
-          title="Strikethrough"
+          title="{{ 'TEXT_EDITOR.STRIKETHROUGH' | translate }}"
         >
           <lucide-icon name="strikethrough" class="h-4 w-4"></lucide-icon>
         </button>
@@ -45,10 +45,10 @@
           class="h-8 px-2 text-sm border border-gray-200 rounded hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#155347]"
           #headerSelect
         >
-          <option value="">Normal</option>
-          <option value="1">Heading 1</option>
-          <option value="2">Heading 2</option>
-          <option value="3">Heading 3</option>
+          <option value="">{{ 'TEXT_EDITOR.NORMAL' | translate }}</option>
+          <option value="1">{{ 'TEXT_EDITOR.HEADING1' | translate }}</option>
+          <option value="2">{{ 'TEXT_EDITOR.HEADING2' | translate }}</option>
+          <option value="3">{{ 'TEXT_EDITOR.HEADING3' | translate }}</option>
         </select>
       </div>
 
@@ -58,7 +58,7 @@
           type="button"
           (click)="formatList('ordered')"
           [class]="getToolbarButtonClass(formats.listOrdered)"
-          title="Numbered List"
+          title="{{ 'TEXT_EDITOR.NUMBERED_LIST' | translate }}"
         >
           <lucide-icon name="list-ordered" class="h-4 w-4"></lucide-icon>
         </button>
@@ -66,7 +66,7 @@
           type="button"
           (click)="formatList('bullet')"
           [class]="getToolbarButtonClass(formats.listBullet)"
-          title="Bullet List"
+          title="{{ 'TEXT_EDITOR.BULLET_LIST' | translate }}"
         >
           <lucide-icon name="list" class="h-4 w-4"></lucide-icon>
         </button>
@@ -78,7 +78,7 @@
           type="button"
           (click)="formatAlign('')"
           [class]="getToolbarButtonClass(!formats.align || formats.align === '')"
-          title="Align Left"
+          title="{{ 'TEXT_EDITOR.ALIGN_LEFT' | translate }}"
         >
           <lucide-icon name="text-align-start" class="h-4 w-4"></lucide-icon>
         </button>
@@ -86,7 +86,7 @@
           type="button"
           (click)="formatAlign('center')"
           [class]="getToolbarButtonClass(formats.align === 'center')"
-          title="Align Center"
+          title="{{ 'TEXT_EDITOR.ALIGN_CENTER' | translate }}"
         >
           <lucide-icon name="text-align-justify" class="h-4 w-4"></lucide-icon>
         </button>
@@ -94,7 +94,7 @@
           type="button"
           (click)="formatAlign('right')"
           [class]="getToolbarButtonClass(formats.align === 'right')"
-          title="Align Right"
+          title="{{ 'TEXT_EDITOR.ALIGN_RIGHT' | translate }}"
         >
           <lucide-icon name="text-align-end" class="h-4 w-4"></lucide-icon>
         </button>
@@ -108,7 +108,7 @@
             type="button"
             (click)="toggleTextColorMenu()"
             class="p-2 rounded hover:bg-gray-100 transition-colors text-gray-600 flex flex-col items-center"
-            title="Text Color"
+            title="{{ 'TEXT_EDITOR.TEXT_COLOR' | translate }}"
           >
             <lucide-icon name="type" class="h-4 w-4"></lucide-icon>
             <div 
@@ -118,7 +118,7 @@
           </button>
           @if (showTextColorMenu()) {
             <div class="absolute top-full left-0 mt-1 p-3 bg-white border border-gray-200 rounded-lg shadow-lg z-50 w-52">
-              <p class="text-xs text-gray-500 mb-2">Text Color</p>
+              <p class="text-xs text-gray-500 mb-2">{{ 'TEXT_EDITOR.TEXT_COLOR' | translate }}</p>
               <div class="flex flex-wrap gap-2">
                 @for (color of textColors; track color.value) {
                   <button
@@ -135,7 +135,7 @@
                 (click)="applyTextColor('')"
                 class="w-full mt-3 px-2 py-1.5 text-xs text-gray-600 hover:bg-gray-100 rounded border border-gray-200"
               >
-                Remove color
+                {{ 'TEXT_EDITOR.REMOVE_COLOR' | translate }}
               </button>
             </div>
           }
@@ -146,7 +146,7 @@
             type="button"
             (click)="toggleBgColorMenu()"
             class="p-2 rounded hover:bg-gray-100 transition-colors text-gray-600 flex flex-col items-center"
-            title="Background Color"
+            title="{{ 'TEXT_EDITOR.HIGHLIGHT_COLOR' | translate }}"
           >
             <lucide-icon name="highlighter" class="h-4 w-4"></lucide-icon>
             <div 
@@ -156,7 +156,7 @@
           </button>
           @if (showBgColorMenu()) {
             <div class="absolute top-full left-0 mt-1 p-3 bg-white border border-gray-200 rounded-lg shadow-lg z-50 w-52">
-              <p class="text-xs text-gray-500 mb-2">Highlight Color</p>
+              <p class="text-xs text-gray-500 mb-2">{{ 'TEXT_EDITOR.HIGHLIGHT_COLOR' | translate }}</p>
               <div class="flex flex-wrap gap-2">
                 @for (color of backgroundColors; track color.value) {
                   <button
@@ -173,7 +173,7 @@
                 (click)="applyBackgroundColor('')"
                 class="w-full mt-3 px-2 py-1.5 text-xs text-gray-600 hover:bg-gray-100 rounded border border-gray-200"
               >
-                Remove highlight
+                {{ 'TEXT_EDITOR.REMOVE_HIGHLIGHT' | translate }}
               </button>
             </div>
           }
@@ -186,7 +186,7 @@
           type="button"
           (click)="formatLink()"
           [class]="getToolbarButtonClass(formats.link)"
-          title="Insert Link"
+          title="{{ 'TEXT_EDITOR.INSERT_LINK' | translate }}"
         >
           <lucide-icon name="link" class="h-4 w-4"></lucide-icon>
         </button>
@@ -194,7 +194,7 @@
           type="button"
           (click)="insertImage()"
           [class]="getToolbarButtonClass(false)"
-          title="Insert Image"
+          title="{{ 'TEXT_EDITOR.INSERT_IMAGE' | translate }}"
         >
           <lucide-icon name="image" class="h-4 w-4"></lucide-icon>
         </button>
@@ -202,7 +202,7 @@
           type="button"
           (click)="formatBlockquote()"
           [class]="getToolbarButtonClass(formats.blockquote)"
-          title="Blockquote"
+          title="{{ 'TEXT_EDITOR.BLOCKQUOTE' | translate }}"
         >
           <lucide-icon name="quote" class="h-4 w-4"></lucide-icon>
         </button>
@@ -210,7 +210,7 @@
           type="button"
           (click)="formatCode()"
           [class]="getToolbarButtonClass(formats.codeBlock)"
-          title="Code Block"
+          title="{{ 'TEXT_EDITOR.CODE_BLOCK' | translate }}"
         >
           <lucide-icon name="code" class="h-4 w-4"></lucide-icon>
         </button>
@@ -222,19 +222,19 @@
           @case ('saving') {
             <div class="flex items-center gap-2 text-gray-500">
               <lucide-icon name="loader" class="h-4 w-4 animate-spin"></lucide-icon>
-              <span class="text-sm">Saving...</span>
+              <span class="text-sm">{{ 'TEXT_EDITOR.SAVING' | translate }}</span>
             </div>
           }
           @case ('saved') {
             <div class="flex items-center gap-2 text-green-600">
               <lucide-icon name="check" class="h-4 w-4"></lucide-icon>
-              <span class="text-sm">Saved</span>
+              <span class="text-sm">{{ 'TEXT_EDITOR.SAVED' | translate }}</span>
             </div>
           }
           @case ('error') {
             <div class="flex items-center gap-2 text-red-600">
               <lucide-icon name="circle-alert" class="h-4 w-4"></lucide-icon>
-              <span class="text-sm">Error saving</span>
+              <span class="text-sm">{{ 'TEXT_EDITOR.ERROR_SAVING' | translate }}</span>
             </div>
           }
         }
@@ -246,15 +246,15 @@
     @if (!editable()) {
     <div class="bg-amber-50 border-b border-amber-200 px-4 py-2.5 flex items-center gap-2">
       <lucide-icon name="eye" class="h-4 w-4 text-amber-600"></lucide-icon>
-      <span class="text-sm text-amber-700 font-medium">View only</span>
-      <span class="text-sm text-amber-600">- You have read-only access to this document</span>
+      <span class="text-sm text-amber-700 font-medium">{{ 'TEXT_EDITOR.READ_ONLY' | translate }}</span>
+      <span class="text-sm text-amber-600">- {{ 'TEXT_EDITOR.READ_ONLY_DESC' | translate }}</span>
     </div>
     }
 
     <!-- Colaboradores activos (visível quando há outros utilizadores no documento) -->
     @if (collaboratorNames().length > 0) {
       <div class="bg-white border-b border-gray-100 px-4 py-1.5 flex items-center gap-2">
-        <span class="text-xs text-gray-400 mr-1">Editing:</span>
+        <span class="text-xs text-gray-400 mr-1">{{ 'TEXT_EDITOR.EDITING' | translate }}</span>
         @for (name of collaboratorNames(); track name; let i = $index) {
           <div
             class="flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium text-white"
@@ -291,7 +291,7 @@
             <button
               (mousedown)="onGenerateButtonMousedown($event)"
               class="group flex items-center justify-center w-7 h-7 rounded-lg border border-dashed border-gray-300 hover:border-purple-400 hover:bg-purple-50 transition-all"
-              title="Generate with AI"
+              title="{{ 'TEXT_EDITOR.GENERATE_AI' | translate }}"
             >
               <lucide-icon name="plus" class="h-4 w-4 text-gray-300 group-hover:text-purple-500 transition-colors"></lucide-icon>
             </button>
@@ -311,26 +311,26 @@
                 type="button"
                 (click)="setImageSize('small')"
                 class="px-2 py-1 text-xs rounded hover:bg-gray-100 transition-colors"
-                title="Small (25%)"
-              >S</button>
+                title="{{ 'TEXT_EDITOR.IMG_SMALL_ALT' | translate }}"
+              >{{ 'TEXT_EDITOR.IMG_SMALL' | translate }}</button>
               <button
                 type="button"
                 (click)="setImageSize('medium')"
                 class="px-2 py-1 text-xs rounded hover:bg-gray-100 transition-colors"
-                title="Medium (50%)"
-              >M</button>
+                title="{{ 'TEXT_EDITOR.IMG_MEDIUM_ALT' | translate }}"
+              >{{ 'TEXT_EDITOR.IMG_MEDIUM' | translate }}</button>
               <button
                 type="button"
                 (click)="setImageSize('large')"
                 class="px-2 py-1 text-xs rounded hover:bg-gray-100 transition-colors"
-                title="Large (75%)"
-              >L</button>
+                title="{{ 'TEXT_EDITOR.IMG_LARGE_ALT' | translate }}"
+              >{{ 'TEXT_EDITOR.IMG_LARGE' | translate }}</button>
               <button
                 type="button"
                 (click)="setImageSize('full')"
                 class="px-2 py-1 text-xs rounded hover:bg-gray-100 transition-colors"
-                title="Full width (100%)"
-              >Full</button>
+                title="{{ 'TEXT_EDITOR.IMG_FULL_ALT' | translate }}"
+              >{{ 'TEXT_EDITOR.IMG_FULL' | translate }}</button>
             </div>
             
             <!-- Alignment options -->
@@ -339,7 +339,7 @@
                 type="button"
                 (click)="setImageAlign('left')"
                 class="p-1.5 rounded hover:bg-gray-100 transition-colors"
-                title="Align left"
+                title="{{ 'TEXT_EDITOR.IMG_ALIGN_LEFT' | translate }}"
               >
                 <lucide-icon name="align-horizontal-distribute-start" class="h-4 w-4"></lucide-icon>
               </button>
@@ -347,7 +347,7 @@
                 type="button"
                 (click)="setImageAlign('center')"
                 class="p-1.5 rounded hover:bg-gray-100 transition-colors"
-                title="Align center"
+                title="{{ 'TEXT_EDITOR.IMG_ALIGN_CENTER' | translate }}"
               >
                 <lucide-icon name="align-horizontal-distribute-center" class="h-4 w-4"></lucide-icon>
               </button>
@@ -355,7 +355,7 @@
                 type="button"
                 (click)="setImageAlign('right')"
                 class="p-1.5 rounded hover:bg-gray-100 transition-colors"
-                title="Align right"
+                title="{{ 'TEXT_EDITOR.IMG_ALIGN_RIGHT' | translate }}"
               >
                 <lucide-icon name="align-horizontal-distribute-end" class="h-4 w-4"></lucide-icon>
               </button>
@@ -366,7 +366,7 @@
               type="button"
               (click)="deleteImage()"
               class="p-1.5 rounded hover:bg-red-100 text-red-600 transition-colors"
-              title="Delete image"
+              title="{{ 'TEXT_EDITOR.DELETE_IMAGE' | translate }}"
             >
               <lucide-icon name="trash-2" class="h-4 w-4"></lucide-icon>
             </button>

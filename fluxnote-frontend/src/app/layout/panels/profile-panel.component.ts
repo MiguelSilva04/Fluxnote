@@ -1,15 +1,16 @@
 import { Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LucideAngularModule } from 'lucide-angular';
+import { TranslateModule } from '@ngx-translate/core';
 import { AuthService, PanelStateService, TeamService } from '../../core/services';
-import { ButtonComponent, BadgeComponent } from '../../shared/components/ui';
+import { ButtonComponent, BadgeComponent, WorkInProgressComponent } from '../../shared/components/ui';
 import { Router, RouterLink } from "@angular/router";
 import { TeamGet } from '../../core/models';
 
 @Component({
   selector: 'app-profile-panel',
   standalone: true,
-  imports: [CommonModule, LucideAngularModule, ButtonComponent, BadgeComponent, RouterLink],
+  imports: [CommonModule, LucideAngularModule, TranslateModule, ButtonComponent, BadgeComponent, WorkInProgressComponent, RouterLink],
   template: `
       <!-- Backdrop -->
       <div class="fixed inset-0 bg-black/20 z-40 transition-opacity duration-300"
@@ -22,7 +23,7 @@ import { TeamGet } from '../../core/models';
              [class.translate-x-full]="!panelState.isProfilePanelOpen()"
              [attr.inert]="!panelState.isProfilePanelOpen() ? '' : null">
         <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-          <h2 class="text-lg font-bold text-gray-900">Profile</h2>
+          <h2 class="text-lg font-bold text-gray-900">{{ 'PROFILE_PANEL.TITLE' | translate }}</h2>
           <button (click)="panelState.closeProfilePanel()" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
             <lucide-icon name="x" class="h-5 w-5 text-gray-500"></lucide-icon>
           </button>
@@ -61,15 +62,15 @@ import { TeamGet } from '../../core/models';
             <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
               <lucide-icon name="badge-euro" class="h-5 w-5 text-gray-500"></lucide-icon>
               <div>
-                <p class="text-xs text-gray-500">Plan</p>
-                <p class="text-sm font-medium text-gray-900">Professional</p>
+                <p class="text-xs text-gray-500">{{ 'PROFILE_PANEL.PLAN' | translate }}</p>
+                <p class="text-sm font-medium text-gray-900">{{ 'PROFILE_PANEL.PLAN_VALUE' | translate }}</p>
               </div>
             </div>
             @if (user()?.createdAt) {
               <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
                 <lucide-icon name="calendar" class="h-5 w-5 text-gray-500"></lucide-icon>
                 <div>
-                  <p class="text-xs text-gray-500">Member Since</p>
+                  <p class="text-xs text-gray-500">{{ 'PROFILE_PANEL.MEMBER_SINCE' | translate }}</p>
                   <p class="text-sm font-medium text-gray-900">{{ formatDate(user()?.createdAt) }}</p>
                 </div>
               </div>
@@ -78,7 +79,7 @@ import { TeamGet } from '../../core/models';
               <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
                 <lucide-icon name="clock" class="h-5 w-5 text-gray-500"></lucide-icon>
                 <div>
-                  <p class="text-xs text-gray-500">Timezone</p>
+                  <p class="text-xs text-gray-500">{{ 'PROFILE_PANEL.TIMEZONE' | translate }}</p>
                   <p class="text-sm font-medium text-gray-900">{{ user()?.timezone }}</p>
                 </div>
               </div>
@@ -89,7 +90,7 @@ import { TeamGet } from '../../core/models';
           <div>
             <div class="flex items-center gap-2 mb-3">
               <lucide-icon name="users" class="h-5 w-5 text-gray-600"></lucide-icon>
-              <h4 class="text-base font-bold text-gray-900">Teams</h4>
+              <h4 class="text-base font-bold text-gray-900">{{ 'PROFILE_PANEL.TEAMS' | translate }}</h4>
             </div>
             <div class="space-y-2">
               @if (isLoadingTeams()) {
@@ -97,7 +98,7 @@ import { TeamGet } from '../../core/models';
                   <lucide-icon name="loader-circle" class="h-5 w-5 text-[#155347] animate-spin"></lucide-icon>
                 </div>
               } @else if (userTeams().length === 0) {
-                <p class="text-sm text-gray-500 text-center py-4">No teams yet</p>
+                <p class="text-sm text-gray-500 text-center py-4">{{ 'PROFILE_PANEL.NO_TEAMS' | translate }}</p>
               } @else {
                 @for (team of userTeams(); track team.id) {
                   <div 
@@ -109,7 +110,7 @@ import { TeamGet } from '../../core/models';
                       [variant]="team.currentUserRole === 2 ? 'default' : 'outline'"
                       [customClass]="team.currentUserRole === 2 ? 'bg-[#155347]' : ''"
                     >
-                      {{ getRoleName(team.currentUserRole) }}
+                      {{ getRoleName(team.currentUserRole) | translate }}
                     </app-badge>
                   </div>
                 }
@@ -125,39 +126,19 @@ import { TeamGet } from '../../core/models';
               class="w-full flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-left cursor-pointer"
             >
               <lucide-icon name="user" class="h-5 w-5 text-gray-500"></lucide-icon>
-              <span class="text-sm font-medium text-gray-900">Account Settings</span>
+              <span class="text-sm font-medium text-gray-900">{{ 'PROFILE_PANEL.ACCOUNT_SETTINGS' | translate }}</span>
             </a>
           </div>
         </div>
 
         <div class="p-6 border-t border-gray-200">
           <app-button variant="outline" (onClick)="panelState.closeProfilePanel()" customClass="w-full">
-            Close
+            {{ 'PROFILE_PANEL.CLOSE' | translate }}
           </app-button>
         </div>
       </aside>
 
-      <!-- WIP Modal -->
-      @if (showWipModal()) {
-        <div class="fixed inset-0 bg-black/50 flex items-center justify-center z-[60]" (click)="showWipModal.set(false)">
-          <div class="bg-white rounded-xl shadow-xl max-w-sm w-full mx-4 p-6" (click)="$event.stopPropagation()">
-            <div class="text-center mb-4">
-              <div class="h-16 w-16 rounded-full bg-amber-100 flex items-center justify-center mx-auto mb-4">
-                <lucide-icon name="construction" class="h-8 w-8 text-amber-600"></lucide-icon>
-              </div>
-              <h3 class="text-lg font-bold text-gray-900 mb-2">Work in Progress</h3>
-              <p class="text-sm text-gray-600">This feature is currently under development and will be available soon.</p>
-            </div>
-
-            <app-button
-              customClass="w-full bg-[#155347] hover:bg-[#0d3d31]"
-              (onClick)="showWipModal.set(false)"
-            >
-              Got it
-            </app-button>
-          </div>
-        </div>
-      }
+      <app-work-in-progress [show]="showWipModal()" (close)="showWipModal.set(false)" />
   `
 })
 export class ProfilePanelComponent implements OnInit {
@@ -190,10 +171,10 @@ export class ProfilePanelComponent implements OnInit {
 
   getRoleName(role: number): string {
     switch (role) {
-      case 0: return 'Member';
-      case 1: return 'Team Admin';
-      case 2: return 'Owner';
-      default: return 'Member';
+      case 0: return 'ROLES.MEMBER';
+      case 1: return 'ROLES.TEAM_ADMIN';
+      case 2: return 'ROLES.OWNER';
+      default: return 'ROLES.MEMBER';
     }
   }
 

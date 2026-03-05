@@ -4,11 +4,12 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
 import { AuthService, PanelStateService } from '../../core/services';
 import { ModalComponent, ButtonComponent } from '../../shared/components/ui';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [CommonModule, RouterLink, RouterLinkActive, LucideAngularModule, ModalComponent, ButtonComponent],
+  imports: [CommonModule, RouterLink, RouterLinkActive, LucideAngularModule, ModalComponent, ButtonComponent, TranslateModule],
   template: `
     <!-- Backdrop (mobile/tablet) — fecha o sidebar ao clicar fora -->
     @if (panelState.isSidebarOpen()) {
@@ -37,7 +38,7 @@ import { ModalComponent, ButtonComponent } from '../../shared/components/ui';
           class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors text-gray-600 hover:bg-gray-50 hover:text-gray-900"
         >
           <lucide-icon name="layout-dashboard" class="h-5 w-5"></lucide-icon>
-          Dashboard
+          {{ 'SIDEBAR.DASHBOARD' | translate }}
         </a>
         <a
           routerLink="/teams"
@@ -47,7 +48,7 @@ import { ModalComponent, ButtonComponent } from '../../shared/components/ui';
           class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors text-gray-600 hover:bg-gray-50 hover:text-gray-900"
         >
           <lucide-icon name="users" class="h-5 w-5"></lucide-icon>
-          Teams
+          {{ 'SIDEBAR.TEAMS' | translate }}
         </a>
         <a
           routerLink="/subscriptions"
@@ -56,7 +57,7 @@ import { ModalComponent, ButtonComponent } from '../../shared/components/ui';
           class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors text-gray-600 hover:bg-gray-50 hover:text-gray-900"
         >
           <lucide-icon name="credit-card" class="h-5 w-5"></lucide-icon>
-          Subscriptions
+          {{ 'SIDEBAR.SUBSCRIPTIONS' | translate }}
         </a>
         <a
           routerLink="/profile"
@@ -66,7 +67,7 @@ import { ModalComponent, ButtonComponent } from '../../shared/components/ui';
           class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors text-gray-600 hover:bg-gray-50 hover:text-gray-900"
         >
           <lucide-icon name="user" class="h-5 w-5"></lucide-icon>
-          Profile
+          {{ 'SIDEBAR.PROFILE' | translate }}
         </a>
         <a
           routerLink="/settings"
@@ -75,7 +76,7 @@ import { ModalComponent, ButtonComponent } from '../../shared/components/ui';
           class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors text-gray-600 hover:bg-gray-50 hover:text-gray-900"
         >
           <lucide-icon name="settings" class="h-5 w-5"></lucide-icon>
-          Settings
+          {{ 'SIDEBAR.SETTINGS' | translate }}
         </a>
       </nav>
 
@@ -87,7 +88,7 @@ import { ModalComponent, ButtonComponent } from '../../shared/components/ui';
           class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors"
         >
           <lucide-icon name="badge-question-mark" class="h-5 w-5"></lucide-icon>
-          Help & Support
+          {{ 'SIDEBAR.HELP' | translate }}
         </a>
         <a
           routerLink="/trash"
@@ -96,14 +97,14 @@ import { ModalComponent, ButtonComponent } from '../../shared/components/ui';
           class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors"
         >
           <lucide-icon name="trash-2" class="h-5 w-5"></lucide-icon>
-          Trash
+          {{ 'SIDEBAR.TRASH' | translate }}
         </a>
         <button
           (click)="showLogoutModal.set(true)"
           class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 transition-colors"
         >
           <lucide-icon name="log-out" class="h-5 w-5"></lucide-icon>
-          Logout
+          {{ 'SIDEBAR.LOGOUT' | translate }}
         </button>
       </div>
     </aside>
@@ -111,14 +112,14 @@ import { ModalComponent, ButtonComponent } from '../../shared/components/ui';
     <!-- Modal de confirmação de logout -->
     <app-modal
       [isOpen]="showLogoutModal()"
-      title="Confirm logout"
+      [title]="'SIDEBAR.CONFIRM_LOGOUT' | translate"
       maxWidth="sm"
       [hasFooter]="true"
       (onClose)="showLogoutModal.set(false)"
     >
       <div class="space-y-4">
         <p class="text-gray-600">
-          Are you sure that want to logout of your session?
+          {{ 'SIDEBAR.LOGOUT_MSG' | translate }}
         </p>
       </div>
 
@@ -128,13 +129,13 @@ import { ModalComponent, ButtonComponent } from '../../shared/components/ui';
           (onClick)="showLogoutModal.set(false)"
           customClass="flex-1"
         >
-          Cancel
+          {{ 'COMMON.CANCEL' | translate }}
         </app-button>
         <app-button
           (onClick)="confirmLogout()"
           customClass="flex-1 bg-red-600 hover:bg-red-700 text-white"
         >
-          Logout
+          {{ 'SIDEBAR.LOGOUT' | translate }}
         </app-button>
       </div>
     </app-modal>

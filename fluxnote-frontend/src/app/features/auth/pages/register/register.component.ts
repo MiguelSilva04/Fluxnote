@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { AuthService } from '../../../../core/services';
 import {
   ButtonComponent,
@@ -20,6 +21,7 @@ import { ToastService } from '../../../../shared/services/toast.service';
     FormsModule,
     RouterLink,
     LucideAngularModule,
+    TranslateModule,
     ButtonComponent,
     InputComponent,
     CardComponent,
@@ -34,18 +36,18 @@ import { ToastService } from '../../../../shared/services/toast.service';
           
           <img src="assets/white_icon.png" alt="FluxNote" class="h-10 w-10" />
         </div>
-        <h1 class="text-3xl font-bold text-gray-900">FluxNote</h1>
-        <p class="text-gray-500 mt-2">Create your account to get started!</p>
+        <h1 class="text-3xl font-bold text-gray-900">{{ 'AUTH.REGISTER.TITLE' | translate }}</h1>
+        <p class="text-gray-500 mt-2">{{ 'AUTH.REGISTER.SUBTITLE' | translate }}</p>
       </div>
 
       <app-card customClass="w-full max-w-md shadow-xl border-0">
         <app-card-content customClass="p-8">
-          <h2 class="text-2xl font-bold text-center text-gray-900 mb-8">Create Account</h2>
+          <h2 class="text-2xl font-bold text-center text-gray-900 mb-8">{{ 'AUTH.REGISTER.HEADING' | translate }}</h2>
 
           <form (ngSubmit)="handleSubmit()" class="space-y-5">
             <app-input
-              label="Full Name"
-              placeholder="John Doe"
+              [label]="'AUTH.REGISTER.FULL_NAME' | translate"
+              [placeholder]="'AUTH.REGISTER.FULL_NAME_PLACEHOLDER' | translate"
               [ngModel]="fullName()"
               (ngModelChange)="fullName.set($event)"
               name="fullName"
@@ -56,9 +58,9 @@ import { ToastService } from '../../../../shared/services/toast.service';
             </app-input>
 
             <app-input
-              label="Email"
+              [label]="'AUTH.REGISTER.EMAIL' | translate"
               type="email"
-              placeholder="your.email&#64;example.com"
+              [placeholder]="'AUTH.REGISTER.EMAIL_PLACEHOLDER' | translate"
               [ngModel]="email()"
               (ngModelChange)="email.set($event)"
               name="email"
@@ -71,9 +73,9 @@ import { ToastService } from '../../../../shared/services/toast.service';
             <div class="space-y-2">
               <div class="relative">
                 <app-input
-                  label="Password"
+                  [label]="'AUTH.REGISTER.PASSWORD' | translate"
                   [type]="showPassword() ? 'text' : 'password'"
-                  placeholder="••••••••"
+                  [placeholder]="'AUTH.LOGIN.PASSWORD_PLACEHOLDER' | translate"
                   [ngModel]="password()"
                   (ngModelChange)="password.set($event)"
                   name="password"
@@ -106,7 +108,7 @@ import { ToastService } from '../../../../shared/services/toast.service';
                   } @else {
                     <div class="h-3 w-3 rounded-full border border-gray-300"></div>
                   }
-                  <span>Min 8 characters</span>
+                  <span>{{ 'AUTH.REGISTER.MIN_CHARS' | translate }}</span>
                 </div>
                 <div
                   [class]="
@@ -119,7 +121,7 @@ import { ToastService } from '../../../../shared/services/toast.service';
                   } @else {
                     <div class="h-3 w-3 rounded-full border border-gray-300"></div>
                   }
-                  <span>At least one number</span>
+                  <span>{{ 'AUTH.REGISTER.ONE_NUMBER' | translate }}</span>
                 </div>
                 <div
                   [class]="
@@ -132,16 +134,16 @@ import { ToastService } from '../../../../shared/services/toast.service';
                   } @else {
                     <div class="h-3 w-3 rounded-full border border-gray-300"></div>
                   }
-                  <span>One special char</span>
+                  <span>{{ 'AUTH.REGISTER.ONE_SPECIAL' | translate }}</span>
                 </div>
               </div>
             </div>
 
             <div class="space-y-2">
               <app-input
-                label="Confirm Password"
+                [label]="'AUTH.REGISTER.CONFIRM_PASSWORD' | translate"
                 type="password"
-                placeholder="••••••••"
+                [placeholder]="'AUTH.LOGIN.PASSWORD_PLACEHOLDER' | translate"
                 [ngModel]="confirmPassword()"
                 (ngModelChange)="confirmPassword.set($event)"
                 name="confirmPassword"
@@ -151,7 +153,7 @@ import { ToastService } from '../../../../shared/services/toast.service';
                 "
               ></app-input>
               @if (confirmPassword() && !validations().match) {
-                <p class="text-xs text-red-500 pl-1">Passwords do not match</p>
+                <p class="text-xs text-red-500 pl-1">{{ 'AUTH.REGISTER.PASSWORDS_NO_MATCH' | translate }}</p>
               }
             </div>
 
@@ -162,7 +164,7 @@ import { ToastService } from '../../../../shared/services/toast.service';
               [isLoading]="isLoading()"
               [disabled]="!isFormValid()"
             >
-              Create Account
+              {{ 'AUTH.REGISTER.CREATE_BTN' | translate }}
             </app-button>
           </form>
 
@@ -172,7 +174,7 @@ import { ToastService } from '../../../../shared/services/toast.service';
                 <span class="w-full border-t border-gray-200"></span>
               </div>
               <div class="relative flex justify-center text-xs uppercase">
-                <span class="bg-white px-2 text-gray-500">Or</span>
+                <span class="bg-white px-2 text-gray-500">{{ 'AUTH.REGISTER.OR' | translate }}</span>
               </div>
             </div>
 
@@ -201,7 +203,7 @@ import { ToastService } from '../../../../shared/services/toast.service';
                     fill="#EA4335"
                   />
                 </svg>
-                Google
+                {{ 'AUTH.REGISTER.GOOGLE' | translate }}
               </app-button>
               <app-button
                 variant="outline"
@@ -216,15 +218,15 @@ import { ToastService } from '../../../../shared/services/toast.service';
                   <path fill="#05a6f0" d="M1 12h10v10H1z" />
                   <path fill="#ffba08" d="M12 12h10v10H12z" />
                 </svg>
-                Microsoft
+                {{ 'AUTH.REGISTER.MICROSOFT' | translate }}
               </app-button>
             </div>
           </div>
 
           <p class="mt-8 text-center text-sm text-gray-600">
-            Already have an account?
+            {{ 'AUTH.REGISTER.HAS_ACCOUNT' | translate }}
             <a routerLink="/login" class="font-medium text-[#155347] hover:underline ml-1">
-              Log in
+              {{ 'AUTH.REGISTER.LOG_IN' | translate }}
             </a>
           </p>
         </app-card-content>
@@ -236,6 +238,7 @@ export class RegisterComponent {
   private authService = inject(AuthService);
   private router = inject(Router);
   private toastService = inject(ToastService);
+  private translateService = inject(TranslateService);
 
   showPassword = signal(false);
   isLoading = this.authService.isLoading;
@@ -275,7 +278,7 @@ export class RegisterComponent {
 
   async handleSubmit(): Promise<void> {
     if (!this.isFormValid()) {
-      this.toastService.warning('Please fill out all fields correctly.');
+      this.toastService.warning(this.translateService.instant('TOASTS.REGISTER_FILL_FIELDS'));
       return;
     }
 
@@ -293,10 +296,10 @@ export class RegisterComponent {
       });
     } else if (result.status === 'error') {
       // erro genérico (sem lista de erros)
-      this.toastService.error(result.message || 'Failed to create account. Please try again.');
+      this.toastService.error(result.message || this.translateService.instant('TOASTS.REGISTER_FAILED'));
     } else {
       // sucesso
-      this.toastService.success(result.message || 'Account created successfully! Please check your email to confirm.');
+      this.toastService.success(result.message || this.translateService.instant('TOASTS.REGISTER_SUCCESS'));
       this.router.navigate(['/pending-email'], {
         queryParams: { email: this.email() },
         state: { fromRegistration: true }

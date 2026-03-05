@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { DashboardLayoutComponent } from '../../../layout/dashboard-layout/dashboard-layout.component';
 import { ButtonComponent, CardComponent, CardContentComponent, BadgeComponent, ModalComponent } from '../../../shared/components/ui';
 import { DocumentService, TeamService, AuthService, FolderService } from '../../../core/services';
@@ -18,6 +19,7 @@ import { DocumentDto, TeamGet, Folder } from '../../../core/models';
     CommonModule,
     FormsModule,
     LucideAngularModule,
+    TranslateModule,
     DashboardLayoutComponent,
     ButtonComponent,
     CardComponent,
@@ -33,6 +35,7 @@ export class DashboardComponent implements OnInit {
   private teamService = inject(TeamService);
   private authService = inject(AuthService);
   private tourService = inject(TourService);
+  private translateService = inject(TranslateService);
   private folderService = inject(FolderService);
   private toastService = inject(ToastService);
 
@@ -348,12 +351,12 @@ export class DashboardComponent implements OnInit {
       next: () => {
         this.isCreateFolderModalOpen.set(false);
         this.newFolderName = '';
-        this.toastService.success('Folder created successfully');
+        this.toastService.success(this.translateService.instant('TOASTS.FOLDER_CREATED'));
         this.loadUserTeams(true);
       },
       error: (err) => {
         console.error('Error creating folder:', err);
-        this.toastService.error('Failed to create folder');
+        this.toastService.error(this.translateService.instant('TOASTS.FOLDER_CREATE_FAILED'));
       }
     });
   }
@@ -397,13 +400,13 @@ export class DashboardComponent implements OnInit {
 
     this.folderService.moveDocumentToFolder(folderId, docId).subscribe({
       next: () => {
-        this.toastService.success('Document moved to folder');
+        this.toastService.success(this.translateService.instant('TOASTS.DOC_MOVED_TO_FOLDER'));
         this.loadDocuments();
         this.loadUserTeams(true);
       },
       error: (err) => {
         console.error('Error moving document:', err);
-        this.toastService.error('Failed to move document');
+        this.toastService.error(this.translateService.instant('TOASTS.DOC_MOVE_FAILED'));
       }
     });
   }
@@ -420,13 +423,13 @@ export class DashboardComponent implements OnInit {
 
     this.folderService.removeDocumentFromFolder(doc.folderId, docId).subscribe({
       next: () => {
-        this.toastService.success('Document removed from folder');
+        this.toastService.success(this.translateService.instant('TOASTS.DOC_REMOVED_FROM_FOLDER'));
         this.loadDocuments();
         this.loadUserTeams(true);
       },
       error: (err) => {
         console.error('Error removing from folder:', err);
-        this.toastService.error('Failed to remove document from folder');
+        this.toastService.error(this.translateService.instant('TOASTS.DOC_REMOVE_FROM_FOLDER_FAILED'));
       }
     });
   }
@@ -482,12 +485,12 @@ export class DashboardComponent implements OnInit {
                 this.isMergeFolderModalOpen.set(false);
                 this.mergeFolderName = '';
                 this.mergeDocIds.set([]);
-                this.toastService.success('Folder created and documents grouped');
+                this.toastService.success(this.translateService.instant('TOASTS.FOLDER_CREATED_GROUPED'));
                 this.loadDocuments();
                 this.loadUserTeams(true);
               },
               error: () => {
-                this.toastService.error('Folder created but failed to move one document');
+                this.toastService.error(this.translateService.instant('TOASTS.FOLDER_CREATED_MOVE_ONE_FAILED'));
                 this.isMergeFolderModalOpen.set(false);
                 this.loadDocuments();
                 this.loadUserTeams(true);
@@ -495,7 +498,7 @@ export class DashboardComponent implements OnInit {
             });
           },
           error: () => {
-            this.toastService.error('Folder created but failed to move documents');
+            this.toastService.error(this.translateService.instant('TOASTS.FOLDER_CREATED_MOVE_FAILED'));
             this.isMergeFolderModalOpen.set(false);
             this.loadDocuments();
             this.loadUserTeams(true);
@@ -503,7 +506,7 @@ export class DashboardComponent implements OnInit {
         });
       },
       error: () => {
-        this.toastService.error('Failed to create folder');
+        this.toastService.error(this.translateService.instant('TOASTS.FOLDER_CREATE_FAILED'));
       }
     });
   }
@@ -511,33 +514,30 @@ export class DashboardComponent implements OnInit {
   // ── Tour ──
 
   startTour(): void {
+    const t = (key: string) => this.translateService.instant(key);
     const steps: TourStep[] = [
     {
       targetSelector: '[data-tour="documents-section"]',
-      title: 'Your Documents',
-      description:
-        'Welcome to FluxNote! This is your Dashboard, where you can view and manage all your documents.',
+      title: t('TOUR.DASHBOARD.DOCUMENTS_TITLE'),
+      description: t('TOUR.DASHBOARD.DOCUMENTS_DESC'),
       position: 'bottom',
     },
     {
       targetSelector: '[data-tour="create-document-btn"]',
-      title: 'Create a New Document',
-      description:
-        'Click here to create a new document. You can assign it to an existing team or create a new team on the spot.',
+      title: t('TOUR.DASHBOARD.CREATE_DOC_TITLE'),
+      description: t('TOUR.DASHBOARD.CREATE_DOC_DESC'),
       position: 'bottom',
     },
     {
       targetSelector: '[data-tour="team-filter-tabs"]',
-      title: 'Filter by Team',
-      description:
-        'Use these tabs to filter your documents by team. Select "All Teams" to see everything.',
+      title: t('TOUR.DASHBOARD.FILTER_TITLE'),
+      description: t('TOUR.DASHBOARD.FILTER_DESC'),
       position: 'bottom',
     },
     {
       targetSelector: '[data-tour="sidebar-teams"]',
-      title: 'Teams Section',
-      description:
-        'Go to the Teams page to view all your teams, create new ones and manage their members.',
+      title: t('TOUR.DASHBOARD.TEAMS_TITLE'),
+      description: t('TOUR.DASHBOARD.TEAMS_DESC'),
       position: 'right',
             onActivate: () => {
         this.router.navigate(['/teams']);
@@ -547,9 +547,8 @@ export class DashboardComponent implements OnInit {
     if (this.userTeams().length > 0) {
       steps.push({
       targetSelector: '[data-tour="team-details"]',
-      title: 'Team Details',
-      description:
-        'Inside each team, you can access Team Details to manage members, assign Team Roles (Owner, Admin, Member) and configure Document Roles (per-document permissions).',
+      title: t('TOUR.DASHBOARD.TEAM_DETAILS_TITLE'),
+      description: t('TOUR.DASHBOARD.TEAM_DETAILS_DESC'),
       position: 'right',
     },);
     }
@@ -557,9 +556,8 @@ export class DashboardComponent implements OnInit {
     steps.push(
       {
         targetSelector: '[data-tour="sidebar-profile"]',
-        title: 'Your Profile',
-        description:
-          'Visit your Profile to update your personal information and manage your account settings.',
+        title: t('TOUR.DASHBOARD.PROFILE_TITLE'),
+        description: t('TOUR.DASHBOARD.PROFILE_DESC'),
         position: 'bottom',
         onActivate: () => {
           this.router.navigate(['/profile']);

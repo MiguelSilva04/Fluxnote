@@ -1,8 +1,9 @@
-import { Component, inject, signal, computed } from '@angular/core';
+﻿import { Component, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { DashboardLayoutComponent } from '../../../layout/dashboard-layout/dashboard-layout.component';
 import { ButtonComponent, CardComponent, BadgeComponent, ModalComponent, InputComponent } from '../../../shared/components/ui';
 import { TeamService, DocumentService, AuthService, FolderService } from '../../../core/services';
@@ -20,6 +21,7 @@ import { TeamDocument, Folder } from '../../../core/models';
     CommonModule,
     FormsModule,
     LucideAngularModule,
+    TranslateModule,
     DashboardLayoutComponent,
     ButtonComponent,
     CardComponent,
@@ -31,6 +33,8 @@ import { TeamDocument, Folder } from '../../../core/models';
 })
 export class TeamsComponent {
   
+  private translateService = inject(TranslateService);
+
   /**
    * Serviço responsável pela gestão de equipas.
    */
@@ -432,12 +436,12 @@ export class TeamsComponent {
         this.isCreateFolderModalOpen.set(false);
         this.newFolderName = '';
         this.createFolderForTeamId.set(null);
-        this.toastService.success('Folder created successfully');
+        this.toastService.success(this.translateService.instant('TOASTS.FOLDER_CREATED'));
         this.loadTeams();
       },
       error: (err) => {
         console.error('Error creating folder:', err);
-        this.toastService.error('Failed to create folder');
+        this.toastService.error(this.translateService.instant('TOASTS.FOLDER_CREATE_FAILED'));
       }
     });
   }
@@ -498,8 +502,8 @@ export class TeamsComponent {
     if (typeof target === 'number') {
       if (!this.isOwnerOrAdmin(team)) return;
       this.folderService.moveDocumentToFolder(target, docId).subscribe({
-        next: () => { this.toastService.success('Document moved to folder'); this.loadTeams(); },
-        error: () => this.toastService.error('Failed to move document')
+        next: () => { this.toastService.success(this.translateService.instant('TOASTS.DOC_MOVED_TO_FOLDER')); this.loadTeams(); },
+        error: () => this.toastService.error(this.translateService.instant('TOASTS.DOC_MOVE_FAILED'))
       });
     } else if (target === 'root') {
       if (!this.isOwnerOrAdmin(team)) return;
@@ -508,8 +512,8 @@ export class TeamsComponent {
       const doc = fullTeam?.documents.find(d => d.id === docId);
       if (doc?.folderId) {
         this.folderService.removeDocumentFromFolder(doc.folderId, docId).subscribe({
-          next: () => { this.toastService.success('Document removed from folder'); this.loadTeams(); },
-          error: () => this.toastService.error('Failed to move document')
+          next: () => { this.toastService.success(this.translateService.instant('TOASTS.DOC_REMOVED_FROM_FOLDER')); this.loadTeams(); },
+          error: () => this.toastService.error(this.translateService.instant('TOASTS.DOC_MOVE_FAILED'))
         });
       }
     }
@@ -603,12 +607,12 @@ export class TeamsComponent {
    * @returns Texto da role
    */
   getRoleName(role: number): string {
-    const roleNames: { [key: number]: string } = {
-      0: 'Member',
-      1: 'Team Admin',
-      2: 'Owner'
+    const keys: { [key: number]: string } = {
+      0: 'ROLES.MEMBER',
+      1: 'ROLES.TEAM_ADMIN',
+      2: 'ROLES.OWNER'
     };
-    return roleNames[role] ?? 'Unknown';
+    return this.translateService.instant(keys[role] ?? 'ROLES.MEMBER');
   }
 
   /**
@@ -637,22 +641,25 @@ export class TeamsComponent {
   
     var seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
   
-    var intervals: { label: string; seconds: number }[] = [
-      { label: "year", seconds: 31536000 },
-      { label: "month", seconds: 2592000 },
-      { label: "day", seconds: 86400 },
-      { label: "hour", seconds: 3600 },
-      { label: "minute", seconds: 60 },
-      { label: "second", seconds: 1 },
+    var intervals: { singularKey: string; pluralKey: string; seconds: number }[] = [
+      { singularKey: "COMMON.UNIT_YEAR",   pluralKey: "COMMON.UNIT_YEARS",   seconds: 31536000 },
+      { singularKey: "COMMON.UNIT_MONTH",  pluralKey: "COMMON.UNIT_MONTHS",  seconds: 2592000 },
+      { singularKey: "COMMON.UNIT_DAY",    pluralKey: "COMMON.UNIT_DAYS",    seconds: 86400 },
+      { singularKey: "COMMON.UNIT_HOUR",   pluralKey: "COMMON.UNIT_HOURS",   seconds: 3600 },
+      { singularKey: "COMMON.UNIT_MINUTE", pluralKey: "COMMON.UNIT_MINUTES", seconds: 60 },
+      { singularKey: "COMMON.UNIT_SECOND", pluralKey: "COMMON.UNIT_SECONDS", seconds: 1 },
     ];
   
     for (var interval of intervals) {
       var count = Math.floor(seconds / interval.seconds);
       if (count > 0) {
-        return `${count} ${interval.label}${count !== 1 ? "s" : ""} ago`;
+        const unitKey = count === 1 ? interval.singularKey : interval.pluralKey;
+        const unit = this.translateService.instant(unitKey);
+        const ago = this.translateService.instant('COMMON.TIME_AGO_SUFFIX');
+        return `${count} ${unit} ${ago}`;
       }
     }
   
-    return "just now";
+    return this.translateService.instant('COMMON.JUST_NOW');
   }
 }

@@ -13,6 +13,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { LucideAngularModule } from 'lucide-angular';
+import { TranslateModule } from '@ngx-translate/core';
 import Quill from 'quill';
 import { Subject, debounceTime, takeUntil } from 'rxjs';
 
@@ -87,7 +88,7 @@ const COLLABORATOR_COLORS = [
 @Component({
   selector: 'app-rich-text-editor',
   standalone: true,
-  imports: [CommonModule, FormsModule, LucideAngularModule],
+  imports: [CommonModule, FormsModule, LucideAngularModule, TranslateModule],
   templateUrl: './text-editor.html',
   styleUrls: ['./text-editor.styles.css'],
 })

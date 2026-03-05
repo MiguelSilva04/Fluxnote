@@ -4,6 +4,7 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import {
   ButtonComponent,
   BadgeComponent,
@@ -26,6 +27,7 @@ import { diffWords } from 'diff';
     CommonModule,
     FormsModule,
     LucideAngularModule,
+    TranslateModule,
     ButtonComponent,
     BadgeComponent,
     TextEditorComponent,
@@ -41,13 +43,13 @@ import { diffWords } from 'diff';
             name="loader-circle"
             class="h-10 w-10 text-[#155347] animate-spin"
           ></lucide-icon>
-          <div class="text-gray-500 text-sm">Loading document...</div>
+          <div class="text-gray-500 text-sm">{{ 'DOCUMENT_EDITOR.LOADING' | translate }}</div>
         </div>
       } @else if (loadError()) {
         <div class="flex flex-col items-center justify-center h-screen gap-4">
           <lucide-icon name="circle-alert" class="h-10 w-10 text-red-500"></lucide-icon>
           <div class="text-red-600 text-sm">{{ loadError() }}</div>
-          <div class="text-gray-500 text-xs">Redirecting to dashboard...</div>
+          <div class="text-gray-500 text-xs">{{ 'DOCUMENT_EDITOR.REDIRECTING' | translate }}</div>
         </div>
       } @else {
         <!-- Header -->
@@ -78,7 +80,7 @@ import { diffWords } from 'diff';
                     <h1
                       (click)="startEditingTitle()"
                       class="text-base md:text-lg font-bold text-gray-900 cursor-pointer hover:text-[#155347] transition-colors truncate"
-                      title="Click to edit title"
+                      [title]="'DOCUMENT_EDITOR.CLICK_TO_EDIT' | translate"
                     >
                       {{ documentTitle }}
                     </h1>
@@ -95,7 +97,7 @@ import { diffWords } from 'diff';
                     class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-700"
                   >
                       <lucide-icon name="eye" class="h-3 w-3"></lucide-icon>
-                      <span class="hidden sm:inline">View only</span>
+                      <span class="hidden sm:inline">{{ 'DOCUMENT_EDITOR.VIEW_ONLY' | translate }}</span>
                     </span>
                   }
                 </div>
@@ -105,7 +107,7 @@ import { diffWords } from 'diff';
             @if (canEdit()) {
               <app-button variant="outline" size="sm" [leftIcon]="true" (onClick)="toggleAIPanel()" customClass="hidden md:inline-flex">
                 <lucide-icon leftIcon name="sparkles" class="h-4 w-4"></lucide-icon>
-                AI Assistance
+                {{ 'DOCUMENT_EDITOR.AI_ASSISTANCE' | translate }}
               </app-button>
               <app-button
                 variant="outline"
@@ -114,7 +116,7 @@ import { diffWords } from 'diff';
                 (onClick)="toggleVersionHistory()" customClass="hidden md:inline-flex"
               >
                 <lucide-icon leftIcon name="clock" class="h-4 w-4"></lucide-icon>
-                History
+                {{ 'DOCUMENT_EDITOR.HISTORY' | translate }}
               </app-button>
               <app-button
                 variant="outline"
@@ -123,7 +125,7 @@ import { diffWords } from 'diff';
                 (onClick)="showWipModal.set(true)" customClass="hidden md:inline-flex"
               >
                 <lucide-icon leftIcon name="message-square" class="h-4 w-4"></lucide-icon>
-                Comments
+                {{ 'DOCUMENT_EDITOR.COMMENTS' | translate }}
               </app-button>
             }
             @if (pendingInvites().length > 0) {
@@ -131,10 +133,10 @@ import { diffWords } from 'diff';
                 <button
                   (click)="toggleInvitesPanel()"
                   class="inline-flex items-center gap-2 px-3 py-1.5 text-xs font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-full transition-colors"
-                  title="Pending invites"
+                  [title]="'DOCUMENT_EDITOR.INVITES' | translate"
                 >
                   <lucide-icon name="user-plus" class="h-3.5 w-3.5 text-gray-600"></lucide-icon>
-                  Invites
+                  {{ 'DOCUMENT_EDITOR.INVITES' | translate }}
                   <span
                     class="ml-1 inline-flex items-center justify-center h-5 min-w-5 px-1.5 rounded-full bg-[#155347] text-white text-[10px]"
                   >
@@ -146,24 +148,24 @@ import { diffWords } from 'diff';
                     class="absolute right-0 mt-2 w-64 bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden z-10"
                   >
                     <div class="px-3 py-2 text-xs font-medium text-gray-500 bg-gray-50">
-                      Pending invites
+                      {{ 'DOCUMENT_EDITOR.PENDING_INVITES' | translate }}
                     </div>
                     <div class="divide-y divide-gray-100">
                       @for (inv of pendingInvites(); track inv.id) {
                         <div class="px-3 py-2 text-sm flex items-center justify-between">
                           <div>
                             <div class="font-medium text-gray-900">
-                              {{ inv.role === 1 ? 'Editor' : 'Viewer' }} invite
+                              {{ inv.role === 1 ? ('DOCUMENT_EDITOR.EDITOR_INVITE' | translate) : ('DOCUMENT_EDITOR.VIEWER_INVITE' | translate) }}
                             </div>
                             <div class="text-xs text-gray-500">
-                              Expires {{ inv.expiresAt | date: 'MMM d, y' }}
+                              {{ 'DOCUMENT_EDITOR.EXPIRES' | translate }} {{ inv.expiresAt | date: 'MMM d, y' }}
                             </div>
                           </div>
                           <button
                             (click)="copyInviteUrl(inv.id, inv.inviteUrl)"
                             class="text-xs font-medium text-gray-700 hover:text-gray-900"
                           >
-                            {{ lastCopiedInviteId() === inv.id ? 'Copied!' : 'Copy link' }}
+                            {{ lastCopiedInviteId() === inv.id ? ('DOCUMENT_EDITOR.COPIED' | translate) : ('DOCUMENT_EDITOR.COPY_LINK' | translate) }}
                           </button>
                         </div>
                       }
@@ -181,7 +183,7 @@ import { diffWords } from 'diff';
                 customClass="hidden md:inline-flex"
               >
                 <lucide-icon leftIcon name="share-2" class="h-4 w-4"></lucide-icon>
-                Share
+                {{ 'DOCUMENT_EDITOR.SHARE' | translate }}
               </app-button>
               <!-- Mobile 3-dots menu -->
               <div class="relative md:hidden">
@@ -199,21 +201,21 @@ import { diffWords } from 'diff';
                       class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors text-left"
                     >
                       <lucide-icon name="sparkles" class="h-4 w-4 shrink-0"></lucide-icon>
-                      AI Assistance
+                      {{ 'DOCUMENT_EDITOR.AI_ASSISTANCE' | translate }}
                     </button>
                     <button
                       (click)="toggleVersionHistory(); showMobileMenu.set(false)"
                       class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors text-left"
                     >
                       <lucide-icon name="clock" class="h-4 w-4 shrink-0"></lucide-icon>
-                      History
+                      {{ 'DOCUMENT_EDITOR.HISTORY' | translate }}
                     </button>
                     <button
                       (click)="showWipModal.set(true); showMobileMenu.set(false)"
                       class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors text-left"
                     >
                       <lucide-icon name="message-square" class="h-4 w-4 shrink-0"></lucide-icon>
-                      Comments
+                      {{ 'DOCUMENT_EDITOR.COMMENTS' | translate }}
                     </button>
                     <div class="border-t border-gray-100 my-1"></div>
                     <button
@@ -221,7 +223,7 @@ import { diffWords } from 'diff';
                       class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors text-left"
                     >
                       <lucide-icon name="share-2" class="h-4 w-4 shrink-0"></lucide-icon>
-                      Share
+                      {{ 'DOCUMENT_EDITOR.SHARE' | translate }}
                     </button>
                   </div>
                 }
@@ -258,7 +260,7 @@ import { diffWords } from 'diff';
                   class="flex items-center gap-1.5 px-2 py-1 rounded-md hover:bg-white/20 transition-colors text-xs font-medium"
                 >
                   <lucide-icon name="sparkles" class="h-3.5 w-3.5 text-purple-300"></lucide-icon>
-                  Improve with AI
+                  {{ 'DOCUMENT_EDITOR.IMPROVE_WITH_AI' | translate }}
                 </button>
               </div>
             }
@@ -272,7 +274,7 @@ import { diffWords } from 'diff';
               <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
                 <div class="flex items-center gap-2">
                   <lucide-icon name="sparkles" class="h-5 w-5 text-[#155347]"></lucide-icon>
-                  <h3 class="text-lg font-bold text-gray-900">AI Assistance</h3>
+                  <h3 class="text-lg font-bold text-gray-900">{{ 'DOCUMENT_EDITOR.AI_ASSISTANCE' | translate }}</h3>
                 </div>
                 <button (click)="showAIPanel.set(false)" class="p-1 hover:bg-gray-100 rounded">
                   <lucide-icon name="x" class="h-5 w-5 text-gray-500"></lucide-icon>
@@ -281,7 +283,7 @@ import { diffWords } from 'diff';
 
             <div class="flex-1 overflow-y-auto p-6">
               <div class="mb-6">
-                <h4 class="text-sm font-semibold text-gray-900 mb-3">Actions</h4>
+                <h4 class="text-sm font-semibold text-gray-900 mb-3">{{ 'DOCUMENT_EDITOR.ACTIONS' | translate }}</h4>
                 <div class="space-y-2">
 
                   <!-- Generate Summary (functional) -->
@@ -295,8 +297,8 @@ import { diffWords } from 'diff';
                         <lucide-icon name="file-text" class="h-5 w-5 text-purple-600"></lucide-icon>
                       </div>
                       <div class="flex-1 min-w-0">
-                        <p class="text-sm font-medium text-gray-900 mb-0.5">Generate Summary</p>
-                        <p class="text-xs text-gray-500">Get a concise AI-generated summary of this document</p>
+                        <p class="text-sm font-medium text-gray-900 mb-0.5">{{ 'DOCUMENT_EDITOR.GENERATE_SUMMARY' | translate }}</p>
+                        <p class="text-xs text-gray-500">{{ 'DOCUMENT_EDITOR.GENERATE_SUMMARY_DESC' | translate }}</p>
                       </div>
                     </div>
                   </button>
@@ -312,8 +314,8 @@ import { diffWords } from 'diff';
                         <lucide-icon name="pencil-line" class="h-5 w-5 text-blue-600"></lucide-icon>
                       </div>
                       <div class="flex-1 min-w-0">
-                        <p class="text-sm font-medium text-gray-900 mb-0.5">Generate Content</p>
-                        <p class="text-xs text-gray-500">Generate new content from a prompt using AI</p>
+                        <p class="text-sm font-medium text-gray-900 mb-0.5">{{ 'DOCUMENT_EDITOR.GENERATE_CONTENT' | translate }}</p>
+                        <p class="text-xs text-gray-500">{{ 'DOCUMENT_EDITOR.GENERATE_CONTENT_DESC' | translate }}</p>
                       </div>
                     </div>
                   </button>
@@ -328,7 +330,7 @@ import { diffWords } from 'diff';
                 >
                   <div class="flex items-center gap-2">
                     <lucide-icon name="file-stack" class="h-4 w-4"></lucide-icon>
-                    Context
+                    {{ 'DOCUMENT_EDITOR.CONTEXT' | translate }}
                     @if (contextFiles().length > 0) {
                       <span class="inline-flex items-center justify-center w-4 h-4 text-xs font-medium bg-[#155347] text-white rounded-full">{{ contextFiles().length }}</span>
                     }
@@ -340,7 +342,7 @@ import { diffWords } from 'diff';
                   @if (contextLoading()) {
                     <div class="flex items-center gap-2 py-2 text-gray-400">
                       <lucide-icon name="loader-circle" class="h-4 w-4 animate-spin"></lucide-icon>
-                      <span class="text-xs">Loading...</span>
+                      <span class="text-xs">{{ 'DOCUMENT_EDITOR.CONTEXT_LOADING' | translate }}</span>
                     </div>
                   } @else {
                     <div class="space-y-2 mb-3">
@@ -365,7 +367,7 @@ import { diffWords } from 'diff';
                         </div>
                       }
                       @if (contextFiles().length === 0) {
-                        <p class="text-xs text-gray-400 py-1">No context files yet.</p>
+                        <p class="text-xs text-gray-400 py-1">{{ 'DOCUMENT_EDITOR.NO_CONTEXT_FILES' | translate }}</p>
                       }
                     </div>
 
@@ -380,10 +382,10 @@ import { diffWords } from 'diff';
                     >
                       @if (contextUploading()) {
                         <lucide-icon name="loader-circle" class="h-3.5 w-3.5 animate-spin"></lucide-icon>
-                        Uploading...
+                        {{ 'DOCUMENT_EDITOR.UPLOADING' | translate }}
                       } @else {
                         <lucide-icon name="plus" class="h-3.5 w-3.5"></lucide-icon>
-                        Add file (PDF, TXT)
+                        {{ 'DOCUMENT_EDITOR.ADD_FILE' | translate }}
                       }
                     </button>
 
@@ -408,7 +410,7 @@ import { diffWords } from 'diff';
               <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
                 <div class="flex items-center gap-2">
                   <lucide-icon name="clock" class="h-5 w-5 text-[#155347]"></lucide-icon>
-                  <h3 class="text-lg font-bold text-gray-900">Version History</h3>
+                  <h3 class="text-lg font-bold text-gray-900">{{ 'DOCUMENT_EDITOR.VERSION_HISTORY' | translate }}</h3>
                 </div>
                 <button
                   (click)="showVersionHistory.set(false); selectedVersions.set([])"
@@ -425,7 +427,7 @@ import { diffWords } from 'diff';
                       (onClick)="handleCompareVersions()"
                       customClass="w-full bg-[#155347] hover:bg-[#0d3d31]"
                     >
-                      Compare Selected Versions
+                      {{ 'DOCUMENT_EDITOR.COMPARE_VERSIONS' | translate }}
                     </app-button>
                   </div>
                 }
@@ -433,7 +435,7 @@ import { diffWords } from 'diff';
                 @if (versionsLoading()) {
                   <div class="flex flex-col items-center justify-center py-12 gap-3">
                     <lucide-icon name="loader-circle" class="h-6 w-6 text-[#155347] animate-spin"></lucide-icon>
-                    <p class="text-sm text-gray-500">Loading versions...</p>
+                    <p class="text-sm text-gray-500">{{ 'DOCUMENT_EDITOR.LOADING_VERSIONS' | translate }}</p>
                   </div>
                 } @else if (versionsError()) {
                   <div class="p-4 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600">
@@ -442,8 +444,8 @@ import { diffWords } from 'diff';
                 } @else if (documentVersions().length === 0) {
                   <div class="flex flex-col items-center justify-center py-12 gap-2 text-center">
                     <lucide-icon name="clock" class="h-8 w-8 text-gray-300"></lucide-icon>
-                    <p class="text-sm font-medium text-gray-500">No versions yet</p>
-                    <p class="text-xs text-gray-400">Versions are created when you close the editing session.</p>
+                    <p class="text-sm font-medium text-gray-500">{{ 'DOCUMENT_EDITOR.NO_VERSIONS' | translate }}</p>
+                    <p class="text-xs text-gray-400">{{ 'DOCUMENT_EDITOR.NO_VERSIONS_DESC' | translate }}</p>
                   </div>
                 } @else {
                   <div class="space-y-4">
@@ -479,7 +481,7 @@ import { diffWords } from 'diff';
                             (onClick)="openVersionPreview(version, i)"
                           >
                             <lucide-icon leftIcon name="eye" class="h-3 w-3"></lucide-icon>
-                            View
+                            {{ 'DOCUMENT_EDITOR.VIEW' | translate }}
                           </app-button>
                           <app-button
                             variant="outline"
@@ -488,7 +490,7 @@ import { diffWords } from 'diff';
                             (onClick)="handleRestore(documentVersions().length - i)"
                           >
                             <lucide-icon leftIcon name="rotate-ccw" class="h-3 w-3"></lucide-icon>
-                            Restore
+                            {{ 'DOCUMENT_EDITOR.RESTORE' | translate }}
                           </app-button>
                         </div>
                       </div>
@@ -504,7 +506,7 @@ import { diffWords } from 'diff';
             <aside class="w-96 bg-white border-l border-gray-200 flex flex-col shadow-xl">
               <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
                 <div class="flex items-center gap-2">
-                  <h3 class="text-lg font-bold text-gray-900">Comments</h3>
+                  <h3 class="text-lg font-bold text-gray-900">{{ 'DOCUMENT_EDITOR.COMMENTS_TITLE' | translate }}</h3>
                   <app-badge customClass="bg-red-500 text-white">2</app-badge>
                 </div>
                 <button (click)="showComments.set(false)" class="p-1 hover:bg-gray-100 rounded">
@@ -514,7 +516,7 @@ import { diffWords } from 'diff';
 
               <div class="p-4 border-b border-gray-200">
                 <textarea
-                  placeholder="Add a comment..."
+                  [placeholder]="'DOCUMENT_EDITOR.ADD_COMMENT' | translate"
                   [(ngModel)]="newComment"
                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#155347] text-sm resize-none"
                   rows="3"
@@ -552,7 +554,7 @@ import { diffWords } from 'diff';
                         </div>
                         <p class="text-sm text-gray-700">{{ comment.text }}</p>
                         <button class="text-xs text-gray-500 hover:text-[#155347] mt-2">
-                          Reply
+                          {{ 'DOCUMENT_EDITOR.REPLY' | translate }}
                         </button>
                       </div>
                     </div>
@@ -588,7 +590,7 @@ import { diffWords } from 'diff';
           <div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
             <div class="bg-white rounded-xl shadow-2xl w-full max-w-md">
               <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
-                <h2 class="text-lg font-bold text-gray-900">Restore Old Version</h2>
+                <h2 class="text-lg font-bold text-gray-900">{{ 'DOCUMENT_EDITOR.RESTORE_TITLE' | translate }}</h2>
                 <button (click)="closeRestoreModal()" class="text-gray-400 hover:text-gray-600 p-1">
                   <lucide-icon name="x" class="h-5 w-5"></lucide-icon>
                 </button>
@@ -601,13 +603,12 @@ import { diffWords } from 'diff';
                     class="h-5 w-5 text-red-600 shrink-0 mt-0.5"
                   ></lucide-icon>
                   <p class="text-sm text-red-800 font-medium">
-                    This action will replace the current version of the document with the selected
-                    version.
+                    {{ 'DOCUMENT_EDITOR.RESTORE_WARNING' | translate }}
                   </p>
                 </div>
 
                 <p class="text-sm text-gray-600">
-                  This action cannot be undone. Make sure you want to continue.
+                  {{ 'DOCUMENT_EDITOR.RESTORE_NOTE' | translate }}
                 </p>
 
                 <label class="flex items-start gap-3 cursor-pointer">
@@ -617,7 +618,7 @@ import { diffWords } from 'diff';
                     class="mt-0.5 rounded border-gray-300 text-red-600 focus:ring-red-500"
                   />
                   <span class="text-sm text-gray-700"
-                    >I understand that this action is irreversible.</span
+                    >{{ 'DOCUMENT_EDITOR.RESTORE_CONFIRM_CHECK' | translate }}</span
                   >
                 </label>
               </div>
@@ -625,13 +626,13 @@ import { diffWords } from 'diff';
               <div
                 class="px-6 py-4 bg-gray-50 border-t border-gray-100 flex justify-end gap-3 rounded-b-xl"
               >
-                <app-button variant="ghost" (onClick)="closeRestoreModal()">Cancel</app-button>
+                <app-button variant="ghost" (onClick)="closeRestoreModal()">{{ 'COMMON.CANCEL' | translate }}</app-button>
                 <app-button
                   (onClick)="confirmRestore()"
                   [disabled]="!restoreConfirmed"
                   customClass="bg-red-600 hover:bg-red-700 disabled:bg-gray-300 disabled:cursor-not-allowed"
                 >
-                  Restore and Replace
+                  {{ 'DOCUMENT_EDITOR.RESTORE_AND_REPLACE' | translate }}
                 </app-button>
               </div>
             </div>
@@ -663,27 +664,27 @@ import { diffWords } from 'diff';
                 <button
                   (click)="versionHasPrevious() && diffViewMode.set('diff')"
                   [disabled]="!versionHasPrevious()"
-                  [title]="versionHasPrevious() ? '' : 'No previous version to compare against'"
+                  [title]="versionHasPrevious() ? '' : ('DOCUMENT_EDITOR.NO_PREV_VERSION' | translate)"
                   [class]="'px-3 py-1 text-xs font-medium rounded-md transition-colors ' + (diffViewMode() === 'diff' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-500 hover:text-gray-700') + (!versionHasPrevious() ? ' opacity-40 cursor-not-allowed' : '')"
                 >
-                  Changes
+                  {{ 'DOCUMENT_EDITOR.CHANGES' | translate }}
                 </button>
                 <button
                   (click)="diffViewMode.set('full')"
                   [class]="'px-3 py-1 text-xs font-medium rounded-md transition-colors ' + (diffViewMode() === 'full' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-500 hover:text-gray-700')"
                 >
-                  Full version
+                  {{ 'DOCUMENT_EDITOR.FULL_VERSION' | translate }}
                 </button>
               </div>
             } @else {
               <div class="flex items-center gap-2 flex-1">
                 <lucide-icon name="loader-circle" class="h-4 w-4 text-[#155347] animate-spin"></lucide-icon>
-                <span class="text-sm text-gray-500">Loading version...</span>
+                <span class="text-sm text-gray-500">{{ 'DOCUMENT_EDITOR.LOADING_VERSION' | translate }}</span>
               </div>
             }
             <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-700 shrink-0">
               <lucide-icon name="eye" class="h-3 w-3"></lucide-icon>
-              Read only
+              {{ 'DOCUMENT_EDITOR.READ_ONLY' | translate }}
             </span>
           </div>
           <!-- Content -->
@@ -694,26 +695,26 @@ import { diffWords } from 'diff';
                   @if (!versionHasPrevious()) {
                     <div class="flex flex-col items-center justify-center py-16 gap-3 text-center">
                       <lucide-icon name="git-commit-horizontal" class="h-10 w-10 text-gray-300"></lucide-icon>
-                      <p class="text-gray-500 text-sm">This is the first version — no previous version to compare against.</p>
+                      <p class="text-gray-500 text-sm">{{ 'DOCUMENT_EDITOR.FIRST_VERSION' | translate }}</p>
                       <button
                         (click)="diffViewMode.set('full')"
                         class="text-xs text-[#155347] underline hover:no-underline"
-                      >Switch to Full version</button>
+                      >{{ 'DOCUMENT_EDITOR.SWITCH_FULL' | translate }}</button>
                     </div>
                   } @else if (versionDiff()) {
                     <!-- Diff legend -->
                     <div class="flex items-center gap-5 mb-6 pb-4 border-b border-gray-200 flex-wrap text-xs text-gray-600">
                       <span class="flex items-center gap-1.5">
                         <span class="inline-block w-3 h-3 rounded-sm bg-green-200"></span>
-                        Added
+                        {{ 'DOCUMENT_EDITOR.DIFF_ADDED' | translate }}
                       </span>
                       <span class="flex items-center gap-1.5">
                         <span class="inline-block w-3 h-3 rounded-sm bg-yellow-200"></span>
-                        Modified
+                        {{ 'DOCUMENT_EDITOR.DIFF_MODIFIED' | translate }}
                       </span>
                       <span class="flex items-center gap-1.5">
                         <span class="inline-block w-3 h-3 rounded-sm bg-red-200"></span>
-                        Removed
+                        {{ 'DOCUMENT_EDITOR.DIFF_REMOVED' | translate }}
                       </span>
                     </div>
                     <div [innerHTML]="versionDiff()"></div>
@@ -724,7 +725,7 @@ import { diffWords } from 'diff';
                   } @else {
                     <div class="flex flex-col items-center justify-center py-16 gap-3 text-center">
                       <lucide-icon name="file-x" class="h-10 w-10 text-gray-300"></lucide-icon>
-                      <p class="text-gray-500 text-sm">No content available for this version.</p>
+                      <p class="text-gray-500 text-sm">{{ 'DOCUMENT_EDITOR.NO_CONTENT' | translate }}</p>
                     </div>
                   }
                 }
@@ -741,7 +742,7 @@ import { diffWords } from 'diff';
             <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
               <div class="flex items-center gap-2">
                 <lucide-icon name="sparkles" class="h-5 w-5 text-purple-600"></lucide-icon>
-                <h2 class="text-lg font-bold text-gray-900">AI Summary</h2>
+                <h2 class="text-lg font-bold text-gray-900">{{ 'DOCUMENT_EDITOR.AI_SUMMARY_TITLE' | translate }}</h2>
               </div>
               <button
                 (click)="closeSummaryModal()"
@@ -758,13 +759,13 @@ import { diffWords } from 'diff';
                     name="loader-circle"
                     class="h-8 w-8 text-purple-600 animate-spin"
                   ></lucide-icon>
-                  <p class="text-gray-600 text-sm">Generating summary...</p>
+                  <p class="text-gray-600 text-sm">{{ 'DOCUMENT_EDITOR.GENERATING_SUMMARY' | translate }}</p>
                 </div>
               } @else if (summaryError()) {
                 <div class="bg-red-50 border border-red-200 rounded-lg p-4">
                   <div class="flex items-center gap-2 text-red-700 mb-1">
                     <lucide-icon name="circle-alert" class="h-5 w-5"></lucide-icon>
-                    <span class="font-medium">Error</span>
+                    <span class="font-medium">{{ 'DOCUMENT_EDITOR.ERROR' | translate }}</span>
                   </div>
                   <p class="text-sm text-red-600">{{ summaryError() }}</p>
                 </div>
@@ -784,14 +785,14 @@ import { diffWords } from 'diff';
                 <app-button variant="outline" size="sm" (onClick)="copySummary()">
                   @if (summaryCopied()) {
                     <lucide-icon name="check" class="h-4 w-4 mr-1 text-green-600"></lucide-icon>
-                    Copied!
+                    {{ 'DOCUMENT_EDITOR.COPIED' | translate }}
                   } @else {
                     <lucide-icon name="clipboard" class="h-4 w-4 mr-1"></lucide-icon>
-                    Copy
+                    {{ 'DOCUMENT_EDITOR.COPY' | translate }}
                   }
                 </app-button>
               }
-              <app-button variant="ghost" (onClick)="closeSummaryModal()">Close</app-button>
+              <app-button variant="ghost" (onClick)="closeSummaryModal()">{{ 'DOCUMENT_EDITOR.CLOSE' | translate }}</app-button>
             </div>
           </div>
         </div>
@@ -804,7 +805,7 @@ import { diffWords } from 'diff';
             <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
               <div class="flex items-center gap-2">
                 <lucide-icon name="sparkles" class="h-5 w-5 text-blue-600"></lucide-icon>
-                <h2 class="text-lg font-bold text-gray-900">Generate Content</h2>
+                <h2 class="text-lg font-bold text-gray-900">{{ 'DOCUMENT_EDITOR.GENERATE_CONTENT' | translate }}</h2>
               </div>
               <button
                 (click)="closeGeneratePanelModal()"
@@ -819,14 +820,14 @@ import { diffWords } from 'diff';
               @if (!generateLoading() && !generateResult() && !generateError()) {
                 <textarea
                   [(ngModel)]="generatePrompt"
-                  placeholder="Describe the content you want to generate..."
+                  [placeholder]="'DOCUMENT_EDITOR.GENERATE_PROMPT' | translate"
                   rows="4"
                   class="w-full text-sm border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-400 resize-none placeholder:text-gray-400"
                 ></textarea>
                 @if (contextFiles().length > 0) {
                   <p class="text-xs text-gray-400 mt-2 flex items-center gap-1">
                     <lucide-icon name="file-stack" class="h-3.5 w-3.5"></lucide-icon>
-                    {{ contextFiles().length }} context file{{ contextFiles().length > 1 ? 's' : '' }} will be included
+                    {{ 'DOCUMENT_EDITOR.CONTEXT_FILES_HINT' | translate: { count: contextFiles().length } }}
                   </p>
                 }
               }
@@ -835,7 +836,7 @@ import { diffWords } from 'diff';
               @if (generateLoading()) {
                 <div class="flex flex-col items-center justify-center py-8 gap-3">
                   <lucide-icon name="loader-circle" class="h-8 w-8 text-blue-600 animate-spin"></lucide-icon>
-                  <p class="text-gray-600 text-sm">Generating content...</p>
+                  <p class="text-gray-600 text-sm">{{ 'DOCUMENT_EDITOR.GENERATING' | translate }}</p>
                 </div>
               }
 
@@ -844,7 +845,7 @@ import { diffWords } from 'diff';
                 <div class="bg-red-50 border border-red-200 rounded-lg p-4">
                   <div class="flex items-center gap-2 text-red-700 mb-1">
                     <lucide-icon name="circle-alert" class="h-5 w-5"></lucide-icon>
-                    <span class="font-medium">Error</span>
+                    <span class="font-medium">{{ 'DOCUMENT_EDITOR.ERROR' | translate }}</span>
                   </div>
                   <p class="text-sm text-red-600">{{ generateError() }}</p>
                 </div>
@@ -867,26 +868,26 @@ import { diffWords } from 'diff';
                   [disabled]="!generatePrompt.trim()"
                 >
                   <lucide-icon name="sparkles" class="h-4 w-4 mr-1"></lucide-icon>
-                  Generate
+                  {{ 'DOCUMENT_EDITOR.GENERATE_BTN' | translate }}
                 </app-button>
               }
               @if (generateError()) {
                 <app-button variant="outline" size="sm" (onClick)="resetGeneratePanelModal()">
-                  Try again
+                  {{ 'DOCUMENT_EDITOR.TRY_AGAIN' | translate }}
                 </app-button>
               }
               @if (!generateLoading() && !generateError() && generateResult()) {
                 <app-button variant="outline" size="sm" (onClick)="copyGeneratedContent()">
                   @if (generateCopied()) {
                     <lucide-icon name="check" class="h-4 w-4 mr-1 text-green-600"></lucide-icon>
-                    Copied!
+                    {{ 'DOCUMENT_EDITOR.COPIED' | translate }}
                   } @else {
                     <lucide-icon name="clipboard" class="h-4 w-4 mr-1"></lucide-icon>
-                    Copy
+                    {{ 'DOCUMENT_EDITOR.COPY' | translate }}
                   }
                 </app-button>
               }
-              <app-button variant="ghost" (onClick)="closeGeneratePanelModal()">Close</app-button>
+              <app-button variant="ghost" (onClick)="closeGeneratePanelModal()">{{ 'DOCUMENT_EDITOR.CLOSE' | translate }}</app-button>
             </div>
           </div>
         </div>
@@ -909,7 +910,7 @@ import { diffWords } from 'diff';
               <div class="w-6 h-6 rounded-md bg-purple-100 flex items-center justify-center">
                 <lucide-icon name="sparkles" class="h-3.5 w-3.5 text-purple-600"></lucide-icon>
               </div>
-              <span class="text-sm font-semibold text-gray-900">Improve with AI</span>
+              <span class="text-sm font-semibold text-gray-900">{{ 'DOCUMENT_EDITOR.IMPROVE_WITH_AI' | translate }}</span>
             </div>
             <button
               (click)="closeImproveModal()"
@@ -924,7 +925,7 @@ import { diffWords } from 'diff';
             @if (improveLoading()) {
               <div class="flex flex-col items-center justify-center py-10 gap-3">
                 <lucide-icon name="loader-circle" class="h-6 w-6 text-purple-600 animate-spin"></lucide-icon>
-                <p class="text-xs text-gray-500">Analyzing and improving your text...</p>
+                <p class="text-xs text-gray-500">{{ 'DOCUMENT_EDITOR.ANALYZING' | translate }}</p>
               </div>
             } @else if (improveError()) {
               <div class="m-4 bg-red-50 border border-red-200 rounded-lg p-3 flex items-start gap-2">
@@ -936,12 +937,12 @@ import { diffWords } from 'diff';
               <div class="divide-y divide-gray-100">
                 <!-- Original -->
                 <div class="px-4 py-3">
-                  <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-widest mb-1.5">Original</p>
+                  <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-widest mb-1.5">{{ 'DOCUMENT_EDITOR.ORIGINAL' | translate }}</p>
                   <p class="text-xs text-gray-400 leading-relaxed line-clamp-3 line-through">{{ improveOriginalText() }}</p>
                 </div>
                 <!-- Sugestão -->
                 <div class="px-4 py-3 bg-purple-50/60">
-                  <p class="text-[10px] font-semibold text-purple-500 uppercase tracking-widest mb-1.5">Suggestion</p>
+                  <p class="text-[10px] font-semibold text-purple-500 uppercase tracking-widest mb-1.5">{{ 'DOCUMENT_EDITOR.SUGGESTION' | translate }}</p>
                   <p class="text-sm text-gray-800 leading-relaxed">{{ improveResult() }}</p>
                 </div>
               </div>
@@ -955,7 +956,7 @@ import { diffWords } from 'diff';
                 (click)="closeImproveModal()"
                 class="px-3 py-1.5 text-xs text-gray-500 hover:text-gray-700 rounded-lg hover:bg-gray-100 transition-colors"
               >
-                Discard
+                {{ 'DOCUMENT_EDITOR.DISCARD' | translate }}
               </button>
               <button
                 (click)="copyImprovedText()"
@@ -963,10 +964,10 @@ import { diffWords } from 'diff';
               >
                 @if (improveCopied()) {
                   <lucide-icon name="check" class="h-3.5 w-3.5 text-green-600"></lucide-icon>
-                  <span>Copied!</span>
+                  <span>{{ 'DOCUMENT_EDITOR.COPIED' | translate }}</span>
                 } @else {
                   <lucide-icon name="clipboard" class="h-3.5 w-3.5"></lucide-icon>
-                  <span>Copy</span>
+                  <span>{{ 'DOCUMENT_EDITOR.COPY' | translate }}</span>
                 }
               </button>
               <button
@@ -974,7 +975,7 @@ import { diffWords } from 'diff';
                 class="px-3 py-1.5 text-xs bg-[#155347] text-white rounded-lg hover:bg-[#0d3d31] transition-colors flex items-center gap-1.5"
               >
                 <lucide-icon name="check" class="h-3.5 w-3.5"></lucide-icon>
-                <span>Apply</span>
+                <span>{{ 'DOCUMENT_EDITOR.APPLY' | translate }}</span>
               </button>
             </div>
           }
@@ -995,7 +996,7 @@ import { diffWords } from 'diff';
               <div class="w-6 h-6 rounded-md bg-blue-100 flex items-center justify-center">
                 <lucide-icon name="sparkles" class="h-3.5 w-3.5 text-blue-600"></lucide-icon>
               </div>
-              <span class="text-sm font-semibold text-gray-900">Generate with AI</span>
+              <span class="text-sm font-semibold text-gray-900">{{ 'DOCUMENT_EDITOR.GENERATE_WITH_AI' | translate }}</span>
             </div>
             <button
               (click)="closeGenerateCard()"
@@ -1011,7 +1012,7 @@ import { diffWords } from 'diff';
               <textarea
                 #generatePromptInput
                 [(ngModel)]="generatePrompt"
-                placeholder="Describe the content you want to generate..."
+                [placeholder]="'DOCUMENT_EDITOR.GENERATE_PROMPT' | translate"
                 rows="3"
                 class="w-full text-sm border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-400 resize-none placeholder:text-gray-400"
                 (keydown.enter)="onGenerateKeydown($event)"
@@ -1020,7 +1021,7 @@ import { diffWords } from 'diff';
                 <p class="text-[10px] text-gray-400">
                   @if (contextFiles().length > 0) {
                     <lucide-icon name="file-stack" class="h-3 w-3 inline-block mr-0.5 -mt-0.5"></lucide-icon>
-                    {{ contextFiles().length }} context file{{ contextFiles().length > 1 ? 's' : '' }} included
+                    {{ 'DOCUMENT_EDITOR.CONTEXT_FILES_HINT' | translate: { count: contextFiles().length } }}
                   }
                 </p>
                 <button
@@ -1029,7 +1030,7 @@ import { diffWords } from 'diff';
                   class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-[#155347] text-white rounded-lg hover:bg-[#0d3d31] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   <lucide-icon name="sparkles" class="h-3.5 w-3.5"></lucide-icon>
-                  Generate
+                  {{ 'DOCUMENT_EDITOR.GENERATE_BTN' | translate }}
                 </button>
               </div>
             </div>
@@ -1039,7 +1040,7 @@ import { diffWords } from 'diff';
           @if (generateLoading()) {
             <div class="flex flex-col items-center justify-center py-10 gap-3">
               <lucide-icon name="loader-circle" class="h-6 w-6 text-blue-600 animate-spin"></lucide-icon>
-              <p class="text-xs text-gray-500">Generating content...</p>
+              <p class="text-xs text-gray-500">{{ 'DOCUMENT_EDITOR.GENERATING' | translate }}</p>
             </div>
           }
 
@@ -1054,7 +1055,7 @@ import { diffWords } from 'diff';
                 (click)="resetGenerateCard()"
                 class="px-3 py-1.5 text-xs text-gray-500 hover:text-gray-700 rounded-lg hover:bg-gray-100 transition-colors"
               >
-                Try again
+                {{ 'DOCUMENT_EDITOR.TRY_AGAIN' | translate }}
               </button>
             </div>
           }
@@ -1063,7 +1064,7 @@ import { diffWords } from 'diff';
           @if (!generateLoading() && !generateError() && generateResult()) {
             <div class="flex-1 overflow-y-auto">
               <div class="px-4 py-3 bg-blue-50/60">
-                <p class="text-[10px] font-semibold text-blue-500 uppercase tracking-widest mb-1.5">Generated Content</p>
+                <p class="text-[10px] font-semibold text-blue-500 uppercase tracking-widest mb-1.5">{{ 'DOCUMENT_EDITOR.GENERATED_CONTENT' | translate }}</p>
                 <p class="text-sm text-gray-800 leading-relaxed whitespace-pre-wrap">{{ generateResult() }}</p>
               </div>
             </div>
@@ -1072,7 +1073,7 @@ import { diffWords } from 'diff';
                 (click)="closeGenerateCard()"
                 class="px-3 py-1.5 text-xs text-gray-500 hover:text-gray-700 rounded-lg hover:bg-gray-100 transition-colors"
               >
-                Discard
+                {{ 'DOCUMENT_EDITOR.DISCARD' | translate }}
               </button>
               <button
                 (click)="copyGeneratedContent()"
@@ -1080,10 +1081,10 @@ import { diffWords } from 'diff';
               >
                 @if (generateCopied()) {
                   <lucide-icon name="check" class="h-3.5 w-3.5 text-green-600"></lucide-icon>
-                  <span>Copied!</span>
+                  <span>{{ 'DOCUMENT_EDITOR.COPIED' | translate }}</span>
                 } @else {
                   <lucide-icon name="clipboard" class="h-3.5 w-3.5"></lucide-icon>
-                  <span>Copy</span>
+                  <span>{{ 'DOCUMENT_EDITOR.COPY' | translate }}</span>
                 }
               </button>
               <button
@@ -1091,7 +1092,7 @@ import { diffWords } from 'diff';
                 class="px-3 py-1.5 text-xs bg-[#155347] text-white rounded-lg hover:bg-[#0d3d31] transition-colors flex items-center gap-1.5"
               >
                 <lucide-icon name="check" class="h-3.5 w-3.5"></lucide-icon>
-                <span>Insert</span>
+                <span>{{ 'DOCUMENT_EDITOR.INSERT' | translate }}</span>
               </button>
             </div>
           }
@@ -1111,6 +1112,7 @@ export class DocumentEditorComponent implements OnInit {
   private collaborationService = inject(CollaborationService);
   private sanitizer = inject(DomSanitizer);
   private location = inject(Location);
+  private translateService = inject(TranslateService);
 
   // ID do documento atual
   documentId: number | null = null;
@@ -1435,11 +1437,11 @@ export class DocumentEditorComponent implements OnInit {
     const diffHours = Math.floor(diffMs / 3600000);
     const diffDays = Math.floor(diffMs / 86400000);
 
-    if (diffMins < 1) return 'Last edited just now';
-    if (diffMins < 60) return `Last edited ${diffMins} minute${diffMins > 1 ? 's' : ''} ago`;
-    if (diffHours < 24) return `Last edited ${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
-    if (diffDays === 1) return 'Last edited yesterday';
-    return `Last edited ${diffDays} days ago`;
+    if (diffMins < 1) return this.translateService.instant('DOCUMENT_EDITOR.LAST_EDITED_JUST_NOW');
+    if (diffMins < 60) return this.translateService.instant(diffMins === 1 ? 'DOCUMENT_EDITOR.LAST_EDITED_MINUTE' : 'DOCUMENT_EDITOR.LAST_EDITED_MINUTES', { count: diffMins });
+    if (diffHours < 24) return this.translateService.instant(diffHours === 1 ? 'DOCUMENT_EDITOR.LAST_EDITED_HOUR' : 'DOCUMENT_EDITOR.LAST_EDITED_HOURS', { count: diffHours });
+    if (diffDays === 1) return this.translateService.instant('DOCUMENT_EDITOR.LAST_EDITED_YESTERDAY');
+    return this.translateService.instant('DOCUMENT_EDITOR.LAST_EDITED_DAYS', { count: diffDays });
   }
 
   startEditingTitle(): void {
@@ -1488,7 +1490,7 @@ export class DocumentEditorComponent implements OnInit {
 
   private updateLastEdited(): void {
     this.lastEdited.set(new Date());
-    this.lastEditedText.set('Last edited just now');
+    this.lastEditedText.set(this.translateService.instant('DOCUMENT_EDITOR.LAST_EDITED_JUST_NOW'));
   }
 
   onContentChange(_content: string): void {

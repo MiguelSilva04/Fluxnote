@@ -5,13 +5,14 @@ import { Router } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
 import { AuthService, PanelStateService, DocumentService } from '../../core/services';
 import { WorkInProgressComponent } from '../../shared/components/ui';
+import { TranslateModule } from '@ngx-translate/core';
 import { DocumentDto } from '../../core/models';
 import { Subject, debounceTime, takeUntil, distinctUntilChanged } from 'rxjs';
 
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [CommonModule, FormsModule, LucideAngularModule, WorkInProgressComponent],
+  imports: [CommonModule, FormsModule, LucideAngularModule, WorkInProgressComponent, TranslateModule],
   template: `
     <header class="h-14 md:h-16 bg-white border-b border-gray-200 px-3 md:px-6 flex items-center gap-2 md:gap-4 shrink-0">
       <!-- Hamburger (mobile only) -->
@@ -28,7 +29,7 @@ import { Subject, debounceTime, takeUntil, distinctUntilChanged } from 'rxjs';
           <lucide-icon name="search" class="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400"></lucide-icon>
           <input
             type="text"
-            placeholder="Search documents..."
+            [placeholder]="'HEADER.SEARCH_PLACEHOLDER' | translate"
             [(ngModel)]="searchQuery"
             (input)="onSearchInput()"
             (focus)="showResults.set(true)"
@@ -42,17 +43,17 @@ import { Subject, debounceTime, takeUntil, distinctUntilChanged } from 'rxjs';
               @if (isSearching()) {
                 <div class="p-4 text-center text-gray-500">
                   <lucide-icon name="loader-circle" class="h-5 w-5 animate-spin mx-auto mb-2"></lucide-icon>
-                  <p class="text-sm">Searching...</p>
+                  <p class="text-sm">{{ 'HEADER.SEARCHING' | translate }}</p>
                 </div>
               } @else if (searchResults().length === 0) {
                 <div class="p-4 text-center text-gray-500">
                   <lucide-icon name="file-search" class="h-8 w-8 mx-auto mb-2 text-gray-300"></lucide-icon>
-                  <p class="text-sm">No documents found</p>
+                  <p class="text-sm">{{ 'HEADER.NO_RESULTS' | translate }}</p>
                 </div>
               } @else {
                 <div class="py-2">
                   <p class="px-4 py-1 text-xs text-gray-500 font-medium">
-                    {{ searchResults().length }} result{{ searchResults().length > 1 ? 's' : '' }}
+                    {{ searchResults().length }} {{ searchResults().length > 1 ? ('HEADER.RESULTS_COUNT_PLURAL' | translate) : ('HEADER.RESULTS_COUNT' | translate) }}
                   </p>
                   @for (doc of searchResults(); track doc.id) {
                     <button

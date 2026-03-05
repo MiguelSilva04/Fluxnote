@@ -2,6 +2,7 @@ import { Component, inject, signal, computed, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { LucideAngularModule } from 'lucide-angular';
+import { TranslateModule } from '@ngx-translate/core';
 import { DashboardLayoutComponent } from '../../../layout/dashboard-layout/dashboard-layout.component';
 import {
   ButtonComponent,
@@ -22,6 +23,7 @@ import { firstValueFrom } from 'rxjs';
     CommonModule,
     FormsModule,
     LucideAngularModule,
+    TranslateModule,
     DashboardLayoutComponent,
     ButtonComponent,
     CardComponent,
@@ -33,7 +35,7 @@ import { firstValueFrom } from 'rxjs';
   template: `
     <app-dashboard-layout>
       <div class="max-w-4xl">
-        <h1 class="text-3xl font-bold text-gray-900 mb-8">Profile</h1>
+        <h1 class="text-3xl font-bold text-gray-900 mb-8">{{ 'PROFILE.TITLE' | translate }}</h1>
 
         <!-- Success/Error Messages -->
         @if (successMessage()) {
@@ -92,10 +94,10 @@ import { firstValueFrom } from 'rxjs';
                 <p class="text-sm text-gray-600 mb-2">{{ user()?.email || '' }}</p>
                 @if (user()?.createdAt) {
                   <p class="text-xs text-gray-400 mb-4">
-                    Member since {{ formatDate(user()?.createdAt) }}
+                    {{ 'PROFILE.MEMBER_SINCE' | translate }} {{ formatDate(user()?.createdAt) }}
                   </p>
                 }
-                <app-badge variant="default">Pro Plan</app-badge>
+                <app-badge variant="default">{{ 'PROFILE.PRO_PLAN' | translate }}</app-badge>
               </app-card-content>
             </app-card>
           </div>
@@ -104,10 +106,10 @@ import { firstValueFrom } from 'rxjs';
           <div class="lg:col-span-2 space-y-6">
             <app-card>
               <app-card-content customClass="p-6">
-                <h3 class="text-lg font-bold text-gray-900 mb-4">Personal Information</h3>
+                <h3 class="text-lg font-bold text-gray-900 mb-4">{{ 'PROFILE.PERSONAL_INFO' | translate }}</h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">{{ 'PROFILE.FULL_NAME' | translate }}</label>
                     <input
                       type="text"
                       [ngModel]="formData().fullName"
@@ -126,10 +128,10 @@ import { firstValueFrom } from 'rxjs';
                   </div>
                   <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">
-                      Username
+                      {{ 'PROFILE.USERNAME' | translate }}
                       @if (user()?.usernameChangesRemaining !== undefined) {
                         <span class="text-xs text-gray-400 font-normal ml-2">
-                          ({{ user()?.usernameChangesRemaining }} changes remaining this month)
+                          {{ 'PROFILE.USERNAME_CHANGES' | translate: { count: user()?.usernameChangesRemaining } }}
                         </span>
                       }
                     </label>
@@ -156,7 +158,7 @@ import { firstValueFrom } from 'rxjs';
                     </div>
                     @if (user()?.usernameChangesRemaining === 0) {
                       <p class="text-xs text-amber-600 mt-1">
-                        You've reached your username change limit for this month.
+                        {{ 'PROFILE.USERNAME_LIMIT' | translate }}
                       </p>
                     }
                     @if (formErrors()['userName']) {
@@ -164,7 +166,7 @@ import { firstValueFrom } from 'rxjs';
                     }
                   </div>
                   <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">{{ 'PROFILE.EMAIL' | translate }}</label>
                     <input
                       type="email"
                       [value]="user()?.email || ''"
@@ -173,7 +175,7 @@ import { firstValueFrom } from 'rxjs';
                     />
                   </div>
                   <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Phone</label>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">{{ 'PROFILE.PHONE' | translate }}</label>
                     <input
                       type="tel"
                       maxlength="20"
@@ -192,7 +194,7 @@ import { firstValueFrom } from 'rxjs';
                     }
                   </div>
                   <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Location</label>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">{{ 'PROFILE.LOCATION' | translate }}</label>
                     <div class="relative">
                       <input
                         type="text"
@@ -202,7 +204,7 @@ import { firstValueFrom } from 'rxjs';
                         (ngModelChange)="onLocationInput($event)"
                         (keydown)="onLocationKeydown($event)"
                         (blur)="closeCityDropdown()"
-                        placeholder="City, Country"
+                        [placeholder]="'PROFILE.LOCATION_PLACEHOLDER' | translate"
                         [class]="
                           'w-full h-10 px-4 rounded-lg border focus:outline-none focus:ring-2 text-sm ' +
                           (formErrors()['location']
@@ -236,13 +238,13 @@ import { firstValueFrom } from 'rxjs';
                     }
                   </div>
                   <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Timezone</label>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">{{ 'PROFILE.TIMEZONE' | translate }}</label>
                     <select
                       [ngModel]="formData().timezone"
                       (ngModelChange)="updateFormField('timezone', $event)"
                       class="w-full h-10 px-4 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#155347] text-sm bg-white"
                     >
-                      <option value="">Select timezone</option>
+                      <option value="">{{ 'PROFILE.SELECT_TIMEZONE' | translate }}</option>
                       <option value="UTC-12:00">UTC-12:00 (Baker Island)</option>
                       <option value="UTC-11:00">UTC-11:00 (American Samoa)</option>
                       <option value="UTC-10:00">UTC-10:00 (Hawaii)</option>
@@ -272,11 +274,11 @@ import { firstValueFrom } from 'rxjs';
                     </select>
                   </div>
                   <div class="md:col-span-2">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Bio</label>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">{{ 'PROFILE.BIO' | translate }}</label>
                     <textarea
                       [ngModel]="formData().bio"
                       (ngModelChange)="updateFormField('bio', $event)"
-                      placeholder="Tell us a bit about yourself..."
+                      [placeholder]="'PROFILE.BIO_PLACEHOLDER' | translate"
                       maxlength="500"
                       rows="3"
                       class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#155347] text-sm resize-none"
@@ -289,7 +291,7 @@ import { firstValueFrom } from 'rxjs';
                 <div class="mt-4 flex justify-end gap-2">
                   @if (hasChanges()) {
                     <app-button variant="outline" (click)="resetForm()" [disabled]="isSaving()">
-                      Cancel
+                      {{ 'COMMON.CANCEL' | translate }}
                     </app-button>
                   }
                   <app-button
@@ -297,7 +299,7 @@ import { firstValueFrom } from 'rxjs';
                     (click)="showSaveConfirmation()"
                     [disabled]="!hasChanges() || isSaving() || !isFormValid()"
                   >
-                    {{ isSaving() ? 'Saving...' : 'Save Changes' }}
+                    {{ isSaving() ? ('PROFILE.SAVING' | translate) : ('COMMON.SAVE_CHANGES' | translate) }}
                   </app-button>
                 </div>
               </app-card-content>
@@ -305,7 +307,7 @@ import { firstValueFrom } from 'rxjs';
 
             <app-card>
               <app-card-content customClass="p-6">
-                <h3 class="text-lg font-bold text-gray-900 mb-4">Connected Accounts</h3>
+                <h3 class="text-lg font-bold text-gray-900 mb-4">{{ 'PROFILE.CONNECTED_ACCOUNTS' | translate }}</h3>
                 <div class="space-y-3">
                   <div
                     class="flex items-center justify-between p-4 border border-gray-200 rounded-lg"
@@ -332,7 +334,7 @@ import { firstValueFrom } from 'rxjs';
                       <div>
                         <p class="text-sm font-medium text-gray-900">Google</p>
                         <p class="text-xs text-gray-500">
-                          {{ googleConnected() ? 'Connected' : 'Not connected' }}
+                        {{ googleConnected() ? ('PROFILE.CONNECTED' | translate) : ('PROFILE.NOT_CONNECTED' | translate) }}
                         </p>
                       </div>
                     </div>
@@ -342,7 +344,7 @@ import { firstValueFrom } from 'rxjs';
                       [disabled]="isCheckingExternalAccounts() || isDisconnectingGoogle()"
                       (click)="googleConnected() ? disconnectGoogle() : connectGoogle()"
                     >
-                      {{ googleConnected() ? 'Disconnect' : 'Connect' }}
+                      {{ googleConnected() ? ('PROFILE.DISCONNECT' | translate) : ('PROFILE.CONNECT' | translate) }}
                     </app-button>
                   </div>
                   <div
@@ -359,7 +361,7 @@ import { firstValueFrom } from 'rxjs';
                       <div>
                         <p class="text-sm font-medium text-gray-900">Microsoft</p>
                         <p class="text-xs text-gray-500">
-                          {{ microsoftConnected() ? 'Connected' : 'Not connected' }}
+                        {{ microsoftConnected() ? ('PROFILE.CONNECTED' | translate) : ('PROFILE.NOT_CONNECTED' | translate) }}
                         </p>
                       </div>
                     </div>
@@ -369,7 +371,7 @@ import { firstValueFrom } from 'rxjs';
                       [disabled]="isCheckingExternalAccounts() || microsoftConnected()"
                       (click)="connectMicrosoft()"
                     >
-                      {{ microsoftConnected() ? 'Connected' : 'Connect' }}
+                      {{ microsoftConnected() ? ('PROFILE.CONNECTED' | translate) : ('PROFILE.CONNECT' | translate) }}
                     </app-button>
                   </div>
                 </div>
@@ -378,16 +380,16 @@ import { firstValueFrom } from 'rxjs';
 
             <app-card>
               <app-card-content customClass="p-6">
-                <h3 class="text-lg font-bold text-gray-900 mb-4">Security</h3>
+                <h3 class="text-lg font-bold text-gray-900 mb-4">{{ 'PROFILE.SECURITY' | translate }}</h3>
                 <button
                   (click)="showPasswordModal.set(true)"
                   class="w-full flex items-center gap-3 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-left"
                 >
                   <lucide-icon name="key" class="h-5 w-5 text-gray-500"></lucide-icon>
                   <div>
-                    <p class="text-sm font-medium text-gray-900">Change Password</p>
+                    <p class="text-sm font-medium text-gray-900">{{ 'PROFILE.CHANGE_PASSWORD' | translate }}</p>
                     <p class="text-xs text-gray-500">
-                      Update your password to keep your account secure
+                      {{ 'PROFILE.CHANGE_PASSWORD_DESC' | translate }}
                     </p>
                   </div>
                 </button>
@@ -408,7 +410,7 @@ import { firstValueFrom } from 'rxjs';
             (click)="$event.stopPropagation()"
           >
             <div class="flex items-center justify-between mb-4">
-              <h3 class="text-lg font-bold text-gray-900">Update Profile Picture</h3>
+              <h3 class="text-lg font-bold text-gray-900">{{ 'PROFILE.UPDATE_PICTURE' | translate }}</h3>
               <button (click)="closeAvatarModal()" class="text-gray-400 hover:text-gray-600">
                 <lucide-icon name="x" class="h-5 w-5"></lucide-icon>
               </button>
@@ -425,7 +427,7 @@ import { firstValueFrom } from 'rxjs';
                     : 'border-transparent text-gray-500 hover:text-gray-700')
                 "
               >
-                Upload File
+                {{ 'PROFILE.UPLOAD_FILE' | translate }}
               </button>
               <button
                 (click)="uploadMode.set('url')"
@@ -436,7 +438,7 @@ import { firstValueFrom } from 'rxjs';
                     : 'border-transparent text-gray-500 hover:text-gray-700')
                 "
               >
-                Image URL
+                {{ 'PROFILE.IMAGE_URL_TAB' | translate }}
               </button>
             </div>
 
@@ -472,9 +474,9 @@ import { firstValueFrom } from 'rxjs';
                       "
                     ></lucide-icon>
                     <p class="text-sm text-gray-600">
-                      {{ isDragging() ? 'Drop image here' : 'Click or drag an image here' }}
+                      {{ isDragging() ? ('PROFILE.DROP_IMAGE' | translate) : ('PROFILE.CLICK_OR_DRAG' | translate) }}
                     </p>
-                    <p class="text-xs text-gray-400 mt-1">JPEG, PNG, GIF or WebP (max 2MB)</p>
+                    <p class="text-xs text-gray-400 mt-1">{{ 'PROFILE.FILE_CONSTRAINTS' | translate }}</p>
                   </div>
                 </div>
 
@@ -484,7 +486,7 @@ import { firstValueFrom } from 'rxjs';
 
                 @if (filePreview()) {
                   <div class="text-center">
-                    <p class="text-sm text-gray-500 mb-2">Preview:</p>
+                    <p class="text-sm text-gray-500 mb-2">{{ 'PROFILE.PREVIEW' | translate }}</p>
                     <img
                       [src]="filePreview()"
                       alt="Preview"
@@ -511,7 +513,7 @@ import { firstValueFrom } from 'rxjs';
 
                 @if (avatarUrl) {
                   <div class="text-center">
-                    <p class="text-sm text-gray-500 mb-2">Preview:</p>
+                    <p class="text-sm text-gray-500 mb-2">{{ 'PROFILE.PREVIEW' | translate }}</p>
                     <img
                       [src]="avatarUrl"
                       alt="Preview"
@@ -533,14 +535,14 @@ import { firstValueFrom } from 'rxjs';
                   (click)="closeAvatarModal()"
                   [disabled]="isSavingAvatar()"
                 >
-                  Cancel
+                  {{ 'COMMON.CANCEL' | translate }}
                 </app-button>
                 <app-button
                   customClass="flex-1 bg-[#155347] hover:bg-[#0d3d31]"
                   (click)="saveAvatar()"
                   [disabled]="!canSaveAvatar() || isSavingAvatar()"
                 >
-                  {{ isSavingAvatar() ? 'Saving...' : 'Save' }}
+                  {{ isSavingAvatar() ? ('PROFILE.SAVING' | translate) : ('COMMON.SAVE' | translate) }}
                 </app-button>
               </div>
             </div>
@@ -559,7 +561,7 @@ import { firstValueFrom } from 'rxjs';
             (click)="$event.stopPropagation()"
           >
             <div class="flex items-center justify-between mb-4">
-              <h3 class="text-lg font-bold text-gray-900">Change Password</h3>
+              <h3 class="text-lg font-bold text-gray-900">{{ 'PROFILE.CHANGE_PASSWORD' | translate }}</h3>
               <button (click)="closePasswordModal()" class="text-gray-400 hover:text-gray-600">
                 <lucide-icon name="x" class="h-5 w-5"></lucide-icon>
               </button>
@@ -573,7 +575,7 @@ import { firstValueFrom } from 'rxjs';
 
             <div class="space-y-4">
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Current Password</label>
+                <label class="block text-sm font-medium text-gray-700 mb-2">{{ 'PROFILE.CURRENT_PASSWORD' | translate }}</label>
                 <div class="relative">
                   <input
                     [type]="showCurrentPassword() ? 'text' : 'password'"
@@ -595,7 +597,7 @@ import { firstValueFrom } from 'rxjs';
               </div>
 
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">New Password</label>
+                <label class="block text-sm font-medium text-gray-700 mb-2">{{ 'PROFILE.NEW_PASSWORD' | translate }}</label>
                 <div class="relative">
                   <input
                     [type]="showNewPassword() ? 'text' : 'password'"
@@ -627,7 +629,7 @@ import { firstValueFrom } from 'rxjs';
                     } @else {
                       <div class="h-3 w-3 rounded-full border border-gray-300"></div>
                     }
-                    <span>Min 8 characters</span>
+                    <span>{{ 'PROFILE.MIN_CHARS' | translate }}</span>
                   </div>
                   <div
                     [class]="
@@ -640,7 +642,7 @@ import { firstValueFrom } from 'rxjs';
                     } @else {
                       <div class="h-3 w-3 rounded-full border border-gray-300"></div>
                     }
-                    <span>At least one number</span>
+                    <span>{{ 'PROFILE.AT_LEAST_NUMBER' | translate }}</span>
                   </div>
                   <div
                     [class]="
@@ -653,7 +655,7 @@ import { firstValueFrom } from 'rxjs';
                     } @else {
                       <div class="h-3 w-3 rounded-full border border-gray-300"></div>
                     }
-                    <span>One special char</span>
+                    <span>{{ 'PROFILE.ONE_SPECIAL' | translate }}</span>
                   </div>
                   <div
                     [class]="
@@ -666,14 +668,14 @@ import { firstValueFrom } from 'rxjs';
                     } @else {
                       <div class="h-3 w-3 rounded-full border border-gray-300"></div>
                     }
-                    <span>Passwords match</span>
+                    <span>{{ 'PROFILE.PASSWORDS_MATCH' | translate }}</span>
                   </div>
                 </div>
               </div>
 
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2"
-                  >Confirm New Password</label
+                  >{{ 'PROFILE.CONFIRM_NEW_PASSWORD' | translate }}</label
                 >
                 <div class="relative">
                   <input
@@ -702,14 +704,14 @@ import { firstValueFrom } from 'rxjs';
 
               <div class="flex gap-2 pt-2">
                 <app-button variant="outline" class="flex-1" (click)="closePasswordModal()">
-                  Cancel
+                  {{ 'COMMON.CANCEL' | translate }}
                 </app-button>
                 <app-button
                   customClass="flex-1 bg-[#155347] hover:bg-[#0d3d31]"
                   (click)="showPasswordConfirmModal.set(true)"
                   [disabled]="!isPasswordFormValid() || isChangingPassword()"
                 >
-                  Change Password
+                  {{ 'PROFILE.CHANGE_PASSWORD' | translate }}
                 </app-button>
               </div>
             </div>
@@ -733,10 +735,9 @@ import { firstValueFrom } from 'rxjs';
               >
                 <lucide-icon name="key" class="h-6 w-6 text-yellow-600"></lucide-icon>
               </div>
-              <h3 class="text-lg font-bold text-gray-900 mb-2">Confirm Password Change</h3>
+              <h3 class="text-lg font-bold text-gray-900 mb-2">{{ 'PROFILE.CONFIRM_PASSWORD_CHANGE' | translate }}</h3>
               <p class="text-sm text-gray-600">
-                Are you sure you want to change your password? You will need to use the new password
-                on your next login.
+                {{ 'PROFILE.CONFIRM_PASSWORD_DESC' | translate }}
               </p>
             </div>
 
@@ -746,14 +747,14 @@ import { firstValueFrom } from 'rxjs';
                 class="flex-1"
                 (click)="showPasswordConfirmModal.set(false)"
               >
-                Cancel
+                {{ 'COMMON.CANCEL' | translate }}
               </app-button>
               <app-button
                 customClass="flex-1 bg-[#155347] hover:bg-[#0d3d31]"
                 (click)="confirmChangePassword()"
                 [disabled]="isChangingPassword()"
               >
-                {{ isChangingPassword() ? 'Changing...' : 'Confirm' }}
+                {{ isChangingPassword() ? ('PROFILE.CHANGING' | translate) : ('COMMON.CONFIRM' | translate) }}
               </app-button>
             </div>
           </div>
@@ -764,7 +765,7 @@ import { firstValueFrom } from 'rxjs';
 
       <app-modal
         [isOpen]="showDisconnectGoogleModal()"
-        title="Disconnect Google"
+        [title]="'PROFILE.DISCONNECT_GOOGLE' | translate"
         maxWidth="sm"
         [hasFooter]="true"
         (onClose)="closeDisconnectGoogleModal()"
@@ -777,10 +778,9 @@ import { firstValueFrom } from 'rxjs';
           </div>
           <p class="text-center text-gray-600">
             @if (unlinkLastExternalDeletesAccount()) {
-              Google is your only login method. Disconnecting it will permanently delete your
-              account. This action cannot be undone.
+              {{ 'PROFILE.DISCONNECT_GOOGLE_ONLY' | translate }}
             } @else {
-              Disconnect Google from this account? Your profile and documents will remain available.
+              {{ 'PROFILE.DISCONNECT_GOOGLE_SAFE' | translate }}
             }
           </p>
         </div>
@@ -792,7 +792,7 @@ import { firstValueFrom } from 'rxjs';
             customClass="flex-1"
             [disabled]="isDisconnectingGoogle()"
           >
-            Cancel
+            {{ 'COMMON.CANCEL' | translate }}
           </app-button>
           <app-button
             (onClick)="confirmDisconnectGoogle()"
@@ -806,9 +806,9 @@ import { firstValueFrom } from 'rxjs';
           >
             @if (isDisconnectingGoogle()) {
               <lucide-icon name="loader-circle" class="h-4 w-4 animate-spin mr-2"></lucide-icon>
-              Disconnecting...
+              {{ 'PROFILE.DISCONNECTING' | translate }}
             } @else {
-              Disconnect
+              {{ 'PROFILE.DISCONNECT' | translate }}
             }
           </app-button>
         </div>
@@ -830,21 +830,21 @@ import { firstValueFrom } from 'rxjs';
               >
                 <lucide-icon name="triangle-alert" class="h-6 w-6 text-yellow-600"></lucide-icon>
               </div>
-              <h3 class="text-lg font-bold text-gray-900 mb-2">Confirm Changes</h3>
+              <h3 class="text-lg font-bold text-gray-900 mb-2">{{ 'PROFILE.SAVE_CONFIRM_TITLE' | translate }}</h3>
               <p class="text-sm text-gray-600">
-                Are you sure you want to save these changes to your profile?
+                {{ 'PROFILE.SAVE_CONFIRM_DESC' | translate }}
               </p>
             </div>
 
             <div class="flex gap-2">
               <app-button variant="outline" class="flex-1" (click)="showConfirmModal.set(false)">
-                Cancel
+                {{ 'COMMON.CANCEL' | translate }}
               </app-button>
               <app-button
                 customClass="flex-1 bg-[#155347] hover:bg-[#0d3d31]"
                 (click)="confirmSaveProfile()"
               >
-                Confirm
+                {{ 'COMMON.CONFIRM' | translate }}
               </app-button>
             </div>
           </div>

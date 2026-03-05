@@ -1,19 +1,20 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-testimonials-section',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, TranslateModule],
   template: `
     <section id="testemunhos" class="py-20 bg-white">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-16">
           <h2 class="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
-            What our users are saying
+            {{ 'LANDING.TESTIMONIALS.TITLE' | translate }}
           </h2>
           <p class="text-xl text-gray-600 max-w-3xl mx-auto">
-            Thousands of professionals trust Fluxnote for their most important work.
+            {{ 'LANDING.TESTIMONIALS.SUBTITLE' | translate }}
           </p>
         </div>
 
@@ -30,12 +31,12 @@ import { CommonModule } from '@angular/common';
                 </div>
                 <div>
                   <h4 class="font-semibold text-gray-900">{{ testimonial.name }}</h4>
-                  <p class="text-gray-600 text-sm">{{ testimonial.role }}</p>
+                  <p class="text-gray-600 text-sm">{{ testimonial.roleKey | translate }}</p>
                 </div>
               </div>
 
               <blockquote class="text-gray-700 italic">
-                "{{ testimonial.quote }}"
+                "{{ testimonial.quoteKey | translate }}"
               </blockquote>
 
               <div class="flex text-[#155347] mt-4">
@@ -56,20 +57,20 @@ export class TestimonialsSectionComponent {
   testimonials = [
     {
       name: 'Ana Silva',
-      role: 'Project Manager',
-      quote: 'Fluxnote has transformed the way our team collaborates. The AI truly helps improve the quality of our documents.',
+      roleKey: 'LANDING.TESTIMONIALS.ANA_ROLE',
+      quoteKey: 'LANDING.TESTIMONIALS.ANA_QUOTE',
       avatar: 'assets/ana.jpeg'
     },
     {
       name: 'Joao Santos',
-      role: 'Marketing Director',
-      quote: 'Creating high-quality content has never been easier. Real-time collaboration is perfect for our campaigns.',
+      roleKey: 'LANDING.TESTIMONIALS.JOAO_ROLE',
+      quoteKey: 'LANDING.TESTIMONIALS.JOAO_QUOTE',
       avatar: 'assets/joao.jpg'
     },
     {
       name: 'Maria Costa',
-      role: 'Consultant',
-      quote: 'The version history feature has saved me more than once. It’s an essential tool for any professional.',
+      roleKey: 'LANDING.TESTIMONIALS.MARIA_ROLE',
+      quoteKey: 'LANDING.TESTIMONIALS.MARIA_QUOTE',
       avatar: 'assets/maria.jpg'
     }
   ];

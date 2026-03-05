@@ -2,6 +2,7 @@ import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { LucideAngularModule } from 'lucide-angular';
+import { TranslateModule } from '@ngx-translate/core';
 import { DashboardLayoutComponent } from '../../../layout/dashboard-layout/dashboard-layout.component';
 import { ButtonComponent, CardComponent, CardContentComponent } from '../../../shared/components/ui';
 
@@ -12,6 +13,7 @@ import { ButtonComponent, CardComponent, CardContentComponent } from '../../../s
     CommonModule,
     FormsModule,
     LucideAngularModule,
+    TranslateModule,
     DashboardLayoutComponent,
     ButtonComponent,
     CardComponent,
@@ -25,15 +27,15 @@ import { ButtonComponent, CardComponent, CardContentComponent } from '../../../s
           <div class="inline-flex items-center justify-center w-16 h-16 bg-[#155347] rounded-full mb-4">
             <lucide-icon name="badge-question-mark" class="h-8 w-8 text-white"></lucide-icon>
           </div>
-          <h1 class="text-4xl font-bold text-gray-900 mb-4">How can we help you?</h1>
-          <p class="text-lg text-gray-600 mb-8">Search our knowledge base or browse categories below</p>
+          <h1 class="text-4xl font-bold text-gray-900 mb-4">{{ 'HELP.TITLE' | translate }}</h1>
+          <p class="text-lg text-gray-600 mb-8">{{ 'HELP.SUBTITLE' | translate }}</p>
 
           <!-- Search Bar -->
           <div class="max-w-2xl mx-auto relative">
             <lucide-icon name="search" class="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400"></lucide-icon>
             <input
               type="text"
-              placeholder="Search for help articles..."
+              [placeholder]="'HELP.SEARCH_PLACEHOLDER' | translate"
               [(ngModel)]="searchQuery"
               class="w-full h-14 pl-12 pr-4 rounded-xl border-2 border-gray-200 focus:border-[#155347] focus:outline-none text-base shadow-sm"
             />
@@ -47,9 +49,9 @@ import { ButtonComponent, CardComponent, CardContentComponent } from '../../../s
               <div class="inline-flex items-center justify-center w-12 h-12 bg-blue-100 rounded-full mb-4">
                 <lucide-icon name="book" class="h-6 w-6 text-blue-600"></lucide-icon>
               </div>
-              <h3 class="text-lg font-bold text-gray-900 mb-2">Documentation</h3>
-              <p class="text-sm text-gray-600 mb-4">Browse our comprehensive guides</p>
-              <app-button variant="outline" size="sm" customClass="w-full">View Docs</app-button>
+              <h3 class="text-lg font-bold text-gray-900 mb-2">{{ 'HELP.DOCUMENTATION' | translate }}</h3>
+              <p class="text-sm text-gray-600 mb-4">{{ 'HELP.DOCS_DESC' | translate }}</p>
+              <app-button variant="outline" size="sm" customClass="w-full">{{ 'HELP.VIEW_DOCS' | translate }}</app-button>
             </app-card-content>
           </app-card>
 
@@ -58,9 +60,9 @@ import { ButtonComponent, CardComponent, CardContentComponent } from '../../../s
               <div class="inline-flex items-center justify-center w-12 h-12 bg-green-100 rounded-full mb-4">
                 <lucide-icon name="message-circle" class="h-6 w-6 text-green-600"></lucide-icon>
               </div>
-              <h3 class="text-lg font-bold text-gray-900 mb-2">Live Chat</h3>
-              <p class="text-sm text-gray-600 mb-4">Chat with our support team</p>
-              <app-button variant="outline" size="sm" customClass="w-full">Start Chat</app-button>
+              <h3 class="text-lg font-bold text-gray-900 mb-2">{{ 'HELP.LIVE_CHAT' | translate }}</h3>
+              <p class="text-sm text-gray-600 mb-4">{{ 'HELP.CHAT_DESC' | translate }}</p>
+              <app-button variant="outline" size="sm" customClass="w-full">{{ 'HELP.START_CHAT' | translate }}</app-button>
             </app-card-content>
           </app-card>
 
@@ -69,16 +71,16 @@ import { ButtonComponent, CardComponent, CardContentComponent } from '../../../s
               <div class="inline-flex items-center justify-center w-12 h-12 bg-purple-100 rounded-full mb-4">
                 <lucide-icon name="mail" class="h-6 w-6 text-purple-600"></lucide-icon>
               </div>
-              <h3 class="text-lg font-bold text-gray-900 mb-2">Email Support</h3>
-              <p class="text-sm text-gray-600 mb-4">Get help via email</p>
-              <app-button variant="outline" size="sm" customClass="w-full">Contact Us</app-button>
+              <h3 class="text-lg font-bold text-gray-900 mb-2">{{ 'HELP.EMAIL_SUPPORT' | translate }}</h3>
+              <p class="text-sm text-gray-600 mb-4">{{ 'HELP.EMAIL_DESC' | translate }}</p>
+              <app-button variant="outline" size="sm" customClass="w-full">{{ 'HELP.CONTACT_US' | translate }}</app-button>
             </app-card-content>
           </app-card>
         </div>
 
         <!-- Categories -->
         <div class="mb-12">
-          <h2 class="text-2xl font-bold text-gray-900 mb-6">Browse by Category</h2>
+          <h2 class="text-2xl font-bold text-gray-900 mb-6">{{ 'HELP.BROWSE_CATEGORY' | translate }}</h2>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             @for (category of categories; track category.id) {
               <app-card customClass="hover:shadow-lg transition-shadow cursor-pointer">
@@ -86,8 +88,8 @@ import { ButtonComponent, CardComponent, CardContentComponent } from '../../../s
                   <div class="flex items-start gap-4">
                     <div class="text-4xl">{{ category.icon }}</div>
                     <div class="flex-1">
-                      <h3 class="text-lg font-bold text-gray-900 mb-1">{{ category.name }}</h3>
-                      <p class="text-sm text-gray-600 mb-2">{{ category.description }}</p>
+                      <h3 class="text-lg font-bold text-gray-900 mb-1">{{ category.nameKey | translate }}</h3>
+                      <p class="text-sm text-gray-600 mb-2">{{ category.descKey | translate }}</p>
                       <p class="text-xs text-gray-500">{{ category.articles }} articles</p>
                     </div>
                     <lucide-icon name="chevron-right" class="h-5 w-5 text-gray-400"></lucide-icon>
@@ -100,7 +102,7 @@ import { ButtonComponent, CardComponent, CardContentComponent } from '../../../s
 
         <!-- Popular Articles -->
         <div class="mb-12">
-          <h2 class="text-2xl font-bold text-gray-900 mb-6">Popular Articles</h2>
+          <h2 class="text-2xl font-bold text-gray-900 mb-6">{{ 'HELP.POPULAR_ARTICLES' | translate }}</h2>
           <app-card>
             <app-card-content customClass="p-0">
               <div class="divide-y divide-gray-100">
@@ -123,7 +125,7 @@ import { ButtonComponent, CardComponent, CardContentComponent } from '../../../s
 
         <!-- FAQs -->
         <div class="mb-12">
-          <h2 class="text-2xl font-bold text-gray-900 mb-6">Frequently Asked Questions</h2>
+          <h2 class="text-2xl font-bold text-gray-900 mb-6">{{ 'HELP.FAQ_TITLE' | translate }}</h2>
           <div class="space-y-4">
             @for (faq of faqs; track faq.question) {
               <app-card>
@@ -139,11 +141,11 @@ import { ButtonComponent, CardComponent, CardContentComponent } from '../../../s
         <!-- Contact Support -->
         <app-card customClass="bg-gradient-to-br from-[#155347] to-[#0d3d31] text-white">
           <app-card-content customClass="p-8 text-center">
-            <h2 class="text-2xl font-bold mb-4">Still need help?</h2>
-            <p class="text-white/90 mb-6">Our support team is available 24/7 to assist you with any questions or issues.</p>
+            <h2 class="text-2xl font-bold mb-4">{{ 'HELP.STILL_NEED_HELP' | translate }}</h2>
+            <p class="text-white/90 mb-6">{{ 'HELP.STILL_HELP_DESC' | translate }}</p>
             <div class="flex items-center justify-center gap-4">
-              <app-button variant="outline" customClass="bg-white text-[#155347] hover:bg-gray-100">Contact Support</app-button>
-              <app-button variant="outline" customClass="bg-transparent border-white text-white hover:bg-white/10">Schedule a Call</app-button>
+              <app-button variant="outline" customClass="bg-white text-[#155347] hover:bg-gray-100">{{ 'HELP.CONTACT_SUPPORT' | translate }}</app-button>
+              <app-button variant="outline" customClass="bg-transparent border-white text-white hover:bg-white/10">{{ 'HELP.SCHEDULE_CALL' | translate }}</app-button>
             </div>
           </app-card-content>
         </app-card>
@@ -164,10 +166,10 @@ export class HelpComponent {
   ];
 
   categories = [
-    { id: 1, name: 'Getting Started', icon: '🚀', articles: 12, description: 'Learn the basics of Fluxnote' },
-    { id: 2, name: 'Collaboration', icon: '👥', articles: 18, description: 'Work together with your team' },
-    { id: 3, name: 'AI Features', icon: '🤖', articles: 15, description: 'Leverage AI to enhance your work' },
-    { id: 4, name: 'Account & Billing', icon: '💳', articles: 10, description: 'Manage your subscription' }
+    { id: 1, nameKey: 'HELP.CAT_STARTED', icon: '🚀', articles: 12, descKey: 'HELP.CAT_STARTED_DESC' },
+    { id: 2, nameKey: 'HELP.CAT_COLLAB', icon: '👥', articles: 18, descKey: 'HELP.CAT_COLLAB_DESC' },
+    { id: 3, nameKey: 'HELP.CAT_AI', icon: '🤖', articles: 15, descKey: 'HELP.CAT_AI_DESC' },
+    { id: 4, nameKey: 'HELP.CAT_BILLING', icon: '💳', articles: 10, descKey: 'HELP.CAT_BILLING_DESC' }
   ];
 
   faqs = [
