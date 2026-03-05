@@ -1693,7 +1693,9 @@ export class DocumentEditorComponent implements OnInit {
   confirmRestore(): void {
     if (this.restoreConfirmed) {
       this.closeRestoreModal();
-      // Handle restore logic
+      this.closeVersionPreview();
+      this.showVersionHistory.set(false);
+      this.showWipModal.set(true);
     }
   }
 
