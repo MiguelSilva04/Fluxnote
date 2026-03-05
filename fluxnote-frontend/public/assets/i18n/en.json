@@ -705,6 +705,7 @@
     "RESTORE_NOTE": "This action cannot be undone. Make sure you want to continue.",
     "RESTORE_CONFIRM_CHECK": "I understand that this action is irreversible.",
     "RESTORE_AND_REPLACE": "Restore and Replace",
+    "SUMMARY_RESTORED_BY": "Restored by {{name}}",
     "COMMENTS_TITLE": "Comments",
     "ADD_COMMENT": "Add a comment...",
     "POST": "Post",

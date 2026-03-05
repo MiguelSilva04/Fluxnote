@@ -144,9 +144,9 @@ export class CollaborationService {
   // Desconectar e limpar recursos
   // ─────────────────────────────────────────────────────────────
 
-  async disconnect(): Promise<void> {
-    // Guardar snapshot final antes de desconectar
-    if (this.ydoc && this.currentDocumentId !== null) {
+  async disconnect(skipSave = false): Promise<void> {
+    // Guardar snapshot final antes de desconectar (omitir em restauros)
+    if (!skipSave && this.ydoc && this.currentDocumentId !== null) {
       this.saveSnapshot(this.currentDocumentId);
     }
 
@@ -173,6 +173,19 @@ export class CollaborationService {
     this.quill = null;
     this.currentDocumentId = null;
     this.collaborators.clear();
+  }
+
+  /**
+   * Reconecta ao documento sem guardar o snapshot atual.
+   * Usado após um restauro de versão para carregar o conteúdo restaurado do servidor.
+   */
+  async reconnectAfterRestore(): Promise<void> {
+    const docId = this.currentDocumentId;
+    const quill = this.quill;
+    await this.disconnect(true); // skip saveSnapshot — não sobrescrever o conteúdo restaurado
+    if (docId !== null && quill !== null) {
+      await this.connect(docId, quill);
+    }
   }
 
   // ─────────────────────────────────────────────────────────────
@@ -217,6 +230,12 @@ export class CollaborationService {
           this.userLeft$.next(connId); // notificar com connectionId para remover cursor
         }
       }
+    });
+
+    // Versão restaurada pelo Owner → recarregar conteúdo do servidor
+    this.connection.on('DocumentRestored', () => {
+      console.info('[Collaboration] Documento restaurado — a reconectar');
+      this.reconnectAfterRestore();
     });
 
     // Reconexão → re-entrar no grupo

@@ -483,15 +483,17 @@ import { diffWords } from 'diff';
                             <lucide-icon leftIcon name="eye" class="h-3 w-3"></lucide-icon>
                             {{ 'DOCUMENT_EDITOR.VIEW' | translate }}
                           </app-button>
-                          <app-button
-                            variant="outline"
-                            size="sm"
-                            [leftIcon]="true"
-                            (onClick)="handleRestore(documentVersions().length - i)"
-                          >
-                            <lucide-icon leftIcon name="rotate-ccw" class="h-3 w-3"></lucide-icon>
-                            {{ 'DOCUMENT_EDITOR.RESTORE' | translate }}
-                          </app-button>
+                          @if (isOwner() && i > 0) {
+                            <app-button
+                              variant="outline"
+                              size="sm"
+                              [leftIcon]="true"
+                              (onClick)="handleRestore(version.id)"
+                            >
+                              <lucide-icon leftIcon name="rotate-ccw" class="h-3 w-3"></lucide-icon>
+                              {{ 'DOCUMENT_EDITOR.RESTORE' | translate }}
+                            </app-button>
+                          }
                         </div>
                       </div>
                     }
@@ -629,10 +631,10 @@ import { diffWords } from 'diff';
                 <app-button variant="ghost" (onClick)="closeRestoreModal()">{{ 'COMMON.CANCEL' | translate }}</app-button>
                 <app-button
                   (onClick)="confirmRestore()"
-                  [disabled]="!restoreConfirmed"
+                  [disabled]="!restoreConfirmed || isRestoring()"
                   customClass="bg-red-600 hover:bg-red-700 disabled:bg-gray-300 disabled:cursor-not-allowed"
                 >
-                  {{ 'DOCUMENT_EDITOR.RESTORE_AND_REPLACE' | translate }}
+                  {{ isRestoring() ? ('COMMON.LOADING' | translate) : ('DOCUMENT_EDITOR.RESTORE_AND_REPLACE' | translate) }}
                 </app-button>
               </div>
             </div>
@@ -1252,6 +1254,7 @@ export class DocumentEditorComponent implements OnInit {
   showWipModal = signal(false);
   showMobileMenu = signal(false);
   isRestoreModalOpen = signal(false);
+  isRestoring = signal(false);
   versionToRestore = signal<number | null>(null);
   newComment = '';
   selectedVersions = signal<number[]>([]);
@@ -1314,6 +1317,7 @@ export class DocumentEditorComponent implements OnInit {
   // Team Owners/Admins recebem "Editor" via bypass no backend
   documentRole = signal<string>('Viewer');
   canEdit = computed(() => this.documentRole() === 'Editor');
+  isOwner = signal(false);
 
   // TODO: Implementar colaboração em tempo real
   collaborators: Collaborator[] = [];
@@ -1356,6 +1360,7 @@ export class DocumentEditorComponent implements OnInit {
         this.lastEdited.set(new Date(doc.updatedAt));
         this.lastEditedText.set(this.formatLastEdited(new Date(doc.updatedAt)));
         this.documentRole.set(doc.role || 'Viewer');
+        this.isOwner.set(doc.isOwner ?? false);
         this.isLoading.set(false);
         this.loadDocumentInvites(doc.id);
         if (doc.role === 'Editor') {
@@ -1791,6 +1796,14 @@ export class DocumentEditorComponent implements OnInit {
     });
   }
 
+  formatVersionSummary(summary: string): string {
+    if (summary.startsWith('RESTORED_BY|')) {
+      const name = summary.substring('RESTORED_BY|'.length);
+      return this.translateService.instant('DOCUMENT_EDITOR.SUMMARY_RESTORED_BY', { name });
+    }
+    return summary;
+  }
+
   toggleComments(): void {
     this.showComments.update((v) => !v);
     this.showVersionHistory.set(false);
@@ -1807,52 +1820,13 @@ export class DocumentEditorComponent implements OnInit {
   }
 
   handleCompareVersions(): void {
-    if (this.selectedVersions().length !== 2 || !this.documentId) return;
-    const ids = this.selectedVersions();
-    const versions = this.documentVersions();
-    const idxA = versions.findIndex(v => v.id === ids[0]);
-    const idxB = versions.findIndex(v => v.id === ids[1]);
-    const [olderIdx, newerIdx] = idxA > idxB ? [idxA, idxB] : [idxB, idxA];
-    const olderMeta = versions[olderIdx];
-    const newerMeta = versions[newerIdx];
-
-    this.showCompareOverlay.set(true);
-    this.compareLoading.set(true);
-    this.compareDiffHtml.set(null);
-    this.compareOlderVersion.set(null);
-    this.compareNewerVersion.set(null);
-    this.compareViewMode.set('diff');
-
-    const older$ = this.documentService.getDocumentVersionDetail(this.documentId, olderMeta.id);
-    const newer$ = this.documentService.getDocumentVersionDetail(this.documentId, newerMeta.id);
-
-    forkJoin({ older: older$, newer: newer$ }).subscribe({
-      next: ({ older, newer }) => {
-        this.compareOlderVersion.set(older);
-        this.compareNewerVersion.set(newer);
-        const diffHtml = this.computeVersionDiff(older.contentHtml, newer.contentHtml);
-        this.compareDiffHtml.set(this.sanitizer.bypassSecurityTrustHtml(diffHtml));
-        this.compareLoading.set(false);
-      },
-      error: () => this.compareLoading.set(false),
-    });
+    if (this.selectedVersions().length === 2) {
+      this.showWipModal.set(true);
+    }
   }
 
-  closeCompareOverlay(): void {
-    this.showCompareOverlay.set(false);
-    this.compareDiffHtml.set(null);
-    this.compareOlderVersion.set(null);
-    this.compareNewerVersion.set(null);
-  }
-
-  getVersionNumber(versionId: number): number {
-    const versions = this.documentVersions();
-    const idx = versions.findIndex(v => v.id === versionId);
-    return idx >= 0 ? versions.length - idx : 0;
-  }
-
-  handleRestore(versionNumber: number): void {
-    this.versionToRestore.set(versionNumber);
+  handleRestore(versionId: number): void {
+    this.versionToRestore.set(versionId);
     this.isRestoreModalOpen.set(true);
   }
 
@@ -1862,12 +1836,22 @@ export class DocumentEditorComponent implements OnInit {
   }
 
   confirmRestore(): void {
-    if (this.restoreConfirmed) {
-      this.closeRestoreModal();
-      this.closeVersionPreview();
-      this.showVersionHistory.set(false);
-      this.showWipModal.set(true);
-    }
+    if (!this.restoreConfirmed || !this.versionToRestore() || !this.documentId) return;
+
+    this.isRestoring.set(true);
+    this.documentService.restoreDocumentVersion(this.documentId, this.versionToRestore()!).subscribe({
+      next: () => {
+        this.isRestoring.set(false);
+        this.closeRestoreModal();
+        this.closeVersionPreview();
+        this.showVersionHistory.set(false);
+        this.collaborationService.reconnectAfterRestore();
+      },
+      error: (err) => {
+        this.isRestoring.set(false);
+        console.error('Error restoring version:', err);
+      }
+    });
   }
 
   generateSummary(): void {

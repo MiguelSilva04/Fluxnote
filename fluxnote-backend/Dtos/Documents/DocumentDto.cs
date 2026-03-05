@@ -115,5 +115,11 @@ namespace Fluxnote.Backend.Dtos.Documents
         /// Members recebem o valor do seu DocumentPermission (Editor ou Viewer).
         /// </remarks>
         public string Role { get; set; } = "Viewer";
+
+        /// <summary>
+        /// Indica se o utilizador autenticado é o Owner da equipa deste documento.
+        /// Apenas o Owner pode restaurar versões.
+        /// </summary>
+        public bool IsOwner { get; set; }
     }
 }

@@ -357,4 +357,19 @@ export class DocumentService {
       })
     );
   }
+
+  /**
+   * Restaura o documento para o conteúdo de uma versão anterior.
+   * Apenas o Owner da equipa pode executar esta operação.
+   * @param documentId ID do documento
+   * @param versionId ID da versão a restaurar
+   */
+  restoreDocumentVersion(documentId: number, versionId: number): Observable<void> {
+    return this.http.post<void>(`/api/documents/${documentId}/versions/${versionId}/restore`, {}).pipe(
+      catchError(error => {
+        console.error('Error restoring version:', error);
+        return throwError(() => error);
+      })
+    );
+  }
 }

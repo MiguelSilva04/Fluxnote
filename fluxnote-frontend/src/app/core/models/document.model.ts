@@ -32,6 +32,7 @@ export interface DocumentDetailDto {
   content?: string; // Y.Doc em Base64
   plainText?: string;
   role?: string; // "Editor" | "Viewer"
+  isOwner?: boolean; // true se o utilizador autenticado é o Owner da equipa
 }
 
 /**
