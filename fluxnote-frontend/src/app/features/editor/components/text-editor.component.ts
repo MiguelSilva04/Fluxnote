@@ -15,6 +15,28 @@ import { FormsModule } from '@angular/forms';
 import { LucideAngularModule } from 'lucide-angular';
 import Quill from 'quill';
 import { Subject, debounceTime, takeUntil } from 'rxjs';
+import { Comment } from '../../../core/models';
+
+const Inline = Quill.import('blots/inline') as any;
+
+class CommentBlot extends Inline {
+  static blotName = 'comment';
+  static tagName = 'span';
+
+  static create(value: any) {
+    const node = super.create();
+    node.setAttribute('data-comment-id', value);
+    node.style.backgroundColor = '#FFF59D';
+    return node;
+  }
+
+  static formats(node: HTMLElement) {
+    return node.getAttribute('data-comment-id');
+  }
+}
+
+Quill.register(CommentBlot);
+
 
 // Custom image blot that persists inline styles (width, float, margins) inside the Quill Delta.
 // The default ImageBlot only stores `src`, so direct DOM style mutations bypass Yjs and are
@@ -41,6 +63,8 @@ class StyledImageBlot extends EmbedBlot {
   }
 }
 Quill.register({ 'formats/image': StyledImageBlot }, true);
+
+
 import { UploadService, CollaborationService, AuthService } from '../../../core/services';
 import { CollaboratorState } from '../../../core/services/collaboration.service';
 
@@ -901,5 +925,41 @@ export class TextEditorComponent implements OnInit, AfterViewInit, OnDestroy {
     const index = range ? range.index : this.quill.getLength() - 1;
     this.quill.insertText(index, text, 'user');
     this.quill.setSelection(index + text.length, 0, 'silent');
+  }
+
+  // Retorna o range atual do Quill
+  public getSelectedRange(): { index: number; length: number } | null {
+    return this.quill?.getSelection() ?? null;
+  }
+
+  // Aplica highlight de comentário
+  public highlightComment(comment: Comment): void {
+    if (!comment.range) return;
+    //const { index, length } = comment.range;
+    /* this.quill.formatText(index, length, {
+      'background': comment.color || 'yellow',
+      'comment-id': comment.id
+    }, 'user'); */
+    this.quill.formatText(
+    comment.range.index,
+    comment.range.length,
+    'comment',
+    comment.id
+  );
+  }
+
+  // Obter Quill root para eventos genéricos (opcional)
+  public getEditorRoot(): HTMLElement {
+    return this.quill.root;
+  }
+
+  scrollToRange(range: { index: number; length: number }) {
+    if (!this.quill || !range) return;
+
+    // move o cursor para o texto
+    this.quill.setSelection(range.index, range.length, 'silent');
+
+    // faz scroll automático até ao texto
+    this.quill.scrollIntoView();
   }
 }

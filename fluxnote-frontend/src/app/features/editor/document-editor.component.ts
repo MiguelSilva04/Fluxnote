@@ -13,6 +13,7 @@ import { DocumentService, DocumentInviteService, CollaborationService } from '..
 import { Collaborator, Version, Comment, AISuggestion, DocumentInviteDto, DocumentContextDto } from '../../core/models';
 import { TextEditorComponent } from './components/text-editor.component';
 import { AuthService } from '../../core/services';
+import Quill from 'quill/core/quill';
 
 // import { HttpClient } from '@angular/common/http';
 // import { Observable, catchError, of } from 'rxjs';
@@ -489,7 +490,7 @@ import { AuthService } from '../../core/services';
                 </button>
               </div>
 
-              <div class="p-4 border-b border-gray-200">
+              <!-- <div class="p-4 border-b border-gray-200">
                 <textarea
                   placeholder="Add a comment..."
                   [(ngModel)]="newComment"
@@ -507,11 +508,14 @@ import { AuthService } from '../../core/services';
                     Post
                   </app-button>
                 </div>
-              </div>
+              </div> -->
 
               <div class="flex-1 overflow-y-auto p-4 space-y-4">
                 @for (comment of comments; track comment.id) {
-                  <div class="space-y-2">
+                  <div class="space-y-2" [id]="'comment-' + comment.id" (click)="scrollToCommentText(comment)"
+                  [class.bg-yellow-100]="activeCommentId() === comment.id"
+                  [class.border-l-4]="activeCommentId() === comment.id"
+                  [class.border-yellow-400]="activeCommentId() === comment.id">
                     <div class="flex gap-3">
                       <div
                         class="h-8 w-8 rounded-full text-white flex items-center justify-center text-xs font-medium shrink-0"
@@ -1033,6 +1037,36 @@ import { AuthService } from '../../core/services';
           }
         </div>
       }
+
+      <!-- Inline Comment Box -->
+      @if (showInlineCommentBox()) {
+        <div
+          class="fixed z-50 bg-white border border-gray-300 rounded-lg shadow-lg p-3 w-64 flex flex-col gap-2"
+          [style.top.px]="inlineCommentPosition().top"
+          [style.left.px]="inlineCommentPosition().left"
+        >
+          <textarea
+            [(ngModel)]="inlineCommentText"
+            placeholder="Write a comment..."
+            rows="3"
+            class="w-full px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#155347] text-sm resize-none"
+          ></textarea>
+          <div class="flex justify-end gap-2">
+            <button
+              class="text-xs text-gray-500 hover:text-gray-700"
+              (click)="showInlineCommentBox.set(false); inlineCommentText = ''"
+            >
+              Cancel
+            </button>
+            <button
+              class="text-xs bg-[#155347] text-white px-3 py-1 rounded-md hover:bg-[#0d3d31]"
+              (click)="addInlineComment()"
+            >
+              Add Comment
+            </button>
+          </div>
+        </div>
+      }
     </div>
   `,
 })
@@ -1086,6 +1120,7 @@ export class DocumentEditorComponent implements OnInit {
   improveCopied = signal(false);
   private selectedTextForImprove = '';
   private selectionBounds = { top: 0, left: 0, width: 0, height: 0 };
+  private selectionRange: any = null;
 
   // AI Generate Content
   showGeneratePanelModal = signal(false);
@@ -1136,6 +1171,11 @@ export class DocumentEditorComponent implements OnInit {
 
   lastEditedText = signal('Last edited just now');
 
+  // Texto selecionado para adicionar comentário
+  showInlineCommentBox = signal(false);
+  inlineCommentText = '';
+  inlineCommentPosition = signal({ top: 0, left: 0 });
+  activeCommentId = signal<number | null>(null);
 
   //comentários
   private authService = inject(AuthService);
@@ -1154,6 +1194,7 @@ export class DocumentEditorComponent implements OnInit {
     }
   }
 
+
   private loadDocument(id: number): void {
     this.isLoading.set(true);
     this.loadError.set(null);
@@ -1167,6 +1208,39 @@ export class DocumentEditorComponent implements OnInit {
         this.lastEditedText.set(this.formatLastEdited(new Date(doc.updatedAt)));
         this.documentRole.set(doc.role || 'Viewer');
         this.isLoading.set(false);
+        
+        // Adicionar event listener ao editor após renderizar
+        setTimeout(() => {
+          if (this.editor) {
+            //console.log('Editor instance:', this.editor);
+            const editorRoot = this.editor.getEditorRoot();
+
+            editorRoot.addEventListener('click', (e: MouseEvent) => {
+              let el = e.target as HTMLElement;
+
+              while (el && el !== editorRoot) {
+                const commentId = el.getAttribute('data-comment-id');
+
+                if (commentId) {
+                  const comment = this.comments.find(c => c.id === +commentId);
+
+                  if (comment) {
+                    this.activeCommentId.set(comment.id);  // ✅ ativa aqui
+                    this.openComment(comment);
+                  }
+
+                  return;
+                }
+
+                el = el.parentElement!;
+              }
+
+              // se clicou fora de um comentário
+              this.activeCommentId.set(null);
+            });
+          }
+        }, 0);
+        
         this.loadDocumentInvites(doc.id);
         if (doc.role === 'Editor') {
           this.loadContextFiles();
@@ -1559,6 +1633,8 @@ export class DocumentEditorComponent implements OnInit {
     if (event.text && event.text.trim().length > 0 && event.bounds) {
       this.selectedTextForImprove = event.text;
       this.selectionBounds = event.bounds;
+      // Guardar o range da seleção para uso posterior em comentários
+      this.selectionRange = this.editor.getSelectedRange();
       // Posicionar o tooltip acima da seleção, com clamp para não sair da viewport
       const tooltipWidth = 140;
       const rawLeft = event.bounds.left + (event.bounds.width / 2) - (tooltipWidth / 2);
@@ -1590,32 +1666,55 @@ export class DocumentEditorComponent implements OnInit {
     if (!this.documentId || !this.selectedTextForImprove.trim()) return;
 
     this.showImproveTooltip.set(false);
-    //this.triggerImproveRequest();
+    //this.showComments.set(true);
+
+    this.showInlineCommentBox.set(true);
+    this.inlineCommentText = ''; // limpar
+
+  // Posicionar a caixa próxima da seleção
+  if (this.selectionBounds) {
+    this.inlineCommentPosition.set({
+      top: this.selectionBounds.top + this.selectionBounds.height + 4, // logo abaixo do texto
+      left: this.selectionBounds.left,
+    });
+  }
   }
 
-  addComment() {
+  addComment(): void {
     if (!this.newComment.trim()) return;
-    /* var currentUser = {
-      name: 'João Silva',
-      avatar: 'JS',
-      color: 'bg-[#155347]'
-    }; */
     
+    const selectedRange = this.selectionRange;
+
+    if (!selectedRange || selectedRange.length === 0) return;
+
     const comment: Comment = {
-      id: Date.now(), // id simples
+      id: Date.now(),
       author: this.user()?.fullName,
       avatar: this.user()?.initials,
-      color:this.user()?.color,
+      color: this.user()?.color,
       time: 'Agora mesmo',
       text: this.newComment.trim(),
+      range: { index: selectedRange.index, length: selectedRange.length },
       replies: [],
       resolved: false
     };
-    //console.log(comment.color);
 
-    this.comments = [comment, ...this.comments]; // adiciona no topo
+    this.comments = [comment, ...this.comments];
     this.newComment = '';
+
+    // Destacar no Quill
+    this.editor.highlightComment(comment);
+
+    //this.showComments.set(true);
   }
+
+  openComment(comment: Comment) {
+    this.showComments.set(true);
+    setTimeout(() => {
+      const el = document.getElementById(`comment-${comment.id}`);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 50);
+}
 
   toggleReply(commentId: number) {
     if (this.activeReplyId === commentId) {
@@ -1649,6 +1748,45 @@ export class DocumentEditorComponent implements OnInit {
 
     this.replyText = '';
     this.activeReplyId = null;
+  }
+
+  addInlineComment(): void {
+    if (!this.inlineCommentText.trim()) return;
+
+    const selectedRange = this.selectionRange;
+    if (!selectedRange || selectedRange.length === 0) {
+      this.showInlineCommentBox.set(false);
+      this.inlineCommentText = '';
+      return;
+    }
+
+    const comment: Comment = {
+      id: Date.now(),
+      author: this.user()?.fullName,
+      avatar: this.user()?.initials,
+      color: this.user()?.color,
+      time: 'Agora mesmo',
+      text: this.inlineCommentText.trim(),
+      range: { index: selectedRange.index, length: selectedRange.length },
+      replies: [],
+      resolved: false
+    };
+
+    this.comments = [comment, ...this.comments];
+    this.inlineCommentText = '';
+    this.showInlineCommentBox.set(false);
+
+    // Destacar no Quill
+    this.editor.highlightComment(comment);
+
+    // Abrir sidebar de comentários
+    //this.showComments.set(true);
+  }
+
+  scrollToCommentText(comment: Comment) {
+    if (!comment.range) return;
+    //this.activeCommentId.set(comment.id);
+    this.editor.scrollToRange(comment.range);
   }
   //---------------- comentarios------------------
 

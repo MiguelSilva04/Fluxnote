@@ -76,6 +76,7 @@ export interface Comment {
   color?: string;
   time: string;
   text: string;
+  range?: {index:number;length: number}; //range 
   replies: Comment[];
   resolved?: boolean;
 }
