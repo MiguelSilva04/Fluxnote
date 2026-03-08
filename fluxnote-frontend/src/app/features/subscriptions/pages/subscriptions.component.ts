@@ -1,6 +1,7 @@
 import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LucideAngularModule } from 'lucide-angular';
+import { TranslateModule } from '@ngx-translate/core';
 import { DashboardLayoutComponent } from '../../../layout/dashboard-layout/dashboard-layout.component';
 import { ButtonComponent, CardComponent, CardContentComponent, BadgeComponent, WorkInProgressComponent } from '../../../shared/components/ui';
 
@@ -10,6 +11,7 @@ import { ButtonComponent, CardComponent, CardContentComponent, BadgeComponent, W
   imports: [
     CommonModule,
     LucideAngularModule,
+    TranslateModule,
     DashboardLayoutComponent,
     ButtonComponent,
     CardComponent,
@@ -20,33 +22,33 @@ import { ButtonComponent, CardComponent, CardContentComponent, BadgeComponent, W
   template: `
     <app-dashboard-layout>
       <div class="max-w-7xl mx-auto">
-        <h1 class="text-3xl font-bold text-gray-900 mb-8">Subscription</h1>
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-8">{{ 'SUBSCRIPTIONS.TITLE' | translate }}</h1>
 
         <!-- Tabs -->
-        <div class="flex gap-1 mb-8 border-b border-gray-200">
+        <div class="flex gap-1 mb-8 border-b border-gray-200 dark:border-gray-700">
           <button
             (click)="activeTab.set('plans')"
-            [class]="'px-6 py-3 text-sm font-medium border-b-2 transition-colors ' + (activeTab() === 'plans' ? 'border-[#155347] text-[#155347]' : 'border-transparent text-gray-600 hover:text-gray-900')"
+            [class]="'px-6 py-3 text-sm font-medium border-b-2 transition-colors ' + (activeTab() === 'plans' ? 'border-[#155347] dark:border-emerald-400 text-[#155347] dark:text-emerald-400' : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100')"
           >
-            Subscription Plans
+            {{ 'SUBSCRIPTIONS.TAB_PLANS' | translate }}
           </button>
         </div>
 
         @if (activeTab() === 'plans') {
           <!-- Plans Section -->
           <div class="mb-12">
-            <h2 class="text-2xl font-bold text-gray-900 mb-6">Choose Your Plan</h2>
+            <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6">{{ 'SUBSCRIPTIONS.CHOOSE_PLAN' | translate }}</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               @for (plan of plans; track plan.name) {
                 <app-card
-                  [customClass]="'relative transition-all ' + (plan.current ? 'ring-4 ring-[#155347] shadow-2xl scale-105' : plan.recommended ? 'ring-2 ring-[#155347]/30' : 'hover:shadow-lg')"
+                  [customClass]="'relative transition-all ' + (plan.current ? 'ring-4 ring-[#155347] dark:ring-emerald-500 shadow-2xl scale-105' : plan.recommended ? 'ring-2 ring-[#155347]/30 dark:ring-emerald-500/40' : 'hover:shadow-lg')"
                 >
                   <!-- Current Plan Badge -->
                   @if (plan.current) {
                     <div class="absolute -top-5 left-1/2 -translate-x-1/2 z-10">
                       <app-badge customClass="bg-[#155347] text-white px-6 py-2.5 text-sm font-bold whitespace-nowrap shadow-lg flex items-center gap-1">
                         <lucide-icon name="star" class="h-4 w-4"></lucide-icon>
-                        YOUR CURRENT PLAN
+                        {{ 'SUBSCRIPTIONS.CURRENT_PLAN_BADGE' | translate }}
                       </app-badge>
                     </div>
                   }
@@ -56,33 +58,33 @@ import { ButtonComponent, CardComponent, CardContentComponent, BadgeComponent, W
                     <div class="absolute -top-5 left-1/2 -translate-x-1/2 z-10">
                       <app-badge customClass="bg-gradient-to-r from-amber-500 to-orange-500 text-white px-6 py-2.5 text-sm font-bold whitespace-nowrap shadow-lg flex items-center gap-1">
                         <lucide-icon name="zap" class="h-4 w-4"></lucide-icon>
-                        MOST POPULAR
+                        {{ 'SUBSCRIPTIONS.MOST_POPULAR_BADGE' | translate }}
                       </app-badge>
                     </div>
                   }
 
-                  <app-card-content [customClass]="'p-6 ' + (plan.current ? 'bg-gradient-to-br from-[#e8f0ee] to-white rounded-xl' : '')">
+                  <app-card-content [customClass]="'p-6 ' + (plan.current ? 'bg-gradient-to-br from-[#e8f0ee] to-white dark:from-emerald-900/40 dark:to-gray-800 rounded-xl' : '')">
                     <div class="text-center mb-6">
-                      <h3 class="text-2xl font-bold text-gray-900 mb-2">{{ plan.name }}</h3>
+                      <h3 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">{{ plan.name | translate }}</h3>
                       <div class="mb-2">
-                        <span class="text-5xl font-bold text-gray-900">{{ plan.price }}</span>
+                        <span class="text-5xl font-bold text-gray-900 dark:text-gray-100">{{ plan.price }}</span>
                         @if (plan.period) {
-                          <span class="text-xl text-gray-600">{{ plan.period }}</span>
+                          <span class="text-xl text-gray-600 dark:text-gray-400">{{ plan.period | translate }}</span>
                         }
                       </div>
                       @if (plan.billing) {
-                        <p class="text-xs text-gray-500">{{ plan.billing }}</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">{{ plan.billing | translate }}</p>
                       }
                     </div>
 
                     <ul class="space-y-3 mb-6">
                       @for (feature of plan.features; track feature) {
-                        <li class="flex items-start gap-3 text-sm text-gray-700">
+                        <li class="flex items-start gap-3 text-sm text-gray-700 dark:text-gray-300">
                           <lucide-icon
                             name="check"
-                            [class]="'h-5 w-5 shrink-0 mt-0.5 ' + (plan.current ? 'text-[#155347]' : 'text-gray-400')"
+                            [class]="'h-5 w-5 shrink-0 mt-0.5 ' + (plan.current ? 'text-[#155347] dark:text-emerald-400' : 'text-gray-400 dark:text-gray-500')"
                           ></lucide-icon>
-                          <span [class]="plan.current ? 'font-medium' : ''">{{ feature }}</span>
+                          <span [class]="plan.current ? 'font-medium' : ''">{{ feature | translate }}</span>
                         </li>
                       }
                     </ul>
@@ -93,7 +95,7 @@ import { ButtonComponent, CardComponent, CardContentComponent, BadgeComponent, W
                       [disabled]="plan.current"
                       (click)="!plan.current && showWipModal.set(true)"
                     >
-                      {{ plan.buttonText }}
+                      {{ plan.buttonText | translate }}
                     </app-button>
                   </app-card-content>
                 </app-card>
@@ -101,54 +103,51 @@ import { ButtonComponent, CardComponent, CardContentComponent, BadgeComponent, W
             </div>
 
             <!-- Plan Comparison Note -->
-            <div class="mt-8 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-              <p class="text-sm text-blue-900">
-                <strong>💡 Tip:</strong> You're currently on the <strong>Pro Plan</strong>.
-                Upgrade to Team for unlimited members and advanced features, or downgrade to save costs.
-              </p>
+            <div class="mt-8 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+              <p class="text-sm text-blue-900 dark:text-blue-200" [innerHTML]="'SUBSCRIPTIONS.TIP' | translate"></p>
             </div>
           </div>
 
           <!-- Current Usage -->
           <app-card customClass="mb-8">
             <app-card-content customClass="p-8">
-              <h2 class="text-2xl font-bold text-gray-900 mb-6">Current Usage</h2>
+              <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6">{{ 'SUBSCRIPTIONS.CURRENT_USAGE' | translate }}</h2>
 
               <div class="space-y-6">
                 <!-- Documents Created -->
                 <div>
                   <div class="flex items-center justify-between mb-3">
-                    <span class="text-sm font-medium text-gray-700">Documents Created</span>
-                    <span class="text-sm font-bold text-gray-900">120 of 200 documents</span>
+                    <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ 'SUBSCRIPTIONS.DOCS_LABEL' | translate }}</span>
+                    <span class="text-sm font-bold text-gray-900 dark:text-gray-100">{{ 'SUBSCRIPTIONS.DOCS_VALUE' | translate }}</span>
                   </div>
-                  <div class="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+                  <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 overflow-hidden">
                     <div class="bg-[#155347] h-full rounded-full transition-all duration-500" style="width: 60%"></div>
                   </div>
-                  <p class="text-xs text-gray-500 mt-2">You have 80 documents remaining in your plan</p>
+                  <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">{{ 'SUBSCRIPTIONS.DOCS_REMAINING' | translate }}</p>
                 </div>
 
                 <!-- AI Requests -->
                 <div>
                   <div class="flex items-center justify-between mb-3">
-                    <span class="text-sm font-medium text-gray-700">AI Requests Used</span>
-                    <span class="text-sm font-bold text-gray-900">15,000 of 20,000 requests</span>
+                    <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ 'SUBSCRIPTIONS.AI_LABEL' | translate }}</span>
+                    <span class="text-sm font-bold text-gray-900 dark:text-gray-100">{{ 'SUBSCRIPTIONS.AI_VALUE' | translate }}</span>
                   </div>
-                  <div class="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+                  <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 overflow-hidden">
                     <div class="bg-[#155347] h-full rounded-full transition-all duration-500" style="width: 75%"></div>
                   </div>
-                  <p class="text-xs text-gray-500 mt-2">5,000 AI requests remaining this month</p>
+                  <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">{{ 'SUBSCRIPTIONS.AI_REMAINING' | translate }}</p>
                 </div>
 
                 <!-- Teams Created -->
                 <div>
                   <div class="flex items-center justify-between mb-3">
-                    <span class="text-sm font-medium text-gray-700">Teams Created</span>
-                    <span class="text-sm font-bold text-gray-900">3 of 5 teams</span>
+                    <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ 'SUBSCRIPTIONS.TEAMS_LABEL' | translate }}</span>
+                    <span class="text-sm font-bold text-gray-900 dark:text-gray-100">{{ 'SUBSCRIPTIONS.TEAMS_VALUE' | translate }}</span>
                   </div>
-                  <div class="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+                  <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 overflow-hidden">
                     <div class="bg-[#155347] h-full rounded-full transition-all duration-500" style="width: 60%"></div>
                   </div>
-                  <p class="text-xs text-gray-500 mt-2">You can create 2 more teams</p>
+                  <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">{{ 'SUBSCRIPTIONS.TEAMS_REMAINING' | translate }}</p>
                 </div>
               </div>
             </app-card-content>
@@ -157,43 +156,43 @@ import { ButtonComponent, CardComponent, CardContentComponent, BadgeComponent, W
           <!-- Payment Information -->
           <app-card>
             <app-card-content customClass="p-8">
-              <h2 class="text-2xl font-bold text-gray-900 mb-6">Payment Information</h2>
+              <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6">{{ 'SUBSCRIPTIONS.PAYMENT_INFO' | translate }}</h2>
               <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2">Credit Card Number</label>
+                  <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{{ 'SUBSCRIPTIONS.CARD_NUMBER' | translate }}</label>
                   <input
                     type="text"
-                    placeholder="XXXX XXXX XXXX XXXX"
-                    class="w-full h-10 px-4 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#155347] text-sm"
+                    [placeholder]="'SUBSCRIPTIONS.CARD_NUMBER' | translate"
+                    class="w-full h-10 px-4 rounded-lg border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-[#155347] text-sm"
                   />
                 </div>
                 <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2">Expiration Date</label>
+                  <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{{ 'SUBSCRIPTIONS.EXPIRY' | translate }}</label>
                   <input
                     type="text"
                     placeholder="MM/YY"
-                    class="w-full h-10 px-4 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#155347] text-sm"
+                    class="w-full h-10 px-4 rounded-lg border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-[#155347] text-sm"
                   />
                 </div>
                 <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2">CVC</label>
+                  <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{{ 'SUBSCRIPTIONS.CVC' | translate }}</label>
                   <input
                     type="text"
                     placeholder="CVC"
-                    class="w-full h-10 px-4 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#155347] text-sm"
+                    class="w-full h-10 px-4 rounded-lg border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-[#155347] text-sm"
                   />
                 </div>
                 <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2">Billing Zip Code</label>
+                  <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{{ 'SUBSCRIPTIONS.BILLING_ZIP' | translate }}</label>
                   <input
                     type="text"
-                    placeholder="Billing Zip Code"
-                    class="w-full h-10 px-4 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#155347] text-sm"
+                    [placeholder]="'SUBSCRIPTIONS.BILLING_ZIP' | translate"
+                    class="w-full h-10 px-4 rounded-lg border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-[#155347] text-sm"
                   />
                 </div>
               </div>
               <div class="mt-6">
-                <app-button customClass="bg-[#155347] hover:bg-[#0d3d31]" (click)="showWipModal.set(true)">Update Payment Method</app-button>
+                <app-button customClass="bg-[#155347] hover:bg-[#0d3d31]" (click)="showWipModal.set(true)">{{ 'SUBSCRIPTIONS.UPDATE_PAYMENT' | translate }}</app-button>
               </div>
             </app-card-content>
           </app-card>
@@ -210,49 +209,49 @@ export class SubscriptionsComponent {
 
   plans = [
     {
-      name: 'Free',
+      name: 'SUBSCRIPTIONS.FREE_PLAN',
       price: '$0',
       period: '',
       billing: '',
-      features: ['Basic document editing', '5 documents', 'Community support'],
+      features: ['SUBSCRIPTIONS.FREE_FEAT_1', 'SUBSCRIPTIONS.FREE_FEAT_2', 'SUBSCRIPTIONS.FREE_FEAT_3'],
       current: false,
-      buttonText: 'Downgrade',
+      buttonText: 'SUBSCRIPTIONS.BTN_DOWNGRADE',
       buttonVariant: 'outline' as const,
       popular: false,
       recommended: false
     },
     {
-      name: 'Student',
+      name: 'SUBSCRIPTIONS.STUDENT_PLAN',
       price: '$9',
-      period: '/month',
-      billing: 'per month, billed annually',
-      features: ['All Free features', 'Unlimited documents', 'Academic templates', 'Email support'],
+      period: 'SUBSCRIPTIONS.PER_MONTH',
+      billing: 'SUBSCRIPTIONS.BILLED_ANNUALLY',
+      features: ['SUBSCRIPTIONS.STUDENT_FEAT_1', 'SUBSCRIPTIONS.STUDENT_FEAT_2', 'SUBSCRIPTIONS.STUDENT_FEAT_3', 'SUBSCRIPTIONS.STUDENT_FEAT_4'],
       current: false,
-      buttonText: 'Upgrade to Student',
+      buttonText: 'SUBSCRIPTIONS.BTN_UPGRADE_STUDENT',
       buttonVariant: 'primary' as const,
       popular: false,
       recommended: false
     },
     {
-      name: 'Pro',
+      name: 'SUBSCRIPTIONS.PRO_PLAN',
       price: '$19',
-      period: '/month',
-      billing: 'per month, billed annually',
-      features: ['All Student features', 'Version history', 'AI Assistant access', 'Priority support', 'Team collaboration (up to 5 users)'],
+      period: 'SUBSCRIPTIONS.PER_MONTH',
+      billing: 'SUBSCRIPTIONS.BILLED_ANNUALLY',
+      features: ['SUBSCRIPTIONS.PRO_FEAT_1', 'SUBSCRIPTIONS.PRO_FEAT_2', 'SUBSCRIPTIONS.PRO_FEAT_3', 'SUBSCRIPTIONS.PRO_FEAT_4', 'SUBSCRIPTIONS.PRO_FEAT_5'],
       current: true,
       popular: true,
       recommended: true,
-      buttonText: 'Current Plan',
+      buttonText: 'SUBSCRIPTIONS.BTN_CURRENT',
       buttonVariant: 'primary' as const
     },
     {
-      name: 'Team',
+      name: 'SUBSCRIPTIONS.TEAM_PLAN',
       price: '$49',
-      period: '/month',
-      billing: 'per month, billed annually',
-      features: ['All Pro features', 'Custom branding', 'Admin controls', 'Dedicated account manager', 'Unlimited team members'],
+      period: 'SUBSCRIPTIONS.PER_MONTH',
+      billing: 'SUBSCRIPTIONS.BILLED_ANNUALLY',
+      features: ['SUBSCRIPTIONS.TEAM_FEAT_1', 'SUBSCRIPTIONS.TEAM_FEAT_2', 'SUBSCRIPTIONS.TEAM_FEAT_3', 'SUBSCRIPTIONS.TEAM_FEAT_4', 'SUBSCRIPTIONS.TEAM_FEAT_5'],
       current: false,
-      buttonText: 'Upgrade to Team',
+      buttonText: 'SUBSCRIPTIONS.BTN_UPGRADE_TEAM',
       buttonVariant: 'primary' as const,
       popular: false,
       recommended: false

@@ -42,4 +42,10 @@ public class RegisterRequest
     /// </summary>
     /// <example>João Silva</example>
     public string FullName { get; set; } = default!;
+
+    /// <summary>
+    /// Idioma preferido do utilizador para emails ("en" ou "pt").
+    /// </summary>
+    /// <example>pt</example>
+    public string Lang { get; set; } = "en";
 }

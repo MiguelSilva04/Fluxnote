@@ -2,6 +2,7 @@ import { Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { DashboardLayoutComponent } from '../../../layout/dashboard-layout/dashboard-layout.component';
 import { ButtonComponent, CardComponent, CardContentComponent, ModalComponent } from '../../../shared/components/ui';
 import { DocumentService } from '../../../core/services';
@@ -13,6 +14,7 @@ import { DocumentDto } from '../../../core/models';
   imports: [
     CommonModule,
     LucideAngularModule,
+    TranslateModule,
     DashboardLayoutComponent,
     ButtonComponent,
     CardComponent,
@@ -23,27 +25,27 @@ import { DocumentDto } from '../../../core/models';
     <app-dashboard-layout>
       <div class="flex items-center justify-between mb-8">
         <div>
-          <h1 class="text-3xl font-bold text-gray-900 mb-2">Trash</h1>
-          <p class="text-gray-600">Documents you've deleted. Restore them or delete permanently.</p>
+          <h1 class="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">{{ 'TRASH.TITLE' | translate }}</h1>
+          <p class="text-gray-600 dark:text-gray-400">{{ 'TRASH.SUBTITLE' | translate }}</p>
         </div>
       </div>
 
       <!-- Loading State -->
       @if (isLoading()) {
         <div class="flex items-center justify-center py-12">
-          <lucide-icon name="loader-circle" class="h-8 w-8 text-[#155347] animate-spin"></lucide-icon>
-          <span class="ml-3 text-gray-600">Loading trash...</span>
+          <lucide-icon name="loader-circle" class="h-8 w-8 text-[#155347] dark:text-emerald-400 animate-spin"></lucide-icon>
+          <span class="ml-3 text-gray-600 dark:text-gray-400">{{ 'TRASH.LOADING' | translate }}</span>
         </div>
       }
 
       <!-- Empty State -->
       @if (!isLoading() && trashDocuments().length === 0) {
         <div class="text-center py-12">
-          <div class="p-4 bg-gray-100 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+          <div class="p-4 bg-gray-100 dark:bg-gray-700 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
             <lucide-icon name="trash-2" class="h-8 w-8 text-gray-400"></lucide-icon>
           </div>
-          <h3 class="text-lg font-medium text-gray-900 mb-2">Trash is empty</h3>
-          <p class="text-gray-600">Documents you delete will appear here</p>
+          <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">{{ 'TRASH.EMPTY' | translate }}</h3>
+          <p class="text-gray-600 dark:text-gray-400">{{ 'TRASH.EMPTY_DESC' | translate }}</p>
         </div>
       }
 
@@ -54,14 +56,14 @@ import { DocumentDto } from '../../../core/models';
             <app-card customClass="hover:shadow-lg transition-shadow">
               <app-card-content customClass="p-4">
                 <div class="flex flex-col items-center text-center mb-3">
-                  <div class="p-2 bg-red-50 rounded-lg mb-3">
+                  <div class="p-2 bg-red-50 dark:bg-red-900/20 rounded-lg mb-3">
                     <lucide-icon name="file-text" class="h-5 w-5 text-red-400"></lucide-icon>
                   </div>
-                  <h3 class="text-base font-bold text-gray-900 mb-2">{{ doc.title }}</h3>
-                  <div class="flex flex-col items-center gap-1 text-xs text-gray-600 mb-3">
+                  <h3 class="text-base font-bold text-gray-900 dark:text-gray-100 mb-2">{{ doc.title }}</h3>
+                  <div class="flex flex-col items-center gap-1 text-xs text-gray-600 dark:text-gray-400 mb-3">
                     <div class="flex items-center gap-1">
                       <lucide-icon name="clock" class="h-3 w-3"></lucide-icon>
-                      <span>Deleted {{ formatDate(doc.updatedAt) }}</span>
+                      <span>{{ 'TRASH.DELETED' | translate }} {{ formatDate(doc.updatedAt) }}</span>
                     </div>
                     <div class="flex items-center gap-1">
                       <lucide-icon name="users" class="h-3 w-3"></lucide-icon>
@@ -77,16 +79,16 @@ import { DocumentDto } from '../../../core/models';
                     (onClick)="handleRestore(doc.id)"
                   >
                     <lucide-icon name="undo-2" class="h-4 w-4 mr-1"></lucide-icon>
-                    Restore
+                    {{ 'TRASH.RESTORE' | translate }}
                   </app-button>
                   <app-button 
                     variant="outline" 
                     size="sm" 
-                    customClass="flex-1 max-w-[120px] text-red-600 border-red-200 hover:bg-red-50"
+                    customClass="flex-1 max-w-[120px] text-red-600 border-red-200 dark:border-red-800 hover:bg-red-50 dark:hover:bg-red-900/20"
                     (onClick)="openDeleteModal(doc.id)"
                   >
                     <lucide-icon name="trash-2" class="h-4 w-4 mr-1"></lucide-icon>
-                    Delete
+                    {{ 'TRASH.DELETE' | translate }}
                   </app-button>
                 </div>
               </app-card-content>
@@ -98,30 +100,30 @@ import { DocumentDto } from '../../../core/models';
       <!-- Permanent Delete Confirmation Modal -->
       <app-modal
         [isOpen]="isDeleteModalOpen()"
-        title="Permanently Delete"
+        [title]="'TRASH.PERMANENT_DELETE' | translate"
         (onClose)="closeDeleteModal()"
         [hasFooter]="true"
         maxWidth="sm"
       >
         <div class="text-center">
-          <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
+          <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 dark:bg-red-900/30 mb-4">
             <lucide-icon name="triangle-alert" class="h-6 w-6 text-red-600"></lucide-icon>
           </div>
-          <p class="text-gray-600 mb-2">
-            Are you sure you want to permanently delete this document?
+          <p class="text-gray-600 dark:text-gray-400 mb-2">
+            {{ 'TRASH.PERMANENT_CONFIRM' | translate }}
           </p>
           <p class="text-sm text-red-600 font-medium">
-            This action cannot be undone.
+            {{ 'TRASH.PERMANENT_WARNING' | translate }}
           </p>
         </div>
         <div footer class="flex gap-3 w-full justify-center">
-          <app-button variant="ghost" customClass="flex-1 max-w-[140px]" (onClick)="closeDeleteModal()">Cancel</app-button>
+          <app-button variant="ghost" customClass="flex-1 max-w-[140px]" (onClick)="closeDeleteModal()">{{ 'COMMON.CANCEL' | translate }}</app-button>
           <app-button 
             customClass="flex-1 max-w-[140px] bg-red-600 hover:bg-red-700" 
             (onClick)="confirmPermanentDelete()"
             [isLoading]="isDeleting()"
           >
-            Delete Forever
+            {{ 'DASHBOARD.DELETE_FOREVER' | translate }}
           </app-button>
         </div>
       </app-modal>
@@ -131,6 +133,7 @@ import { DocumentDto } from '../../../core/models';
 export class TrashComponent implements OnInit {
   private router = inject(Router);
   private documentService = inject(DocumentService);
+  private translate = inject(TranslateService);
 
   // State
   trashDocuments = signal<DocumentDto[]>([]);
@@ -204,10 +207,11 @@ export class TrashComponent implements OnInit {
     const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
     const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
 
-    if (diffHours < 1) return 'just now';
-    if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
-    if (diffDays === 1) return 'yesterday';
-    if (diffDays < 7) return `${diffDays} days ago`;
+    if (diffHours < 1) return this.translate.instant('TRASH.DATE_JUST_NOW');
+    if (diffHours === 1) return this.translate.instant('TRASH.DATE_HOUR_AGO');
+    if (diffHours < 24) return this.translate.instant('TRASH.DATE_HOURS_AGO', { count: diffHours });
+    if (diffDays === 1) return this.translate.instant('TRASH.DATE_YESTERDAY');
+    if (diffDays < 7) return this.translate.instant('TRASH.DATE_DAYS_AGO', { count: diffDays });
     return date.toLocaleDateString();
   }
 }

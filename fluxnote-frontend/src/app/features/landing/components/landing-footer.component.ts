@@ -2,24 +2,25 @@ import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-landing-footer',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslateModule],
   template: `
     <footer class="bg-gray-900 text-white py-16 relative overflow-hidden">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="grid md:grid-cols-4 gap-8">
           <div>
-            <h3 class="text-lg font-semibold mb-4">Info</h3>
+            <h3 class="text-lg font-semibold mb-4">{{ 'LANDING.FOOTER.INFO' | translate }}</h3>
             <ul class="space-y-3">
               <li>
                 <button
                   (click)="scrollTo('funcionalidades')"
                   class="text-gray-300 hover:text-white transition-colors text-left cursor-pointer"
                 >
-                  Features
+                  {{ 'LANDING.HEADER.FEATURES' | translate }}
                 </button>
               </li>
               <li>
@@ -27,7 +28,7 @@ import { FormsModule } from '@angular/forms';
                   (click)="scrollTo('testemunhos')"
                   class="text-gray-300 hover:text-white transition-colors text-left cursor-pointer"
                 >
-                  Testimonials
+                  {{ 'LANDING.HEADER.TESTIMONIALS' | translate }}
                 </button>
               </li>
               <li>
@@ -35,7 +36,7 @@ import { FormsModule } from '@angular/forms';
                   (click)="scrollTo('precos')"
                   class="text-gray-300 hover:text-white transition-colors text-left cursor-pointer"
                 >
-                  Pricing
+                  {{ 'LANDING.HEADER.PRICING' | translate }}
                 </button>
               </li>
               <li>
@@ -43,21 +44,21 @@ import { FormsModule } from '@angular/forms';
                   (click)="scrollTo('faq')"
                   class="text-gray-300 hover:text-white transition-colors text-left cursor-pointer"
                 >
-                  FAQ
+                  {{ 'LANDING.HEADER.FAQ' | translate }}
                 </button>
               </li>
             </ul>
           </div>
 
           <div>
-            <h3 class="text-lg font-semibold mb-4">Resources</h3>
+            <h3 class="text-lg font-semibold mb-4">{{ 'LANDING.FOOTER.RESOURCES' | translate }}</h3>
             <ul class="space-y-3">
               <li>
                 <button
                   (click)="navigateTo('/technologies')"
                   class="text-gray-300 hover:text-white transition-colors text-left cursor-pointer"
                 >
-                  Technologies
+                  {{ 'LANDING.FOOTER.TECHNOLOGIES' | translate }}
                 </button>
               </li>
               <li>
@@ -65,21 +66,21 @@ import { FormsModule } from '@angular/forms';
                   (click)="navigateTo('/blog')"
                   class="text-gray-300 hover:text-white transition-colors text-left cursor-pointer"
                 >
-                  Blog
+                  {{ 'LANDING.FOOTER.BLOG' | translate }}
                 </button>
               </li>
             </ul>
           </div>
 
           <div>
-            <h3 class="text-lg font-semibold mb-4">About Fluxnote</h3>
+            <h3 class="text-lg font-semibold mb-4">{{ 'LANDING.FOOTER.ABOUT_FLUXNOTE' | translate }}</h3>
             <ul class="space-y-3">
               <li>
                 <button
                   (click)="navigateTo('/privacy')"
                   class="text-gray-300 hover:text-white transition-colors text-left cursor-pointer"
                 >
-                  Privacy Policy
+                  {{ 'LANDING.FOOTER.PRIVACY_POLICY' | translate }}
                 </button>
               </li>
               <li>
@@ -87,7 +88,7 @@ import { FormsModule } from '@angular/forms';
                   (click)="navigateTo('/terms')"
                   class="text-gray-300 hover:text-white transition-colors text-left cursor-pointer"
                 >
-                  Terms & Conditions
+                  {{ 'LANDING.FOOTER.TERMS' | translate }}
                 </button>
               </li>
               <li>
@@ -95,7 +96,7 @@ import { FormsModule } from '@angular/forms';
                   (click)="navigateTo('/contact')"
                   class="text-gray-300 hover:text-white transition-colors text-left cursor-pointer"
                 >
-                  Contact
+                  {{ 'LANDING.FOOTER.CONTACT' | translate }}
                 </button>
               </li>
               <li>
@@ -103,16 +104,16 @@ import { FormsModule } from '@angular/forms';
                   (click)="navigateTo('/about')"
                   class="text-gray-300 hover:text-white transition-colors text-left cursor-pointer"
                 >
-                  About us
+                  {{ 'LANDING.FOOTER.ABOUT_US' | translate }}
                 </button>
               </li>
             </ul>
           </div>
 
           <div>
-            <h3 class="text-lg font-semibold mb-4">Newsletter</h3>
+            <h3 class="text-lg font-semibold mb-4">{{ 'LANDING.FOOTER.NEWSLETTER' | translate }}</h3>
             <p class="text-gray-300 mb-4">
-              Get the latest updates and productivity tips.
+              {{ 'LANDING.FOOTER.NEWSLETTER_DESC' | translate }}
             </p>
 
             <form (submit)="handleNewsletterSubmit($event)" class="mb-6">
@@ -121,7 +122,7 @@ import { FormsModule } from '@angular/forms';
                   type="email"
                   [(ngModel)]="email"
                   name="email"
-                  placeholder="Your email"
+                  [placeholder]="'LANDING.FOOTER.YOUR_EMAIL' | translate"
                   class="flex-1 px-4 py-2 rounded-l-lg bg-gray-800 border border-gray-700 text-white placeholder-gray-400 focus:outline-none focus:border-[#155347]"
                   required
                 />
@@ -129,7 +130,7 @@ import { FormsModule } from '@angular/forms';
                   type="submit"
                   class="bg-[#155347] text-white px-6 py-2 rounded-r-lg hover:bg-[#155347] transition-colors cursor-pointer"
                 >
-                  Subscribe
+                  {{ 'LANDING.FOOTER.SUBSCRIBE' | translate }}
                 </button>
               </div>
             </form>
@@ -169,7 +170,7 @@ import { FormsModule } from '@angular/forms';
             <div class="text-2xl font-bold text-[#155347]">Fluxnote</div>
           </div>
           <div class="text-gray-400 text-sm">
-            © 2026 Fluxnote. All rights reserved.
+            {{ 'LANDING.FOOTER.ALL_RIGHTS' | translate }}
           </div>
         </div>
       </div>

@@ -32,6 +32,7 @@ export interface DocumentDetailDto {
   content?: string; // Y.Doc em Base64
   plainText?: string;
   role?: string; // "Editor" | "Viewer"
+  isOwner?: boolean; // true se o utilizador autenticado é o Owner da equipa
 }
 
 /**
@@ -79,6 +80,20 @@ export interface DocumentContextDto {
   uploadedAt: string;
   uploadedByName: string;
   hasExtractedText: boolean;
+}
+
+/** DTO para listagem de versões de um documento */
+export interface DocumentVersionDto {
+  id: number;
+  documentId: number;
+  authorName: string;
+  createdAt: string;
+  summary: string;
+}
+
+/** DTO para visualização de uma versão específica (inclui conteúdo HTML) */
+export interface DocumentVersionDetailDto extends DocumentVersionDto {
+  contentHtml: string | null;
 }
 
 export interface CommentDto {

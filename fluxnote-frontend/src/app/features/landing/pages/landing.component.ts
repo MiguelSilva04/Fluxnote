@@ -24,7 +24,7 @@ import {
     FaqSectionComponent
   ],
   template: `
-    <div class="min-h-screen bg-white">
+    <div class="min-h-screen bg-white dark:bg-gray-900">
       <app-landing-header></app-landing-header>
       <app-hero-section></app-hero-section>
       <app-features-section></app-features-section>

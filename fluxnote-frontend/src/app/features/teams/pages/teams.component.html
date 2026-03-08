@@ -2,31 +2,31 @@
 <app-dashboard-layout>
     <div class="flex flex-col gap-6">
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-        <h1 class="text-xl md:text-2xl font-bold text-gray-900">My Teams</h1>
+        <h1 class="text-xl md:text-2xl font-bold text-gray-900 dark:text-gray-100">{{ 'TEAMS.MY_TEAMS' | translate }}</h1>
         <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
           <div class="relative">
             <lucide-icon name="search" class="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400"></lucide-icon>
             <input
               type="text"
-              placeholder="Search teams..."
+              [placeholder]="'TEAMS.SEARCH_PLACEHOLDER' | translate"
               [ngModel]="searchQuery()"
               (ngModelChange)="searchQuery.set($event)"
-              class="h-10 pl-10 pr-4 rounded-lg border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-[#155347] focus:border-transparent text-sm w-full sm:w-48 md:w-64"
+              class="h-10 pl-10 pr-4 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#155347] focus:border-transparent text-sm w-full sm:w-48 md:w-64"
             />
           </div>
           <select
             [ngModel]="roleFilter()"
             (ngModelChange)="roleFilter.set($event)"
-            class="h-10 px-3 rounded-lg border border-gray-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[#155347] w-full sm:w-auto"
+            class="h-10 px-3 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 dark:text-gray-100 text-sm focus:outline-none focus:ring-2 focus:ring-[#155347] w-full sm:w-auto"
           >
-            <option [ngValue]="null">All Roles</option>
-            <option [ngValue]="2">Owner</option>
-            <option [ngValue]="1">Team Admin</option>
-            <option [ngValue]="0">Member</option>
+            <option [ngValue]="null">{{ 'TEAMS.ALL_ROLES' | translate }}</option>
+            <option [ngValue]="2">{{ 'ROLES.OWNER' | translate }}</option>
+            <option [ngValue]="1">{{ 'ROLES.TEAM_ADMIN' | translate }}</option>
+            <option [ngValue]="0">{{ 'ROLES.MEMBER' | translate }}</option>
           </select>
           <app-button (onClick)="isCreateModalOpen.set(true)" [leftIcon]="true" customClass="self-start sm:self-auto">
             <lucide-icon leftIcon name="plus" class="h-4 w-4"></lucide-icon>
-            Create Team
+            {{ 'TEAMS.CREATE_TEAM' | translate }}
           </app-button>
         </div>
       </div>
@@ -57,7 +57,7 @@
                   <app-button
                     variant="outline"
                     size="sm"
-                    customClass="text-[#155347] border-[#155347]"
+                    customClass="text-[#155347] dark:text-emerald-400 border-[#155347] dark:border-emerald-400"
                     (onClick)="handleViewTeamDetails(team.id)"
                   >
                     View Team Details
@@ -98,9 +98,9 @@
       <div class="space-y-4">
         @if (loading()) {
           <div class="flex flex-col items-center justify-center h-[60vh] gap-4">
-            <lucide-icon name="loader-circle" class="h-10 w-10 text-[#155347] animate-spin"></lucide-icon>
-            <div class="text-gray-500 text-sm">
-              Loading teams...
+            <lucide-icon name="loader-circle" class="h-10 w-10 text-[#155347] dark:text-emerald-400 animate-spin"></lucide-icon>
+            <div class="text-gray-500 dark:text-gray-400 text-sm">
+              {{ 'TEAMS.LOADING' | translate }}
             </div>
           </div>
         }
@@ -120,7 +120,7 @@
 
                     <div class="flex-1 min-w-0">
                       <div class="flex flex-wrap items-center gap-x-2 gap-y-1 mb-0.5">
-                        <h3 class="text-base sm:text-lg font-bold text-gray-900 truncate hover:text-[#155347] transition-colors">
+                        <h3 class="text-base sm:text-lg font-bold text-gray-900 dark:text-gray-100 truncate hover:text-[#155347] dark:hover:text-emerald-400 transition-colors">
                           {{ team.name }}
                         </h3>
 
@@ -128,31 +128,31 @@
                           {{ getRoleName(team.currentUserRole) }}
                         </span>
                       </div>
-                      <span class="text-xs sm:text-sm text-gray-500">
-                        Created {{ timeAgo(team.createdAt) }}
+                      <span class="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
+                        {{ 'TEAMS.CREATED_PREFIX' | translate }} {{ timeAgo(team.createdAt) }}
                       </span>
                     </div>
                   </div>
 
                   <div class="flex items-center gap-2 sm:gap-3 flex-shrink-0">
                     <!-- Members -->
-                    <div class="flex items-center gap-1.5 text-sm text-gray-600">
+                    <div class="flex items-center gap-1.5 text-sm text-gray-600 dark:text-gray-400">
                       <lucide-icon name="users" class="h-4 w-4"></lucide-icon>
                       <span>{{ team.members.length }}</span>
-                      <span class="hidden sm:inline">Members</span>
+                      <span class="hidden sm:inline">{{ 'TEAMS.MEMBERS_COUNT' | translate }}</span>
                     </div>
 
                     <!-- View details — always shows text -->
                     <app-button data-tour="team-details"
                       variant="outline"
                       size="sm"
-                      customClass="text-[#155347] border-[#155347]"
+                      customClass="text-[#155347] dark:text-emerald-400 border-[#155347] dark:border-emerald-400"
                       (onClick)="handleViewTeamDetails(team.id)"
                     >
-                      View Team Details
+                      {{ 'TEAMS.VIEW_DETAILS' | translate }}
                     </app-button>
 
-                    <button (click)="toggleTeam(team.id)" class="p-2 hover:bg-gray-100 rounded-lg transition-colors flex-shrink-0">
+                    <button (click)="toggleTeam(team.id)" class="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors flex-shrink-0">
                       <lucide-icon
                         [name]="expandedTeam() === team.id ? 'chevron-up' : 'chevron-down'"
                         class="h-5 w-5 text-gray-500"
@@ -162,16 +162,16 @@
                 </div>
   
                 @if (expandedTeam() === team.id && (team.documents.length > 0 || team.folders.length > 0)) {
-                  <div class="mt-6 pt-6 border-t border-gray-100">
+                  <div class="mt-6 pt-6 border-t border-gray-100 dark:border-gray-700">
                     <!-- Create folder button (Owner/Admin) -->
                     @if (isOwnerOrAdmin(team)) {
                       <div class="flex justify-end mb-3">
                         <button
                           (click)="openCreateFolderModal($event, team.id)"
-                          class="flex items-center gap-1.5 text-xs text-[#155347] hover:text-[#0d3d31] font-medium px-2 py-1 rounded hover:bg-gray-50 transition-colors"
+                          class="flex items-center gap-1.5 text-xs text-[#155347] dark:text-emerald-400 hover:text-[#0d3d31] dark:hover:text-emerald-300 font-medium px-2 py-1 rounded hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                         >
                           <lucide-icon name="folder-plus" class="h-3.5 w-3.5"></lucide-icon>
-                          New Folder
+                          {{ 'TEAMS.NEW_FOLDER' | translate }}
                         </button>
                       </div>
                     }
@@ -187,11 +187,8 @@
                         >
                           <div
                             (click)="toggleFolder(folder.id)"
-                            class="flex items-center justify-between p-2.5 rounded-lg transition-colors cursor-pointer"
-                            [class.bg-[#155347]/10]="dragOverTarget() === folder.id"
-                            [class.ring-2]="dragOverTarget() === folder.id"
-                            [class.ring-[#155347]]="dragOverTarget() === folder.id"
-                            [class.hover:bg-gray-50]="dragOverTarget() !== folder.id"
+                            class="flex items-center justify-between p-2.5 rounded-lg transition-colors cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
+                            [ngClass]="dragOverTarget() === folder.id ? 'bg-emerald-50 dark:bg-emerald-900/30 ring-2 ring-emerald-500' : ''"
                           >
                             <div class="flex items-center gap-2.5">
                               <lucide-icon
@@ -202,7 +199,7 @@
                                 [name]="isFolderExpanded(folder.id) ? 'folder-open' : 'folder'"
                                 class="h-4 w-4 text-amber-500"
                               ></lucide-icon>
-                              <span class="text-sm font-medium text-gray-900">{{ folder.name }}</span>
+                              <span class="text-sm font-medium text-gray-900 dark:text-gray-100">{{ folder.name }}</span>
                               <span class="text-xs text-gray-400">({{ getDocumentsInFolder(team, folder.id).length }})</span>
                             </div>
                           </div>
@@ -218,27 +215,27 @@
                                   (touchmove)="onTouchMoveDoc($event)"
                                   (touchend)="onTouchEndDoc($event)"
                                   (click)="handleDocumentClick(doc.id)"
-                                  class="flex items-center justify-between p-2.5 hover:bg-gray-50 rounded-lg transition-colors cursor-pointer"
+                                  class="flex items-center justify-between p-2.5 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors cursor-pointer"
                                   [class.opacity-50]="draggingDocId() === doc.id || touchDraggingDocId() === doc.id"
                                 >
                                   <div class="flex items-center gap-3 flex-1">
                                     <lucide-icon name="file-text" class="h-4 w-4 text-gray-400"></lucide-icon>
-                                    <span class="text-sm font-medium text-gray-900">{{ doc.title }}</span>
+                                    <span class="text-sm font-medium text-gray-900 dark:text-gray-100">{{ doc.title }}</span>
                                   </div>
                                   @if (isDocumentOwner(doc)) {
                                     <div class="relative">
-                                      <button class="p-1 hover:bg-gray-200 rounded" (click)="toggleDocumentMenu($event, doc.id)">
+                                      <button class="p-1 hover:bg-gray-200 dark:hover:bg-gray-600 rounded" (click)="toggleDocumentMenu($event, doc.id)">
                                         <lucide-icon name="ellipsis-vertical" class="h-4 w-4 text-gray-400"></lucide-icon>
                                       </button>
                                       @if (openDocumentMenu() === doc.id) {
-                                        <div class="absolute right-0 top-6 bg-white rounded-lg shadow-lg border border-gray-200 py-1 min-w-[120px] z-10">
-                                          <button (click)="handleDuplicateDocument($event, doc.id)" class="w-full px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2">
+                                        <div class="absolute right-0 top-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-1 min-w-[120px] z-10">
+                                          <button (click)="handleDuplicateDocument($event, doc.id)" class="w-full px-3 py-2 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2">
                                             <lucide-icon name="copy" class="h-4 w-4"></lucide-icon>
-                                            Duplicate
+                                            {{ 'TEAMS.DUPLICATE' | translate }}
                                           </button>
-                                          <button (click)="handleDeleteDocument($event, doc.id)" class="w-full px-3 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2">
+                                          <button (click)="handleDeleteDocument($event, doc.id)" class="w-full px-3 py-2 text-left text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 flex items-center gap-2">
                                             <lucide-icon name="trash-2" class="h-4 w-4"></lucide-icon>
-                                            Delete
+                                            {{ 'TEAMS.DELETE' | translate }}
                                           </button>
                                         </div>
                                       }
@@ -246,7 +243,7 @@
                                   }
                                 </div>
                               } @empty {
-                                <div class="px-3 py-2 text-xs text-gray-400 italic">Empty folder</div>
+                                <div class="px-3 py-2 text-xs text-gray-400 italic">{{ 'TEAMS.EMPTY_FOLDER' | translate }}</div>
                               }
                             </div>
                           }
@@ -275,27 +272,27 @@
                           (touchmove)="onTouchMoveDoc($event)"
                           (touchend)="onTouchEndDoc($event)"
                           (click)="handleDocumentClick(doc.id)"
-                          class="flex items-center justify-between p-2.5 hover:bg-gray-50 rounded-lg transition-colors cursor-pointer"
+                          class="flex items-center justify-between p-2.5 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors cursor-pointer"
                           [class.opacity-50]="draggingDocId() === doc.id || touchDraggingDocId() === doc.id"
                         >
                           <div class="flex items-center gap-3 flex-1">
                             <lucide-icon name="file-text" class="h-4 w-4 text-gray-400"></lucide-icon>
-                            <span class="text-sm font-medium text-gray-900">{{ doc.title }}</span>
+                            <span class="text-sm font-medium text-gray-900 dark:text-gray-100">{{ doc.title }}</span>
                           </div>
                           @if (isDocumentOwner(doc)) {
                             <div class="relative">
-                              <button class="p-1 hover:bg-gray-200 rounded" (click)="toggleDocumentMenu($event, doc.id)">
+                              <button class="p-1 hover:bg-gray-200 dark:hover:bg-gray-600 rounded" (click)="toggleDocumentMenu($event, doc.id)">
                                 <lucide-icon name="ellipsis-vertical" class="h-4 w-4 text-gray-400"></lucide-icon>
                               </button>
                               @if (openDocumentMenu() === doc.id) {
-                                <div class="absolute right-0 top-6 bg-white rounded-lg shadow-lg border border-gray-200 py-1 min-w-[120px] z-10">
-                                  <button (click)="handleDuplicateDocument($event, doc.id)" class="w-full px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2">
+                                <div class="absolute right-0 top-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-1 min-w-[120px] z-10">
+                                  <button (click)="handleDuplicateDocument($event, doc.id)" class="w-full px-3 py-2 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2">
                                     <lucide-icon name="copy" class="h-4 w-4"></lucide-icon>
-                                    Duplicate
+                                    {{ 'TEAMS.DUPLICATE' | translate }}
                                   </button>
-                                  <button (click)="handleDeleteDocument($event, doc.id)" class="w-full px-3 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2">
+                                  <button (click)="handleDeleteDocument($event, doc.id)" class="w-full px-3 py-2 text-left text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 flex items-center gap-2">
                                     <lucide-icon name="trash-2" class="h-4 w-4"></lucide-icon>
-                                    Delete
+                                    {{ 'TEAMS.DELETE' | translate }}
                                   </button>
                                 </div>
                               }
@@ -311,7 +308,7 @@
 
                 <!-- Deletion scheduled -->
                 @if (team.deletionScheduled) {
-                  <div class="mt-6 pt-6 border-t border-gray-100">
+                  <div class="mt-6 pt-6 border-t border-gray-100 dark:border-gray-700">
                     <span class="text-sm text-red-600">
                       Deleção agendada para {{ team.deletionScheduled }}
                     </span>
@@ -325,8 +322,8 @@
             <div class="flex flex-col items-center justify-center h-[40vh] gap-4">
               <lucide-icon name="search-x" class="h-12 w-12 text-gray-300"></lucide-icon>
               <div class="text-center">
-                <p class="text-gray-600 font-medium">No teams found</p>
-                <p class="text-gray-400 text-sm">Try searching with different roles</p>
+                <p class="text-gray-600 dark:text-gray-400 font-medium">{{ 'TEAMS.NO_TEAMS_FOUND' | translate }}</p>
+                <p class="text-gray-400 dark:text-gray-500 text-sm">{{ 'TEAMS.NO_TEAMS_HINT' | translate }}</p>
               </div>
             </div>
           }
@@ -340,24 +337,24 @@
     <!-- Create Team Modal -->
     <app-modal
       [isOpen]="isCreateModalOpen()"
-      title="Create New Team"
+      [title]="'TEAMS.CREATE_TEAM_TITLE' | translate"
       (onClose)="isCreateModalOpen.set(false)"
       [hasFooter]="true"
     >
       <div class="space-y-4">
-        <app-input label="Team Name" placeholder="e.g. Design Team" [(ngModel)]="newTeamName"></app-input>
+        <app-input [label]="'TEAMS.TEAM_NAME_LABEL' | translate" [placeholder]="'TEAMS.TEAM_NAME_PLACEHOLDER' | translate" [(ngModel)]="newTeamName"></app-input>
         <!--app-input label="Description" placeholder="What is this team for?" [(ngModel)]="newTeamDescription"></app-input-->
       </div>
       <div footer class="flex gap-3">
-        <app-button variant="ghost" (onClick)="isCreateModalOpen.set(false)">Cancel</app-button>
-        <app-button (onClick)="createTeam()">Create Team</app-button>
+        <app-button variant="ghost" (onClick)="isCreateModalOpen.set(false)">{{ 'COMMON.CANCEL' | translate }}</app-button>
+        <app-button (onClick)="createTeam()">{{ 'TEAMS.CREATE_TEAM' | translate }}</app-button>
       </div>
     </app-modal>
 
     <!-- Delete Confirmation Modal -->
     <app-modal
       [isOpen]="isDeleteModalOpen()"
-      title="Delete Document"
+      [title]="'TEAMS.DELETE_DOC_TITLE' | translate"
       (onClose)="closeDeleteModal()"
       [hasFooter]="true"
       maxWidth="sm"
@@ -366,18 +363,18 @@
         <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
           <lucide-icon name="trash-2" class="h-6 w-6 text-red-600"></lucide-icon>
         </div>
-        <p class="text-gray-600">
-          Are you sure you want to delete this document? This action cannot be undone.
+        <p class="text-gray-600 dark:text-gray-400">
+          {{ 'TEAMS.DELETE_DOC_CONFIRM' | translate }}
         </p>
       </div>
       <div footer class="flex gap-3 w-full">
-        <app-button variant="ghost" customClass="flex-1" (onClick)="closeDeleteModal()">Cancel</app-button>
+        <app-button variant="ghost" customClass="flex-1" (onClick)="closeDeleteModal()">{{ 'COMMON.CANCEL' | translate }}</app-button>
         <app-button 
           customClass="flex-1 bg-red-600 hover:bg-red-700" 
           (onClick)="confirmDelete()"
           [isLoading]="isDeleting()"
         >
-          Delete
+          {{ 'COMMON.DELETE' | translate }}
         </app-button>
       </div>
     </app-modal>
@@ -385,7 +382,7 @@
     <!-- Duplicate Confirmation Modal -->
     <app-modal
       [isOpen]="isDuplicateModalOpen()"
-      title="Duplicate Document"
+      [title]="'TEAMS.DUPLICATE_DOC_TITLE' | translate"
       (onClose)="closeDuplicateModal()"
       [hasFooter]="true"
       maxWidth="sm"
@@ -394,18 +391,18 @@
         <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 mb-4">
           <lucide-icon name="copy" class="h-6 w-6 text-blue-600"></lucide-icon>
         </div>
-        <p class="text-gray-600">
-          Are you sure you want to duplicate this document? A new copy will be created with "(Copy)" next to the title.
+        <p class="text-gray-600 dark:text-gray-400">
+          {{ 'TEAMS.DUPLICATE_DOC_CONFIRM' | translate }}
         </p>
       </div>
       <div footer class="flex gap-3 w-full">
-        <app-button variant="ghost" customClass="flex-1" (onClick)="closeDuplicateModal()">Cancel</app-button>
+        <app-button variant="ghost" customClass="flex-1" (onClick)="closeDuplicateModal()">{{ 'COMMON.CANCEL' | translate }}</app-button>
         <app-button 
           customClass="flex-1 bg-[#155347] hover:bg-[#0d3d31]" 
           (onClick)="confirmDuplicate()"
           [isLoading]="isDuplicating()"
         >
-          Duplicate
+          {{ 'COMMON.DUPLICATE' | translate }}
         </app-button>
       </div>
     </app-modal>
@@ -413,17 +410,17 @@
     <!-- Create Folder Modal -->
     <app-modal
       [isOpen]="isCreateFolderModalOpen()"
-      title="Create New Folder"
+      [title]="'TEAMS.CREATE_FOLDER_TITLE' | translate"
       (onClose)="isCreateFolderModalOpen.set(false)"
       [hasFooter]="true"
       maxWidth="sm"
     >
       <div class="space-y-4">
-        <app-input label="Folder Name" placeholder="e.g. Marketing Documents" [(ngModel)]="newFolderName"></app-input>
+        <app-input [label]="'TEAMS.FOLDER_NAME_LABEL' | translate" [placeholder]="'TEAMS.FOLDER_NAME_PLACEHOLDER' | translate" [(ngModel)]="newFolderName"></app-input>
       </div>
       <div footer class="flex gap-3">
-        <app-button variant="ghost" (onClick)="isCreateFolderModalOpen.set(false)">Cancel</app-button>
-        <app-button (onClick)="createFolder()">Create Folder</app-button>
+        <app-button variant="ghost" (onClick)="isCreateFolderModalOpen.set(false)">{{ 'COMMON.CANCEL' | translate }}</app-button>
+        <app-button (onClick)="createFolder()">{{ 'TEAMS.CREATE_FOLDER_BTN' | translate }}</app-button>
       </div>
     </app-modal>
   </app-dashboard-layout>

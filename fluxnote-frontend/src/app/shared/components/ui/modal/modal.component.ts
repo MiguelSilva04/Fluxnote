@@ -15,13 +15,13 @@ import { LucideAngularModule } from 'lucide-angular';
           aria-modal="true"
           [attr.aria-labelledby]="'modal-title-' + modalId"
         >
-          <div class="flex items-center justify-between p-6 border-b border-gray-100">
-            <h2 [id]="'modal-title-' + modalId" class="text-xl font-semibold text-gray-900">
+          <div class="flex items-center justify-between p-6 border-b border-gray-100 dark:border-gray-700">
+            <h2 [id]="'modal-title-' + modalId" class="text-xl font-semibold text-gray-900 dark:text-gray-100">
               {{ title }}
             </h2>
             <button
               (click)="close()"
-              class="text-gray-400 hover:text-gray-500 transition-colors p-1 rounded-md hover:bg-gray-100"
+              class="text-gray-400 hover:text-gray-500 dark:text-gray-500 dark:hover:text-gray-300 transition-colors p-1 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700"
               aria-label="Close modal"
             >
               <lucide-icon name="x" class="h-5 w-5"></lucide-icon>
@@ -33,7 +33,7 @@ import { LucideAngularModule } from 'lucide-angular';
           </div>
 
           @if (hasFooter) {
-            <div class="p-6 bg-gray-50 border-t border-gray-100 rounded-b-xl flex justify-end gap-3">
+            <div class="p-6 bg-gray-50 dark:bg-gray-800 border-t border-gray-100 dark:border-gray-700 rounded-b-xl flex justify-end gap-3">
               <ng-content select="[footer]"></ng-content>
             </div>
           }
@@ -60,7 +60,7 @@ export class ModalComponent {
   };
 
   get modalClasses(): string {
-    return `bg-white rounded-xl shadow-xl w-full ${this.maxWidths[this.maxWidth]} flex flex-col max-h-[90vh]`;
+    return `bg-white dark:bg-gray-900 rounded-xl shadow-xl w-full ${this.maxWidths[this.maxWidth]} flex flex-col max-h-[90vh]`;
   }
 
   @HostListener('document:keydown.escape')

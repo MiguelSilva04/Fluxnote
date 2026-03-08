@@ -8,3 +8,5 @@ export { UploadService } from './upload.service';
 export { FolderService } from './folder.service';
 export { TeamInviteService } from './team-invite.service';
 export { CollaborationService } from './collaboration.service';
+export { LanguageService } from './language.service';
+export { ThemeService } from './theme.service';

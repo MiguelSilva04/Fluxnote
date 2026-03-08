@@ -11,6 +11,18 @@ export class EditorPage {
   readonly viewOnlyBadge: Locator;
   readonly lastEditedText: Locator;
 
+  // Version history
+  readonly historyButton: Locator;
+  readonly versionHistoryPanel: Locator;
+  readonly versionPreviewOverlay: Locator;
+  readonly changesTab: Locator;
+  readonly fullVersionTab: Locator;
+
+  // Restore version modal
+  readonly restoreModal: Locator;
+  readonly restoreConfirmCheckbox: Locator;
+  readonly restoreConfirmButton: Locator;
+
   constructor(page: Page) {
     this.page = page;
     this.title = page.locator('header h1');
@@ -21,6 +33,18 @@ export class EditorPage {
     this.editorArea = page.locator('.ql-editor');
     this.viewOnlyBadge = page.getByText('View only');
     this.lastEditedText = page.locator('header').getByText('Last edited');
+
+    // Version history
+    this.historyButton = page.getByRole('button', { name: /History/i }).first();
+    this.versionHistoryPanel = page.locator('aside').filter({ has: page.getByText('Version History') });
+    this.versionPreviewOverlay = page.locator('span').filter({ hasText: 'Read only' }).first();
+    this.changesTab = page.getByRole('button', { name: 'Changes' });
+    this.fullVersionTab = page.getByRole('button', { name: 'Full version' });
+
+    // Restore version modal
+    this.restoreModal = page.locator('div').filter({ hasText: /Restore Old Version/ }).first();
+    this.restoreConfirmCheckbox = page.locator('input[type="checkbox"]').last();
+    this.restoreConfirmButton = page.getByRole('button', { name: /Restore and Replace/i });
   }
 
   async waitForLoad() {
@@ -45,5 +69,52 @@ export class EditorPage {
 
   async goBack() {
     await this.backButton.click();
+  }
+
+  async openVersionHistory() {
+    await this.historyButton.click();
+    await this.versionHistoryPanel.waitFor({ state: 'visible', timeout: 5_000 });
+  }
+
+  async closeVersionHistory() {
+    // X button is inside the panel header (the only button in that flex row with the title)
+    await this.versionHistoryPanel.locator('div').first().getByRole('button').click();
+    await this.versionHistoryPanel.waitFor({ state: 'hidden', timeout: 5_000 });
+  }
+
+  async clickVersionView(index: number) {
+    const viewButtons = this.versionHistoryPanel.getByRole('button', { name: 'View' });
+    await viewButtons.nth(index).click();
+  }
+
+  async closeVersionPreview() {
+    // The preview overlay is a fixed full-screen div (div.fixed.inset-0)
+    // Its first button is the back arrow (the main header back button is outside this div)
+    await this.page.locator('div.fixed.inset-0').getByRole('button').first().click();
+  }
+
+  async waitForVersionPreview() {
+    await this.versionPreviewOverlay.waitFor({ state: 'visible', timeout: 10_000 });
+  }
+
+  async isChangesTabDisabled(): Promise<boolean> {
+    return this.changesTab.isDisabled();
+  }
+
+  /** Clica no botão Restore do cartão de versão no índice dado (0 = mais recente). */
+  async clickVersionRestore(index: number) {
+    const restoreButtons = this.versionHistoryPanel.getByRole('button', { name: /Restore/i });
+    await restoreButtons.nth(index).click();
+  }
+
+  /** Aguarda que o modal de restauro fique visível. */
+  async waitForRestoreModal() {
+    await this.restoreModal.waitFor({ state: 'visible', timeout: 5_000 });
+  }
+
+  /** Ativa o checkbox de confirmação e clica em "Restore and Replace". */
+  async confirmRestore() {
+    await this.restoreConfirmCheckbox.check();
+    await this.restoreConfirmButton.click();
   }
 }

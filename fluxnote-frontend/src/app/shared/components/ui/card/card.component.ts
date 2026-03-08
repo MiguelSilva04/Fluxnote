@@ -19,7 +19,7 @@ export class CardComponent {
   @Input() hoverable = false;
 
   get cardClasses(): string {
-    const baseClasses = 'bg-white rounded-xl border border-gray-200 shadow-sm';
+    const baseClasses = 'bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm';
     const hoverClasses = this.hoverable ? 'transition-shadow hover:shadow-md cursor-pointer' : '';
     return `${baseClasses} ${hoverClasses} ${this.customClass}`;
   }
@@ -30,7 +30,7 @@ export class CardComponent {
   standalone: true,
   imports: [CommonModule],
   template: `
-    <div [class]="'p-6 border-b border-gray-100 ' + customClass">
+    <div [class]="'p-6 border-b border-gray-100 dark:border-gray-700 ' + customClass">
       <ng-content></ng-content>
     </div>
   `
@@ -58,7 +58,7 @@ export class CardContentComponent {
   standalone: true,
   imports: [CommonModule],
   template: `
-    <div [class]="'p-6 bg-gray-50 border-t border-gray-100 ' + customClass">
+    <div [class]="'p-6 bg-gray-50 dark:bg-gray-800/50 border-t border-gray-100 dark:border-gray-700 ' + customClass">
       <ng-content></ng-content>
     </div>
   `

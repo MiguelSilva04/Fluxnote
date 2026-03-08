@@ -8,16 +8,16 @@ import { LandingHeaderComponent, LandingFooterComponent } from '../components';
   standalone: true,
   imports: [CommonModule, LandingHeaderComponent, LandingFooterComponent],
   template: `
-    <div class="min-h-screen bg-white">
+    <div class="min-h-screen bg-white dark:bg-gray-900">
       <app-landing-header></app-landing-header>
 
-      <section class="py-20 bg-gradient-to-br from-[#155347]/10 to-white">
+      <section class="py-20 bg-gradient-to-br from-[#155347]/10 to-white dark:to-gray-900">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div class="text-center mb-16">
-            <h1 class="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
+            <h1 class="text-4xl lg:text-5xl font-bold text-gray-900 dark:text-gray-100 mb-6">
               Technologies we use
             </h1>
-            <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+            <p class="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
               Fluxnote is built with modern technologies to ensure performance, scalability,
               and an exceptional user experience.
             </p>
@@ -25,10 +25,10 @@ import { LandingHeaderComponent, LandingFooterComponent } from '../components';
 
           <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             @for (category of techCategories; track category.title) {
-              <div class="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-shadow">
+              <div class="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg hover:shadow-xl transition-shadow">
                 <div class="flex items-center mb-6">
                   <span class="text-4xl mr-4">{{ category.icon }}</span>
-                  <h2 class="text-2xl font-bold text-gray-900">
+                  <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100">
                     {{ category.title }}
                   </h2>
                 </div>
@@ -36,10 +36,10 @@ import { LandingHeaderComponent, LandingFooterComponent } from '../components';
                 <div class="space-y-4">
                   @for (tech of category.technologies; track tech.name) {
                     <div class="border-l-4 border-[#155347] pl-4">
-                      <h3 class="font-semibold text-gray-900 mb-1">
+                      <h3 class="font-semibold text-gray-900 dark:text-gray-100 mb-1">
                         {{ tech.name }}
                       </h3>
-                      <p class="text-gray-600 text-sm">
+                      <p class="text-gray-600 dark:text-gray-400 text-sm">
                         {{ tech.description }}
                       </p>
                     </div>
@@ -49,8 +49,8 @@ import { LandingHeaderComponent, LandingFooterComponent } from '../components';
             }
           </div>
 
-          <div class="mt-16 bg-gray-50 rounded-2xl p-8">
-            <h2 class="text-2xl font-bold text-gray-900 mb-6 text-center">
+          <div class="mt-16 bg-gray-50 dark:bg-gray-800 rounded-2xl p-8">
+            <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6 text-center">
               Technical architecture
             </h2>
             <div class="grid md:grid-cols-3 gap-8 text-center">
@@ -58,10 +58,10 @@ import { LandingHeaderComponent, LandingFooterComponent } from '../components';
                 <div class="bg-[#155347]/15 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
                   <span class="text-2xl">🌐</span>
                 </div>
-                <h3 class="font-semibold text-gray-900 mb-2">
+                <h3 class="font-semibold text-gray-900 dark:text-gray-100 mb-2">
                   Modern frontend
                 </h3>
-                <p class="text-gray-600 text-sm">
+                <p class="text-gray-600 dark:text-gray-400 text-sm">
                   A responsive interface built with React and TailwindCSS for a smooth experience
                 </p>
               </div>
@@ -69,10 +69,10 @@ import { LandingHeaderComponent, LandingFooterComponent } from '../components';
                 <div class="bg-[#155347]/15 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
                   <span class="text-2xl">⚡</span>
                 </div>
-                <h3 class="font-semibold text-gray-900 mb-2">
+                <h3 class="font-semibold text-gray-900 dark:text-gray-100 mb-2">
                   Scalable backend
                 </h3>
-                <p class="text-gray-600 text-sm">
+                <p class="text-gray-600 dark:text-gray-400 text-sm">
                   A robust API with Node.js and Express, backed by PostgreSQL for secure data
                 </p>
               </div>
@@ -80,10 +80,10 @@ import { LandingHeaderComponent, LandingFooterComponent } from '../components';
                 <div class="bg-[#155347]/15 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
                   <span class="text-2xl">🚀</span>
                 </div>
-                <h3 class="font-semibold text-gray-900 mb-2">
+                <h3 class="font-semibold text-gray-900 dark:text-gray-100 mb-2">
                   Automated deployment
                 </h3>
-                <p class="text-gray-600 text-sm">
+                <p class="text-gray-600 dark:text-gray-400 text-sm">
                   Containerized infrastructure with Docker and Kubernetes for high availability
                 </p>
               </div>

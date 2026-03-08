@@ -24,6 +24,7 @@ export class CollaborationService {
   private connection: signalR.HubConnection | null = null;
   private ydoc: Y.Doc | null = null;
   private binding: QuillBinding | null = null;
+  private quill: Quill | null = null;
   private currentDocumentId: number | null = null;
 
   // Mapa de estados de awareness dos outros clientes
@@ -42,6 +43,7 @@ export class CollaborationService {
     // Cleanup de sessão anterior
     await this.disconnect();
     this.currentDocumentId = documentId;
+    this.quill = quill;
 
     // 1. Procurar snapshot Y.Doc do backend
     const snapshotBytes = await this.fetchSnapshot(documentId);
@@ -122,8 +124,9 @@ export class CollaborationService {
     if (this.connection?.state !== signalR.HubConnectionState.Connected) return;
 
     const snapshot = Y.encodeStateAsUpdate(this.ydoc);
+    const currentHtml = this.quill?.root.innerHTML ?? null;
     this.connection
-      .invoke('SaveSnapshot', documentId, this.toBase64(snapshot))
+      .invoke('SaveSnapshot', documentId, this.toBase64(snapshot), currentHtml)
       .catch((err) => console.error('[Collaboration] Erro ao guardar snapshot:', err));
   }
 
@@ -141,9 +144,9 @@ export class CollaborationService {
   // Desconectar e limpar recursos
   // ─────────────────────────────────────────────────────────────
 
-  async disconnect(): Promise<void> {
-    // Guardar snapshot final antes de desconectar
-    if (this.ydoc && this.currentDocumentId !== null) {
+  async disconnect(skipSave = false): Promise<void> {
+    // Guardar snapshot final antes de desconectar (omitir em restauros)
+    if (!skipSave && this.ydoc && this.currentDocumentId !== null) {
       this.saveSnapshot(this.currentDocumentId);
     }
 
@@ -156,7 +159,9 @@ export class CollaborationService {
         this.connection.state === signalR.HubConnectionState.Connected
       ) {
         try {
-          await this.connection.invoke('LeaveDocument', this.currentDocumentId);
+          // Enviar HTML actual para o servidor capturar o conteúdo correcto na versão
+          const currentHtml = this.quill?.root.innerHTML ?? null;
+          await this.connection.invoke('LeaveDocument', this.currentDocumentId, currentHtml);
         } catch {}
       }
       await this.connection.stop();
@@ -165,8 +170,22 @@ export class CollaborationService {
 
     this.ydoc?.destroy();
     this.ydoc = null;
+    this.quill = null;
     this.currentDocumentId = null;
     this.collaborators.clear();
+  }
+
+  /**
+   * Reconecta ao documento sem guardar o snapshot atual.
+   * Usado após um restauro de versão para carregar o conteúdo restaurado do servidor.
+   */
+  async reconnectAfterRestore(): Promise<void> {
+    const docId = this.currentDocumentId;
+    const quill = this.quill;
+    await this.disconnect(true); // skip saveSnapshot — não sobrescrever o conteúdo restaurado
+    if (docId !== null && quill !== null) {
+      await this.connect(docId, quill);
+    }
   }
 
   // ─────────────────────────────────────────────────────────────
@@ -211,6 +230,12 @@ export class CollaborationService {
           this.userLeft$.next(connId); // notificar com connectionId para remover cursor
         }
       }
+    });
+
+    // Versão restaurada pelo Owner → recarregar conteúdo do servidor
+    this.connection.on('DocumentRestored', () => {
+      console.info('[Collaboration] Documento restaurado — a reconectar');
+      this.reconnectAfterRestore();
     });
 
     // Reconexão → re-entrar no grupo

@@ -17,11 +17,11 @@ export class BadgeComponent {
 
   private variants: Record<string, string> = {
     default: 'bg-[#155347] text-white',
-    secondary: 'bg-[#e8f0ee] text-[#155347]',
-    outline: 'border border-gray-200 text-gray-800',
-    destructive: 'bg-red-100 text-red-700',
-    success: 'bg-green-100 text-green-700',
-    warning: 'bg-yellow-100 text-yellow-800'
+    secondary: 'bg-[#e8f0ee] dark:bg-[#155347]/20 text-[#155347] dark:text-[#6ee7b7]',
+    outline: 'border border-gray-200 dark:border-gray-600 text-gray-800 dark:text-gray-300',
+    destructive: 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400',
+    success: 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400',
+    warning: 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400'
   };
 
   get badgeClasses(): string {

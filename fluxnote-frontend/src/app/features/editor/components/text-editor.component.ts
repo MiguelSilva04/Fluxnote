@@ -13,6 +13,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { LucideAngularModule } from 'lucide-angular';
+import { TranslateModule } from '@ngx-translate/core';
 import Quill from 'quill';
 import { Subject, debounceTime, takeUntil } from 'rxjs';
 import {CommentDto } from '../../../core/models';
@@ -111,7 +112,7 @@ const COLLABORATOR_COLORS = [
 @Component({
   selector: 'app-rich-text-editor',
   standalone: true,
-  imports: [CommonModule, FormsModule, LucideAngularModule],
+  imports: [CommonModule, FormsModule, LucideAngularModule, TranslateModule],
   templateUrl: './text-editor.html',
   styleUrls: ['./text-editor.styles.css'],
 })
@@ -148,6 +149,7 @@ export class TextEditorComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // ─── Privados ───
   private quill!: Quill;
+  private isInitializing = false;
   private destroy$ = new Subject<void>();
   private contentChange$ = new Subject<string>();
   private snapshotInterval?: ReturnType<typeof setInterval>;
@@ -218,6 +220,9 @@ export class TextEditorComponent implements OnInit, AfterViewInit, OnDestroy {
     try {
       // Conectar ao documento (busca snapshot, liga Yjs ao Quill, inicia SignalR)
       await this.collaborationService.connect(documentId, this.quill);
+
+      // Snapshot inicial imediato (garante doc.Content actualizado desde o primeiro momento)
+      this.collaborationService.saveSnapshot(documentId);
 
       // Snapshot periódico a cada 30 segundos
       this.snapshotInterval = setInterval(() => {
@@ -369,7 +374,10 @@ export class TextEditorComponent implements OnInit, AfterViewInit, OnDestroy {
 
     // Conteúdo inicial (HTML) — se não houver snapshot Yjs, fica aqui
     if (this.initialContent()) {
-      this.quill.root.innerHTML = this.initialContent();
+      this.isInitializing = true;
+      const delta = (this.quill as any).clipboard.convert({ html: this.initialContent() });
+      this.quill.setContents(delta, 'silent');
+      this.isInitializing = false;
     }
 
     if (!this.editable()) {
@@ -377,6 +385,7 @@ export class TextEditorComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     this.quill.on('text-change', () => {
+      if (this.isInitializing) return;
       this.triggerContentChange();
       this.saveStatus.set('idle');
     });
@@ -759,8 +768,8 @@ export class TextEditorComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   getToolbarButtonClass(isActive: boolean | string | undefined): string {
-    const base = 'p-2 rounded hover:bg-gray-100 transition-colors';
-    return isActive ? `${base} bg-[#e8f0ee] text-[#155347]` : `${base} text-gray-600`;
+    const base = 'p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors';
+    return isActive ? `${base} bg-[#e8f0ee] dark:bg-[#155347]/20 text-[#155347] dark:text-[#4ade80]` : `${base} text-gray-600 dark:text-gray-400`;
   }
 
   getContent(): string {
@@ -768,7 +777,12 @@ export class TextEditorComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   setContent(content: string): void {
-    if (this.quill) this.quill.root.innerHTML = content;
+    if (this.quill) {
+      this.isInitializing = true;
+      const delta = (this.quill as any).clipboard.convert({ html: content });
+      this.quill.setContents(delta, 'silent');
+      this.isInitializing = false;
+    }
   }
 
   setSaveStatus(status: SaveStatus): void {

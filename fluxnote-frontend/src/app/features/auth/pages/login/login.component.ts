@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { AuthService } from '../../../../core/services';
 import { ButtonComponent, InputComponent, CardComponent, CardContentComponent } from '../../../../shared/components/ui';
 import { ToastService } from '../../../../shared/services/toast.service';
@@ -19,27 +20,28 @@ import { ToastService } from '../../../../shared/services/toast.service';
     InputComponent,
     CardComponent,
     CardContentComponent,
+    TranslateModule,
   ],
   template: `
-    <div class="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
+    <div class="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col items-center justify-center p-4">
       <div class="mb-8 text-center">
         <div class="inline-flex items-center justify-center p-3 bg-[#155347] rounded-xl mb-4 shadow-lg shadow-[#155347]/20">
         <img src="assets/white_icon.png" alt="FluxNote" class="h-10 w-10" />
         </div>
-        <h1 class="text-3xl font-bold text-gray-900">FluxNote</h1>
-        <p class="text-gray-500 mt-2">Access your collaborative documents</p>
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-gray-100">{{ 'AUTH.LOGIN.TITLE' | translate }}</h1>
+        <p class="text-gray-500 dark:text-gray-400 mt-2">{{ 'AUTH.LOGIN.SUBTITLE' | translate }}</p>
       </div>
 
       <app-card customClass="w-full max-w-md shadow-xl border-0">
         <app-card-content customClass="p-8">
-          <h2 class="text-2xl font-bold text-center text-gray-900 mb-8">Login</h2>
+          <h2 class="text-2xl font-bold text-center text-gray-900 dark:text-gray-100 mb-8">{{ 'AUTH.LOGIN.HEADING' | translate }}</h2>
 
           <form (ngSubmit)="handleSubmit()" class="space-y-5">
             <div class="relative">
               <app-input
-                label="Email"
+                [label]="'AUTH.LOGIN.EMAIL' | translate"
                 type="email"
-                placeholder="your.email&#64;example.com"
+                [placeholder]="'AUTH.LOGIN.EMAIL_PLACEHOLDER' | translate"
                 [(ngModel)]="formData.email"
                 name="email"
                 [hasLeftIcon]="true"
@@ -51,9 +53,9 @@ import { ToastService } from '../../../../shared/services/toast.service';
 
             <div class="relative">
               <app-input
-                label="Password"
+                [label]="'AUTH.LOGIN.PASSWORD' | translate"
                 [type]="showPassword() ? 'text' : 'password'"
-                placeholder="••••••••"
+                [placeholder]="'AUTH.LOGIN.PASSWORD_PLACEHOLDER' | translate"
                 [(ngModel)]="formData.password"
                 name="password"
                 [hasLeftIcon]="true"
@@ -64,7 +66,7 @@ import { ToastService } from '../../../../shared/services/toast.service';
               <button
                 type="button"
                 (click)="showPassword.set(!showPassword())"
-                class="absolute right-3 top-[38px] text-gray-400 hover:text-gray-600"
+                class="absolute right-3 top-[38px] text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
               >
                 <lucide-icon [name]="showPassword() ? 'eye-off' : 'eye'" class="h-4 w-4"></lucide-icon>
               </button>
@@ -72,26 +74,26 @@ import { ToastService } from '../../../../shared/services/toast.service';
 
             <div class="flex items-center justify-between text-sm">
               <label class="flex items-center gap-2 cursor-pointer">
-                <input name="rememberMe" [(ngModel)]="formData.rememberMe" type="checkbox" class="rounded border-gray-300 text-[#155347] focus:ring-[#155347]" />
-                <span class="text-gray-600">Remember me</span>
+                <input name="rememberMe" [(ngModel)]="formData.rememberMe" type="checkbox" class="rounded border-gray-300 dark:border-gray-600 text-[#155347] focus:ring-[#155347]" />
+                <span class="text-gray-600 dark:text-gray-400">{{ 'AUTH.LOGIN.REMEMBER_ME' | translate }}</span>
               </label>
               <a routerLink="/forgot-password" class="text-[#155347] hover:underline font-medium">
-                Forgot password?
+                {{ 'AUTH.LOGIN.FORGOT_PASSWORD' | translate }}
               </a>
             </div>
 
             <app-button type="submit" customClass="w-full" size="lg" [isLoading]="isLoading()">
-              Login
+              {{ 'AUTH.LOGIN.LOGIN_BTN' | translate }}
             </app-button>
           </form>
 
           <div class="mt-8">
             <div class="relative">
               <div class="absolute inset-0 flex items-center">
-                <span class="w-full border-t border-gray-200"></span>
+                <span class="w-full border-t border-gray-200 dark:border-gray-700"></span>
               </div>
               <div class="relative flex justify-center text-xs uppercase">
-                <span class="bg-white px-2 text-gray-500">Or continue with</span>
+                <span class="bg-white dark:bg-gray-800 px-2 text-gray-500 dark:text-gray-400">{{ 'AUTH.LOGIN.OR_CONTINUE' | translate }}</span>
               </div>
             </div>
 
@@ -108,7 +110,7 @@ import { ToastService } from '../../../../shared/services/toast.service';
                   <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
                   <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
                 </svg>
-                Sign in with Google
+                {{ 'AUTH.LOGIN.GOOGLE' | translate }}
               </app-button>
               <app-button
                 variant="outline"
@@ -123,15 +125,15 @@ import { ToastService } from '../../../../shared/services/toast.service';
                   <path fill="#05a6f0" d="M1 12h10v10H1z" />
                   <path fill="#ffba08" d="M12 12h10v10H12z" />
                 </svg>
-                Sign in with Microsoft
+                {{ 'AUTH.LOGIN.MICROSOFT' | translate }}
               </app-button>
             </div>
           </div>
 
-          <p class="mt-8 text-center text-sm text-gray-600">
-            Don't have an account?
+          <p class="mt-8 text-center text-sm text-gray-600 dark:text-gray-400">
+            {{ 'AUTH.LOGIN.NO_ACCOUNT' | translate }}
             <a routerLink="/register" class="font-medium text-[#155347] hover:underline ml-1">
-              Create an account
+              {{ 'AUTH.LOGIN.CREATE_ACCOUNT' | translate }}
             </a>
           </p>
         </app-card-content>
@@ -144,6 +146,7 @@ export class LoginComponent {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private toastService = inject(ToastService);
+  private translateService = inject(TranslateService);
 
   showPassword = signal(false);
   isLoading = this.authService.isLoading;
@@ -157,7 +160,7 @@ export class LoginComponent {
     );
 
     if (result.success) {
-      this.toastService.success('Login successful!');
+      this.toastService.success(this.translateService.instant('TOASTS.LOGIN_SUCCESS'));
       const returnUrl = this.route.snapshot.queryParams['returnUrl'];
       if (returnUrl) {
         this.router.navigateByUrl(returnUrl);
@@ -173,7 +176,7 @@ export class LoginComponent {
         });
       } else {
         // mostra mensagem principal se não houver erros detalhados
-        this.toastService.error(result.message || 'Login failed. Please try again.');
+        this.toastService.error(result.message || this.translateService.instant('TOASTS.LOGIN_FAILED'));
       }
     }
   }

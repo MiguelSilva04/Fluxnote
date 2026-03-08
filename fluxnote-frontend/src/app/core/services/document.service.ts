@@ -10,7 +10,9 @@ import {
   CommentDto,
   AISuggestion,
   DocumentContextDto,
-  CreateCommentDto
+  CreateCommentDto,
+  DocumentVersionDto,
+  DocumentVersionDetailDto
 } from '../models';
 
 @Injectable({
@@ -337,5 +339,52 @@ export class DocumentService {
       { id: 2, title: 'Improve writing', description: 'Enhance clarity and style', icon: '✨' },
       { id: 3, title: 'Generate content from prompt', description: 'Create new content based on your instructions', icon: '🤖' }
     ];
+  }
+
+  // ===============================
+  // Histórico de versões
+  // ===============================
+
+  /**
+   * Lista as versões de um documento, ordenadas da mais recente para a mais antiga.
+   * Requer acesso de Editor, TeamAdmin ou Owner.
+   * @param documentId ID do documento
+   */
+  getDocumentVersions(documentId: number): Observable<DocumentVersionDto[]> {
+    return this.http.get<DocumentVersionDto[]>(`/api/documents/${documentId}/versions`).pipe(
+      catchError(error => {
+        console.error('Error loading document versions:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  /**
+   * Obtém os detalhes de uma versão específica, incluindo o conteúdo HTML.
+   * @param documentId ID do documento
+   * @param versionId ID da versão
+   */
+  getDocumentVersionDetail(documentId: number, versionId: number): Observable<DocumentVersionDetailDto> {
+    return this.http.get<DocumentVersionDetailDto>(`/api/documents/${documentId}/versions/${versionId}`).pipe(
+      catchError(error => {
+        console.error('Error loading version detail:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  /**
+   * Restaura o documento para o conteúdo de uma versão anterior.
+   * Apenas o Owner da equipa pode executar esta operação.
+   * @param documentId ID do documento
+   * @param versionId ID da versão a restaurar
+   */
+  restoreDocumentVersion(documentId: number, versionId: number): Observable<void> {
+    return this.http.post<void>(`/api/documents/${documentId}/versions/${versionId}/restore`, {}).pipe(
+      catchError(error => {
+        console.error('Error restoring version:', error);
+        return throwError(() => error);
+      })
+    );
   }
 }

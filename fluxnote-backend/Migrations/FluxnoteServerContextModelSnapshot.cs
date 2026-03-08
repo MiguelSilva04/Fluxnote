@@ -260,6 +260,51 @@ namespace fluxnotebackend.Migrations
                     b.ToTable("DocumentPermission");
                 });
 
+            modelBuilder.Entity("Fluxnote.Backend.Models.DocumentVersion", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AuthorId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("AuthorName")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<byte[]>("ContentHtml")
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("DocumentId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Summary")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<byte[]>("YDocSnapshot")
+                        .HasColumnType("varbinary(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AuthorId");
+
+                    b.HasIndex("CreatedAt");
+
+                    b.HasIndex("DocumentId");
+
+                    b.ToTable("DocumentVersion");
+                });
+
             modelBuilder.Entity("Fluxnote.Backend.Models.Folder", b =>
                 {
                     b.Property<int>("Id")
@@ -801,6 +846,25 @@ namespace fluxnotebackend.Migrations
                     b.Navigation("Document");
 
                     b.Navigation("TeamMember");
+                });
+
+            modelBuilder.Entity("Fluxnote.Backend.Models.DocumentVersion", b =>
+                {
+                    b.HasOne("Fluxnote.Backend.Models.User", "Author")
+                        .WithMany()
+                        .HasForeignKey("AuthorId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Fluxnote.Backend.Models.Document", "Document")
+                        .WithMany()
+                        .HasForeignKey("DocumentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Author");
+
+                    b.Navigation("Document");
                 });
 
             modelBuilder.Entity("Fluxnote.Backend.Models.Folder", b =>

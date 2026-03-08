@@ -1,8 +1,10 @@
 import { Component, inject, signal, ViewChild, ElementRef, OnInit, computed } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { LucideAngularModule, ThumbsDown } from 'lucide-angular';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import {
   ButtonComponent,
   BadgeComponent,
@@ -10,11 +12,13 @@ import {
 } from '../../shared/components/ui';
 import { DocumentShareModalComponent } from '../../shared/components/document-share-modal/document-share-modal.component';
 import { DocumentService, DocumentInviteService, CollaborationService } from '../../core/services';
-import { Collaborator, Version, CommentDto, CreateCommentDto, AISuggestion, DocumentInviteDto, DocumentContextDto } from '../../core/models';
+import { Collaborator, Version, CommentDto, CreateCommentDto, AISuggestion, DocumentInviteDto, DocumentContextDto, DocumentVersionDto, DocumentVersionDetailDto } from '../../core/models';
 import { TextEditorComponent } from './components/text-editor.component';
 import { AuthService } from '../../core/services';
 import Quill from 'quill/core/quill';
 
+import { forkJoin } from 'rxjs';
+import { diffWords } from 'diff';
 // import { HttpClient } from '@angular/common/http';
 // import { Observable, catchError, of } from 'rxjs';
 
@@ -25,6 +29,7 @@ import Quill from 'quill/core/quill';
     CommonModule,
     FormsModule,
     LucideAngularModule,
+    TranslateModule,
     ButtonComponent,
     BadgeComponent,
     TextEditorComponent,
@@ -32,33 +37,33 @@ import Quill from 'quill/core/quill';
     DocumentShareModalComponent,
   ],
   template: `
-    <div class="min-h-screen bg-gray-50 flex flex-col relative">
+    <div class="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col relative">
       <!-- Loading State -->
       @if (isLoading()) {
         <div class="flex flex-col items-center justify-center h-screen gap-4">
           <lucide-icon
             name="loader-circle"
-            class="h-10 w-10 text-[#155347] animate-spin"
+            class="h-10 w-10 text-[#155347] dark:text-emerald-400 animate-spin"
           ></lucide-icon>
-          <div class="text-gray-500 text-sm">Loading document...</div>
+          <div class="text-gray-500 dark:text-gray-400 text-sm">{{ 'DOCUMENT_EDITOR.LOADING' | translate }}</div>
         </div>
       } @else if (loadError()) {
         <div class="flex flex-col items-center justify-center h-screen gap-4">
           <lucide-icon name="circle-alert" class="h-10 w-10 text-red-500"></lucide-icon>
           <div class="text-red-600 text-sm">{{ loadError() }}</div>
-          <div class="text-gray-500 text-xs">Redirecting to dashboard...</div>
+          <div class="text-gray-500 text-xs">{{ 'DOCUMENT_EDITOR.REDIRECTING' | translate }}</div>
         </div>
       } @else {
         <!-- Header -->
         <header
-          class="bg-white border-b border-gray-200 px-3 md:px-6 py-2 md:py-4 flex items-center justify-between gap-2 shrink-0"
+          class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-3 md:px-6 py-2 md:py-4 flex items-center justify-between gap-2 shrink-0"
         >
           <div class="flex items-center gap-2 md:gap-4 min-w-0 flex-1">
             <button
               (click)="navigateBack()"
-              class="p-2 hover:bg-gray-100 rounded-lg transition-colors flex-shrink-0"
+              class="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors flex-shrink-0"
             >
-                <lucide-icon name="arrow-left" class="h-5 w-5 text-gray-600"></lucide-icon>
+                <lucide-icon name="arrow-left" class="h-5 w-5 text-gray-600 dark:text-gray-400"></lucide-icon>
               </button>
               <div class="min-w-0 flex-1">
                 <!-- Editable Title -->
@@ -71,19 +76,19 @@ import Quill from 'quill/core/quill';
                       (blur)="saveTitle()"
                       (keydown.enter)="saveTitle()"
                       (keydown.escape)="cancelTitleEdit()"
-                      class="text-base md:text-lg font-bold text-gray-900 bg-transparent border-b-2 border-[#155347] focus:outline-none w-full max-w-md"
+                      class="text-base md:text-lg font-bold text-gray-900 dark:text-gray-100 bg-transparent border-b-2 border-[#155347] focus:outline-none w-full max-w-md"
                     />
                   } @else {
                     <h1
                       (click)="startEditingTitle()"
-                      class="text-base md:text-lg font-bold text-gray-900 cursor-pointer hover:text-[#155347] transition-colors truncate"
-                      title="Click to edit title"
+                      class="text-base md:text-lg font-bold text-gray-900 dark:text-gray-100 cursor-pointer hover:text-[#155347] dark:hover:text-emerald-400 transition-colors truncate"
+                      [title]="'DOCUMENT_EDITOR.CLICK_TO_EDIT' | translate"
                     >
                       {{ documentTitle }}
                     </h1>
                   }
                 } @else {
-                  <h1 class="text-base md:text-lg font-bold text-gray-900 truncate">
+                  <h1 class="text-base md:text-lg font-bold text-gray-900 dark:text-gray-100 truncate">
                     {{ documentTitle }}
                   </h1>
                 }
@@ -94,7 +99,7 @@ import Quill from 'quill/core/quill';
                     class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-700"
                   >
                       <lucide-icon name="eye" class="h-3 w-3"></lucide-icon>
-                      <span class="hidden sm:inline">View only</span>
+                      <span class="hidden sm:inline">{{ 'DOCUMENT_EDITOR.VIEW_ONLY' | translate }}</span>
                     </span>
                   }
                 </div>
@@ -104,16 +109,16 @@ import Quill from 'quill/core/quill';
             @if (canEdit()) {
               <app-button variant="outline" size="sm" [leftIcon]="true" (onClick)="toggleAIPanel()" customClass="hidden md:inline-flex">
                 <lucide-icon leftIcon name="sparkles" class="h-4 w-4"></lucide-icon>
-                AI Assistance
+                {{ 'DOCUMENT_EDITOR.AI_ASSISTANCE' | translate }}
               </app-button>
               <app-button
                 variant="outline"
                 size="sm"
                 [leftIcon]="true"
-                (onClick)="showWipModal.set(true)" customClass="hidden md:inline-flex"
+                (onClick)="toggleVersionHistory()" customClass="hidden md:inline-flex"
               >
                 <lucide-icon leftIcon name="clock" class="h-4 w-4"></lucide-icon>
-                History
+                {{ 'DOCUMENT_EDITOR.HISTORY' | translate }}
               </app-button>
               <app-button
                 variant="outline"
@@ -122,18 +127,18 @@ import Quill from 'quill/core/quill';
                 (onClick)="toggleComments()" customClass="hidden md:inline-flex"
               >
                 <lucide-icon leftIcon name="message-square" class="h-4 w-4"></lucide-icon>
-                Comments
+                {{ 'DOCUMENT_EDITOR.COMMENTS' | translate }}
               </app-button>
             }
             @if (pendingInvites().length > 0) {
               <div class="relative">
                 <button
                   (click)="toggleInvitesPanel()"
-                  class="inline-flex items-center gap-2 px-3 py-1.5 text-xs font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-full transition-colors"
-                  title="Pending invites"
+                  class="inline-flex items-center gap-2 px-3 py-1.5 text-xs font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-full transition-colors"
+                  [title]="'DOCUMENT_EDITOR.INVITES' | translate"
                 >
-                  <lucide-icon name="user-plus" class="h-3.5 w-3.5 text-gray-600"></lucide-icon>
-                  Invites
+                  <lucide-icon name="user-plus" class="h-3.5 w-3.5 text-gray-600 dark:text-gray-400"></lucide-icon>
+                  {{ 'DOCUMENT_EDITOR.INVITES' | translate }}
                   <span
                     class="ml-1 inline-flex items-center justify-center h-5 min-w-5 px-1.5 rounded-full bg-[#155347] text-white text-[10px]"
                   >
@@ -142,27 +147,27 @@ import Quill from 'quill/core/quill';
                 </button>
                 @if (showInvitesPanel()) {
                   <div
-                    class="absolute right-0 mt-2 w-64 bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden z-10"
+                    class="absolute right-0 mt-2 w-64 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg overflow-hidden z-10"
                   >
-                    <div class="px-3 py-2 text-xs font-medium text-gray-500 bg-gray-50">
-                      Pending invites
+                    <div class="px-3 py-2 text-xs font-medium text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-700">
+                      {{ 'DOCUMENT_EDITOR.PENDING_INVITES' | translate }}
                     </div>
-                    <div class="divide-y divide-gray-100">
+                    <div class="divide-y divide-gray-100 dark:divide-gray-700">
                       @for (inv of pendingInvites(); track inv.id) {
                         <div class="px-3 py-2 text-sm flex items-center justify-between">
                           <div>
-                            <div class="font-medium text-gray-900">
-                              {{ inv.role === 1 ? 'Editor' : 'Viewer' }} invite
+                            <div class="font-medium text-gray-900 dark:text-gray-100">
+                              {{ inv.role === 1 ? ('DOCUMENT_EDITOR.EDITOR_INVITE' | translate) : ('DOCUMENT_EDITOR.VIEWER_INVITE' | translate) }}
                             </div>
-                            <div class="text-xs text-gray-500">
-                              Expires {{ inv.expiresAt | date: 'MMM d, y' }}
+                            <div class="text-xs text-gray-500 dark:text-gray-400">
+                              {{ 'DOCUMENT_EDITOR.EXPIRES' | translate }} {{ inv.expiresAt | date: 'dd/MM/yyyy' }}
                             </div>
                           </div>
                           <button
                             (click)="copyInviteUrl(inv.id, inv.inviteUrl)"
-                            class="text-xs font-medium text-gray-700 hover:text-gray-900"
+                            class="text-xs font-medium text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-gray-100"
                           >
-                            {{ lastCopiedInviteId() === inv.id ? 'Copied!' : 'Copy link' }}
+                            {{ lastCopiedInviteId() === inv.id ? ('DOCUMENT_EDITOR.COPIED' | translate) : ('DOCUMENT_EDITOR.COPY_LINK' | translate) }}
                           </button>
                         </div>
                       }
@@ -180,7 +185,7 @@ import Quill from 'quill/core/quill';
                 customClass="hidden md:inline-flex"
               >
                 <lucide-icon leftIcon name="share-2" class="h-4 w-4"></lucide-icon>
-                Share
+                {{ 'DOCUMENT_EDITOR.SHARE' | translate }}
               </app-button>
               <!-- Mobile 3-dots menu -->
               <div class="relative md:hidden">
@@ -192,35 +197,35 @@ import Quill from 'quill/core/quill';
                 </button>
                 @if (showMobileMenu()) {
                   <div class="fixed inset-0 z-10" (click)="showMobileMenu.set(false)"></div>
-                  <div class="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden z-20">
+                  <div class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg overflow-hidden z-20">
                     <button
                       (click)="toggleAIPanel(); showMobileMenu.set(false)"
-                      class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors text-left"
+                      class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-left"
                     >
                       <lucide-icon name="sparkles" class="h-4 w-4 shrink-0"></lucide-icon>
-                      AI Assistance
+                      {{ 'DOCUMENT_EDITOR.AI_ASSISTANCE' | translate }}
                     </button>
                     <button
-                      (click)="showWipModal.set(true); showMobileMenu.set(false)"
-                      class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors text-left"
+                      (click)="toggleVersionHistory(); showMobileMenu.set(false)"
+                      class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-left"
                     >
                       <lucide-icon name="clock" class="h-4 w-4 shrink-0"></lucide-icon>
-                      History
+                      {{ 'DOCUMENT_EDITOR.HISTORY' | translate }}
                     </button>
                     <button
                       (click)="showWipModal.set(true); showMobileMenu.set(false)"
-                      class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors text-left"
+                      class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-left"
                     >
                       <lucide-icon name="message-square" class="h-4 w-4 shrink-0"></lucide-icon>
-                      Comments
+                      {{ 'DOCUMENT_EDITOR.COMMENTS' | translate }}
                     </button>
-                    <div class="border-t border-gray-100 my-1"></div>
+                    <div class="border-t border-gray-100 dark:border-gray-700 my-1"></div>
                     <button
                       (click)="openShareModal(); showMobileMenu.set(false)"
-                      class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors text-left"
+                      class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-left"
                     >
                       <lucide-icon name="share-2" class="h-4 w-4 shrink-0"></lucide-icon>
-                      Share
+                      {{ 'DOCUMENT_EDITOR.SHARE' | translate }}
                     </button>
                   </div>
                 }
@@ -236,7 +241,7 @@ import Quill from 'quill/core/quill';
               #editor
               [initialContent]="initialContent"
               [documentId]="documentId"
-              placeholder="Start writing your document..."
+              [placeholder]="'DOCUMENT_EDITOR.PLACEHOLDER' | translate"
               [autoSaveDelay]="2000"
               [editable]="canEdit()"
               (contentChange)="onContentChange($event)"
@@ -257,7 +262,14 @@ import Quill from 'quill/core/quill';
                   class="flex items-center gap-1.5 px-2 py-1 rounded-md hover:bg-white/20 transition-colors text-xs font-medium"
                 >
                   <lucide-icon name="sparkles" class="h-3.5 w-3.5 text-purple-300"></lucide-icon>
-                  Improve with AI
+                  {{ 'DOCUMENT_EDITOR.IMPROVE_WITH_AI' | translate }}
+                </button>
+                <button
+                  (mousedown)="addCommentSelection($event)"
+                  class="flex items-center gap-1.5 px-2 py-1 rounded-md hover:bg-white/20 transition-colors text-xs font-medium"
+                >
+                  <lucide-icon name="message-square" class="h-3.5 w-3.5 text-blue-300"></lucide-icon>
+                  Add comment
                 </button>
                 <button
                   (mousedown)="addCommentSelection($event)"
@@ -274,35 +286,35 @@ import Quill from 'quill/core/quill';
 
           <!-- AI Assistant Panel -->
           @if (showAIPanel()) {
-            <aside class="w-full md:w-80 bg-white border-l border-gray-200 flex flex-col shadow-xl">
-              <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+            <aside class="w-full md:w-80 bg-white dark:bg-gray-800 border-l border-gray-200 dark:border-gray-700 flex flex-col shadow-xl">
+              <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
                 <div class="flex items-center gap-2">
-                  <lucide-icon name="sparkles" class="h-5 w-5 text-[#155347]"></lucide-icon>
-                  <h3 class="text-lg font-bold text-gray-900">AI Assistance</h3>
+                  <lucide-icon name="sparkles" class="h-5 w-5 text-[#155347] dark:text-emerald-400"></lucide-icon>
+                  <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100">{{ 'DOCUMENT_EDITOR.AI_ASSISTANCE' | translate }}</h3>
                 </div>
-                <button (click)="showAIPanel.set(false)" class="p-1 hover:bg-gray-100 rounded">
+                <button (click)="showAIPanel.set(false)" class="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded">
                   <lucide-icon name="x" class="h-5 w-5 text-gray-500"></lucide-icon>
                 </button>
               </div>
 
             <div class="flex-1 overflow-y-auto p-6">
               <div class="mb-6">
-                <h4 class="text-sm font-semibold text-gray-900 mb-3">Actions</h4>
+                <h4 class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3">{{ 'DOCUMENT_EDITOR.ACTIONS' | translate }}</h4>
                 <div class="space-y-2">
 
                   <!-- Generate Summary (functional) -->
                   <button
                     (click)="generateSummary()"
                     [disabled]="summaryLoading()"
-                    class="w-full p-4 border border-gray-200 rounded-lg hover:bg-purple-50 hover:border-purple-300 transition-colors text-left disabled:opacity-50 disabled:cursor-not-allowed group"
+                    class="w-full p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-purple-50 dark:hover:bg-purple-900/20 hover:border-purple-300 dark:hover:border-purple-700 transition-colors text-left disabled:opacity-50 disabled:cursor-not-allowed group"
                   >
                     <div class="flex items-start gap-3">
-                      <div class="w-9 h-9 rounded-lg bg-purple-100 flex items-center justify-center shrink-0 group-hover:bg-purple-200 transition-colors">
-                        <lucide-icon name="file-text" class="h-5 w-5 text-purple-600"></lucide-icon>
+                      <div class="w-9 h-9 rounded-lg bg-purple-100 dark:bg-purple-900/40 flex items-center justify-center shrink-0 group-hover:bg-purple-200 dark:group-hover:bg-purple-800/50 transition-colors">
+                        <lucide-icon name="file-text" class="h-5 w-5 text-purple-600 dark:text-purple-400"></lucide-icon>
                       </div>
                       <div class="flex-1 min-w-0">
-                        <p class="text-sm font-medium text-gray-900 mb-0.5">Generate Summary</p>
-                        <p class="text-xs text-gray-500">Get a concise AI-generated summary of this document</p>
+                        <p class="text-sm font-medium text-gray-900 dark:text-gray-100 mb-0.5">{{ 'DOCUMENT_EDITOR.GENERATE_SUMMARY' | translate }}</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">{{ 'DOCUMENT_EDITOR.GENERATE_SUMMARY_DESC' | translate }}</p>
                       </div>
                     </div>
                   </button>
@@ -311,15 +323,15 @@ import Quill from 'quill/core/quill';
                   <button
                     (click)="openGeneratePanelModal()"
                     [disabled]="generateLoading()"
-                    class="w-full p-4 border border-gray-200 rounded-lg hover:bg-blue-50 hover:border-blue-300 transition-colors text-left disabled:opacity-50 disabled:cursor-not-allowed group"
+                    class="w-full p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-blue-300 dark:hover:border-blue-700 transition-colors text-left disabled:opacity-50 disabled:cursor-not-allowed group"
                   >
                     <div class="flex items-start gap-3">
-                      <div class="w-9 h-9 rounded-lg bg-blue-100 flex items-center justify-center shrink-0 group-hover:bg-blue-200 transition-colors">
-                        <lucide-icon name="pencil-line" class="h-5 w-5 text-blue-600"></lucide-icon>
+                      <div class="w-9 h-9 rounded-lg bg-blue-100 dark:bg-blue-900/40 flex items-center justify-center shrink-0 group-hover:bg-blue-200 dark:group-hover:bg-blue-800/50 transition-colors">
+                        <lucide-icon name="pencil-line" class="h-5 w-5 text-blue-600 dark:text-blue-400"></lucide-icon>
                       </div>
                       <div class="flex-1 min-w-0">
-                        <p class="text-sm font-medium text-gray-900 mb-0.5">Generate Content</p>
-                        <p class="text-xs text-gray-500">Generate new content from a prompt using AI</p>
+                        <p class="text-sm font-medium text-gray-900 dark:text-gray-100 mb-0.5">{{ 'DOCUMENT_EDITOR.GENERATE_CONTENT' | translate }}</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">{{ 'DOCUMENT_EDITOR.GENERATE_CONTENT_DESC' | translate }}</p>
                       </div>
                     </div>
                   </button>
@@ -327,14 +339,14 @@ import Quill from 'quill/core/quill';
               </div>
 
               <!-- Context Section -->
-              <div class="border-t border-gray-100 pt-4">
+              <div class="border-t border-gray-100 dark:border-gray-700 pt-4">
                 <button
                   (click)="showContextSection.set(!showContextSection())"
-                  class="w-full flex items-center justify-between text-sm font-semibold text-gray-900 mb-3 hover:text-[#155347] transition-colors"
+                  class="w-full flex items-center justify-between text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3 hover:text-[#155347] dark:hover:text-emerald-400 transition-colors"
                 >
                   <div class="flex items-center gap-2">
                     <lucide-icon name="file-stack" class="h-4 w-4"></lucide-icon>
-                    Context
+                    {{ 'DOCUMENT_EDITOR.CONTEXT' | translate }}
                     @if (contextFiles().length > 0) {
                       <span class="inline-flex items-center justify-center w-4 h-4 text-xs font-medium bg-[#155347] text-white rounded-full">{{ contextFiles().length }}</span>
                     }
@@ -346,15 +358,15 @@ import Quill from 'quill/core/quill';
                   @if (contextLoading()) {
                     <div class="flex items-center gap-2 py-2 text-gray-400">
                       <lucide-icon name="loader-circle" class="h-4 w-4 animate-spin"></lucide-icon>
-                      <span class="text-xs">Loading...</span>
+                      <span class="text-xs">{{ 'DOCUMENT_EDITOR.CONTEXT_LOADING' | translate }}</span>
                     </div>
                   } @else {
                     <div class="space-y-2 mb-3">
                       @for (file of contextFiles(); track file.id) {
-                        <div class="flex items-center gap-2 p-2 rounded-lg border border-gray-100 bg-gray-50 group">
+                        <div class="flex items-center gap-2 p-2 rounded-lg border border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 group">
                           <lucide-icon name="file-text" class="h-4 w-4 text-gray-400 shrink-0"></lucide-icon>
                           <div class="flex-1 min-w-0">
-                            <p class="text-xs font-medium text-gray-800 truncate" [title]="file.fileName">{{ file.fileName }}</p>
+                            <p class="text-xs font-medium text-gray-800 dark:text-gray-200 truncate" [title]="file.fileName">{{ file.fileName }}</p>
                             <p class="text-xs text-gray-400">{{ formatFileSize(file.fileSizeBytes) }}</p>
                           </div>
                           @if (file.hasExtractedText) {
@@ -371,7 +383,7 @@ import Quill from 'quill/core/quill';
                         </div>
                       }
                       @if (contextFiles().length === 0) {
-                        <p class="text-xs text-gray-400 py-1">No context files yet.</p>
+                        <p class="text-xs text-gray-400 py-1">{{ 'DOCUMENT_EDITOR.NO_CONTEXT_FILES' | translate }}</p>
                       }
                     </div>
 
@@ -382,14 +394,14 @@ import Quill from 'quill/core/quill';
                     <button
                       (click)="openContextFileInput()"
                       [disabled]="contextUploading()"
-                      class="w-full flex items-center justify-center gap-2 px-3 py-2 text-xs font-medium text-[#155347] border border-dashed border-[#155347] rounded-lg hover:bg-[#155347]/5 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      class="w-full flex items-center justify-center gap-2 px-3 py-2 text-xs font-medium text-[#155347] dark:text-emerald-400 border border-dashed border-[#155347] rounded-lg hover:bg-[#155347]/5 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       @if (contextUploading()) {
                         <lucide-icon name="loader-circle" class="h-3.5 w-3.5 animate-spin"></lucide-icon>
-                        Uploading...
+                        {{ 'DOCUMENT_EDITOR.UPLOADING' | translate }}
                       } @else {
                         <lucide-icon name="plus" class="h-3.5 w-3.5"></lucide-icon>
-                        Add file (PDF, TXT)
+                        {{ 'DOCUMENT_EDITOR.ADD_FILE' | translate }}
                       }
                     </button>
 
@@ -410,14 +422,17 @@ import Quill from 'quill/core/quill';
 
           <!-- Version History Sidebar -->
           @if (showVersionHistory()) {
-            <aside class="w-96 bg-white border-l border-gray-200 flex flex-col shadow-xl">
-              <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-                <h3 class="text-lg font-bold text-gray-900">Version History</h3>
+            <aside class="w-full md:w-96 bg-white dark:bg-gray-800 border-l border-gray-200 dark:border-gray-700 flex flex-col shadow-xl">
+              <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <lucide-icon name="clock" class="h-5 w-5 text-[#155347] dark:text-emerald-400"></lucide-icon>
+                  <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100">{{ 'DOCUMENT_EDITOR.VERSION_HISTORY' | translate }}</h3>
+                </div>
                 <button
-                  (click)="showVersionHistory.set(false)"
-                  class="p-1 hover:bg-gray-100 rounded"
+                  (click)="showVersionHistory.set(false); selectedVersions.set([])"
+                  class="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
                 >
-                  <lucide-icon name="x" class="h-5 w-5 text-gray-500"></lucide-icon>
+                  <lucide-icon name="x" class="h-5 w-5 text-gray-500 dark:text-gray-400"></lucide-icon>
                 </button>
               </div>
 
@@ -428,73 +443,100 @@ import Quill from 'quill/core/quill';
                       (onClick)="handleCompareVersions()"
                       customClass="w-full bg-[#155347] hover:bg-[#0d3d31]"
                     >
-                      Compare Selected Versions
+                      {{ 'DOCUMENT_EDITOR.COMPARE_VERSIONS' | translate }}
                     </app-button>
                   </div>
                 }
 
-                <div class="space-y-4">
-                  @for (version of versions; track version.id) {
-                    <div
-                      [class]="
-                        'p-4 border-2 rounded-lg transition-colors ' +
-                        (selectedVersions().includes(version.id)
-                          ? 'border-[#155347] bg-[#e8f0ee]'
-                          : 'border-gray-200 hover:border-gray-300')
-                      "
-                    >
-                      <div class="flex items-start justify-between mb-2">
-                        <div>
-                          <h4 class="text-sm font-bold text-gray-900">
-                            Version {{ version.number }}
-                          </h4>
-                          <p class="text-xs text-gray-500">{{ version.timestamp }}</p>
+                @if (versionsLoading()) {
+                  <div class="flex flex-col items-center justify-center py-12 gap-3">
+                    <lucide-icon name="loader-circle" class="h-6 w-6 text-[#155347] dark:text-emerald-400 animate-spin"></lucide-icon>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">{{ 'DOCUMENT_EDITOR.LOADING_VERSIONS' | translate }}</p>
+                  </div>
+                } @else if (versionsError()) {
+                  <div class="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-sm text-red-600 dark:text-red-400">
+                    {{ versionsError() }}
+                  </div>
+                } @else if (documentVersions().length === 0) {
+                  <div class="flex flex-col items-center justify-center py-12 gap-2 text-center">
+                    <lucide-icon name="clock" class="h-8 w-8 text-gray-300 dark:text-gray-600"></lucide-icon>
+                    <p class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ 'DOCUMENT_EDITOR.NO_VERSIONS' | translate }}</p>
+                    <p class="text-xs text-gray-400 dark:text-gray-500">{{ 'DOCUMENT_EDITOR.NO_VERSIONS_DESC' | translate }}</p>
+                  </div>
+                } @else {
+                  <div class="space-y-4">
+                    @for (version of documentVersions(); track version.id; let i = $index) {
+                      <div
+                        [class]="'p-4 border-2 rounded-lg transition-colors ' +
+                          (selectedVersions().includes(version.id)
+                            ? 'border-[#155347] bg-[#e8f0ee] dark:bg-[#155347]/20'
+                            : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 bg-white dark:bg-gray-700/40 hover:bg-gray-50 dark:hover:bg-gray-700/70')"
+                      >
+                        <div class="flex items-start justify-between mb-2">
+                          <div>
+                            <h4 class="text-sm font-bold text-gray-900 dark:text-gray-100">
+                              {{ 'DOCUMENT_EDITOR.VERSION_N' | translate: {n: documentVersions().length - i} }}
+                            </h4>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">{{ formatVersionDate(version.createdAt) }}</p>
+                          </div>
+                          <input
+                            type="checkbox"
+                            [checked]="selectedVersions().includes(version.id)"
+                            [disabled]="selectedVersions().length === 2 && !selectedVersions().includes(version.id)"
+                            (change)="handleVersionSelect(version.id)"
+                            class="mt-1 rounded border-gray-300 dark:border-gray-500 bg-white dark:bg-gray-600 text-[#155347] dark:text-emerald-400 focus:ring-[#155347] dark:focus:ring-emerald-500 cursor-pointer disabled:cursor-not-allowed disabled:opacity-40"
+                          />
                         </div>
-                        <input
-                          type="checkbox"
-                          [checked]="selectedVersions().includes(version.id)"
-                          (change)="handleVersionSelect(version.id)"
-                          class="rounded border-gray-300 text-[#155347] focus:ring-[#155347]"
-                        />
+                        <p class="text-xs font-medium text-gray-900 dark:text-gray-100 mb-1">{{ 'DOCUMENT_EDITOR.SAVED_BY' | translate }} {{ version.authorName }}</p>
+                        <p class="text-xs text-gray-700 dark:text-gray-400 mb-3">{{ formatVersionSummary(version.summary) }}</p>
+                        <div class="flex gap-2">
+                          <app-button
+                            variant="outline"
+                            size="sm"
+                            [leftIcon]="true"
+                            (onClick)="openVersionPreview(version, i)"
+                          >
+                            <lucide-icon leftIcon name="eye" class="h-3 w-3"></lucide-icon>
+                            {{ 'DOCUMENT_EDITOR.VIEW' | translate }}
+                          </app-button>
+                          @if (isOwner() && i > 0) {
+                            <app-button
+                              variant="outline"
+                              size="sm"
+                              [leftIcon]="true"
+                              (onClick)="handleRestore(version.id)"
+                            >
+                              <lucide-icon leftIcon name="rotate-ccw" class="h-3 w-3"></lucide-icon>
+                              {{ 'DOCUMENT_EDITOR.RESTORE' | translate }}
+                            </app-button>
+                          }
+                        </div>
                       </div>
-                      <p class="text-xs font-medium text-gray-900 mb-1">{{ version.author }}:</p>
-                      <p class="text-xs text-gray-700 mb-3">{{ version.description }}</p>
-                      <div class="flex gap-2">
-                        <app-button
-                          variant="outline"
-                          size="sm"
-                          [leftIcon]="true"
-                          (onClick)="handleRestore(version.number)"
-                        >
-                          <lucide-icon leftIcon name="rotate-ccw" class="h-3 w-3"></lucide-icon>
-                          Restore
-                        </app-button>
-                      </div>
-                    </div>
-                  }
-                </div>
+                    }
+                  </div>
+                }
               </div>
             </aside>
           }
 
           <!-- Comments Sidebar -->
           @if (showComments()) {
-            <aside class="w-96 bg-white border-l border-gray-200 flex flex-col shadow-xl">
-              <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+            <aside class="w-96 bg-white dark:bg-gray-800 border-l border-gray-200 dark:border-gray-700 flex flex-col shadow-xl">
+              <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
                 <div class="flex items-center gap-2">
-                  <h3 class="text-lg font-bold text-gray-900">Comments</h3>
+                  <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100">{{ 'DOCUMENT_EDITOR.COMMENTS_TITLE' | translate }}</h3>
                   <app-badge customClass="bg-red-500 text-white">{{ comments.length }}</app-badge>
                 </div>
-                <button (click)="showComments.set(false)" class="p-1 hover:bg-gray-100 rounded">
+                <button (click)="showComments.set(false)" class="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded">
                   <lucide-icon name="x" class="h-5 w-5 text-gray-500"></lucide-icon>
                 </button>
               </div>
 
               <!-- <div class="p-4 border-b border-gray-200">
                 <textarea
-                  placeholder="Add a comment..."
+                  [placeholder]="'DOCUMENT_EDITOR.ADD_COMMENT' | translate"
                   [(ngModel)]="newComment"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#155347] text-sm resize-none"
+                  class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#155347] text-sm resize-none dark:bg-gray-700 dark:text-gray-100"
                   rows="3"
                 ></textarea>
                 <div class="mt-2 flex justify-end">
@@ -623,52 +665,51 @@ import Quill from 'quill/core/quill';
         <!-- Restore Version Modal -->
         @if (isRestoreModalOpen()) {
           <div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <div class="bg-white rounded-xl shadow-2xl w-full max-w-md">
-              <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
-                <h2 class="text-lg font-bold text-gray-900">Restore Old Version</h2>
-                <button (click)="closeRestoreModal()" class="text-gray-400 hover:text-gray-600 p-1">
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-md">
+              <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between">
+                <h2 class="text-lg font-bold text-gray-900 dark:text-gray-100">{{ 'DOCUMENT_EDITOR.RESTORE_TITLE' | translate }}</h2>
+                <button (click)="closeRestoreModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-1">
                   <lucide-icon name="x" class="h-5 w-5"></lucide-icon>
                 </button>
               </div>
 
               <div class="p-6 space-y-4">
-                <div class="flex items-start gap-3 p-4 bg-red-50 border border-red-200 rounded-lg">
+                <div class="flex items-start gap-3 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
                   <lucide-icon
                     name="triangle-alert"
                     class="h-5 w-5 text-red-600 shrink-0 mt-0.5"
                   ></lucide-icon>
-                  <p class="text-sm text-red-800 font-medium">
-                    This action will replace the current version of the document with the selected
-                    version.
+                  <p class="text-sm text-red-800 dark:text-red-400 font-medium">
+                    {{ 'DOCUMENT_EDITOR.RESTORE_WARNING' | translate }}
                   </p>
                 </div>
 
-                <p class="text-sm text-gray-600">
-                  This action cannot be undone. Make sure you want to continue.
+                <p class="text-sm text-gray-600 dark:text-gray-400">
+                  {{ 'DOCUMENT_EDITOR.RESTORE_NOTE' | translate }}
                 </p>
 
                 <label class="flex items-start gap-3 cursor-pointer">
                   <input
                     type="checkbox"
                     [(ngModel)]="restoreConfirmed"
-                    class="mt-0.5 rounded border-gray-300 text-red-600 focus:ring-red-500"
+                    class="mt-0.5 rounded border-gray-300 dark:border-gray-600 text-red-600 focus:ring-red-500"
                   />
-                  <span class="text-sm text-gray-700"
-                    >I understand that this action is irreversible.</span
+                  <span class="text-sm text-gray-700 dark:text-gray-300"
+                    >{{ 'DOCUMENT_EDITOR.RESTORE_CONFIRM_CHECK' | translate }}</span
                   >
                 </label>
               </div>
 
               <div
-                class="px-6 py-4 bg-gray-50 border-t border-gray-100 flex justify-end gap-3 rounded-b-xl"
+                class="px-6 py-4 bg-gray-50 dark:bg-gray-900 border-t border-gray-100 dark:border-gray-700 flex justify-end gap-3 rounded-b-xl"
               >
-                <app-button variant="ghost" (onClick)="closeRestoreModal()">Cancel</app-button>
+                <app-button variant="ghost" (onClick)="closeRestoreModal()">{{ 'COMMON.CANCEL' | translate }}</app-button>
                 <app-button
                   (onClick)="confirmRestore()"
-                  [disabled]="!restoreConfirmed"
+                  [disabled]="!restoreConfirmed || isRestoring()"
                   customClass="bg-red-600 hover:bg-red-700 disabled:bg-gray-300 disabled:cursor-not-allowed"
                 >
-                  Restore and Replace
+                  {{ isRestoring() ? ('COMMON.LOADING' | translate) : ('DOCUMENT_EDITOR.RESTORE_AND_REPLACE' | translate) }}
                 </app-button>
               </div>
             </div>
@@ -677,18 +718,226 @@ import Quill from 'quill/core/quill';
       }
       <!-- End of @else (loading) -->
 
+      <!-- Version Preview Overlay -->
+      @if (versionPreview() || versionPreviewLoading()) {
+        <div class="fixed inset-0 bg-white dark:bg-gray-900 z-50 flex flex-col">
+          <!-- Header -->
+          <div class="px-4 md:px-6 py-3 border-b border-gray-200 dark:border-gray-700 flex items-center gap-3 shrink-0 bg-white dark:bg-gray-800 shadow-sm">
+            <button
+              (click)="closeVersionPreview()"
+              data-testid="version-preview-back"
+              class="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+            >
+              <lucide-icon name="arrow-left" class="h-5 w-5 text-gray-600 dark:text-gray-400"></lucide-icon>
+            </button>
+            @if (versionPreview(); as v) {
+              <div class="min-w-0 flex-1">
+                <p class="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">{{ documentTitle }}</p>
+                <p class="text-xs text-gray-500 dark:text-gray-400">
+                  {{ formatVersionDate(v.createdAt) }} &mdash; {{ v.authorName }}
+                </p>
+              </div>
+              <!-- View mode toggle -->
+              <div class="flex items-center bg-gray-100 dark:bg-gray-700 rounded-lg p-0.5 shrink-0">
+                <button
+                  (click)="versionHasPrevious() && diffViewMode.set('diff')"
+                  [disabled]="!versionHasPrevious()"
+                  [title]="versionHasPrevious() ? '' : ('DOCUMENT_EDITOR.NO_PREV_VERSION' | translate)"
+                  [class]="'px-3 py-1 text-xs font-medium rounded-md transition-colors ' + (diffViewMode() === 'diff' ? 'bg-white dark:bg-gray-600 shadow-sm text-gray-900 dark:text-gray-100' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200') + (!versionHasPrevious() ? ' opacity-40 cursor-not-allowed' : '')"
+                >
+                  {{ 'DOCUMENT_EDITOR.CHANGES' | translate }}
+                </button>
+                <button
+                  (click)="diffViewMode.set('full')"
+                  [class]="'px-3 py-1 text-xs font-medium rounded-md transition-colors ' + (diffViewMode() === 'full' ? 'bg-white dark:bg-gray-600 shadow-sm text-gray-900 dark:text-gray-100' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200')"
+                >
+                  {{ 'DOCUMENT_EDITOR.FULL_VERSION' | translate }}
+                </button>
+              </div>
+            } @else {
+              <div class="flex items-center gap-2 flex-1">
+                <lucide-icon name="loader-circle" class="h-4 w-4 text-[#155347] dark:text-emerald-400 animate-spin"></lucide-icon>
+                <span class="text-sm text-gray-500 dark:text-gray-400">{{ 'DOCUMENT_EDITOR.LOADING_VERSION' | translate }}</span>
+              </div>
+            }
+            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-400 shrink-0">
+              <lucide-icon name="eye" class="h-3 w-3"></lucide-icon>
+              {{ 'DOCUMENT_EDITOR.READ_ONLY' | translate }}
+            </span>
+          </div>
+          <!-- Content -->
+          <div class="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-900 flex justify-center px-4 py-8">
+            @if (versionPreview(); as v) {
+              <div class="w-full max-w-3xl bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-8 md:p-12">
+                @if (diffViewMode() === 'diff') {
+                  @if (!versionHasPrevious()) {
+                    <div class="flex flex-col items-center justify-center py-16 gap-3 text-center">
+                      <lucide-icon name="git-commit-horizontal" class="h-10 w-10 text-gray-300 dark:text-gray-600"></lucide-icon>
+                      <p class="text-gray-500 dark:text-gray-400 text-sm">{{ 'DOCUMENT_EDITOR.FIRST_VERSION' | translate }}</p>
+                      <button
+                        (click)="diffViewMode.set('full')"
+                        class="text-xs text-[#155347] dark:text-emerald-400 underline hover:no-underline"
+                      >{{ 'DOCUMENT_EDITOR.SWITCH_FULL' | translate }}</button>
+                    </div>
+                  } @else if (versionDiff()) {
+                    <!-- Diff legend -->
+                    <div class="flex items-center gap-5 mb-6 pb-4 border-b border-gray-200 dark:border-gray-700 flex-wrap text-xs text-gray-600 dark:text-gray-400">
+                      <span class="flex items-center gap-1.5">
+                        <span class="inline-block w-3 h-3 rounded-sm bg-green-200 dark:bg-green-800"></span>
+                        {{ 'DOCUMENT_EDITOR.DIFF_ADDED' | translate }}
+                      </span>
+                      <span class="flex items-center gap-1.5">
+                        <span class="inline-block w-3 h-3 rounded-sm bg-yellow-200 dark:bg-yellow-800"></span>
+                        {{ 'DOCUMENT_EDITOR.DIFF_MODIFIED' | translate }}
+                      </span>
+                      <span class="flex items-center gap-1.5">
+                        <span class="inline-block w-3 h-3 rounded-sm bg-red-200 dark:bg-red-800"></span>
+                        {{ 'DOCUMENT_EDITOR.DIFF_REMOVED' | translate }}
+                      </span>
+                    </div>
+                    <div [innerHTML]="versionDiff()"></div>
+                  }
+                } @else {
+                  @if (v.contentHtml) {
+                    <div class="ql-editor" [innerHTML]="safeHtml(v.contentHtml!)"></div>
+                  } @else {
+                    <div class="flex flex-col items-center justify-center py-16 gap-3 text-center">
+                      <lucide-icon name="file-x" class="h-10 w-10 text-gray-300 dark:text-gray-600"></lucide-icon>
+                      <p class="text-gray-500 dark:text-gray-400 text-sm">{{ 'DOCUMENT_EDITOR.NO_CONTENT' | translate }}</p>
+                    </div>
+                  }
+                }
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+      <!-- Compare Versions Overlay -->
+      @if (showCompareOverlay()) {
+        <div class="fixed inset-0 bg-white dark:bg-gray-900 z-50 flex flex-col">
+          <!-- Header -->
+          <div class="px-4 md:px-6 py-3 border-b border-gray-200 dark:border-gray-700 flex items-center gap-3 shrink-0 bg-white dark:bg-gray-800 shadow-sm">
+            <button
+              (click)="closeCompareOverlay()"
+              class="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+            >
+              <lucide-icon name="arrow-left" class="h-5 w-5 text-gray-600 dark:text-gray-400"></lucide-icon>
+            </button>
+            <div class="min-w-0 flex-1">
+              <p class="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">{{ 'DOCUMENT_EDITOR.COMPARING_VERSIONS' | translate }}</p>
+              @if (compareOlderVersion(); as older) {
+                <p class="text-xs text-gray-500 dark:text-gray-400">
+                  {{ 'DOCUMENT_EDITOR.VERSION_N' | translate: {n: getVersionNumber(older.id)} }}
+                  &rarr;
+                  {{ 'DOCUMENT_EDITOR.VERSION_N' | translate: {n: getVersionNumber(compareNewerVersion()!.id)} }}
+                </p>
+              }
+            </div>
+            <!-- View mode toggle -->
+            <div class="flex items-center bg-gray-100 dark:bg-gray-700 rounded-lg p-0.5 shrink-0">
+              <button
+                (click)="compareViewMode.set('diff')"
+                [class]="'px-3 py-1 text-xs font-medium rounded-md transition-colors ' + (compareViewMode() === 'diff' ? 'bg-white dark:bg-gray-600 shadow-sm text-gray-900 dark:text-gray-100' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200')"
+              >
+                {{ 'DOCUMENT_EDITOR.UNIFIED_DIFF' | translate }}
+              </button>
+              <button
+                (click)="compareViewMode.set('side')"
+                [class]="'px-3 py-1 text-xs font-medium rounded-md transition-colors ' + (compareViewMode() === 'side' ? 'bg-white dark:bg-gray-600 shadow-sm text-gray-900 dark:text-gray-100' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200')"
+              >
+                {{ 'DOCUMENT_EDITOR.SIDE_BY_SIDE' | translate }}
+              </button>
+            </div>
+            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-400 shrink-0">
+              <lucide-icon name="eye" class="h-3 w-3"></lucide-icon>
+              {{ 'DOCUMENT_EDITOR.READ_ONLY' | translate }}
+            </span>
+          </div>
+          <!-- Content -->
+          <div class="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-900 px-4 py-8">
+            @if (compareLoading()) {
+              <div class="flex flex-col items-center justify-center py-24 gap-3">
+                <lucide-icon name="loader-circle" class="h-6 w-6 text-[#155347] dark:text-emerald-400 animate-spin"></lucide-icon>
+                <p class="text-sm text-gray-500 dark:text-gray-400">{{ 'DOCUMENT_EDITOR.LOADING_COMPARISON' | translate }}</p>
+              </div>
+            } @else if (compareViewMode() === 'diff') {
+              <!-- Unified diff -->
+              <div class="max-w-3xl mx-auto bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-8 md:p-12">
+                <!-- Diff legend -->
+                <div class="flex items-center gap-5 mb-6 pb-4 border-b border-gray-200 dark:border-gray-700 flex-wrap text-xs text-gray-600 dark:text-gray-400">
+                  <span class="flex items-center gap-1.5">
+                    <span class="inline-block w-3 h-3 rounded-sm bg-green-200 dark:bg-green-800"></span>
+                    {{ 'DOCUMENT_EDITOR.DIFF_ADDED' | translate }}
+                  </span>
+                  <span class="flex items-center gap-1.5">
+                    <span class="inline-block w-3 h-3 rounded-sm bg-yellow-200 dark:bg-yellow-800"></span>
+                    {{ 'DOCUMENT_EDITOR.DIFF_MODIFIED' | translate }}
+                  </span>
+                  <span class="flex items-center gap-1.5">
+                    <span class="inline-block w-3 h-3 rounded-sm bg-red-200 dark:bg-red-800"></span>
+                    {{ 'DOCUMENT_EDITOR.DIFF_REMOVED' | translate }}
+                  </span>
+                </div>
+                @if (compareDiffHtml()) {
+                  <div [innerHTML]="compareDiffHtml()"></div>
+                }
+              </div>
+            } @else {
+              <!-- Side-by-side -->
+              <div class="max-w-7xl mx-auto grid grid-cols-2 gap-4">
+                <!-- Older version -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col overflow-hidden">
+                  <div class="px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/80">
+                    <p class="text-sm font-semibold text-gray-900 dark:text-gray-100">
+                      {{ 'DOCUMENT_EDITOR.VERSION_N' | translate: {n: getVersionNumber(compareOlderVersion()!.id)} }}
+                      <span class="text-xs font-normal text-gray-500 dark:text-gray-400 ml-2">{{ 'DOCUMENT_EDITOR.OLDER' | translate }}</span>
+                    </p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">{{ formatVersionDate(compareOlderVersion()!.createdAt) }} &mdash; {{ compareOlderVersion()!.authorName }}</p>
+                  </div>
+                  <div class="p-6 md:p-8 overflow-y-auto flex-1">
+                    @if (compareOlderVersion()!.contentHtml) {
+                      <div class="ql-editor" [innerHTML]="safeHtml(compareOlderVersion()!.contentHtml!)"></div>
+                    } @else {
+                      <p class="text-sm text-gray-400 dark:text-gray-500 italic">{{ 'DOCUMENT_EDITOR.NO_CONTENT' | translate }}</p>
+                    }
+                  </div>
+                </div>
+                <!-- Newer version -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col overflow-hidden">
+                  <div class="px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/80">
+                    <p class="text-sm font-semibold text-gray-900 dark:text-gray-100">
+                      {{ 'DOCUMENT_EDITOR.VERSION_N' | translate: {n: getVersionNumber(compareNewerVersion()!.id)} }}
+                      <span class="text-xs font-normal text-gray-500 dark:text-gray-400 ml-2">{{ 'DOCUMENT_EDITOR.NEWER' | translate }}</span>
+                    </p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">{{ formatVersionDate(compareNewerVersion()!.createdAt) }} &mdash; {{ compareNewerVersion()!.authorName }}</p>
+                  </div>
+                  <div class="p-6 md:p-8 overflow-y-auto flex-1">
+                    @if (compareNewerVersion()!.contentHtml) {
+                      <div class="ql-editor" [innerHTML]="safeHtml(compareNewerVersion()!.contentHtml!)"></div>
+                    } @else {
+                      <p class="text-sm text-gray-400 dark:text-gray-500 italic">{{ 'DOCUMENT_EDITOR.NO_CONTENT' | translate }}</p>
+                    }
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
       <!-- AI Summary Modal -->
       @if (showSummaryModal()) {
         <div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div class="bg-white rounded-xl shadow-2xl w-full max-w-lg">
-            <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+          <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-lg">
+            <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between">
               <div class="flex items-center gap-2">
-                <lucide-icon name="sparkles" class="h-5 w-5 text-purple-600"></lucide-icon>
-                <h2 class="text-lg font-bold text-gray-900">AI Summary</h2>
+                <lucide-icon name="sparkles" class="h-5 w-5 text-purple-600 dark:text-purple-400"></lucide-icon>
+                <h2 class="text-lg font-bold text-gray-900 dark:text-gray-100">{{ 'DOCUMENT_EDITOR.AI_SUMMARY_TITLE' | translate }}</h2>
               </div>
               <button
                 (click)="closeSummaryModal()"
-                class="text-gray-400 hover:text-gray-600 text-2xl"
+                class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 text-2xl"
               >
                 &times;
               </button>
@@ -699,21 +948,21 @@ import Quill from 'quill/core/quill';
                 <div class="flex flex-col items-center justify-center py-8 gap-3">
                   <lucide-icon
                     name="loader-circle"
-                    class="h-8 w-8 text-purple-600 animate-spin"
+                    class="h-8 w-8 text-purple-600 dark:text-purple-400 animate-spin"
                   ></lucide-icon>
-                  <p class="text-gray-600 text-sm">Generating summary...</p>
+                  <p class="text-gray-600 dark:text-gray-400 text-sm">{{ 'DOCUMENT_EDITOR.GENERATING_SUMMARY' | translate }}</p>
                 </div>
               } @else if (summaryError()) {
                 <div class="bg-red-50 border border-red-200 rounded-lg p-4">
                   <div class="flex items-center gap-2 text-red-700 mb-1">
                     <lucide-icon name="circle-alert" class="h-5 w-5"></lucide-icon>
-                    <span class="font-medium">Error</span>
+                    <span class="font-medium">{{ 'DOCUMENT_EDITOR.ERROR' | translate }}</span>
                   </div>
                   <p class="text-sm text-red-600">{{ summaryError() }}</p>
                 </div>
               } @else {
-                <div class="bg-purple-50 border border-purple-200 rounded-lg p-4">
-                  <p class="text-gray-800 text-sm leading-relaxed whitespace-pre-wrap">
+                <div class="bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg p-4">
+                  <p class="text-gray-800 dark:text-gray-200 text-sm leading-relaxed whitespace-pre-wrap">
                     {{ summaryResult() }}
                   </p>
                 </div>
@@ -721,20 +970,20 @@ import Quill from 'quill/core/quill';
             </div>
 
             <div
-              class="px-6 py-4 bg-gray-50 border-t border-gray-100 flex justify-end gap-3 rounded-b-xl"
+              class="px-6 py-4 bg-gray-50 dark:bg-gray-900 border-t border-gray-100 dark:border-gray-700 flex justify-end gap-3 rounded-b-xl"
             >
               @if (!summaryLoading() && !summaryError()) {
                 <app-button variant="outline" size="sm" (onClick)="copySummary()">
                   @if (summaryCopied()) {
                     <lucide-icon name="check" class="h-4 w-4 mr-1 text-green-600"></lucide-icon>
-                    Copied!
+                    {{ 'DOCUMENT_EDITOR.COPIED' | translate }}
                   } @else {
                     <lucide-icon name="clipboard" class="h-4 w-4 mr-1"></lucide-icon>
-                    Copy
+                    {{ 'DOCUMENT_EDITOR.COPY' | translate }}
                   }
                 </app-button>
               }
-              <app-button variant="ghost" (onClick)="closeSummaryModal()">Close</app-button>
+              <app-button variant="ghost" (onClick)="closeSummaryModal()">{{ 'DOCUMENT_EDITOR.CLOSE' | translate }}</app-button>
             </div>
           </div>
         </div>
@@ -743,15 +992,15 @@ import Quill from 'quill/core/quill';
       <!-- AI Generate Content Panel Modal -->
       @if (showGeneratePanelModal()) {
         <div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div class="bg-white rounded-xl shadow-2xl w-full max-w-lg">
-            <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+          <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-lg">
+            <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between">
               <div class="flex items-center gap-2">
-                <lucide-icon name="sparkles" class="h-5 w-5 text-blue-600"></lucide-icon>
-                <h2 class="text-lg font-bold text-gray-900">Generate Content</h2>
+                <lucide-icon name="sparkles" class="h-5 w-5 text-blue-600 dark:text-blue-400"></lucide-icon>
+                <h2 class="text-lg font-bold text-gray-900 dark:text-gray-100">{{ 'DOCUMENT_EDITOR.GENERATE_CONTENT' | translate }}</h2>
               </div>
               <button
                 (click)="closeGeneratePanelModal()"
-                class="text-gray-400 hover:text-gray-600 text-2xl"
+                class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 text-2xl"
               >
                 &times;
               </button>
@@ -762,14 +1011,14 @@ import Quill from 'quill/core/quill';
               @if (!generateLoading() && !generateResult() && !generateError()) {
                 <textarea
                   [(ngModel)]="generatePrompt"
-                  placeholder="Describe the content you want to generate..."
+                  [placeholder]="'DOCUMENT_EDITOR.GENERATE_PROMPT' | translate"
                   rows="4"
-                  class="w-full text-sm border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-400 resize-none placeholder:text-gray-400"
+                  class="w-full text-sm border border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-800 focus:border-blue-400 resize-none placeholder:text-gray-400"
                 ></textarea>
                 @if (contextFiles().length > 0) {
                   <p class="text-xs text-gray-400 mt-2 flex items-center gap-1">
                     <lucide-icon name="file-stack" class="h-3.5 w-3.5"></lucide-icon>
-                    {{ contextFiles().length }} context file{{ contextFiles().length > 1 ? 's' : '' }} will be included
+                    {{ 'DOCUMENT_EDITOR.CONTEXT_FILES_HINT' | translate: { count: contextFiles().length } }}
                   </p>
                 }
               }
@@ -777,8 +1026,8 @@ import Quill from 'quill/core/quill';
               <!-- Loading -->
               @if (generateLoading()) {
                 <div class="flex flex-col items-center justify-center py-8 gap-3">
-                  <lucide-icon name="loader-circle" class="h-8 w-8 text-blue-600 animate-spin"></lucide-icon>
-                  <p class="text-gray-600 text-sm">Generating content...</p>
+                  <lucide-icon name="loader-circle" class="h-8 w-8 text-blue-600 dark:text-blue-400 animate-spin"></lucide-icon>
+                  <p class="text-gray-600 dark:text-gray-400 text-sm">{{ 'DOCUMENT_EDITOR.GENERATING' | translate }}</p>
                 </div>
               }
 
@@ -787,7 +1036,7 @@ import Quill from 'quill/core/quill';
                 <div class="bg-red-50 border border-red-200 rounded-lg p-4">
                   <div class="flex items-center gap-2 text-red-700 mb-1">
                     <lucide-icon name="circle-alert" class="h-5 w-5"></lucide-icon>
-                    <span class="font-medium">Error</span>
+                    <span class="font-medium">{{ 'DOCUMENT_EDITOR.ERROR' | translate }}</span>
                   </div>
                   <p class="text-sm text-red-600">{{ generateError() }}</p>
                 </div>
@@ -795,13 +1044,13 @@ import Quill from 'quill/core/quill';
 
               <!-- Result -->
               @if (!generateLoading() && !generateError() && generateResult()) {
-                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                  <p class="text-gray-800 text-sm leading-relaxed whitespace-pre-wrap">{{ generateResult() }}</p>
+                <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+                  <p class="text-gray-800 dark:text-gray-200 text-sm leading-relaxed whitespace-pre-wrap">{{ generateResult() }}</p>
                 </div>
               }
             </div>
 
-            <div class="px-6 py-4 bg-gray-50 border-t border-gray-100 flex justify-end gap-3 rounded-b-xl">
+            <div class="px-6 py-4 bg-gray-50 dark:bg-gray-900 border-t border-gray-100 dark:border-gray-700 flex justify-end gap-3 rounded-b-xl">
               @if (!generateLoading() && !generateResult() && !generateError()) {
                 <app-button
                   variant="primary"
@@ -810,26 +1059,26 @@ import Quill from 'quill/core/quill';
                   [disabled]="!generatePrompt.trim()"
                 >
                   <lucide-icon name="sparkles" class="h-4 w-4 mr-1"></lucide-icon>
-                  Generate
+                  {{ 'DOCUMENT_EDITOR.GENERATE_BTN' | translate }}
                 </app-button>
               }
               @if (generateError()) {
                 <app-button variant="outline" size="sm" (onClick)="resetGeneratePanelModal()">
-                  Try again
+                  {{ 'DOCUMENT_EDITOR.TRY_AGAIN' | translate }}
                 </app-button>
               }
               @if (!generateLoading() && !generateError() && generateResult()) {
                 <app-button variant="outline" size="sm" (onClick)="copyGeneratedContent()">
                   @if (generateCopied()) {
                     <lucide-icon name="check" class="h-4 w-4 mr-1 text-green-600"></lucide-icon>
-                    Copied!
+                    {{ 'DOCUMENT_EDITOR.COPIED' | translate }}
                   } @else {
                     <lucide-icon name="clipboard" class="h-4 w-4 mr-1"></lucide-icon>
-                    Copy
+                    {{ 'DOCUMENT_EDITOR.COPY' | translate }}
                   }
                 </app-button>
               }
-              <app-button variant="ghost" (onClick)="closeGeneratePanelModal()">Close</app-button>
+              <app-button variant="ghost" (onClick)="closeGeneratePanelModal()">{{ 'DOCUMENT_EDITOR.CLOSE' | translate }}</app-button>
             </div>
           </div>
         </div>
@@ -841,22 +1090,22 @@ import Quill from 'quill/core/quill';
       <!-- AI Improve Inline Card (aparece junto ao texto selecionado) -->
       @if (showImproveModal()) {
         <div
-          class="fixed z-50 bg-white rounded-xl shadow-2xl border border-purple-100 w-[400px] flex flex-col animate-in fade-in slide-in-from-top-2"
+          class="fixed z-50 bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-purple-100 dark:border-purple-900 w-[400px] flex flex-col animate-in fade-in slide-in-from-top-2"
           [style.top.px]="improveCardPosition().top"
           [style.left.px]="improveCardPosition().left"
           style="max-height: 360px;"
         >
           <!-- Card Header -->
-          <div class="px-4 py-3 flex items-center justify-between shrink-0 border-b border-gray-100">
+          <div class="px-4 py-3 flex items-center justify-between shrink-0 border-b border-gray-100 dark:border-gray-700">
             <div class="flex items-center gap-2">
-              <div class="w-6 h-6 rounded-md bg-purple-100 flex items-center justify-center">
-                <lucide-icon name="sparkles" class="h-3.5 w-3.5 text-purple-600"></lucide-icon>
+              <div class="w-6 h-6 rounded-md bg-purple-100 dark:bg-purple-900/40 flex items-center justify-center">
+                <lucide-icon name="sparkles" class="h-3.5 w-3.5 text-purple-600 dark:text-purple-400"></lucide-icon>
               </div>
-              <span class="text-sm font-semibold text-gray-900">Improve with AI</span>
+              <span class="text-sm font-semibold text-gray-900 dark:text-gray-100">{{ 'DOCUMENT_EDITOR.IMPROVE_WITH_AI' | translate }}</span>
             </div>
             <button
               (click)="closeImproveModal()"
-              class="p-1 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+              class="p-1 rounded-md text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
             >
               <lucide-icon name="x" class="h-4 w-4"></lucide-icon>
             </button>
@@ -866,8 +1115,8 @@ import Quill from 'quill/core/quill';
           <div class="flex-1 overflow-y-auto">
             @if (improveLoading()) {
               <div class="flex flex-col items-center justify-center py-10 gap-3">
-                <lucide-icon name="loader-circle" class="h-6 w-6 text-purple-600 animate-spin"></lucide-icon>
-                <p class="text-xs text-gray-500">Analyzing and improving your text...</p>
+                <lucide-icon name="loader-circle" class="h-6 w-6 text-purple-600 dark:text-purple-400 animate-spin"></lucide-icon>
+                <p class="text-xs text-gray-500">{{ 'DOCUMENT_EDITOR.ANALYZING' | translate }}</p>
               </div>
             } @else if (improveError()) {
               <div class="m-4 bg-red-50 border border-red-200 rounded-lg p-3 flex items-start gap-2">
@@ -876,16 +1125,16 @@ import Quill from 'quill/core/quill';
               </div>
             } @else {
               <!-- Split diff view -->
-              <div class="divide-y divide-gray-100">
+              <div class="divide-y divide-gray-100 dark:divide-gray-700">
                 <!-- Original -->
                 <div class="px-4 py-3">
-                  <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-widest mb-1.5">Original</p>
+                  <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-widest mb-1.5">{{ 'DOCUMENT_EDITOR.ORIGINAL' | translate }}</p>
                   <p class="text-xs text-gray-400 leading-relaxed line-clamp-3 line-through">{{ improveOriginalText() }}</p>
                 </div>
                 <!-- Sugestão -->
-                <div class="px-4 py-3 bg-purple-50/60">
-                  <p class="text-[10px] font-semibold text-purple-500 uppercase tracking-widest mb-1.5">Suggestion</p>
-                  <p class="text-sm text-gray-800 leading-relaxed">{{ improveResult() }}</p>
+                <div class="px-4 py-3 bg-purple-50/60 dark:bg-purple-900/20">
+                  <p class="text-[10px] font-semibold text-purple-500 uppercase tracking-widest mb-1.5">{{ 'DOCUMENT_EDITOR.SUGGESTION' | translate }}</p>
+                  <p class="text-sm text-gray-800 dark:text-gray-200 leading-relaxed">{{ improveResult() }}</p>
                 </div>
               </div>
             }
@@ -893,23 +1142,23 @@ import Quill from 'quill/core/quill';
 
           <!-- Card Footer -->
           @if (!improveLoading() && !improveError() && improveResult()) {
-            <div class="px-4 py-3 border-t border-gray-100 flex items-center justify-end gap-2 shrink-0">
+            <div class="px-4 py-3 border-t border-gray-100 dark:border-gray-700 flex items-center justify-end gap-2 shrink-0">
               <button
                 (click)="closeImproveModal()"
-                class="px-3 py-1.5 text-xs text-gray-500 hover:text-gray-700 rounded-lg hover:bg-gray-100 transition-colors"
+                class="px-3 py-1.5 text-xs text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
               >
-                Discard
+                {{ 'DOCUMENT_EDITOR.DISCARD' | translate }}
               </button>
               <button
                 (click)="copyImprovedText()"
-                class="px-3 py-1.5 text-xs border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-1.5"
+                class="px-3 py-1.5 text-xs border border-gray-200 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors flex items-center gap-1.5"
               >
                 @if (improveCopied()) {
                   <lucide-icon name="check" class="h-3.5 w-3.5 text-green-600"></lucide-icon>
-                  <span>Copied!</span>
+                  <span>{{ 'DOCUMENT_EDITOR.COPIED' | translate }}</span>
                 } @else {
                   <lucide-icon name="clipboard" class="h-3.5 w-3.5"></lucide-icon>
-                  <span>Copy</span>
+                  <span>{{ 'DOCUMENT_EDITOR.COPY' | translate }}</span>
                 }
               </button>
               <button
@@ -917,7 +1166,7 @@ import Quill from 'quill/core/quill';
                 class="px-3 py-1.5 text-xs bg-[#155347] text-white rounded-lg hover:bg-[#0d3d31] transition-colors flex items-center gap-1.5"
               >
                 <lucide-icon name="check" class="h-3.5 w-3.5"></lucide-icon>
-                <span>Apply</span>
+                <span>{{ 'DOCUMENT_EDITOR.APPLY' | translate }}</span>
               </button>
             </div>
           }
@@ -927,22 +1176,22 @@ import Quill from 'quill/core/quill';
       <!-- AI Generate Content Inline Card -->
       @if (showGenerateCard()) {
         <div
-          class="fixed z-50 bg-white rounded-xl shadow-2xl border border-blue-100 w-[440px] flex flex-col animate-in fade-in slide-in-from-top-2"
+          class="fixed z-50 bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-blue-100 dark:border-blue-900 w-[440px] flex flex-col animate-in fade-in slide-in-from-top-2"
           [style.top.px]="generateCardPosition().top"
           [style.left.px]="generateCardPosition().left"
           style="max-height: 420px;"
         >
           <!-- Card Header -->
-          <div class="px-4 py-3 flex items-center justify-between shrink-0 border-b border-gray-100">
+          <div class="px-4 py-3 flex items-center justify-between shrink-0 border-b border-gray-100 dark:border-gray-700">
             <div class="flex items-center gap-2">
-              <div class="w-6 h-6 rounded-md bg-blue-100 flex items-center justify-center">
-                <lucide-icon name="sparkles" class="h-3.5 w-3.5 text-blue-600"></lucide-icon>
+              <div class="w-6 h-6 rounded-md bg-blue-100 dark:bg-blue-900/40 flex items-center justify-center">
+                <lucide-icon name="sparkles" class="h-3.5 w-3.5 text-blue-600 dark:text-blue-400"></lucide-icon>
               </div>
-              <span class="text-sm font-semibold text-gray-900">Generate with AI</span>
+              <span class="text-sm font-semibold text-gray-900 dark:text-gray-100">{{ 'DOCUMENT_EDITOR.GENERATE_WITH_AI' | translate }}</span>
             </div>
             <button
               (click)="closeGenerateCard()"
-              class="p-1 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+              class="p-1 rounded-md text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
             >
               <lucide-icon name="x" class="h-4 w-4"></lucide-icon>
             </button>
@@ -954,7 +1203,7 @@ import Quill from 'quill/core/quill';
               <textarea
                 #generatePromptInput
                 [(ngModel)]="generatePrompt"
-                placeholder="Describe the content you want to generate..."
+                [placeholder]="'DOCUMENT_EDITOR.GENERATE_PROMPT' | translate"
                 rows="3"
                 class="w-full text-sm border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-400 resize-none placeholder:text-gray-400"
                 (keydown.enter)="onGenerateKeydown($event)"
@@ -963,7 +1212,7 @@ import Quill from 'quill/core/quill';
                 <p class="text-[10px] text-gray-400">
                   @if (contextFiles().length > 0) {
                     <lucide-icon name="file-stack" class="h-3 w-3 inline-block mr-0.5 -mt-0.5"></lucide-icon>
-                    {{ contextFiles().length }} context file{{ contextFiles().length > 1 ? 's' : '' }} included
+                    {{ 'DOCUMENT_EDITOR.CONTEXT_FILES_HINT' | translate: { count: contextFiles().length } }}
                   }
                 </p>
                 <button
@@ -972,7 +1221,7 @@ import Quill from 'quill/core/quill';
                   class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-[#155347] text-white rounded-lg hover:bg-[#0d3d31] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   <lucide-icon name="sparkles" class="h-3.5 w-3.5"></lucide-icon>
-                  Generate
+                  {{ 'DOCUMENT_EDITOR.GENERATE_BTN' | translate }}
                 </button>
               </div>
             </div>
@@ -981,8 +1230,8 @@ import Quill from 'quill/core/quill';
           <!-- Loading State -->
           @if (generateLoading()) {
             <div class="flex flex-col items-center justify-center py-10 gap-3">
-              <lucide-icon name="loader-circle" class="h-6 w-6 text-blue-600 animate-spin"></lucide-icon>
-              <p class="text-xs text-gray-500">Generating content...</p>
+              <lucide-icon name="loader-circle" class="h-6 w-6 text-blue-600 dark:text-blue-400 animate-spin"></lucide-icon>
+              <p class="text-xs text-gray-500">{{ 'DOCUMENT_EDITOR.GENERATING' | translate }}</p>
             </div>
           }
 
@@ -997,7 +1246,7 @@ import Quill from 'quill/core/quill';
                 (click)="resetGenerateCard()"
                 class="px-3 py-1.5 text-xs text-gray-500 hover:text-gray-700 rounded-lg hover:bg-gray-100 transition-colors"
               >
-                Try again
+                {{ 'DOCUMENT_EDITOR.TRY_AGAIN' | translate }}
               </button>
             </div>
           }
@@ -1005,9 +1254,9 @@ import Quill from 'quill/core/quill';
           <!-- Result State -->
           @if (!generateLoading() && !generateError() && generateResult()) {
             <div class="flex-1 overflow-y-auto">
-              <div class="px-4 py-3 bg-blue-50/60">
-                <p class="text-[10px] font-semibold text-blue-500 uppercase tracking-widest mb-1.5">Generated Content</p>
-                <p class="text-sm text-gray-800 leading-relaxed whitespace-pre-wrap">{{ generateResult() }}</p>
+              <div class="px-4 py-3 bg-blue-50/60 dark:bg-blue-900/20">
+                <p class="text-[10px] font-semibold text-blue-500 uppercase tracking-widest mb-1.5">{{ 'DOCUMENT_EDITOR.GENERATED_CONTENT' | translate }}</p>
+                <p class="text-sm text-gray-800 dark:text-gray-200 leading-relaxed whitespace-pre-wrap">{{ generateResult() }}</p>
               </div>
             </div>
             <div class="px-4 py-3 border-t border-gray-100 flex items-center justify-end gap-2 shrink-0">
@@ -1015,7 +1264,7 @@ import Quill from 'quill/core/quill';
                 (click)="closeGenerateCard()"
                 class="px-3 py-1.5 text-xs text-gray-500 hover:text-gray-700 rounded-lg hover:bg-gray-100 transition-colors"
               >
-                Discard
+                {{ 'DOCUMENT_EDITOR.DISCARD' | translate }}
               </button>
               <button
                 (click)="copyGeneratedContent()"
@@ -1023,10 +1272,10 @@ import Quill from 'quill/core/quill';
               >
                 @if (generateCopied()) {
                   <lucide-icon name="check" class="h-3.5 w-3.5 text-green-600"></lucide-icon>
-                  <span>Copied!</span>
+                  <span>{{ 'DOCUMENT_EDITOR.COPIED' | translate }}</span>
                 } @else {
                   <lucide-icon name="clipboard" class="h-3.5 w-3.5"></lucide-icon>
-                  <span>Copy</span>
+                  <span>{{ 'DOCUMENT_EDITOR.COPY' | translate }}</span>
                 }
               </button>
               <button
@@ -1034,7 +1283,7 @@ import Quill from 'quill/core/quill';
                 class="px-3 py-1.5 text-xs bg-[#155347] text-white rounded-lg hover:bg-[#0d3d31] transition-colors flex items-center gap-1.5"
               >
                 <lucide-icon name="check" class="h-3.5 w-3.5"></lucide-icon>
-                <span>Insert</span>
+                <span>{{ 'DOCUMENT_EDITOR.INSERT' | translate }}</span>
               </button>
             </div>
           }
@@ -1082,7 +1331,9 @@ export class DocumentEditorComponent implements OnInit {
   private documentService = inject(DocumentService);
   private inviteService = inject(DocumentInviteService);
   private collaborationService = inject(CollaborationService);
+  private sanitizer = inject(DomSanitizer);
   private location = inject(Location);
+  private translateService = inject(TranslateService);
 
   // ID do documento atual
   documentId: number | null = null;
@@ -1093,14 +1344,31 @@ export class DocumentEditorComponent implements OnInit {
 
   showVersionHistory = signal(false);
   showComments = signal(false);
+
+  // Histórico de versões
+  documentVersions = signal<DocumentVersionDto[]>([]);
+  versionsLoading = signal(false);
+  versionsError = signal<string | null>(null);
+  versionPreview = signal<DocumentVersionDetailDto | null>(null);
+  versionPreviewLoading = signal(false);
+  versionDiff = signal<SafeHtml | null>(null);
+  diffViewMode = signal<'diff' | 'full'>('diff');
+  versionHasPrevious = signal(false);
   showShareModal = signal(false);
   showAIPanel = signal(false);
   showWipModal = signal(false);
   showMobileMenu = signal(false);
   isRestoreModalOpen = signal(false);
+  isRestoring = signal(false);
   versionToRestore = signal<number | null>(null);
   newComment = '';
   selectedVersions = signal<number[]>([]);
+  showCompareOverlay = signal(false);
+  compareLoading = signal(false);
+  compareOlderVersion = signal<DocumentVersionDetailDto | null>(null);
+  compareNewerVersion = signal<DocumentVersionDetailDto | null>(null);
+  compareDiffHtml = signal<SafeHtml | null>(null);
+  compareViewMode = signal<'diff' | 'side'>('diff');
   aiGenerating = signal(false);
   restoreConfirmed = false;
 
@@ -1155,6 +1423,7 @@ export class DocumentEditorComponent implements OnInit {
   // Team Owners/Admins recebem "Editor" via bypass no backend
   documentRole = signal<string>('Viewer');
   canEdit = computed(() => this.documentRole() === 'Editor');
+  isOwner = signal(false);
 
   // TODO: Implementar colaboração em tempo real
   collaborators: Collaborator[] = [];
@@ -1210,6 +1479,7 @@ export class DocumentEditorComponent implements OnInit {
         this.lastEdited.set(new Date(doc.updatedAt));
         this.lastEditedText.set(this.formatLastEdited(new Date(doc.updatedAt)));
         this.documentRole.set(doc.role || 'Viewer');
+        this.isOwner.set(doc.isOwner ?? false);
         this.isLoading.set(false);
 
         this.documentService.getComments(this.documentId!).subscribe((comments) => {
@@ -1451,11 +1721,11 @@ export class DocumentEditorComponent implements OnInit {
     const diffHours = Math.floor(diffMs / 3600000);
     const diffDays = Math.floor(diffMs / 86400000);
 
-    if (diffMins < 1) return 'Last edited just now';
-    if (diffMins < 60) return `Last edited ${diffMins} minute${diffMins > 1 ? 's' : ''} ago`;
-    if (diffHours < 24) return `Last edited ${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
-    if (diffDays === 1) return 'Last edited yesterday';
-    return `Last edited ${diffDays} days ago`;
+    if (diffMins < 1) return this.translateService.instant('DOCUMENT_EDITOR.LAST_EDITED_JUST_NOW');
+    if (diffMins < 60) return this.translateService.instant(diffMins === 1 ? 'DOCUMENT_EDITOR.LAST_EDITED_MINUTE' : 'DOCUMENT_EDITOR.LAST_EDITED_MINUTES', { count: diffMins });
+    if (diffHours < 24) return this.translateService.instant(diffHours === 1 ? 'DOCUMENT_EDITOR.LAST_EDITED_HOUR' : 'DOCUMENT_EDITOR.LAST_EDITED_HOURS', { count: diffHours });
+    if (diffDays === 1) return this.translateService.instant('DOCUMENT_EDITOR.LAST_EDITED_YESTERDAY');
+    return this.translateService.instant('DOCUMENT_EDITOR.LAST_EDITED_DAYS', { count: diffDays });
   }
 
   startEditingTitle(): void {
@@ -1504,10 +1774,10 @@ export class DocumentEditorComponent implements OnInit {
 
   private updateLastEdited(): void {
     this.lastEdited.set(new Date());
-    this.lastEditedText.set('Last edited just now');
+    this.lastEditedText.set(this.translateService.instant('DOCUMENT_EDITOR.LAST_EDITED_JUST_NOW'));
   }
 
-  onContentChange(content: string): void {
+  onContentChange(_content: string): void {
     // Função que é chamada quando o conteúdo do editor muda,
     // fica aqui para se for preciso fazer algo em tempo real
   }
@@ -1551,9 +1821,159 @@ export class DocumentEditorComponent implements OnInit {
   }
 
   toggleVersionHistory(): void {
-    this.showVersionHistory.update((v) => !v);
+    const opening = !this.showVersionHistory();
+    this.showVersionHistory.set(opening);
     this.showComments.set(false);
     this.showAIPanel.set(false);
+    if (opening && this.documentId) {
+      this.loadVersions();
+    }
+  }
+
+  loadVersions(): void {
+    if (!this.documentId) return;
+    this.versionsLoading.set(true);
+    this.versionsError.set(null);
+    this.documentService.getDocumentVersions(this.documentId).subscribe({
+      next: (versions) => {
+        this.documentVersions.set(versions);
+        this.versionsLoading.set(false);
+      },
+      error: (err) => {
+        this.versionsError.set(err.error?.message || 'Error loading versions.');
+        this.versionsLoading.set(false);
+      }
+    });
+  }
+
+  openVersionPreview(version: DocumentVersionDto, index: number): void {
+    if (!this.documentId) return;
+    this.versionPreviewLoading.set(true);
+    this.versionPreview.set(null);
+    this.versionDiff.set(null);
+
+    const versions = this.documentVersions();
+    const previousVersion = versions[index + 1]; // list is DESC, so index+1 is the prior version
+    const hasPrevious = !!previousVersion;
+    this.versionHasPrevious.set(hasPrevious);
+    this.diffViewMode.set(hasPrevious ? 'diff' : 'full');
+
+    const current$ = this.documentService.getDocumentVersionDetail(this.documentId, version.id);
+
+    if (hasPrevious) {
+      const previous$ = this.documentService.getDocumentVersionDetail(this.documentId, previousVersion.id);
+      forkJoin({ current: current$, previous: previous$ }).subscribe({
+        next: ({ current, previous }) => {
+          this.versionPreview.set(current);
+          const diffHtml = this.computeVersionDiff(previous.contentHtml, current.contentHtml);
+          this.versionDiff.set(this.sanitizer.bypassSecurityTrustHtml(diffHtml));
+          this.versionPreviewLoading.set(false);
+        },
+        error: () => this.versionPreviewLoading.set(false),
+      });
+    } else {
+      current$.subscribe({
+        next: (current) => {
+          this.versionPreview.set(current);
+          this.versionPreviewLoading.set(false);
+        },
+        error: () => this.versionPreviewLoading.set(false),
+      });
+    }
+  }
+
+  closeVersionPreview(): void {
+    this.versionPreview.set(null);
+    this.versionDiff.set(null);
+    this.versionHasPrevious.set(false);
+  }
+
+  safeHtml(html: string): SafeHtml {
+    return this.sanitizer.bypassSecurityTrustHtml(html);
+  }
+
+  private htmlToText(html: string): string {
+    const withBreaks = html
+      .replace(/<img[^>]*>/gi, '[image]\n')    // placeholder visível para imagens
+      .replace(/<\/p>/gi, '\n')
+      .replace(/<\/h[1-6]>/gi, '\n')
+      .replace(/<\/li>/gi, '\n')
+      .replace(/<br\s*\/?>/gi, '\n')
+      .replace(/<\/div>/gi, '\n');
+    const el = document.createElement('div');
+    el.innerHTML = withBreaks;
+    return (el.textContent || '').replace(/\n{3,}/g, '\n\n').trim();
+  }
+
+  private computeVersionDiff(oldHtml: string | null, newHtml: string | null): string {
+    const oldText = this.htmlToText(oldHtml ?? '');
+    const newText = this.htmlToText(newHtml ?? '');
+    const parts = diffWords(oldText, newText);
+
+    const esc = (s: string) =>
+      s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>');
+
+    let html = '<div style="font-size:15px;line-height:1.8;word-break:break-word;">';
+    let i = 0;
+    while (i < parts.length) {
+      const part = parts[i];
+      const next = parts[i + 1];
+      if (part.removed && next?.added) {
+        html += `<mark style="background:#fee2e2;color:#991b1b;text-decoration:line-through;border-radius:2px;padding:0 2px;">${esc(part.value)}</mark>`;
+        html += `<mark style="background:#fef9c3;color:#854d0e;border-radius:2px;padding:0 2px;">${esc(next.value)}</mark>`;
+        i += 2;
+      } else if (part.added) {
+        html += `<mark style="background:#dcfce7;color:#166534;border-radius:2px;padding:0 2px;">${esc(part.value)}</mark>`;
+        i++;
+      } else if (part.removed) {
+        html += `<mark style="background:#fee2e2;color:#991b1b;text-decoration:line-through;border-radius:2px;padding:0 2px;">${esc(part.value)}</mark>`;
+        i++;
+      } else {
+        html += esc(part.value);
+        i++;
+      }
+    }
+    html += '</div>';
+    return html;
+  }
+
+  formatVersionSummary(summary: string): string {
+    if (!summary) return '';
+    if (summary.startsWith('RESTORED_BY|')) {
+      const name = summary.substring('RESTORED_BY|'.length);
+      return this.translateService.instant('DOCUMENT_EDITOR.SUMMARY_RESTORED_BY', { name });
+    }
+    if (summary.startsWith('Session by ')) {
+      const name = summary.slice('Session by '.length);
+      return this.translateService.instant('DOCUMENT_EDITOR.SESSION_BY') + ' ' + name;
+    }
+    if (summary.startsWith('RESTORED_BY|')) {
+      const name = summary.substring('RESTORED_BY|'.length);
+      return this.translateService.instant('DOCUMENT_EDITOR.SUMMARY_RESTORED_BY', { name });
+    }
+    return summary;
+  }
+
+  formatVersionDate(dateStr: string): string {
+    const date = new Date(dateStr);
+    return date.toLocaleString('pt-PT', {
+      day: '2-digit', month: 'short', year: 'numeric',
+      hour: '2-digit', minute: '2-digit'
+    });
+  }
+
+  closeCompareOverlay(): void {
+    this.showCompareOverlay.set(false);
+    this.compareOlderVersion.set(null);
+    this.compareNewerVersion.set(null);
+    this.compareDiffHtml.set(null);
+    this.selectedVersions.set([]);
+  }
+
+  getVersionNumber(id: number): number {
+    const versions = this.documentVersions();
+    const index = versions.findIndex((v) => v.id === id);
+    return index === -1 ? 0 : versions.length - index;
   }
 
   toggleComments(): void {
@@ -1572,13 +1992,41 @@ export class DocumentEditorComponent implements OnInit {
   }
 
   handleCompareVersions(): void {
-    if (this.selectedVersions().length === 2) {
-      this.router.navigate(['/version-history']);
-    }
+    if (!this.documentId || this.selectedVersions().length !== 2) return;
+
+    const allVersions = this.documentVersions();
+    const [idA, idB] = this.selectedVersions();
+
+    // Determinar qual é a versão mais antiga (índice maior = mais antiga na lista DESC)
+    const idxA = allVersions.findIndex(v => v.id === idA);
+    const idxB = allVersions.findIndex(v => v.id === idB);
+    const olderVersionId = idxA > idxB ? idA : idB;
+    const newerVersionId = idxA > idxB ? idB : idA;
+
+    this.compareLoading.set(true);
+    this.compareOlderVersion.set(null);
+    this.compareNewerVersion.set(null);
+    this.compareDiffHtml.set(null);
+    this.compareViewMode.set('diff');
+    this.showCompareOverlay.set(true);
+
+    const older$ = this.documentService.getDocumentVersionDetail(this.documentId, olderVersionId);
+    const newer$ = this.documentService.getDocumentVersionDetail(this.documentId, newerVersionId);
+
+    forkJoin({ older: older$, newer: newer$ }).subscribe({
+      next: ({ older, newer }) => {
+        this.compareOlderVersion.set(older);
+        this.compareNewerVersion.set(newer);
+        const diffHtml = this.computeVersionDiff(older.contentHtml, newer.contentHtml);
+        this.compareDiffHtml.set(this.sanitizer.bypassSecurityTrustHtml(diffHtml));
+        this.compareLoading.set(false);
+      },
+      error: () => this.compareLoading.set(false),
+    });
   }
 
-  handleRestore(versionNumber: number): void {
-    this.versionToRestore.set(versionNumber);
+  handleRestore(versionId: number): void {
+    this.versionToRestore.set(versionId);
     this.isRestoreModalOpen.set(true);
   }
 
@@ -1588,10 +2036,22 @@ export class DocumentEditorComponent implements OnInit {
   }
 
   confirmRestore(): void {
-    if (this.restoreConfirmed) {
-      this.closeRestoreModal();
-      // Handle restore logic
-    }
+    if (!this.restoreConfirmed || !this.versionToRestore() || !this.documentId) return;
+
+    this.isRestoring.set(true);
+    this.documentService.restoreDocumentVersion(this.documentId, this.versionToRestore()!).subscribe({
+      next: () => {
+        this.isRestoring.set(false);
+        this.closeRestoreModal();
+        this.closeVersionPreview();
+        this.showVersionHistory.set(false);
+        this.collaborationService.reconnectAfterRestore();
+      },
+      error: (err) => {
+        this.isRestoring.set(false);
+        console.error('Error restoring version:', err);
+      }
+    });
   }
 
   generateSummary(): void {
@@ -1633,7 +2093,7 @@ export class DocumentEditorComponent implements OnInit {
     });
   }
 
-  handleAIAction(actionId: number): void {
+  handleAIAction(_actionId: number): void {
     this.aiGenerating.set(true);
     setTimeout(() => this.aiGenerating.set(false), 2000);
   }

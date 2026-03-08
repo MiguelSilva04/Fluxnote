@@ -10,6 +10,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LucideAngularModule } from 'lucide-angular';
+import { TranslateModule } from '@ngx-translate/core';
 import { TourService } from '../../../services/tour.service';
 import { TourPosition, ScreenPosition } from './tour.models';
 
@@ -28,7 +29,7 @@ interface TooltipPos {
 @Component({
   selector: 'app-tour-overlay',
   standalone: true,
-  imports: [CommonModule, LucideAngularModule],
+  imports: [CommonModule, LucideAngularModule, TranslateModule],
   template: `
     @if (tourService.isActive()) {
       <!-- Overlay SVG com recorte de spotlight -->
@@ -39,12 +40,7 @@ interface TooltipPos {
         (click)="onBackdropClick()"
         role="dialog"
         aria-modal="true"
-        [attr.aria-label]="
-          'Guided tour step ' +
-          (tourService.currentStepIndex() + 1) +
-          ' of ' +
-          tourService.totalSteps()
-        "
+        [attr.aria-label]="'TOUR.ARIA_LABEL' | translate:{ current: tourService.currentStepIndex() + 1, total: tourService.totalSteps() }"
       >
         <svg
           class="absolute inset-0 w-full h-full"
@@ -97,10 +93,10 @@ interface TooltipPos {
           <div [class]="arrowClass()"></div>
 
           <div
-            class="bg-white rounded-xl shadow-2xl border border-gray-200 overflow-hidden"
+            class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 overflow-hidden"
           >
             <!-- Barra de progresso -->
-            <div class="h-1 bg-gray-100">
+            <div class="h-1 bg-gray-100 dark:bg-gray-700">
               <div
                 class="h-full bg-primary transition-all duration-500 ease-out rounded-r"
                 [style.width.%]="tourService.progress()"
@@ -110,13 +106,13 @@ interface TooltipPos {
             <!-- Conteúdo -->
             <div class="p-5">
               <div class="flex items-start justify-between mb-1">
-                <h3 class="text-base font-semibold text-gray-900">
+                <h3 class="text-base font-semibold text-gray-900 dark:text-gray-100">
                   {{ tourService.currentStep()?.title }}
                 </h3>
                 <button
                   (click)="tourService.skip()"
-                  class="text-gray-400 hover:text-gray-600 transition-colors p-1 rounded-md hover:bg-gray-100 -mt-1 -mr-1"
-                  aria-label="Skip tour"
+                  class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors p-1 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 -mt-1 -mr-1"
+                  [attr.aria-label]="'TOUR.SKIP' | translate"
                 >
                   <lucide-icon name="x" [size]="16"></lucide-icon>
                 </button>
@@ -124,25 +120,24 @@ interface TooltipPos {
 
               <p
                 [id]="'tour-desc-' + tourService.currentStepIndex()"
-                class="text-sm text-gray-600 leading-relaxed mb-4"
+                class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed mb-4"
               >
                 {{ tourService.currentStep()?.description }}
               </p>
 
               <!-- Rodapé -->
               <div class="flex items-center justify-between">
-                <span class="text-xs text-gray-400 font-medium">
-                  {{ tourService.currentStepIndex() + 1 }} of
-                  {{ tourService.totalSteps() }}
+                <span class="text-xs text-gray-400 dark:text-gray-500 font-medium">
+                  {{ 'TOUR.STEP_OF' | translate:{ current: tourService.currentStepIndex() + 1, total: tourService.totalSteps() } }}
                 </span>
 
                 <div class="flex items-center gap-2">
                   @if (!tourService.isFirstStep()) {
                     <button
                       (click)="tourService.previous()"
-                      class="px-3 py-1.5 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+                      class="px-3 py-1.5 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
                     >
-                      Previous
+                      {{ 'TOUR.PREVIOUS' | translate }}
                     </button>
                   }
 
@@ -151,14 +146,14 @@ interface TooltipPos {
                       (click)="tourService.finish()"
                       class="px-4 py-1.5 text-sm font-medium text-white bg-primary hover:bg-primary/90 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
                     >
-                      Finish
+                      {{ 'TOUR.FINISH' | translate }}
                     </button>
                   } @else {
                     <button
                       (click)="tourService.next()"
                       class="inline-flex items-center px-4 py-1.5 text-sm font-medium text-white bg-primary hover:bg-primary/90 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
                     >
-                      Next
+                      {{ 'TOUR.NEXT' | translate }}
                       <lucide-icon
                         name="arrow-right"
                         [size]="14"
@@ -222,6 +217,10 @@ interface TooltipPos {
         border-left: 8px solid white;
         filter: drop-shadow(1px 0 1px rgba(0, 0, 0, 0.05));
       }
+      :global(.dark) .arrow-top { border-bottom-color: #1f2937; }
+      :global(.dark) .arrow-bottom { border-top-color: #1f2937; }
+      :global(.dark) .arrow-left { border-right-color: #1f2937; }
+      :global(.dark) .arrow-right { border-left-color: #1f2937; }
     `,
   ],
 })

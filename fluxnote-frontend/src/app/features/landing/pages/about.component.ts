@@ -7,13 +7,13 @@ import { LandingHeaderComponent, LandingFooterComponent } from '../components';
   standalone: true,
   imports: [CommonModule, LandingHeaderComponent, LandingFooterComponent],
   template: `
-    <div class="min-h-screen bg-white">
+    <div class="min-h-screen bg-white dark:bg-gray-900">
       <app-landing-header></app-landing-header>
 
-      <section class="py-20 bg-gradient-to-br from-[#155347]/10 to-white">
+      <section class="py-20 bg-gradient-to-br from-[#155347]/10 to-white dark:to-gray-900">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div class="text-center mb-16">
-            <h1 class="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
+            <h1 class="text-4xl lg:text-5xl font-bold text-gray-900 dark:text-gray-100 mb-6">
               About Fluxnote
             </h1>
             <p class="text-xl text-gray-600 max-w-3xl mx-auto">
@@ -24,17 +24,17 @@ import { LandingHeaderComponent, LandingFooterComponent } from '../components';
 
           <div class="grid lg:grid-cols-2 gap-12 items-center">
             <div>
-              <h2 class="text-3xl font-bold text-gray-900 mb-6">Our mission</h2>
-              <p class="text-gray-700 mb-6 text-lg">
+              <h2 class="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-6">Our mission</h2>
+              <p class="text-gray-700 dark:text-gray-300 mb-6 text-lg">
                 Democratize access to intelligent collaboration tools, enabling teams of any size to
                 create professional-quality documents with the help of AI.
               </p>
-              <p class="text-gray-700 text-lg">
+              <p class="text-gray-700 dark:text-gray-300 text-lg">
                 We believe that when people have the right tools, they can focus on what truly matters:
                 their ideas and creativity.
               </p>
             </div>
-            <div class="bg-white rounded-2xl shadow-lg p-4">
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-4">
               <img
                 src="assets/ourMission.png"
                 alt="Fluxnote team at work"
@@ -45,13 +45,13 @@ import { LandingHeaderComponent, LandingFooterComponent } from '../components';
         </div>
       </section>
 
-      <section class="py-20 bg-white">
+      <section class="py-20 bg-white dark:bg-gray-900">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div class="text-center mb-16">
-            <h2 class="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+            <h2 class="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-gray-100 mb-4">
               Our values
             </h2>
-            <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+            <p class="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
               These values guide everything we do—from product development to customer support.
             </p>
           </div>
@@ -60,10 +60,10 @@ import { LandingHeaderComponent, LandingFooterComponent } from '../components';
             @for (value of values; track value.title) {
               <div class="text-center">
                 <div class="text-4xl mb-4">{{ value.icon }}</div>
-                <h3 class="text-xl font-semibold text-gray-900 mb-3">
+                <h3 class="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-3">
                   {{ value.title }}
                 </h3>
-                <p class="text-gray-600">
+                <p class="text-gray-600 dark:text-gray-400">
                   {{ value.description }}
                 </p>
               </div>
@@ -72,20 +72,20 @@ import { LandingHeaderComponent, LandingFooterComponent } from '../components';
         </div>
       </section>
 
-      <section class="py-20 bg-gray-50">
+      <section class="py-20 bg-gray-50 dark:bg-gray-800">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div class="text-center mb-16">
-            <h2 class="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+            <h2 class="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-gray-100 mb-4">
               Meet our team
             </h2>
-            <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+            <p class="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
               Talented, dedicated people working every day to make Fluxnote better.
             </p>
           </div>
 
           <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             @for (member of teamMembers; track member.name) {
-              <div class="bg-white rounded-2xl shadow-lg p-6 text-center hover:shadow-xl transition-shadow">
+              <div class="bg-white dark:bg-gray-700 rounded-2xl shadow-lg p-6 text-center hover:shadow-xl transition-shadow">
                 <div class="w-24 h-24 rounded-full overflow-hidden mx-auto mb-4">
                   <img
                     [src]="member.image"
@@ -93,13 +93,13 @@ import { LandingHeaderComponent, LandingFooterComponent } from '../components';
                     class="w-full h-full object-cover"
                   />
                 </div>
-                <h3 class="text-xl font-semibold text-gray-900 mb-2">
+                <h3 class="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">
                   {{ member.name }}
                 </h3>
                 <p class="text-[#155347] font-medium mb-3">
                   {{ member.role }}
                 </p>
-                <p class="text-gray-600 text-sm">
+                <p class="text-gray-600 dark:text-gray-400 text-sm">
                   {{ member.description }}
                 </p>
               </div>
@@ -108,13 +108,13 @@ import { LandingHeaderComponent, LandingFooterComponent } from '../components';
         </div>
       </section>
 
-      <section class="py-20 bg-white">
+      <section class="py-20 bg-white dark:bg-gray-900">
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div class="text-center mb-16">
-            <h2 class="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+            <h2 class="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-gray-100 mb-4">
               Our journey
             </h2>
-            <p class="text-xl text-gray-600">
+            <p class="text-xl text-gray-600 dark:text-gray-400">
               From the first idea to today—see how Fluxnote has evolved.
             </p>
           </div>
@@ -126,16 +126,16 @@ import { LandingHeaderComponent, LandingFooterComponent } from '../components';
               @for (milestone of milestones; track milestone.year) {
                 <div class="relative flex items-start">
                   <div class="absolute left-6 w-4 h-4 bg-[#155347] rounded-full border-4 border-white shadow-lg"></div>
-                  <div class="ml-16 bg-gray-50 rounded-2xl p-6">
+                  <div class="ml-16 bg-gray-50 dark:bg-gray-800 rounded-2xl p-6">
                     <div class="flex items-center mb-3">
                       <span class="text-sm font-semibold text-[#155347] bg-[#155347]/15 px-3 py-1 rounded-full">
                         {{ milestone.year }}
                       </span>
                     </div>
-                    <h3 class="text-xl font-bold text-gray-900 mb-2">
+                    <h3 class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2">
                       {{ milestone.title }}
                     </h3>
-                    <p class="text-gray-700">
+                    <p class="text-gray-700 dark:text-gray-300">
                       {{ milestone.description }}
                     </p>
                   </div>

@@ -1,5 +1,6 @@
 using Fluxnote.Backend.Data;
 using Fluxnote.Backend.Dtos.Documents;
+using Fluxnote.Backend.Hubs;
 using Fluxnote.Backend.Models;
 using Fluxnote.Backend.Services.AI;
 using Fluxnote.Backend.Services.Storage;
@@ -7,6 +8,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
@@ -63,6 +65,7 @@ namespace Fluxnote.Backend.Controllers
         private readonly IAIService _aiService;
         private readonly IStorageService _storageService;
         private readonly ITextExtractionService _textExtractionService;
+        private readonly IHubContext<DocumentHub> _hubContext;
 
         /// <summary>
         /// Limite de documentos para o plano Free.
@@ -82,13 +85,15 @@ namespace Fluxnote.Backend.Controllers
             UserManager<User> userManager,
             IAIService aiService,
             IStorageService storageService,
-            ITextExtractionService textExtractionService)
+            ITextExtractionService textExtractionService,
+            IHubContext<DocumentHub> hubContext)
         {
             _context = context;
             _userManager = userManager;
             _aiService = aiService;
             _storageService = storageService;
             _textExtractionService = textExtractionService;
+            _hubContext = hubContext;
         }
 
         /// <summary>
@@ -903,7 +908,8 @@ namespace Fluxnote.Backend.Controllers
                 IsDeleted = document.IsDeleted,
                 Content = document.Content != null ? System.Text.Encoding.UTF8.GetString(document.Content) : null,
                 PlainText = document.PlainText,
-                Role = effectiveRole
+                Role = effectiveRole,
+                IsOwner = isOwner
             };
 
             return Ok(dto);
@@ -1034,7 +1040,8 @@ namespace Fluxnote.Backend.Controllers
                 IsDeleted = document.IsDeleted,
                 Content = document.Content != null ? System.Text.Encoding.UTF8.GetString(document.Content) : null,
                 PlainText = document.PlainText,
-                Role = effectiveRole
+                Role = effectiveRole,
+                IsOwner = isOwner
             };
 
             return Ok(dto);
@@ -1633,5 +1640,144 @@ namespace Fluxnote.Backend.Controllers
             return CreatedAtAction(nameof(GetComments), new { id = comment.DocumentId }, result);
         }
 
+
+        // ─────────────────────────────────────────────────────────
+        // Histórico de versões
+        // ─────────────────────────────────────────────────────────
+
+        /// <summary>
+        /// Lista as versões de um documento (mais recente → mais antiga).
+        /// Acessível a Owner, TeamAdmin e Editores do documento.
+        /// </summary>
+        [HttpGet("{id}/versions")]
+        public async Task<ActionResult<IEnumerable<DocumentVersionDto>>> GetVersions(int id)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId is null) return Unauthorized(new { message = "User not authenticated." });
+
+            if (!await HasEditorAccess(userId, id)) return Forbid();
+
+            var versions = await _context.DocumentVersion
+                .Where(v => v.DocumentId == id)
+                .OrderByDescending(v => v.CreatedAt)
+                .Select(v => new DocumentVersionDto
+                {
+                    Id = v.Id,
+                    DocumentId = v.DocumentId,
+                    AuthorName = v.AuthorName,
+                    CreatedAt = v.CreatedAt,
+                    Summary = v.Summary
+                })
+                .ToListAsync();
+
+            return Ok(versions);
+        }
+
+        /// <summary>
+        /// Obtém o detalhe de uma versão específica, incluindo conteúdo HTML para visualização.
+        /// Acessível a Owner, TeamAdmin e Editores do documento.
+        /// </summary>
+        [HttpGet("{id}/versions/{versionId}")]
+        public async Task<ActionResult<DocumentVersionDetailDto>> GetVersionDetail(int id, int versionId)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId is null) return Unauthorized(new { message = "User not authenticated." });
+
+            if (!await HasEditorAccess(userId, id)) return Forbid();
+
+            var version = await _context.DocumentVersion
+                .FirstOrDefaultAsync(v => v.Id == versionId && v.DocumentId == id);
+
+            if (version is null) return NotFound(new { message = "Version not found." });
+
+            return Ok(new DocumentVersionDetailDto
+            {
+                Id = version.Id,
+                DocumentId = version.DocumentId,
+                AuthorName = version.AuthorName,
+                CreatedAt = version.CreatedAt,
+                Summary = version.Summary,
+                ContentHtml = version.ContentHtml is { Length: > 0 }
+                    ? System.Text.Encoding.UTF8.GetString(version.ContentHtml)
+                    : null
+            });
+        }
+
+        /// <summary>
+        /// Restaura o conteúdo do documento para uma versão anterior.
+        /// Apenas o Owner da equipa pode executar esta operação.
+        /// Cria uma nova entrada de versão com o conteúdo restaurado e notifica os clientes via SignalR.
+        /// </summary>
+        [HttpPost("{id}/versions/{versionId}/restore")]
+        public async Task<IActionResult> RestoreVersion(int id, int versionId)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId is null) return Unauthorized(new { message = "User not authenticated." });
+
+            var doc = await _context.Document
+                .Include(d => d.Team)
+                    .ThenInclude(t => t.Members)
+                .FirstOrDefaultAsync(d => d.Id == id && !d.IsDeleted);
+
+            if (doc is null) return NotFound(new { message = "Document not found." });
+
+            var member = doc.Team.Members.FirstOrDefault(m => m.UserId == userId);
+            if (member is null || member.Role != TeamRole.Owner)
+                return StatusCode(403, new { message = "Only the team owner can restore versions." });
+
+            var version = await _context.DocumentVersion
+                .FirstOrDefaultAsync(v => v.Id == versionId && v.DocumentId == id);
+
+            if (version is null) return NotFound(new { message = "Version not found." });
+
+            var user = await _context.Users.FindAsync(userId);
+            var authorName = user?.FullName ?? user?.UserName ?? "Unknown";
+
+            doc.YDocSnapshot = version.YDocSnapshot;
+            doc.Content = version.ContentHtml;
+            doc.UpdatedAt = DateTime.UtcNow;
+
+            _context.DocumentVersion.Add(new DocumentVersion
+            {
+                DocumentId = id,
+                AuthorId = userId,
+                AuthorName = authorName,
+                CreatedAt = DateTime.UtcNow,
+                Summary = $"RESTORED_BY|{authorName}",
+                YDocSnapshot = version.YDocSnapshot,
+                ContentHtml = version.ContentHtml
+            });
+
+            await _context.SaveChangesAsync();
+
+            await _hubContext.Clients.Group($"doc-{id}").SendAsync("DocumentRestored");
+
+            return NoContent();
+        }
+
+        /// <summary>
+        /// Verifica se o utilizador tem acesso de editor ao documento
+        /// (Owner, TeamAdmin ou Editor explícito via DocumentPermission).
+        /// </summary>
+        private async Task<bool> HasEditorAccess(string userId, int documentId)
+        {
+            var doc = await _context.Document
+                .Include(d => d.Team)
+                    .ThenInclude(t => t.Members)
+                .Include(d => d.Permissions)
+                    .ThenInclude(p => p.TeamMember)
+                .FirstOrDefaultAsync(d => d.Id == documentId && !d.IsDeleted);
+
+            if (doc is null) return false;
+
+            var member = doc.Team.Members.FirstOrDefault(m => m.UserId == userId);
+            if (member is null) return false;
+
+            if (member.Role >= TeamRole.TeamAdmin) return true;
+
+            return doc.Permissions.Any(p =>
+                p.TeamMember.UserId == userId &&
+                p.Role == DocumentRole.Editor);
+        }
     }
 }

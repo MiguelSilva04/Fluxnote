@@ -116,3 +116,49 @@
   :host ::ng-deep .ql-editor .ql-align-justify {
     text-align: justify;
   }
+
+  /* ── Dark mode overrides for Quill editor ── */
+
+  :host-context(.dark) ::ng-deep .ql-editor {
+    color: #e5e7eb; /* gray-200 */
+  }
+
+  :host-context(.dark) ::ng-deep .ql-editor h1 {
+    color: #f3f4f6; /* gray-100 */
+  }
+
+  :host-context(.dark) ::ng-deep .ql-editor h2 {
+    color: #e5e7eb; /* gray-200 */
+  }
+
+  :host-context(.dark) ::ng-deep .ql-editor h3 {
+    color: #d1d5db; /* gray-300 */
+  }
+
+  :host-context(.dark) ::ng-deep .ql-editor blockquote {
+    color: #9ca3af; /* gray-400 */
+    border-left-color: #2dd4bf; /* teal-400 for visibility */
+  }
+
+  :host-context(.dark) ::ng-deep .ql-editor pre {
+    background-color: #111827; /* gray-900 */
+    color: #e5e7eb;
+  }
+
+  :host-context(.dark) ::ng-deep .ql-editor a {
+    color: #4ade80; /* green-400, matches active toolbar accent */
+  }
+
+  :host ::ng-deep .ql-editor.ql-blank::before {
+    left: 3rem;
+    right: 3rem;
+  }
+
+  /* Safety net: hide placeholder if ql-blank class was not removed in time */
+  :host ::ng-deep .ql-editor:not(.ql-blank)::before {
+    content: none;
+  }
+
+  :host-context(.dark) ::ng-deep .ql-editor.ql-blank::before {
+    color: #6b7280; /* gray-500 — placeholder text */
+  }
