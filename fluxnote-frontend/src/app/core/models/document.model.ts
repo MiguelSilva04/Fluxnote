@@ -64,17 +64,6 @@ export interface Version {
   timestamp: string;
 }
 
-export interface Comment {
-  id: number;
-  author: string;
-  avatar: string;
-  color: string;
-  time: string;
-  text: string;
-  replies: Comment[];
-  resolved?: boolean;
-}
-
 export interface AISuggestion {
   id: number;
   title: string;
@@ -105,4 +94,29 @@ export interface DocumentVersionDto {
 /** DTO para visualização de uma versão específica (inclui conteúdo HTML) */
 export interface DocumentVersionDetailDto extends DocumentVersionDto {
   contentHtml: string | null;
+}
+
+export interface CommentDto {
+  id: number;
+  documentId: number;
+  userId?: string;
+  createdByName?: string;
+  createdByColor?: string;
+  content: string;
+  createdAt: string;
+  rangeIndex?: number;
+  rangeLength?: number; //range 
+  replies: CommentDto[];
+  resolved?: boolean;
+  parentCommentId?: number;
+}
+
+export interface CreateCommentDto {
+  userId?: string;
+  documentId?: number;
+  createdByColor?: string;
+  content: string;
+  rangeIndex?: number;
+  rangeLength?: number;
+  parentCommentId?: number;
 }

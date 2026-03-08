@@ -36,6 +36,10 @@ namespace Fluxnote.Backend.Controllers
     ///     <item><term>GET</term><description>/trash - Listar documentos na lixeira</description></item>
     ///     <item><term>POST</term><description>/{id}/restore - Restaurar da lixeira</description></item>
     ///     <item><term>DELETE</term><description>/{id}/permanent - Eliminar permanentemente</description></item>
+    ///     <item><term>POST</term><description>/{id}/summary - Gerar resumo com IA</description></item>
+    ///     <item><term>POST</term><description>/{id}/duplicate - Duplicar documento</description></item>
+    ///     <item><term>GET</term><description>/{id}/comments - Listar comentários de um documento</description></item>
+    ///     <item><term>POST</term><description>/{id}/comments - Criar novo comentário</description></item>
     /// </list>
     ///
     /// <b>Regras de Negócio:</b>
@@ -1502,6 +1506,140 @@ namespace Fluxnote.Backend.Controllers
 
             return Ok(new { snapshot = (string?)null });
         }
+
+        // GET /api/documents/{id}/comments
+        // Devolve os comentários associados ao documento, ordenados por data de criação
+        [HttpGet("{id}/comments")]
+        public async Task<ActionResult<IEnumerable<DocumentCommentDto>>> GetComments(int id)
+        {
+            var comments = await _context.DocumentComments
+                .Where(c => c.DocumentId == id && c.ParentCommentId == null)
+                .Include(c => c.CreatedBy)
+                .Include(c => c.CommentReplies)
+                    .ThenInclude(r => r.CreatedBy)
+                .OrderBy(c => c.CreatedAt)
+                .Select(c => new DocumentCommentDto
+                {
+                    Id = c.Id,
+                    DocumentId = c.DocumentId,
+                    UserId = c.UserId,
+                    ParentCommentId = c.ParentCommentId,
+
+                    CreatedByName = c.CreatedBy.FullName ?? c.CreatedBy.Email ?? string.Empty,
+                    CreatedByColor = c.CreatedByColor,
+
+                    Content = c.Content,
+                    CreatedAt = c.CreatedAt.ToString("o"),
+
+                    RangeIndex = c.RangeIndex,
+                    RangeLength = c.RangeLength,
+                    Resolved = c.Resolved,
+
+                    Replies = c.CommentReplies
+                        .OrderBy(r => r.CreatedAt)
+                        .Select(r => new DocumentCommentDto
+                        {
+                            Id = r.Id,
+                            DocumentId = r.DocumentId,
+                            UserId = r.UserId,
+                            ParentCommentId = r.ParentCommentId,
+
+                            CreatedByName = r.CreatedBy.FullName ?? r.CreatedBy.Email ?? string.Empty,
+                            CreatedByColor = r.CreatedByColor,
+
+                            Content = r.Content,
+                            CreatedAt = r.CreatedAt.ToString("o"),
+
+                            RangeIndex = r.RangeIndex,
+                            RangeLength = r.RangeLength,
+                            Resolved = r.Resolved
+                        })
+                        .ToList()
+                })
+                .ToListAsync();
+
+            return Ok(comments);
+        }
+
+        // POST /api/documents/{id}/comments
+        ///
+        /// <summary>
+        /// Cria um novo comentário para o documento. Pode ser um comentário raiz ou uma resposta
+        /// a outro comentário (se ParentCommentId for fornecido). O campo RangeIndex e RangeLength
+        /// permitem associar o comentário a um trecho específico do conteúdo do documento.
+        /// </summary>
+        /// <param name="id">ID do documento.</param>
+        /// <param name="dto">Dados do comentário a criar (CreateDocumentCommentDto).</param>
+        /// <returns>
+        /// <list type="bullet">
+        ///     <item><b>201 Created:</b> Comentário criado (DocumentComment
+        /// DTO com detalhes do comentário).</item>
+        ///    <item><b>400 Bad Request:</b> Dados inválidos (ex: Document ID mismatch, User not found, Parent comment not found).</item>
+        ///   </list>
+        /// </returns>
+        /// <remarks>
+        /// <b>Validação:</b> O ID do documento no URL deve corresponder ao DocumentId no DTO. O UserId deve existir. Se ParentCommentId for fornecido, deve existir um comentário com esse ID.<br/>
+        /// <b>Acesso:</b> Requer que o utilizador seja membro da equipa
+        /// do documento (qualquer role pode comentar).
+        /// </remarks>
+        [HttpPost("{id}/comments")]
+        public async Task<ActionResult<DocumentCommentDto>> CreateComment(
+            int id,
+            [FromBody] CreateDocumentCommentDto dto)
+        {
+            // validação básica
+            if (id != dto.DocumentId)
+                return BadRequest("Document ID mismatch.");
+
+            var user = await _context.Users.FindAsync(dto.UserId);
+            if (user == null)
+                return BadRequest("User not found.");
+
+            DocumentComment? parent = null;
+            if (dto.ParentCommentId.HasValue)
+            {
+                parent = await _context.DocumentComments.FindAsync(dto.ParentCommentId.Value);
+                if (parent == null)
+                    return BadRequest("Parent comment not found.");
+            }
+
+            var comment = new DocumentComment
+            {
+                DocumentId = dto.DocumentId,
+                UserId = dto.UserId,
+                CreatedBy = user,
+                Content = dto.Content,
+                RangeIndex = dto.RangeIndex,
+                RangeLength = dto.RangeLength,
+                CreatedByColor = dto.CreatedByColor ?? "#FFD700", // se tiveres campo color
+                CreatedAt = DateTime.UtcNow,
+                Resolved = false,
+                ParentCommentId = parent?.Id,
+                ParentComment = parent
+            };
+
+            _context.DocumentComments.Add(comment);
+            await _context.SaveChangesAsync();
+
+            // Devolve como DTO
+            var result = new DocumentCommentDto
+            {
+                Id = comment.Id,
+                DocumentId = comment.DocumentId,
+                UserId = comment.UserId,
+                CreatedByName = user.FullName ?? user.Email ?? string.Empty,
+                CreatedByColor = comment.CreatedByColor,
+                Content = comment.Content,
+                CreatedAt = comment.CreatedAt.ToString("o"),
+                RangeIndex = comment.RangeIndex,
+                RangeLength = comment.RangeLength,
+                Resolved = comment.Resolved, 
+                ParentCommentId = parent?.Id,
+            };
+
+            return CreatedAtAction(nameof(GetComments), new { id = comment.DocumentId }, result);
+        }
+
 
         // ─────────────────────────────────────────────────────────
         // Histórico de versões

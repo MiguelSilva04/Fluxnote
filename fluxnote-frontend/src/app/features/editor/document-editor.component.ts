@@ -3,7 +3,7 @@ import { CommonModule, Location } from '@angular/common';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
-import { LucideAngularModule } from 'lucide-angular';
+import { LucideAngularModule, ThumbsDown } from 'lucide-angular';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import {
   ButtonComponent,
@@ -12,8 +12,10 @@ import {
 } from '../../shared/components/ui';
 import { DocumentShareModalComponent } from '../../shared/components/document-share-modal/document-share-modal.component';
 import { DocumentService, DocumentInviteService, CollaborationService } from '../../core/services';
-import { Collaborator, Version, Comment, AISuggestion, DocumentInviteDto, DocumentContextDto, DocumentVersionDto, DocumentVersionDetailDto } from '../../core/models';
+import { Collaborator, Version, CommentDto, CreateCommentDto, AISuggestion, DocumentInviteDto, DocumentContextDto, DocumentVersionDto, DocumentVersionDetailDto } from '../../core/models';
 import { TextEditorComponent } from './components/text-editor.component';
+import { AuthService } from '../../core/services';
+import Quill from 'quill/core/quill';
 
 import { forkJoin } from 'rxjs';
 import { diffWords } from 'diff';
@@ -122,7 +124,7 @@ import { diffWords } from 'diff';
                 variant="outline"
                 size="sm"
                 [leftIcon]="true"
-                (onClick)="showWipModal.set(true)" customClass="hidden md:inline-flex"
+                (onClick)="toggleComments()" customClass="hidden md:inline-flex"
               >
                 <lucide-icon leftIcon name="message-square" class="h-4 w-4"></lucide-icon>
                 {{ 'DOCUMENT_EDITOR.COMMENTS' | translate }}
@@ -261,6 +263,20 @@ import { diffWords } from 'diff';
                 >
                   <lucide-icon name="sparkles" class="h-3.5 w-3.5 text-purple-300"></lucide-icon>
                   {{ 'DOCUMENT_EDITOR.IMPROVE_WITH_AI' | translate }}
+                </button>
+                <button
+                  (mousedown)="addCommentSelection($event)"
+                  class="flex items-center gap-1.5 px-2 py-1 rounded-md hover:bg-white/20 transition-colors text-xs font-medium"
+                >
+                  <lucide-icon name="message-square" class="h-3.5 w-3.5 text-blue-300"></lucide-icon>
+                  Add comment
+                </button>
+                <button
+                  (mousedown)="addCommentSelection($event)"
+                  class="flex items-center gap-1.5 px-2 py-1 rounded-md hover:bg-white/20 transition-colors text-xs font-medium"
+                >
+                  <lucide-icon name="message-square" class="h-3.5 w-3.5 text-blue-300"></lucide-icon>
+                  Add comment
                 </button>
               </div>
             }
@@ -509,14 +525,14 @@ import { diffWords } from 'diff';
               <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
                 <div class="flex items-center gap-2">
                   <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100">{{ 'DOCUMENT_EDITOR.COMMENTS_TITLE' | translate }}</h3>
-                  <app-badge customClass="bg-red-500 text-white">2</app-badge>
+                  <app-badge customClass="bg-red-500 text-white">{{ comments.length }}</app-badge>
                 </div>
                 <button (click)="showComments.set(false)" class="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded">
                   <lucide-icon name="x" class="h-5 w-5 text-gray-500"></lucide-icon>
                 </button>
               </div>
 
-              <div class="p-4 border-b border-gray-200 dark:border-gray-700">
+              <!-- <div class="p-4 border-b border-gray-200">
                 <textarea
                   [placeholder]="'DOCUMENT_EDITOR.ADD_COMMENT' | translate"
                   [(ngModel)]="newComment"
@@ -528,39 +544,98 @@ import { diffWords } from 'diff';
                     size="sm"
                     customClass="bg-[#155347] hover:bg-[#0d3d31]"
                     [leftIcon]="true"
+                    (onClick)="addComment()"
                   >
                     <lucide-icon leftIcon name="send" class="h-3 w-3"></lucide-icon>
                     Post
                   </app-button>
                 </div>
-              </div>
+              </div> -->
 
               <div class="flex-1 overflow-y-auto p-4 space-y-4">
                 @for (comment of comments; track comment.id) {
-                  <div class="space-y-2">
-                    <div class="flex gap-3">
-                      <div
-                        [class]="
-                          'h-8 w-8 rounded-full text-white flex items-center justify-center text-xs font-medium shrink-0 ' +
-                          comment.color
-                        "
-                      >
-                        {{ comment.avatar }}
-                      </div>
-                      <div class="flex-1">
-                        <div class="flex items-center gap-2 mb-1">
-                          <span class="text-sm font-medium text-gray-900">{{
-                            comment.author
-                          }}</span>
-                          <span class="text-xs text-gray-500">{{ comment.time }}</span>
+                  @if(!comment.parentCommentId){
+                    <div class="space-y-2" [id]="'comment-' + comment.id" 
+                    [class.bg-yellow-100]="activeCommentId() === comment.id"
+                    [class.border-l-4]="activeCommentId() === comment.id"
+                    [class.border-yellow-400]="activeCommentId() === comment.id">
+                      <div class="flex gap-3">
+                        <div
+                          class="h-8 w-8 rounded-full text-white flex items-center justify-center text-xs font-medium shrink-0"
+                          [style.background-color] = "comment.createdByColor"
+                        >
+                          {{ this.getInitials(comment.createdByName || '') }}
                         </div>
-                        <p class="text-sm text-gray-700">{{ comment.text }}</p>
-                        <button class="text-xs text-gray-500 hover:text-[#155347] dark:hover:text-emerald-400 mt-2">
-                          {{ 'DOCUMENT_EDITOR.REPLY' | translate }}
-                        </button>
+                        <div class="flex-1">
+                          <div class="flex items-center gap-2 mb-1">
+                            <span class="text-sm font-medium text-gray-900">{{
+                              comment.createdByName
+                            }}</span>
+                            <span class="text-xs text-gray-500">{{ this.formatCommentDate(comment.createdAt) }}</span>
+                          </div>
+                          <p class="text-sm text-gray-700" (click)="openComment(comment, true)">{{ comment.content }}</p>
+                          <button class="text-xs text-gray-500 hover:text-[#155347] mt-2"
+                          (click)="toggleReply(comment.id)">
+                            Reply
+                          </button>
+                          @if (activeReplyId === comment.id) {
+                          <div class="mt-3 ml-11">
+                            <textarea
+                              [(ngModel)]="replyText"
+                              placeholder="Write a reply..."
+                              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#155347] text-sm resize-none"
+                              rows="2"
+                            ></textarea>
+
+                            <div class="flex justify-end mt-2 gap-2">
+                              <button
+                                class="text-xs text-gray-500 hover:text-gray-700"
+                                (click)="toggleReply(comment.id)"
+                              >
+                                Cancel
+                              </button>
+
+                              <button
+                                class="text-xs bg-[#155347] text-white px-3 py-1 rounded-md hover:bg-[#0d3d31]"
+                                (click)="addReply(comment)"
+                              >
+                                Reply
+                              </button>
+                            </div>
+                          </div>
+                        }
+                        </div>
                       </div>
+                      @if (comment.replies && comment.replies.length > 0) {
+                      <div class="ml-11 mt-3 space-y-3">
+                        @for (reply of comment.replies; track reply.id) {
+                          <div class="flex gap-3">
+                          <div
+                              class="h-8 w-8 rounded-full text-white flex items-center justify-center text-xs font-medium shrink-0"
+                              [style.background-color] = "reply.createdByColor"
+                            >
+                              {{ this.getInitials(reply.createdByName || '') }}
+                            </div>
+                            <div>
+                              <div class="flex items-center gap-2 mb-1">
+                                <span class="text-sm font-medium text-gray-900">
+                                  {{ reply.createdByName }}
+                                </span>
+                                <span class="text-xs text-gray-500">
+                                  {{ this.formatCommentDate(reply.createdAt) }}
+                                </span>
+                              </div>
+                              <p class="text-sm text-gray-700">
+                                {{ reply.content }}
+                              </p>
+                            </div>
+                          </div>
+                        }
+                      </div>
+                    }
                     </div>
-                  </div>
+                  }
+                  
                 }
               </div>
             </aside>
@@ -1214,6 +1289,36 @@ import { diffWords } from 'diff';
           }
         </div>
       }
+
+      <!-- Inline Comment Box -->
+      @if (showInlineCommentBox()) {
+        <div
+          class="fixed z-50 bg-white border border-gray-300 rounded-lg shadow-lg p-3 w-64 flex flex-col gap-2"
+          [style.top.px]="inlineCommentPosition().top"
+          [style.left.px]="inlineCommentPosition().left"
+        >
+          <textarea
+            [(ngModel)]="inlineCommentText"
+            placeholder="Write a comment..."
+            rows="3"
+            class="w-full px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#155347] text-sm resize-none"
+          ></textarea>
+          <div class="flex justify-end gap-2">
+            <button
+              class="text-xs text-gray-500 hover:text-gray-700"
+              (click)="showInlineCommentBox.set(false); inlineCommentText = ''"
+            >
+              Cancel
+            </button>
+            <button
+              class="text-xs bg-[#155347] text-white px-3 py-1 rounded-md hover:bg-[#0d3d31]"
+              (click)="addInlineComment()"
+            >
+              Add Comment
+            </button>
+          </div>
+        </div>
+      }
     </div>
   `,
 })
@@ -1286,6 +1391,7 @@ export class DocumentEditorComponent implements OnInit {
   improveCopied = signal(false);
   private selectedTextForImprove = '';
   private selectionBounds = { top: 0, left: 0, width: 0, height: 0 };
+  private selectionRange: any = null;
 
   // AI Generate Content
   showGeneratePanelModal = signal(false);
@@ -1332,10 +1438,22 @@ export class DocumentEditorComponent implements OnInit {
   lastCopiedInviteId = signal<number | null>(null);
 
   versions: Version[] = this.documentService.getVersions();
-  comments: Comment[] = this.documentService.getComments();
+  comments: CommentDto[] = [];
   aiSuggestions: AISuggestion[] = this.documentService.getAISuggestions();
 
   lastEditedText = signal('Last edited just now');
+
+  // Texto selecionado para adicionar comentário
+  showInlineCommentBox = signal(false);
+  inlineCommentText = '';
+  inlineCommentPosition = signal({ top: 0, left: 0 });
+  activeCommentId = signal<number | null>(null);
+
+  //comentários
+  private authService = inject(AuthService);
+  user = this.authService.currentUser;
+  activeReplyId: number | null = null;
+  replyText: string = '';
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
@@ -1347,6 +1465,7 @@ export class DocumentEditorComponent implements OnInit {
       this.router.navigate(['/dashboard']);
     }
   }
+
 
   private loadDocument(id: number): void {
     this.isLoading.set(true);
@@ -1362,6 +1481,46 @@ export class DocumentEditorComponent implements OnInit {
         this.documentRole.set(doc.role || 'Viewer');
         this.isOwner.set(doc.isOwner ?? false);
         this.isLoading.set(false);
+
+        this.documentService.getComments(this.documentId!).subscribe((comments) => {
+          this.comments = comments;
+          //console.log('Loaded comments:', this.comments);
+          // opcional: destacar todos os comentários no Quill
+          this.comments.forEach((comment) => this.editor.highlightComment(comment));
+        });
+        
+        // Adicionar event listener ao editor após renderizar
+        setTimeout(() => {
+          if (this.editor) {
+            //console.log('Editor instance:', this.editor);
+            const editorRoot = this.editor.getEditorRoot();
+
+            editorRoot.addEventListener('click', (e: MouseEvent) => {
+              let el = e.target as HTMLElement;
+
+              while (el && el !== editorRoot) {
+                const commentId = el.getAttribute('data-comment-id');
+
+                if (commentId) {
+                  const comment = this.comments.find(c => c.id === +commentId);
+
+                  if (comment) {
+                    //this.activeCommentId.set(comment.id);  // ✅ ativa aqui
+                    this.openComment(comment, false);
+                  }
+
+                  return;
+                }
+
+                el = el.parentElement!;
+              }
+
+              // se clicou fora de um comentário
+              this.activeCommentId.set(null);
+            });
+          }
+        }, 0);
+        
         this.loadDocumentInvites(doc.id);
         if (doc.role === 'Editor') {
           this.loadContextFiles();
@@ -1944,6 +2103,8 @@ export class DocumentEditorComponent implements OnInit {
     if (event.text && event.text.trim().length > 0 && event.bounds) {
       this.selectedTextForImprove = event.text;
       this.selectionBounds = event.bounds;
+      // Guardar o range da seleção para uso posterior em comentários
+      this.selectionRange = this.editor.getSelectedRange();
       // Posicionar o tooltip acima da seleção, com clamp para não sair da viewport
       const tooltipWidth = 140;
       const rawLeft = event.bounds.left + (event.bounds.width / 2) - (tooltipWidth / 2);
@@ -2144,4 +2305,135 @@ export class DocumentEditorComponent implements OnInit {
     this.generateLoading.set(false);
     this.generateCopied.set(false);
   }
+
+
+  //---------------- comentarios------------------
+  addCommentSelection(event: MouseEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (!this.documentId || !this.selectedTextForImprove.trim()) return;
+
+    this.showImproveTooltip.set(false);
+    //this.showComments.set(true);
+
+    this.showInlineCommentBox.set(true);
+    this.inlineCommentText = ''; // limpar
+
+  // Posicionar a caixa próxima da seleção
+    if (this.selectionBounds) {
+      this.inlineCommentPosition.set({
+        top: this.selectionBounds.top + this.selectionBounds.height + 4, // logo abaixo do texto
+        left: this.selectionBounds.left,
+      });
+    }
+  }
+
+  openComment(comment: CommentDto, selectedfromSide : boolean) {
+    this.activeCommentId.set(comment.id);
+    this.showComments.set(true);
+    setTimeout(() => {
+      const el = document.getElementById(`comment-${comment.id}`);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      if(selectedfromSide){
+        this.editor.selectCommentHighlight(comment.id)
+      }
+    }, 50);
+  }
+
+  toggleReply(commentId: number) {
+    if (this.activeReplyId === commentId) {
+      this.activeReplyId = null;
+      this.replyText = '';
+    } else {
+      this.activeReplyId = commentId;
+      this.activeCommentId.set(null);
+    }
+  }
+
+  addReply(parent: CommentDto) {
+    if (!this.replyText.trim()) return;
+
+    const reply: CreateCommentDto = {
+      userId: this.user()?.id,
+      documentId: this.documentId!,
+      createdByColor: this.user()?.color,
+      content: this.replyText.trim(),
+      parentCommentId : parent.id
+    };
+
+    //console.log('Creating reply', reply);
+
+    this.documentService.createComment(reply, this.documentId!).subscribe( () => {
+
+      this.replyText = '';
+      this.activeReplyId = null;
+      this.documentService.getComments(this.documentId!).subscribe((comments) => {
+          this.comments = comments;
+          //console.log('Loaded comments:', this.comments);
+        });
+    });
+  }
+
+  addInlineComment(): void {
+    if (!this.inlineCommentText.trim()) return;
+
+    const selectedRange = this.selectionRange;
+    if (!selectedRange || selectedRange.length === 0) {
+      this.showInlineCommentBox.set(false);
+      this.inlineCommentText = '';
+      return;
+    }
+
+    const newComment: CreateCommentDto = {
+      userId: this.user()?.id,
+      documentId: this.documentId!,
+      createdByColor: this.user()?.color,
+      content: this.inlineCommentText.trim(),
+      rangeIndex: selectedRange.index,
+      rangeLength: selectedRange.length
+    };
+    //console.log('Creating comment with range:', newComment);
+    
+    this.documentService.createComment(newComment, this.documentId!).subscribe(comment => {
+      // Limpa UI
+      this.inlineCommentText = '';
+      this.showInlineCommentBox.set(false);
+
+      // Destacar no Quill
+      this.editor.highlightComment(comment);
+      this.documentService.getComments(this.documentId!).subscribe((comments) => {
+          this.comments = comments;
+          //console.log('Loaded comments:', this.comments);
+          // opcional: destacar todos os comentários no Quill
+          //this.comments.forEach((comment) => this.editor.highlightComment(comment));
+        });
+    });
+  }
+
+  getInitials(name: string): string {
+    if (!name) return '';
+    return name
+      .split(' ')
+      .filter(word => word.length > 0)
+      .map(word => word[0].toUpperCase())
+      .join('')
+      .slice(0, 2);
+  }
+
+  formatCommentDate(dateString: string): string {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+
+    if (diffMins < 1) return 'just now';
+    if (diffMins < 60) return `${diffMins} minute${diffMins > 1 ? 's' : ''} ago`;
+    if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
+    if (diffDays === 1) return 'yesterday';
+    return `${diffDays} days ago`;
+  }
+  //---------------- comentarios------------------
 }

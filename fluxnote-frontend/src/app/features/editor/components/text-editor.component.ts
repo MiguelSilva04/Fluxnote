@@ -16,6 +16,28 @@ import { LucideAngularModule } from 'lucide-angular';
 import { TranslateModule } from '@ngx-translate/core';
 import Quill from 'quill';
 import { Subject, debounceTime, takeUntil } from 'rxjs';
+import {CommentDto } from '../../../core/models';
+
+const Inline = Quill.import('blots/inline') as any;
+
+class CommentBlot extends Inline {
+  static blotName = 'comment';
+  static tagName = 'span';
+
+  static create(value: any) {
+    const node = super.create();
+    node.setAttribute('data-comment-id', value);
+    node.style.backgroundColor = '#FFF59D';
+    return node;
+  }
+
+  static formats(node: HTMLElement) {
+    return node.getAttribute('data-comment-id');
+  }
+}
+
+Quill.register(CommentBlot);
+
 
 // Custom image blot that persists inline styles (width, float, margins) inside the Quill Delta.
 // The default ImageBlot only stores `src`, so direct DOM style mutations bypass Yjs and are
@@ -42,6 +64,8 @@ class StyledImageBlot extends EmbedBlot {
   }
 }
 Quill.register({ 'formats/image': StyledImageBlot }, true);
+
+
 import { UploadService, CollaborationService, AuthService } from '../../../core/services';
 import { CollaboratorState } from '../../../core/services/collaboration.service';
 
@@ -915,5 +939,68 @@ export class TextEditorComponent implements OnInit, AfterViewInit, OnDestroy {
     const index = range ? range.index : this.quill.getLength() - 1;
     this.quill.insertText(index, text, 'user');
     this.quill.setSelection(index + text.length, 0, 'silent');
+  }
+
+  // Retorna o range atual do Quill
+  /**
+   * Devolve o índice e comprimento da seleção atual no editor, ou null se não houver seleção.
+   * Útil para posicionar tooltips de comentário ou outras interacções baseadas na selecção.
+   */
+  public getSelectedRange(): { index: number; length: number } | null {
+    return this.quill?.getSelection() ?? null;
+  }
+
+  /**
+   * Aplica um destaque visual (ex: background color) a um intervalo de texto baseado num comentário.
+   */
+  public highlightComment(comment: CommentDto): void {
+    if (!comment.rangeIndex || !comment.rangeLength) return;
+    //const { index, length } = comment.range;
+    /* this.quill.formatText(index, length, {
+      'background': comment.color || 'yellow',
+      'comment-id': comment.id
+    }, 'user'); */
+    this.quill.formatText(
+    comment.rangeIndex,
+    comment.rangeLength,
+    'comment',
+    comment.id
+  );
+  }
+
+  // Obter Quill root para eventos genéricos (opcional)
+  /**
+   * Devolve o elemento raiz do editor Quill.
+   */
+  public getEditorRoot(): HTMLElement {
+    return this.quill.root;
+  }
+
+  /**
+   * Faz scroll automático para o intervalo de texto associado ao comentário e aplica uma seleção visual.
+   *  
+   */
+  public selectCommentHighlight(commentId: number): void {
+    if (!this.quill) return;
+
+    const root = this.quill.root;
+
+    const el = root.querySelector(
+      `[data-comment-id="${commentId}"]`
+    ) as HTMLElement | null;
+
+    if (!el) return;
+
+    const blot = this.quill.scroll.find(el);
+
+    if (!blot) return;
+
+    const index = blot.offset(this.quill.scroll);
+    const length = blot.length();
+
+    this.quill.setSelection(index, length, 'silent');
+
+    // faz scroll automático até ao texto
+    this.quill.scrollSelectionIntoView();
   }
 }
