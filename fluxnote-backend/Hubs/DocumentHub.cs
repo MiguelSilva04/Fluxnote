@@ -119,6 +119,38 @@ namespace Fluxnote.Backend.Hubs
         }
 
         // ─────────────────────────────────────────────────────────
+        // Broadcast de comentários em tempo real
+        // ─────────────────────────────────────────────────────────
+
+        /// <summary>
+        /// Notifica outros utilizadores no documento que um comentário foi criado.
+        /// O payload é o JSON do comentário completo (DocumentCommentDto).
+        /// </summary>
+        public async Task SendComment(int documentId, string commentJson)
+        {
+            await Clients.OthersInGroup(GroupName(documentId))
+                .SendAsync("ReceiveComment", commentJson);
+        }
+
+        /// <summary>
+        /// Notifica outros utilizadores que um comentário foi resolvido/unreresolvido.
+        /// </summary>
+        public async Task SendCommentResolved(int documentId, int commentId, bool resolved)
+        {
+            await Clients.OthersInGroup(GroupName(documentId))
+                .SendAsync("ReceiveCommentResolved", commentId, resolved);
+        }
+
+        /// <summary>
+        /// Notifica outros utilizadores que um comentário foi eliminado.
+        /// </summary>
+        public async Task SendCommentDeleted(int documentId, int commentId)
+        {
+            await Clients.OthersInGroup(GroupName(documentId))
+                .SendAsync("ReceiveCommentDeleted", commentId);
+        }
+
+        // ─────────────────────────────────────────────────────────
         // Guardar snapshot completo do Y.Doc na BD
         // Chamado periodicamente pelo cliente (a cada 30 segundos)
         // ─────────────────────────────────────────────────────────

@@ -66,10 +66,10 @@ export class ToastComponent {
   getToastClasses(type: ToastType): string {
     const baseClasses = 'border';
     const typeClasses = {
-      success: 'bg-green-50 border-green-200 dark:bg-green-900/20 dark:border-green-800',
-      error: 'bg-red-50 border-red-200 dark:bg-red-900/20 dark:border-red-800',
-      info: 'bg-blue-50 border-blue-200 dark:bg-blue-900/20 dark:border-blue-800',
-      warning: 'bg-yellow-50 border-yellow-200 dark:bg-yellow-900/20 dark:border-yellow-800'
+      success: 'bg-green-50 border-green-200 dark:bg-green-950 dark:border-green-700',
+      error: 'bg-red-50 border-red-200 dark:bg-red-950 dark:border-red-700',
+      info: 'bg-blue-50 border-blue-200 dark:bg-blue-950 dark:border-blue-700',
+      warning: 'bg-yellow-50 border-yellow-200 dark:bg-yellow-950 dark:border-yellow-700'
     };
     return `${baseClasses} ${typeClasses[type]}`;
   }
@@ -99,7 +99,7 @@ export class ToastComponent {
       success: 'badge-check',
       error: 'badge-alert',
       info: 'info',
-      warning: 'alert-triangle'
+      warning: 'triangle-alert'
     };
     return icons[type];
   }

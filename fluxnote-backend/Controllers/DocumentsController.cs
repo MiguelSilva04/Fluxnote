@@ -1512,6 +1512,10 @@ namespace Fluxnote.Backend.Controllers
         [HttpGet("{id}/comments")]
         public async Task<ActionResult<IEnumerable<DocumentCommentDto>>> GetComments(int id)
         {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId is null) return Unauthorized(new { message = "User not authenticated." });
+            if (!await HasMemberAccess(userId, id)) return Forbid();
+
             var comments = await _context.DocumentComments
                 .Where(c => c.DocumentId == id && c.ParentCommentId == null)
                 .Include(c => c.CreatedBy)
@@ -1587,6 +1591,10 @@ namespace Fluxnote.Backend.Controllers
             int id,
             [FromBody] CreateDocumentCommentDto dto)
         {
+            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (currentUserId is null) return Unauthorized(new { message = "User not authenticated." });
+            if (!await HasEditorAccess(currentUserId, id)) return Forbid();
+
             // validação básica
             if (id != dto.DocumentId)
                 return BadRequest("Document ID mismatch.");
@@ -1638,6 +1646,81 @@ namespace Fluxnote.Backend.Controllers
             };
 
             return CreatedAtAction(nameof(GetComments), new { id = comment.DocumentId }, result);
+        }
+
+        // PATCH /api/documents/{id}/comments/{commentId}/resolve
+        /// <summary>
+        /// Alterna o estado de resolução de um comentário (resolved <-> unresolved).
+        /// </summary>
+        [HttpPatch("{id}/comments/{commentId}/resolve")]
+        public async Task<ActionResult<DocumentCommentDto>> ResolveComment(int id, int commentId)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId is null) return Unauthorized(new { message = "User not authenticated." });
+            if (!await HasEditorAccess(userId, id)) return Forbid();
+
+            var comment = await _context.DocumentComments
+                .Include(c => c.CreatedBy)
+                .FirstOrDefaultAsync(c => c.Id == commentId && c.DocumentId == id);
+
+            if (comment is null)
+                return NotFound(new { message = "Comment not found." });
+
+            comment.Resolved = !comment.Resolved;
+            await _context.SaveChangesAsync();
+
+            var result = new DocumentCommentDto
+            {
+                Id = comment.Id,
+                DocumentId = comment.DocumentId,
+                UserId = comment.UserId,
+                CreatedByName = comment.CreatedBy.FullName ?? comment.CreatedBy.Email ?? string.Empty,
+                CreatedByColor = comment.CreatedByColor,
+                Content = comment.Content,
+                CreatedAt = comment.CreatedAt.ToString("o"),
+                RangeIndex = comment.RangeIndex,
+                RangeLength = comment.RangeLength,
+                Resolved = comment.Resolved,
+                ParentCommentId = comment.ParentCommentId,
+            };
+
+            return Ok(result);
+        }
+
+        // DELETE /api/documents/{id}/comments/{commentId}
+        /// <summary>
+        /// Elimina um comentário e todas as suas respostas. Apenas o autor do comentário
+        /// ou um administrador da equipa pode eliminar.
+        /// </summary>
+        [HttpDelete("{id}/comments/{commentId}")]
+        public async Task<IActionResult> DeleteComment(int id, int commentId)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId is null) return Unauthorized(new { message = "User not authenticated." });
+            if (!await HasEditorAccess(userId, id)) return Forbid();
+
+            var comment = await _context.DocumentComments
+                .Include(c => c.CommentReplies)
+                .FirstOrDefaultAsync(c => c.Id == commentId && c.DocumentId == id);
+
+            if (comment is null)
+                return NotFound(new { message = "Comment not found." });
+
+            // Apenas o autor ou um admin da equipa pode eliminar
+            var doc = await _context.Document
+                .Include(d => d.Team).ThenInclude(t => t.Members)
+                .FirstOrDefaultAsync(d => d.Id == id && !d.IsDeleted);
+
+            var member = doc?.Team.Members.FirstOrDefault(m => m.UserId == userId);
+            if (comment.UserId != userId && (member is null || member.Role < TeamRole.TeamAdmin))
+                return StatusCode(403, new { message = "Only the comment author or a team admin can delete comments." });
+
+            // Eliminar respostas primeiro, depois o comentário
+            _context.DocumentComments.RemoveRange(comment.CommentReplies);
+            _context.DocumentComments.Remove(comment);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
         }
 
 
@@ -1753,6 +1836,29 @@ namespace Fluxnote.Backend.Controllers
             await _hubContext.Clients.Group($"doc-{id}").SendAsync("DocumentRestored");
 
             return NoContent();
+        }
+
+        /// <summary>
+        /// Verifica se o utilizador é membro da equipa do documento
+        /// (qualquer role - Owner, TeamAdmin, ou membro com permissão).
+        /// </summary>
+        private async Task<bool> HasMemberAccess(string userId, int documentId)
+        {
+            var doc = await _context.Document
+                .Include(d => d.Team)
+                    .ThenInclude(t => t.Members)
+                .Include(d => d.Permissions)
+                    .ThenInclude(p => p.TeamMember)
+                .FirstOrDefaultAsync(d => d.Id == documentId && !d.IsDeleted);
+
+            if (doc is null) return false;
+
+            var member = doc.Team.Members.FirstOrDefault(m => m.UserId == userId);
+            if (member is null) return false;
+
+            if (member.Role >= TeamRole.TeamAdmin) return true;
+
+            return doc.Permissions.Any(p => p.TeamMember.UserId == userId);
         }
 
         /// <summary>

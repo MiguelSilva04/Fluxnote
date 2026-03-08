@@ -315,10 +315,44 @@ export class DocumentService {
    * Cria um novo comentário
    * @param request Dados do comentário (texto, intervalo, etc.)
    * @param id ID do documento ao qual o comentário pertence
-    * @returns Observable com o comentário criado
+   * @returns Observable com o comentário criado
    */
   createComment(request: CreateCommentDto, id: number): Observable<CommentDto> {
-    return this.http.post<CommentDto>(`/api/documents/${id}/comments`, request)
+    return this.http.post<CommentDto>(`/api/documents/${id}/comments`, request).pipe(
+      catchError(error => {
+        console.error('Error creating comment:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  /**
+   * Alterna o estado de resolução de um comentário (resolved ↔ unresolved)
+   * @param documentId ID do documento
+   * @param commentId ID do comentário
+   * @returns Observable com o comentário atualizado
+   */
+  resolveComment(documentId: number, commentId: number): Observable<CommentDto> {
+    return this.http.patch<CommentDto>(`/api/documents/${documentId}/comments/${commentId}/resolve`, {}).pipe(
+      catchError(error => {
+        console.error('Error resolving comment:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  /**
+   * Elimina um comentário e todas as suas respostas
+   * @param documentId ID do documento
+   * @param commentId ID do comentário
+   */
+  deleteComment(documentId: number, commentId: number): Observable<void> {
+    return this.http.delete<void>(`/api/documents/${documentId}/comments/${commentId}`).pipe(
+      catchError(error => {
+        console.error('Error deleting comment:', error);
+        return throwError(() => error);
+      })
+    );
   }
 
   // ===============================

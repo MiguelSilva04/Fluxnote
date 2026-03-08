@@ -98,3 +98,15 @@ html.dark body {
   background-color: #111827;
   color: #f3f4f6;
 }
+
+/* Comment highlight in Quill editor */
+.ql-comment-highlight {
+  background-color: #FFF59D;
+  border-bottom: 2px solid #F9A825;
+  cursor: pointer;
+}
+
+.dark .ql-comment-highlight {
+  background-color: rgba(250, 204, 21, 0.25);
+  border-bottom: 2px solid rgba(250, 204, 21, 0.5);
+}

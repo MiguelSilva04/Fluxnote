@@ -35,6 +35,13 @@ export class CollaborationService {
   // Emite o connectionId quando um utilizador sai
   readonly userLeft$ = new Subject<string>();
 
+  // Emite quando chega um novo comentário de outro utilizador
+  readonly commentReceived$ = new Subject<any>();
+  // Emite quando um comentário é resolvido/unresolved por outro utilizador
+  readonly commentResolved$ = new Subject<{ commentId: number; resolved: boolean }>();
+  // Emite quando um comentário é eliminado por outro utilizador
+  readonly commentDeleted$ = new Subject<number>();
+
   // ─────────────────────────────────────────────────────────────
   // Conectar ao documento
   // ─────────────────────────────────────────────────────────────
@@ -111,6 +118,31 @@ export class CollaborationService {
     if (this.connection?.state !== signalR.HubConnectionState.Connected) return;
     this.connection
       .invoke('SendAwareness', documentId, JSON.stringify(state))
+      .catch(() => {});
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // Broadcast de comentários em tempo real
+  // ─────────────────────────────────────────────────────────────
+
+  sendComment(documentId: number, comment: any): void {
+    if (this.connection?.state !== signalR.HubConnectionState.Connected) return;
+    this.connection
+      .invoke('SendComment', documentId, JSON.stringify(comment))
+      .catch(() => {});
+  }
+
+  sendCommentResolved(documentId: number, commentId: number, resolved: boolean): void {
+    if (this.connection?.state !== signalR.HubConnectionState.Connected) return;
+    this.connection
+      .invoke('SendCommentResolved', documentId, commentId, resolved)
+      .catch(() => {});
+  }
+
+  sendCommentDeleted(documentId: number, commentId: number): void {
+    if (this.connection?.state !== signalR.HubConnectionState.Connected) return;
+    this.connection
+      .invoke('SendCommentDeleted', documentId, commentId)
       .catch(() => {});
   }
 
@@ -236,6 +268,26 @@ export class CollaborationService {
     this.connection.on('DocumentRestored', () => {
       console.info('[Collaboration] Documento restaurado — a reconectar');
       this.reconnectAfterRestore();
+    });
+
+    // ── Comentários em tempo real ──
+
+    // Novo comentário de outro utilizador
+    this.connection.on('ReceiveComment', (commentJson: string) => {
+      try {
+        const comment = JSON.parse(commentJson);
+        this.commentReceived$.next(comment);
+      } catch {}
+    });
+
+    // Comentário resolvido/unresolved por outro utilizador
+    this.connection.on('ReceiveCommentResolved', (commentId: number, resolved: boolean) => {
+      this.commentResolved$.next({ commentId, resolved });
+    });
+
+    // Comentário eliminado por outro utilizador
+    this.connection.on('ReceiveCommentDeleted', (commentId: number) => {
+      this.commentDeleted$.next(commentId);
     });
 
     // Reconexão → re-entrar no grupo

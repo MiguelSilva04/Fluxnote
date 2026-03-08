@@ -27,7 +27,7 @@ class CommentBlot extends Inline {
   static create(value: any) {
     const node = super.create();
     node.setAttribute('data-comment-id', value);
-    node.style.backgroundColor = '#FFF59D';
+    node.classList.add('ql-comment-highlight');
     return node;
   }
 
@@ -134,6 +134,7 @@ export class TextEditorComponent implements OnInit, AfterViewInit, OnDestroy {
   // ─── Outputs ───
   contentChange = output<string>();
   save = output<string>();
+  collaborationReady = output<void>();
 
   // ─── State ───
   saveStatus = signal<SaveStatus>('idle');
@@ -278,6 +279,10 @@ export class TextEditorComponent implements OnInit, AfterViewInit, OnDestroy {
             [...this.collaborationService.collaborators.values()].map((s) => s.name)
           );
         });
+
+      // Notificar o componente pai que a colaboração está pronta
+      // (Y.js binding activo, seguro aplicar highlights de comentários)
+      this.collaborationReady.emit();
 
     } catch (err) {
       // Colaboração falhou → editor continua a funcionar em modo offline (HTTP save)
@@ -954,18 +959,13 @@ export class TextEditorComponent implements OnInit, AfterViewInit, OnDestroy {
    * Aplica um destaque visual (ex: background color) a um intervalo de texto baseado num comentário.
    */
   public highlightComment(comment: CommentDto): void {
-    if (!comment.rangeIndex || !comment.rangeLength) return;
-    //const { index, length } = comment.range;
-    /* this.quill.formatText(index, length, {
-      'background': comment.color || 'yellow',
-      'comment-id': comment.id
-    }, 'user'); */
+    if (comment.rangeIndex == null || !comment.rangeLength) return;
     this.quill.formatText(
-    comment.rangeIndex,
-    comment.rangeLength,
-    'comment',
-    comment.id
-  );
+      comment.rangeIndex,
+      comment.rangeLength,
+      'comment',
+      comment.id
+    );
   }
 
   // Obter Quill root para eventos genéricos (opcional)
@@ -1002,5 +1002,25 @@ export class TextEditorComponent implements OnInit, AfterViewInit, OnDestroy {
 
     // faz scroll automático até ao texto
     this.quill.scrollSelectionIntoView();
+  }
+
+  /**
+   * Remove o destaque visual (CommentBlot) associado a um comentário.
+   */
+  public removeCommentHighlight(commentId: number): void {
+    if (!this.quill) return;
+
+    const root = this.quill.root;
+    const elements = root.querySelectorAll(`[data-comment-id="${commentId}"]`);
+
+    elements.forEach((el) => {
+      const blot = this.quill.scroll.find(el);
+      if (!blot) return;
+
+      const index = blot.offset(this.quill.scroll);
+      const length = blot.length();
+
+      this.quill.formatText(index, length, 'comment', false);
+    });
   }
 }
