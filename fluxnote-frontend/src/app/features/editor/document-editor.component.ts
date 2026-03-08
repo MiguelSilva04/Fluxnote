@@ -1484,7 +1484,7 @@ export class DocumentEditorComponent implements OnInit {
 
         this.documentService.getComments(this.documentId!).subscribe((comments) => {
           this.comments = comments;
-          console.log('Loaded comments:', this.comments);
+          //console.log('Loaded comments:', this.comments);
           // opcional: destacar todos os comentários no Quill
           this.comments.forEach((comment) => this.editor.highlightComment(comment));
         });
@@ -2362,7 +2362,7 @@ export class DocumentEditorComponent implements OnInit {
       parentCommentId : parent.id
     };
 
-    console.log('Creating reply', reply);
+    //console.log('Creating reply', reply);
 
     this.documentService.createComment(reply, this.documentId!).subscribe( () => {
 
@@ -2370,7 +2370,7 @@ export class DocumentEditorComponent implements OnInit {
       this.activeReplyId = null;
       this.documentService.getComments(this.documentId!).subscribe((comments) => {
           this.comments = comments;
-          console.log('Loaded comments:', this.comments);
+          //console.log('Loaded comments:', this.comments);
         });
     });
   }
@@ -2393,7 +2393,7 @@ export class DocumentEditorComponent implements OnInit {
       rangeIndex: selectedRange.index,
       rangeLength: selectedRange.length
     };
-    console.log('Creating comment with range:', newComment);
+    //console.log('Creating comment with range:', newComment);
     
     this.documentService.createComment(newComment, this.documentId!).subscribe(comment => {
       // Limpa UI
@@ -2404,7 +2404,7 @@ export class DocumentEditorComponent implements OnInit {
       this.editor.highlightComment(comment);
       this.documentService.getComments(this.documentId!).subscribe((comments) => {
           this.comments = comments;
-          console.log('Loaded comments:', this.comments);
+          //console.log('Loaded comments:', this.comments);
           // opcional: destacar todos os comentários no Quill
           //this.comments.forEach((comment) => this.editor.highlightComment(comment));
         });
