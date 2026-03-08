@@ -63,24 +63,6 @@ export interface Version {
   timestamp: string;
 }
 
-export interface CommentAnchor {
-  start: number; // posição no texto total
-  end: number;   // posição final
-}
-
-export interface Comment {
-  id: number;
-  anchor?: CommentAnchor;
-  author?: string;
-  avatar?: string;
-  color?: string;
-  time: string;
-  text: string;
-  range?: {index:number;length: number}; //range 
-  replies: Comment[];
-  resolved?: boolean;
-}
-
 export interface AISuggestion {
   id: number;
   title: string;
@@ -97,4 +79,29 @@ export interface DocumentContextDto {
   uploadedAt: string;
   uploadedByName: string;
   hasExtractedText: boolean;
+}
+
+export interface CommentDto {
+  id: number;
+  documentId: number;
+  userId?: string;
+  createdByName?: string;
+  createdByColor?: string;
+  content: string;
+  createdAt: string;
+  rangeIndex?: number;
+  rangeLength?: number; //range 
+  replies: CommentDto[];
+  resolved?: boolean;
+  parentCommentId?: number;
+}
+
+export interface CreateCommentDto {
+  userId?: string;
+  documentId?: number;
+  createdByColor?: string;
+  content: string;
+  rangeIndex?: number;
+  rangeLength?: number;
+  parentCommentId?: number;
 }

@@ -7,9 +7,10 @@ import {
   DocumentDetailDto,
   CreateDocumentRequest,
   Version,
-  Comment,
+  CommentDto,
   AISuggestion,
-  DocumentContextDto
+  DocumentContextDto,
+  CreateCommentDto
 } from '../models';
 
 @Injectable({
@@ -297,6 +298,27 @@ export class DocumentService {
     this._currentDocument.set(null);
   }
 
+
+  /**
+   * Obtém os comentários de um documento
+   * @param id ID do documento que contèm os comentários
+   * @returns Observable com os comentários do documento
+   */
+  getComments(id : number): Observable<CommentDto[]> {
+    return this.http.get<CommentDto[]>(`/api/documents/${id}/comments`);
+  }
+
+
+  /**
+   * Cria um novo comentário
+   * @param request Dados do comentário (texto, intervalo, etc.)
+   * @param id ID do documento ao qual o comentário pertence
+    * @returns Observable com o comentário criado
+   */
+  createComment(request: CreateCommentDto, id: number): Observable<CommentDto> {
+    return this.http.post<CommentDto>(`/api/documents/${id}/comments`, request)
+  }
+
   // ===============================
   // Métodos mock para funcionalidades futuas
   // ===============================
@@ -306,13 +328,6 @@ export class DocumentService {
       { id: 7, number: 7, author: 'João Silva', description: 'Added introduction section and fixed spelling errors.', timestamp: '2 hours ago' },
       { id: 6, number: 6, author: 'Ana Clara', description: 'Revised chapter 3 and formatting adjustments.', timestamp: 'Yesterday at 14:30' },
       { id: 5, number: 5, author: 'Pedro Santos', description: 'Implemented team feedback for the Conclusion section.', timestamp: '3 days ago' }
-    ];
-  }
-
-  getComments(): Comment[] {
-    return [
-      { id: 1, author: 'Michael Chen', avatar: 'MC', color: 'bg-blue-500', time: '2 hours ago', text: "Consider rephrasing the introduction for better clarity on AI's impact.", replies: [] },
-      { id: 2, author: 'Sarah Kim', avatar: 'SK', color: 'bg-purple-500', time: '4 hours ago', text: 'The section on quantum computing is very strong.', replies: [] }
     ];
   }
 

@@ -88,6 +88,11 @@ namespace Fluxnote.Backend.Data
         public DbSet<Fluxnote.Backend.Models.DocumentContext> DocumentContext { get; set; } = default!;
 
         /// <summary>
+        /// DbSet para comentários em documentos
+        /// </summary>
+        public DbSet<DocumentComment> DocumentComments { get; set; }
+
+        /// <summary>
         /// DbSet para refresh tokens de autenticação.
         /// </summary>
         public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();

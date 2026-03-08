@@ -2,7 +2,7 @@ import { Component, inject, signal, ViewChild, ElementRef, OnInit, computed } fr
 import { CommonModule, Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
-import { LucideAngularModule } from 'lucide-angular';
+import { LucideAngularModule, ThumbsDown } from 'lucide-angular';
 import {
   ButtonComponent,
   BadgeComponent,
@@ -10,7 +10,7 @@ import {
 } from '../../shared/components/ui';
 import { DocumentShareModalComponent } from '../../shared/components/document-share-modal/document-share-modal.component';
 import { DocumentService, DocumentInviteService, CollaborationService } from '../../core/services';
-import { Collaborator, Version, Comment, AISuggestion, DocumentInviteDto, DocumentContextDto } from '../../core/models';
+import { Collaborator, Version, CommentDto, CreateCommentDto, AISuggestion, DocumentInviteDto, DocumentContextDto } from '../../core/models';
 import { TextEditorComponent } from './components/text-editor.component';
 import { AuthService } from '../../core/services';
 import Quill from 'quill/core/quill';
@@ -512,85 +512,88 @@ import Quill from 'quill/core/quill';
 
               <div class="flex-1 overflow-y-auto p-4 space-y-4">
                 @for (comment of comments; track comment.id) {
-                  <div class="space-y-2" [id]="'comment-' + comment.id" (click)="scrollToCommentText(comment)"
-                  [class.bg-yellow-100]="activeCommentId() === comment.id"
-                  [class.border-l-4]="activeCommentId() === comment.id"
-                  [class.border-yellow-400]="activeCommentId() === comment.id">
-                    <div class="flex gap-3">
-                      <div
-                        class="h-8 w-8 rounded-full text-white flex items-center justify-center text-xs font-medium shrink-0"
-                        [style.background-color] = "comment.color"
-                      >
-                        {{ comment.avatar }}
-                      </div>
-                      <div class="flex-1">
-                        <div class="flex items-center gap-2 mb-1">
-                          <span class="text-sm font-medium text-gray-900">{{
-                            comment.author
-                          }}</span>
-                          <span class="text-xs text-gray-500">{{ comment.time }}</span>
-                        </div>
-                        <p class="text-sm text-gray-700">{{ comment.text }}</p>
-                        <button class="text-xs text-gray-500 hover:text-[#155347] mt-2"
-                        (click)="toggleReply(comment.id)">
-                          Reply
-                        </button>
-                        @if (activeReplyId === comment.id) {
-                        <div class="mt-3 ml-11">
-                          <textarea
-                            [(ngModel)]="replyText"
-                            placeholder="Write a reply..."
-                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#155347] text-sm resize-none"
-                            rows="2"
-                          ></textarea>
-
-                          <div class="flex justify-end mt-2 gap-2">
-                            <button
-                              class="text-xs text-gray-500 hover:text-gray-700"
-                              (click)="toggleReply(comment.id)"
-                            >
-                              Cancel
-                            </button>
-
-                            <button
-                              class="text-xs bg-[#155347] text-white px-3 py-1 rounded-md hover:bg-[#0d3d31]"
-                              (click)="addReply(comment)"
-                            >
-                              Reply
-                            </button>
-                          </div>
-                        </div>
-                      }
-                      </div>
-                    </div>
-                    @if (comment.replies.length > 0) {
-                    <div class="ml-11 mt-3 space-y-3">
-                      @for (reply of comment.replies; track reply.id) {
-                        <div class="flex gap-3">
+                  @if(!comment.parentCommentId){
+                    <div class="space-y-2" [id]="'comment-' + comment.id" 
+                    [class.bg-yellow-100]="activeCommentId() === comment.id"
+                    [class.border-l-4]="activeCommentId() === comment.id"
+                    [class.border-yellow-400]="activeCommentId() === comment.id">
+                      <div class="flex gap-3">
                         <div
-                            class="h-8 w-8 rounded-full text-white flex items-center justify-center text-xs font-medium shrink-0"
-                            [style.background-color] = "reply.color"
-                          >
-                            {{ reply.avatar }}
-                          </div>
-                          <div>
-                            <div class="flex items-center gap-2 mb-1">
-                              <span class="text-sm font-medium text-gray-900">
-                                {{ reply.author }}
-                              </span>
-                              <span class="text-xs text-gray-500">
-                                {{ reply.time }}
-                              </span>
-                            </div>
-                            <p class="text-sm text-gray-700">
-                              {{ reply.text }}
-                            </p>
-                          </div>
+                          class="h-8 w-8 rounded-full text-white flex items-center justify-center text-xs font-medium shrink-0"
+                          [style.background-color] = "comment.createdByColor"
+                        >
+                          {{ this.getInitials(comment.createdByName || '') }}
                         </div>
-                      }
+                        <div class="flex-1">
+                          <div class="flex items-center gap-2 mb-1">
+                            <span class="text-sm font-medium text-gray-900">{{
+                              comment.createdByName
+                            }}</span>
+                            <span class="text-xs text-gray-500">{{ this.formatCommentDate(comment.createdAt) }}</span>
+                          </div>
+                          <p class="text-sm text-gray-700" (click)="openComment(comment, true)">{{ comment.content }}</p>
+                          <button class="text-xs text-gray-500 hover:text-[#155347] mt-2"
+                          (click)="toggleReply(comment.id)">
+                            Reply
+                          </button>
+                          @if (activeReplyId === comment.id) {
+                          <div class="mt-3 ml-11">
+                            <textarea
+                              [(ngModel)]="replyText"
+                              placeholder="Write a reply..."
+                              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#155347] text-sm resize-none"
+                              rows="2"
+                            ></textarea>
+
+                            <div class="flex justify-end mt-2 gap-2">
+                              <button
+                                class="text-xs text-gray-500 hover:text-gray-700"
+                                (click)="toggleReply(comment.id)"
+                              >
+                                Cancel
+                              </button>
+
+                              <button
+                                class="text-xs bg-[#155347] text-white px-3 py-1 rounded-md hover:bg-[#0d3d31]"
+                                (click)="addReply(comment)"
+                              >
+                                Reply
+                              </button>
+                            </div>
+                          </div>
+                        }
+                        </div>
+                      </div>
+                      @if (comment.replies && comment.replies.length > 0) {
+                      <div class="ml-11 mt-3 space-y-3">
+                        @for (reply of comment.replies; track reply.id) {
+                          <div class="flex gap-3">
+                          <div
+                              class="h-8 w-8 rounded-full text-white flex items-center justify-center text-xs font-medium shrink-0"
+                              [style.background-color] = "reply.createdByColor"
+                            >
+                              {{ this.getInitials(reply.createdByName || '') }}
+                            </div>
+                            <div>
+                              <div class="flex items-center gap-2 mb-1">
+                                <span class="text-sm font-medium text-gray-900">
+                                  {{ reply.createdByName }}
+                                </span>
+                                <span class="text-xs text-gray-500">
+                                  {{ this.formatCommentDate(reply.createdAt) }}
+                                </span>
+                              </div>
+                              <p class="text-sm text-gray-700">
+                                {{ reply.content }}
+                              </p>
+                            </div>
+                          </div>
+                        }
+                      </div>
+                    }
                     </div>
                   }
-                  </div>
+                  
                 }
               </div>
             </aside>
@@ -1166,7 +1169,7 @@ export class DocumentEditorComponent implements OnInit {
   lastCopiedInviteId = signal<number | null>(null);
 
   versions: Version[] = this.documentService.getVersions();
-  comments: Comment[] = this.documentService.getComments();
+  comments: CommentDto[] = [];
   aiSuggestions: AISuggestion[] = this.documentService.getAISuggestions();
 
   lastEditedText = signal('Last edited just now');
@@ -1208,6 +1211,13 @@ export class DocumentEditorComponent implements OnInit {
         this.lastEditedText.set(this.formatLastEdited(new Date(doc.updatedAt)));
         this.documentRole.set(doc.role || 'Viewer');
         this.isLoading.set(false);
+
+        this.documentService.getComments(this.documentId!).subscribe((comments) => {
+          this.comments = comments;
+          console.log('Loaded comments:', this.comments);
+          // opcional: destacar todos os comentários no Quill
+          this.comments.forEach((comment) => this.editor.highlightComment(comment));
+        });
         
         // Adicionar event listener ao editor após renderizar
         setTimeout(() => {
@@ -1225,8 +1235,8 @@ export class DocumentEditorComponent implements OnInit {
                   const comment = this.comments.find(c => c.id === +commentId);
 
                   if (comment) {
-                    this.activeCommentId.set(comment.id);  // ✅ ativa aqui
-                    this.openComment(comment);
+                    //this.activeCommentId.set(comment.id);  // ✅ ativa aqui
+                    this.openComment(comment, false);
                   }
 
                   return;
@@ -1658,139 +1668,6 @@ export class DocumentEditorComponent implements OnInit {
     this.triggerImproveRequest();
   }
 
-  //---------------- comentarios------------------
-  addCommentSelection(event: MouseEvent): void {
-    event.preventDefault();
-    event.stopPropagation();
-
-    if (!this.documentId || !this.selectedTextForImprove.trim()) return;
-
-    this.showImproveTooltip.set(false);
-    //this.showComments.set(true);
-
-    this.showInlineCommentBox.set(true);
-    this.inlineCommentText = ''; // limpar
-
-  // Posicionar a caixa próxima da seleção
-  if (this.selectionBounds) {
-    this.inlineCommentPosition.set({
-      top: this.selectionBounds.top + this.selectionBounds.height + 4, // logo abaixo do texto
-      left: this.selectionBounds.left,
-    });
-  }
-  }
-
-  addComment(): void {
-    if (!this.newComment.trim()) return;
-    
-    const selectedRange = this.selectionRange;
-
-    if (!selectedRange || selectedRange.length === 0) return;
-
-    const comment: Comment = {
-      id: Date.now(),
-      author: this.user()?.fullName,
-      avatar: this.user()?.initials,
-      color: this.user()?.color,
-      time: 'Agora mesmo',
-      text: this.newComment.trim(),
-      range: { index: selectedRange.index, length: selectedRange.length },
-      replies: [],
-      resolved: false
-    };
-
-    this.comments = [comment, ...this.comments];
-    this.newComment = '';
-
-    // Destacar no Quill
-    this.editor.highlightComment(comment);
-
-    //this.showComments.set(true);
-  }
-
-  openComment(comment: Comment) {
-    this.showComments.set(true);
-    setTimeout(() => {
-      const el = document.getElementById(`comment-${comment.id}`);
-      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }, 50);
-}
-
-  toggleReply(commentId: number) {
-    if (this.activeReplyId === commentId) {
-      this.activeReplyId = null;
-      this.replyText = '';
-    } else {
-      this.activeReplyId = commentId;
-    }
-  }
-
-  addReply(parent: Comment) {
-    if (!this.replyText.trim()) return;
-
-    /* var currentUser = {
-      name: 'João Silva',
-      avatar: 'JS',
-      color: 'bg-[#155347]'
-    }; */
-
-    const reply: Comment = {
-      id: Date.now(),
-      author: this.user()?.fullName,
-      avatar: this.user()?.initials,
-      color:this.user()?.color,
-      time: 'Agora mesmo',
-      text: this.replyText.trim(),
-      replies: []
-    };
-
-    parent.replies.push(reply);
-
-    this.replyText = '';
-    this.activeReplyId = null;
-  }
-
-  addInlineComment(): void {
-    if (!this.inlineCommentText.trim()) return;
-
-    const selectedRange = this.selectionRange;
-    if (!selectedRange || selectedRange.length === 0) {
-      this.showInlineCommentBox.set(false);
-      this.inlineCommentText = '';
-      return;
-    }
-
-    const comment: Comment = {
-      id: Date.now(),
-      author: this.user()?.fullName,
-      avatar: this.user()?.initials,
-      color: this.user()?.color,
-      time: 'Agora mesmo',
-      text: this.inlineCommentText.trim(),
-      range: { index: selectedRange.index, length: selectedRange.length },
-      replies: [],
-      resolved: false
-    };
-
-    this.comments = [comment, ...this.comments];
-    this.inlineCommentText = '';
-    this.showInlineCommentBox.set(false);
-
-    // Destacar no Quill
-    this.editor.highlightComment(comment);
-
-    // Abrir sidebar de comentários
-    //this.showComments.set(true);
-  }
-
-  scrollToCommentText(comment: Comment) {
-    if (!comment.range) return;
-    //this.activeCommentId.set(comment.id);
-    this.editor.scrollToRange(comment.range);
-  }
-  //---------------- comentarios------------------
-
-
   private triggerImproveRequest(): void {
     if (!this.documentId || !this.selectedTextForImprove.trim()) return;
 
@@ -1968,4 +1845,135 @@ export class DocumentEditorComponent implements OnInit {
     this.generateLoading.set(false);
     this.generateCopied.set(false);
   }
+
+
+  //---------------- comentarios------------------
+  addCommentSelection(event: MouseEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (!this.documentId || !this.selectedTextForImprove.trim()) return;
+
+    this.showImproveTooltip.set(false);
+    //this.showComments.set(true);
+
+    this.showInlineCommentBox.set(true);
+    this.inlineCommentText = ''; // limpar
+
+  // Posicionar a caixa próxima da seleção
+    if (this.selectionBounds) {
+      this.inlineCommentPosition.set({
+        top: this.selectionBounds.top + this.selectionBounds.height + 4, // logo abaixo do texto
+        left: this.selectionBounds.left,
+      });
+    }
+  }
+
+  openComment(comment: CommentDto, selectedfromSide : boolean) {
+    this.activeCommentId.set(comment.id);
+    this.showComments.set(true);
+    setTimeout(() => {
+      const el = document.getElementById(`comment-${comment.id}`);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      if(selectedfromSide){
+        this.editor.selectCommentHighlight(comment.id)
+      }
+    }, 50);
+  }
+
+  toggleReply(commentId: number) {
+    if (this.activeReplyId === commentId) {
+      this.activeReplyId = null;
+      this.replyText = '';
+    } else {
+      this.activeReplyId = commentId;
+      this.activeCommentId.set(null);
+    }
+  }
+
+  addReply(parent: CommentDto) {
+    if (!this.replyText.trim()) return;
+
+    const reply: CreateCommentDto = {
+      userId: this.user()?.id,
+      documentId: this.documentId!,
+      createdByColor: this.user()?.color,
+      content: this.replyText.trim(),
+      parentCommentId : parent.id
+    };
+
+    console.log('Creating reply', reply);
+
+    this.documentService.createComment(reply, this.documentId!).subscribe( () => {
+
+      this.replyText = '';
+      this.activeReplyId = null;
+      this.documentService.getComments(this.documentId!).subscribe((comments) => {
+          this.comments = comments;
+          console.log('Loaded comments:', this.comments);
+        });
+    });
+  }
+
+  addInlineComment(): void {
+    if (!this.inlineCommentText.trim()) return;
+
+    const selectedRange = this.selectionRange;
+    if (!selectedRange || selectedRange.length === 0) {
+      this.showInlineCommentBox.set(false);
+      this.inlineCommentText = '';
+      return;
+    }
+
+    const newComment: CreateCommentDto = {
+      userId: this.user()?.id,
+      documentId: this.documentId!,
+      createdByColor: this.user()?.color,
+      content: this.inlineCommentText.trim(),
+      rangeIndex: selectedRange.index,
+      rangeLength: selectedRange.length
+    };
+    console.log('Creating comment with range:', newComment);
+    
+    this.documentService.createComment(newComment, this.documentId!).subscribe(comment => {
+      // Limpa UI
+      this.inlineCommentText = '';
+      this.showInlineCommentBox.set(false);
+
+      // Destacar no Quill
+      this.editor.highlightComment(comment);
+      this.documentService.getComments(this.documentId!).subscribe((comments) => {
+          this.comments = comments;
+          console.log('Loaded comments:', this.comments);
+          // opcional: destacar todos os comentários no Quill
+          //this.comments.forEach((comment) => this.editor.highlightComment(comment));
+        });
+    });
+  }
+
+  getInitials(name: string): string {
+    if (!name) return '';
+    return name
+      .split(' ')
+      .filter(word => word.length > 0)
+      .map(word => word[0].toUpperCase())
+      .join('')
+      .slice(0, 2);
+  }
+
+  formatCommentDate(dateString: string): string {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+
+    if (diffMins < 1) return 'just now';
+    if (diffMins < 60) return `${diffMins} minute${diffMins > 1 ? 's' : ''} ago`;
+    if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
+    if (diffDays === 1) return 'yesterday';
+    return `${diffDays} days ago`;
+  }
+  //---------------- comentarios------------------
 }

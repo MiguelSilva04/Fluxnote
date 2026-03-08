@@ -15,7 +15,7 @@ import { FormsModule } from '@angular/forms';
 import { LucideAngularModule } from 'lucide-angular';
 import Quill from 'quill';
 import { Subject, debounceTime, takeUntil } from 'rxjs';
-import { Comment } from '../../../core/models';
+import {CommentDto } from '../../../core/models';
 
 const Inline = Quill.import('blots/inline') as any;
 
@@ -928,38 +928,65 @@ export class TextEditorComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   // Retorna o range atual do Quill
+  /**
+   * Devolve o índice e comprimento da seleção atual no editor, ou null se não houver seleção.
+   * Útil para posicionar tooltips de comentário ou outras interacções baseadas na selecção.
+   */
   public getSelectedRange(): { index: number; length: number } | null {
     return this.quill?.getSelection() ?? null;
   }
 
-  // Aplica highlight de comentário
-  public highlightComment(comment: Comment): void {
-    if (!comment.range) return;
+  /**
+   * Aplica um destaque visual (ex: background color) a um intervalo de texto baseado num comentário.
+   */
+  public highlightComment(comment: CommentDto): void {
+    if (!comment.rangeIndex || !comment.rangeLength) return;
     //const { index, length } = comment.range;
     /* this.quill.formatText(index, length, {
       'background': comment.color || 'yellow',
       'comment-id': comment.id
     }, 'user'); */
     this.quill.formatText(
-    comment.range.index,
-    comment.range.length,
+    comment.rangeIndex,
+    comment.rangeLength,
     'comment',
     comment.id
   );
   }
 
   // Obter Quill root para eventos genéricos (opcional)
+  /**
+   * Devolve o elemento raiz do editor Quill.
+   */
   public getEditorRoot(): HTMLElement {
     return this.quill.root;
   }
 
-  scrollToRange(range: { index: number; length: number }) {
-    if (!this.quill || !range) return;
+  /**
+   * Faz scroll automático para o intervalo de texto associado ao comentário e aplica uma seleção visual.
+   *  
+   */
+  public selectCommentHighlight(commentId: number): void {
+    if (!this.quill) return;
 
-    // move o cursor para o texto
-    this.quill.setSelection(range.index, range.length, 'silent');
+    const root = this.quill.root;
+
+    const el = root.querySelector(
+      `[data-comment-id="${commentId}"]`
+    ) as HTMLElement | null;
+
+    if (!el) return;
+
+    const blot = this.quill.scroll.find(el);
+
+    if (!blot) return;
+
+    const index = blot.offset(this.quill.scroll);
+    const length = blot.length();
+
+    this.quill.setSelection(index, length, 'silent');
 
     // faz scroll automático até ao texto
-    this.quill.scrollIntoView();
+    this.quill.scrollSelectionIntoView();
   }
 }

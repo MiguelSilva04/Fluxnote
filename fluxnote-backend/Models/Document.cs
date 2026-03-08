@@ -154,5 +154,10 @@ namespace Fluxnote.Backend.Models
         /// Ficheiros de contexto associados a este documento para uso pela IA.
         /// </summary>
         public ICollection<DocumentContext> ContextFiles { get; set; } = new List<DocumentContext>();
+
+        /// <summary>
+        /// Coleção dos Comentáros
+        /// </summary>  
+        public ICollection<DocumentComment> Comments { get; set; } = new List<DocumentComment>();
     }
 }
