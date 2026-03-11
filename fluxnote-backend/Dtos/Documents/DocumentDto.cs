@@ -118,8 +118,14 @@ namespace Fluxnote.Backend.Dtos.Documents
 
         /// <summary>
         /// Indica se o utilizador autenticado é o Owner da equipa deste documento.
-        /// Apenas o Owner pode restaurar versões.
+        /// Apenas o Owner pode restaurar versões. O Owner e o TeamAdmin podem resolver comentários. 
         /// </summary>
         public bool IsOwner { get; set; }
+
+        /// <summary>
+        /// Indica se o utilizador autenticado é um Team Admin da equipa deste documento.
+        /// O Owner e o TeamAdmin podem resolver comentários.
+        /// </summary>
+        public bool IsTeamAdmin { get; set; }
     }
 }

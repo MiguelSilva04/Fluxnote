@@ -17,7 +17,6 @@ import { Collaborator, Version, CommentDto, CreateCommentDto, AISuggestion, Docu
 import { TextEditorComponent } from './components/text-editor.component';
 import { AuthService } from '../../core/services';
 import Quill from 'quill/core/quill';
-
 import { forkJoin, switchMap } from 'rxjs';
 import { diffWords } from 'diff';
 // import { HttpClient } from '@angular/common/http';
@@ -597,6 +596,7 @@ import { diffWords } from 'diff';
                               (click)="toggleReply(comment.id)">
                               {{ 'DOCUMENT_EDITOR.REPLY' | translate }}
                             </button>
+                             @if (this.isElligableForCommentResolution(comment)) {
                             <button class="text-xs hover:text-emerald-600 dark:hover:text-emerald-400 flex items-center gap-1"
                               [ngClass]="comment.resolved ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-500'"
                               [disabled]="commentResolving() === comment.id"
@@ -606,7 +606,6 @@ import { diffWords } from 'diff';
                               }
                               {{ (comment.resolved ? 'DOCUMENT_EDITOR.UNRESOLVE' : 'DOCUMENT_EDITOR.RESOLVE') | translate }}
                             </button>
-                            @if (comment.userId === user()?.id) {
                               <button class="text-xs flex items-center gap-1 transition-colors"
                                 [ngClass]="pendingDeleteCommentId === comment.id ? 'text-red-600 dark:text-red-400 font-medium' : 'text-gray-500 hover:text-red-600 dark:hover:text-red-400'"
                                 [disabled]="commentDeleting() === comment.id"
@@ -1476,6 +1475,7 @@ export class DocumentEditorComponent implements OnInit {
   documentRole = signal<string>('Viewer');
   canEdit = computed(() => this.documentRole() === 'Editor');
   isOwner = signal(false);
+  isTeamAdmin = signal(false);
 
   // TODO: Implementar colaboração em tempo real
   collaborators: Collaborator[] = [];
@@ -1539,6 +1539,7 @@ export class DocumentEditorComponent implements OnInit {
         this.lastEditedText.set(this.formatLastEdited(new Date(doc.updatedAt)));
         this.documentRole.set(doc.role || 'Viewer');
         this.isOwner.set(doc.isOwner ?? false);
+        this.isTeamAdmin.set(doc.isTeamAdmin ?? false);
         this.isLoading.set(false);
 
         this.documentService.getComments(this.documentId!).subscribe({
@@ -2603,6 +2604,14 @@ export class DocumentEditorComponent implements OnInit {
     );
     if (diffDays === 1) return this.translateService.instant('DOCUMENT_EDITOR.COMMENT_YESTERDAY');
     return this.translateService.instant('DOCUMENT_EDITOR.COMMENT_DAYS_AGO', { count: diffDays });
+  }
+
+  isTeamOwnerOrTeamAdmin(): boolean {
+    return this.isTeamAdmin() || this.isOwner();
+  }
+
+  isElligableForCommentResolution(comment: CommentDto): boolean {
+    return comment.userId === this.user()?.id || this.isTeamOwnerOrTeamAdmin();
   }
 
   // ─── Colaboração/Highlights ──────────────────────────────

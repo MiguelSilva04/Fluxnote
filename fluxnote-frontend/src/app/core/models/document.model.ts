@@ -33,6 +33,7 @@ export interface DocumentDetailDto {
   plainText?: string;
   role?: string; // "Editor" | "Viewer"
   isOwner?: boolean; // true se o utilizador autenticado é o Owner da equipa
+  isTeamAdmin?: boolean; // true se o utilizador autenticado é Admin da equipa
 }
 
 /**
