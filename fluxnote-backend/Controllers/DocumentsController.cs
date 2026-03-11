@@ -873,6 +873,9 @@ namespace Fluxnote.Backend.Controllers
             bool hasAccess = isOwner;
             string effectiveRole = isOwner ? "Editor" : "Viewer";
 
+            // TeamAdmin pode resolver comentários
+            bool isTeamAdmin = userTeamMember.Role == TeamRole.TeamAdmin;
+
             // Se não for Owner, verificar DocumentPermission (inclui TeamAdmins)
             if (!hasAccess)
             {
@@ -909,7 +912,8 @@ namespace Fluxnote.Backend.Controllers
                 Content = document.Content != null ? System.Text.Encoding.UTF8.GetString(document.Content) : null,
                 PlainText = document.PlainText,
                 Role = effectiveRole,
-                IsOwner = isOwner
+                IsOwner = isOwner,
+                IsTeamAdmin = isTeamAdmin
             };
 
             return Ok(dto);
@@ -971,6 +975,9 @@ namespace Fluxnote.Backend.Controllers
             bool isOwner = userTeamMember.Role == TeamRole.Owner;
             bool canEdit = isOwner;
             string effectiveRole = isOwner ? "Editor" : "Viewer";
+
+            // TeamAdmin pode resolver comentários
+            bool isTeamAdmin = userTeamMember.Role == TeamRole.TeamAdmin;
 
             // Se não for Owner, verificar se tem DocumentPermission com Role = Editor (inclui TeamAdmins)
             if (!canEdit)
@@ -1041,7 +1048,8 @@ namespace Fluxnote.Backend.Controllers
                 Content = document.Content != null ? System.Text.Encoding.UTF8.GetString(document.Content) : null,
                 PlainText = document.PlainText,
                 Role = effectiveRole,
-                IsOwner = isOwner
+                IsOwner = isOwner,
+                IsTeamAdmin = isTeamAdmin,
             };
 
             return Ok(dto);
@@ -1650,7 +1658,8 @@ namespace Fluxnote.Backend.Controllers
 
         // PATCH /api/documents/{id}/comments/{commentId}/resolve
         /// <summary>
-        /// Alterna o estado de resolução de um comentário (resolved <-> unresolved).
+        /// Alterna o estado de resolução de um comentário (resolved <-> unresolved). Apenas o autor do comentário
+        /// ou um administrador da equipa pode resolver.
         /// </summary>
         [HttpPatch("{id}/comments/{commentId}/resolve")]
         public async Task<ActionResult<DocumentCommentDto>> ResolveComment(int id, int commentId)
@@ -1665,6 +1674,14 @@ namespace Fluxnote.Backend.Controllers
 
             if (comment is null)
                 return NotFound(new { message = "Comment not found." });
+
+            var doc = await _context.Document
+                .Include(d => d.Team).ThenInclude(t => t.Members)
+                .FirstOrDefaultAsync(d => d.Id == id && !d.IsDeleted);
+
+            var member = doc?.Team.Members.FirstOrDefault(m => m.UserId == userId);
+            if (comment.UserId != userId && (member is null || member.Role < TeamRole.TeamAdmin))
+                return StatusCode(403, new { message = "Only the comment author or a team admin can resolve comments." });
 
             comment.Resolved = !comment.Resolved;
             await _context.SaveChangesAsync();
