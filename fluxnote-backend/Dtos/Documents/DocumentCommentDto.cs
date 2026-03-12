@@ -72,5 +72,10 @@ namespace Fluxnote.Backend.Dtos.Documents
         /// </summary>
         public List<DocumentCommentDto> Replies { get; set; } = new();
 
+        /// <summary>
+        /// Gets or sets the list of user mentions associated with the comment.
+        /// </summary>
+        public List<CommentMentionDto> Mentions { get; set; } = new();
+
     }
 }

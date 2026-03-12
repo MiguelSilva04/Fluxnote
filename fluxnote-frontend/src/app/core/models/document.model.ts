@@ -110,6 +110,7 @@ export interface CommentDto {
   replies: CommentDto[];
   resolved?: boolean;
   parentCommentId?: number;
+  mentions?: CommentMentionDto[]; // Lista de menções associadas ao comentário
 }
 
 export interface CreateCommentDto {
@@ -120,4 +121,10 @@ export interface CreateCommentDto {
   rangeIndex?: number;
   rangeLength?: number;
   parentCommentId?: number;
+  mentionedUserIds?: string[]; // Lista de IDs de utilizadores mencionados no comentário
+}
+
+export interface CommentMentionDto {
+  id : number;
+  mentionedUserId: string;
 }

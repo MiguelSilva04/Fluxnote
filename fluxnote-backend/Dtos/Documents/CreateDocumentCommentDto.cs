@@ -42,5 +42,10 @@
         /// </summary>
         public int? ParentCommentId { get; set; } // se for reply
 
+        /// <summary>
+        /// Lista de IDs de usuários mencionados no comentário
+        /// </summary>
+        public List<string>? MentionedUserIds { get; set; }
+
     }
 }

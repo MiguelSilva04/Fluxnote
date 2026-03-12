@@ -80,5 +80,10 @@
         /// Referência de navegação para o comentário pai, caso este seja uma resposta a outro comentário.
         /// </summary>
         public DocumentComment? ParentComment { get; set; }
+
+        /// <summary>
+        /// Referênça de navegação para as menções feitas dentro do comentário.
+        /// </summary>
+        public ICollection<CommentMention> Mentions { get; set; } = new List<CommentMention>();
     }
 }
