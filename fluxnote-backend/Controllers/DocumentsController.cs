@@ -1566,7 +1566,12 @@ namespace Fluxnote.Backend.Controllers
                             RangeLength = r.RangeLength,
                             Resolved = r.Resolved
                         })
-                        .ToList()
+                        .ToList(),
+                    Mentions = c.Mentions.Select(m => new CommentMentionDto
+                    {
+                        MentionedUserId = m.UserId
+                    })
+                        .ToList(),
                 })
                 .ToListAsync();
 
@@ -1637,6 +1642,37 @@ namespace Fluxnote.Backend.Controllers
             _context.DocumentComments.Add(comment);
             await _context.SaveChangesAsync();
 
+
+            // Criar mentions se existirem
+            if (dto.MentionedUserIds != null && dto.MentionedUserIds.Any())
+            {
+                var validUsers = await _context.Users
+                    .Where(u => dto.MentionedUserIds.Contains(u.Id))
+                    .Select(u => u.Id)
+                    .ToListAsync();
+
+                var mentions = validUsers.Select(userId => new CommentMention
+                {
+                    CommentId = comment.Id,
+                    UserId = userId
+                }).ToList();
+
+                _context.CommentMentions.AddRange(mentions);
+                await _context.SaveChangesAsync();
+            }
+
+            // Buscar mentions com dados do user para devolver no DTO
+            var mentionsForDto = await _context.CommentMentions
+                .Where(m => m.CommentId == comment.Id)
+                .Include(m => m.User)
+                .Select(m => new CommentMentionDto
+                {
+                    MentionedUserId = m.UserId
+                })
+                .ToListAsync();
+
+
+
             // Devolve como DTO
             var result = new DocumentCommentDto
             {
@@ -1651,6 +1687,7 @@ namespace Fluxnote.Backend.Controllers
                 RangeLength = comment.RangeLength,
                 Resolved = comment.Resolved, 
                 ParentCommentId = parent?.Id,
+                Mentions = mentionsForDto,
             };
 
             return CreatedAtAction(nameof(GetComments), new { id = comment.DocumentId }, result);
@@ -1680,7 +1717,10 @@ namespace Fluxnote.Backend.Controllers
                 .FirstOrDefaultAsync(d => d.Id == id && !d.IsDeleted);
 
             var member = doc?.Team.Members.FirstOrDefault(m => m.UserId == userId);
-            if (comment.UserId != userId && (member is null || member.Role < TeamRole.TeamAdmin))
+
+            var isMentioned = comment.Mentions.Any(m => m.UserId == userId);
+
+            if (comment.UserId != userId && !isMentioned && (member is null || member.Role < TeamRole.TeamAdmin))
                 return StatusCode(403, new { message = "Only the comment author or a team admin can resolve comments." });
 
             comment.Resolved = !comment.Resolved;
@@ -1734,7 +1774,10 @@ namespace Fluxnote.Backend.Controllers
 
             // Eliminar respostas primeiro, depois o comentário
             _context.DocumentComments.RemoveRange(comment.CommentReplies);
+            _context.CommentMentions.RemoveRange(_context.CommentMentions
+                .Where(m => m.CommentId == comment.Id || comment.CommentReplies.Select(r => r.Id).Contains(m.CommentId)));
             _context.DocumentComments.Remove(comment);
+
             await _context.SaveChangesAsync();
 
             return NoContent();

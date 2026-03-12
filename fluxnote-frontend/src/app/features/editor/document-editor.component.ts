@@ -12,8 +12,8 @@ import {
 } from '../../shared/components/ui';
 import { DocumentShareModalComponent } from '../../shared/components/document-share-modal/document-share-modal.component';
 import { ToastService } from '../../shared/services/toast.service';
-import { DocumentService, DocumentInviteService, CollaborationService } from '../../core/services';
-import { Collaborator, Version, CommentDto, CreateCommentDto, AISuggestion, DocumentInviteDto, DocumentContextDto, DocumentVersionDto, DocumentVersionDetailDto } from '../../core/models';
+import { DocumentService, DocumentInviteService, CollaborationService, DocumentPermissionService, TeamService } from '../../core/services';
+import { Collaborator, Version, CommentDto, CreateCommentDto, AISuggestion, DocumentInviteDto, DocumentContextDto, DocumentVersionDto, DocumentVersionDetailDto, User } from '../../core/models';
 import { TextEditorComponent } from './components/text-editor.component';
 import { AuthService } from '../../core/services';
 import Quill from 'quill/core/quill';
@@ -1344,16 +1344,36 @@ import { diffWords } from 'diff';
           [style.left.px]="inlineCommentPosition().left"
         >
           <textarea
+            #inlineCommentInput
             [(ngModel)]="inlineCommentText"
+            (input)="updateInlineMentionSuggestions()"
+            (click)="updateInlineMentionSuggestions()"
+            (keyup)="updateInlineMentionSuggestions()"
+            (keydown)="onInlineCommentKeydown($event)"
             [placeholder]="'DOCUMENT_EDITOR.ADD_COMMENT' | translate"
             rows="3"
             class="w-full px-2 py-1 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-[#155347] text-sm resize-none dark:bg-gray-700 dark:text-gray-100"
           ></textarea>
+          @if (showInlineMentionList()) {
+            <div class="max-h-32 overflow-y-auto border border-gray-200 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 shadow-sm">
+              @for (suggestion of inlineMentionSuggestions(); track suggestion.id; let i = $index) {
+                <button
+                  type="button"
+                  class="w-full text-left px-2 py-1.5 text-xs hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
+                  [ngClass]="{ 'bg-gray-100 dark:bg-gray-600': i === activeInlineMentionIndex() }"
+                  (mousedown)="onInlineMentionMouseDown($event, i)"
+                >
+                  <span class="font-medium text-gray-800 dark:text-gray-100">{{ suggestion.name }}</span>
+                  <span class="text-gray-400 ml-1">@{{ suggestion.tag }}</span>
+                </button>
+              }
+            </div>
+          }
           <div class="flex justify-end gap-2">
             <button
               class="text-xs text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
               [disabled]="commentAdding()"
-              (click)="showInlineCommentBox.set(false); inlineCommentText = ''"
+              (click)="closeInlineCommentBox()"
             >
               {{ 'DOCUMENT_EDITOR.CANCEL' | translate }}
             </button>
@@ -1376,10 +1396,13 @@ import { diffWords } from 'diff';
 export class DocumentEditorComponent implements OnInit {
   @ViewChild('editor') editor!: TextEditorComponent;
   @ViewChild('contextFileInput') contextFileInput!: ElementRef<HTMLInputElement>;
+  @ViewChild('inlineCommentInput') inlineCommentInput?: ElementRef<HTMLTextAreaElement>;
 
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private documentService = inject(DocumentService);
+  private documentPermissionService = inject(DocumentPermissionService);
+  private teamService = inject(TeamService);
   private inviteService = inject(DocumentInviteService);
   private collaborationService = inject(CollaborationService);
   private sanitizer = inject(DomSanitizer);
@@ -1479,6 +1502,8 @@ export class DocumentEditorComponent implements OnInit {
 
   // TODO: Implementar colaboração em tempo real
   collaborators: Collaborator[] = [];
+  editorUsers = signal<User[]>([]);
+  editorUsersByPermissionId = signal<Record<number, User>>({});
 
   shareRole = signal<number>(0); // 0=Viewer, 1=Editor
   shareExpirationDays = signal<number>(7);
@@ -1499,7 +1524,13 @@ export class DocumentEditorComponent implements OnInit {
   showInlineCommentBox = signal(false);
   inlineCommentText = '';
   inlineCommentPosition = signal({ top: 0, left: 0 });
+  showInlineMentionList = signal(false);
+  inlineMentionSuggestions = signal<Array<{ id: string; name: string; tag: string }>>([]);
+  activeInlineMentionIndex = signal(0);
+  private inlineMentionRange: { start: number; end: number } | null = null;
   activeCommentId = signal<number | null>(null);
+
+  documentTeamId = signal<number | null>(null);
 
   // Comment loading states
   commentAdding = signal(false);
@@ -1529,6 +1560,7 @@ export class DocumentEditorComponent implements OnInit {
   private loadDocument(id: number): void {
     this.isLoading.set(true);
     this.loadError.set(null);
+    //console.log('Loading document with ID:', id);
 
     this.documentService.getDocument(id).subscribe({
       next: (doc) => {
@@ -1540,6 +1572,9 @@ export class DocumentEditorComponent implements OnInit {
         this.documentRole.set(doc.role || 'Viewer');
         this.isOwner.set(doc.isOwner ?? false);
         this.isTeamAdmin.set(doc.isTeamAdmin ?? false);
+        this.documentTeamId.set(doc.teamId);
+        //console.log('Document id & team id:', doc.id, doc.teamId);
+        this.loadEditorUsersByPermission(doc.id, doc.teamId);
         this.isLoading.set(false);
 
         this.documentService.getComments(this.documentId!).subscribe({
@@ -1620,6 +1655,59 @@ export class DocumentEditorComponent implements OnInit {
         setTimeout(() => this.router.navigate(['/dashboard']), 2000);
       },
     });
+  }
+
+  private loadEditorUsersByPermission(documentId: number, teamId: number): void {
+    forkJoin({
+      editorPermissions: this.documentPermissionService.getEditorsByDocument(documentId),
+      team: this.teamService.getTeamById(teamId),
+    }).subscribe({
+      next: ({ editorPermissions, team }) => {
+        const membersById = new Map(
+          (team.members ?? [])
+            .filter((member) => member.id != null)
+            .map((member) => [member.id as number, member])
+        );
+
+        const usersByPermissionId: Record<number, User> = {};
+        editorPermissions.forEach((permission) => {
+          const member = membersById.get(permission.teamMemberId);
+          if (!member) return;
+
+          const userKey = member.userId || member.email || member.name || `${permission.teamMemberId}`;
+          usersByPermissionId[permission.id] = {
+            id: member.userId,
+            email: member.email,
+            fullName: member.name,
+            userName: member.name,
+            initials: this.getInitials(member.name),
+            color: this.getUserColor(userKey),
+          };
+        });
+
+        this.editorUsersByPermissionId.set(usersByPermissionId);
+        this.editorUsers.set(Object.values(usersByPermissionId));
+        //console.log('Loaded editor users by permission:', usersByPermissionId);
+      },
+      error: (err) => {
+        console.error('Error loading editor users by permission:', err);
+        this.editorUsersByPermissionId.set({});
+        this.editorUsers.set([]);
+      },
+    });
+  }
+
+  getUserForEditorPermission(permissionId: number): User | null {
+    return this.editorUsersByPermissionId()[permissionId] ?? null;
+  }
+
+  private getUserColor(key: string): string {
+    const palette = ['#155347', '#1D4ED8', '#0F766E', '#B45309', '#7C3AED', '#BE185D', '#0E7490'];
+    let hash = 0;
+    for (let i = 0; i < key.length; i += 1) {
+      hash = (hash * 31 + key.charCodeAt(i)) | 0;
+    }
+    return palette[Math.abs(hash) % palette.length];
   }
 
 
@@ -2405,6 +2493,7 @@ export class DocumentEditorComponent implements OnInit {
 
     this.showInlineCommentBox.set(true);
     this.inlineCommentText = ''; // limpar
+    this.hideInlineMentionSuggestions();
 
   // Posicionar a caixa próxima da seleção
     if (this.selectionBounds) {
@@ -2475,26 +2564,28 @@ export class DocumentEditorComponent implements OnInit {
 
     const selectedRange = this.selectionRange;
     if (!selectedRange || selectedRange.length === 0) {
-      this.showInlineCommentBox.set(false);
-      this.inlineCommentText = '';
+      this.closeInlineCommentBox();
       return;
     }
+
+    const commentContent = this.inlineCommentText.trim();
+    const mentionedUserIds = this.getMentionedEditorUserIds(commentContent);
 
     const newComment: CreateCommentDto = {
       userId: this.user()?.id,
       documentId: this.documentId!,
       createdByColor: this.user()?.color,
-      content: this.inlineCommentText.trim(),
+      content: commentContent,
       rangeIndex: selectedRange.index,
-      rangeLength: selectedRange.length
+      rangeLength: selectedRange.length,
+      mentionedUserIds,
     };
     //console.log('Creating comment with range:', newComment);
     
     this.commentAdding.set(true);
     this.documentService.createComment(newComment, this.documentId!).pipe(
       switchMap((comment) => {
-        this.inlineCommentText = '';
-        this.showInlineCommentBox.set(false);
+        this.closeInlineCommentBox();
         this.collaborationService.sendComment(this.documentId!, comment);
         return this.documentService.getComments(this.documentId!);
       })
@@ -2512,6 +2603,151 @@ export class DocumentEditorComponent implements OnInit {
         console.error('Error creating comment:', err);
       }
     });
+  }
+
+  closeInlineCommentBox(): void {
+    this.showInlineCommentBox.set(false);
+    this.inlineCommentText = '';
+    this.hideInlineMentionSuggestions();
+  }
+
+ /*  onInlineCommentInput(): void {
+    this.updateInlineMentionSuggestions();
+  } */
+
+  onInlineCommentKeydown(event: KeyboardEvent): void {
+    if (!this.showInlineMentionList()) return;
+
+    const maxIndex = this.inlineMentionSuggestions().length - 1;
+    if (maxIndex < 0) {
+      this.hideInlineMentionSuggestions();
+      return;
+    }
+
+    if (event.key === 'ArrowDown') {
+      event.preventDefault();
+      this.activeInlineMentionIndex.set(Math.min(this.activeInlineMentionIndex() + 1, maxIndex));
+      return;
+    }
+
+    if (event.key === 'ArrowUp') {
+      event.preventDefault();
+      this.activeInlineMentionIndex.set(Math.max(this.activeInlineMentionIndex() - 1, 0));
+      return;
+    }
+
+    if (event.key === 'Enter' || event.key === 'Tab') {
+      event.preventDefault();
+      this.selectInlineMention(this.activeInlineMentionIndex());
+      return;
+    }
+
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      this.hideInlineMentionSuggestions();
+    }
+  }
+
+  onInlineMentionMouseDown(event: MouseEvent, index: number): void {
+    event.preventDefault();
+    this.selectInlineMention(index);
+  }
+
+  updateInlineMentionSuggestions(): void {
+    const textarea = this.inlineCommentInput?.nativeElement;
+    if (!textarea) {
+      this.hideInlineMentionSuggestions();
+      return;
+    }
+
+    const text = this.inlineCommentText ?? '';
+    const caretIndex = textarea.selectionStart ?? text.length;
+    const beforeCaret = text.slice(0, caretIndex);
+    const atIndex = beforeCaret.lastIndexOf('@');
+
+    if (atIndex < 0) {
+      this.hideInlineMentionSuggestions();
+      return;
+    }
+
+    const query = beforeCaret.slice(atIndex + 1);
+    if (/\s/.test(query)) {
+      this.hideInlineMentionSuggestions();
+      return;
+    }
+
+    // Garantir que temos os dados mais recentes dos utilizadores com permissão para mencionar
+    this.loadEditorUsersByPermission(this.documentId!, this.documentTeamId()!);
+    
+    const normalizedQuery = this.normalizeMentionTag(query);
+    const suggestions = this.getInlineMentionCandidates().filter((candidate) => {
+      const tagKey = this.normalizeMentionTag(candidate.tag);
+      const nameKey = this.normalizeMentionTag(candidate.name);
+      if (!normalizedQuery) return true;
+      return tagKey.startsWith(normalizedQuery) || nameKey.includes(normalizedQuery);
+    });
+
+    if (suggestions.length === 0) {
+      this.hideInlineMentionSuggestions();
+      return;
+    }
+
+    this.inlineMentionRange = { start: atIndex, end: caretIndex };
+    this.inlineMentionSuggestions.set(suggestions);
+    this.activeInlineMentionIndex.set(0);
+    this.showInlineMentionList.set(true);
+  }
+
+  private selectInlineMention(index: number): void {
+    const suggestions = this.inlineMentionSuggestions();
+    const suggestion = suggestions[index];
+    const range = this.inlineMentionRange;
+    if (!suggestion || !range) return;
+
+    const text = this.inlineCommentText;
+    const mentionText = `@${suggestion.tag}`;
+    const needsSpace = range.end >= text.length || !/\s/.test(text.charAt(range.end));
+    const suffix = needsSpace ? ' ' : '';
+    const nextText = `${text.slice(0, range.start)}${mentionText}${suffix}${text.slice(range.end)}`;
+    const nextCaret = range.start + mentionText.length + suffix.length;
+
+    this.inlineCommentText = nextText;
+    this.hideInlineMentionSuggestions();
+
+    setTimeout(() => {
+      const textarea = this.inlineCommentInput?.nativeElement;
+      if (!textarea) return;
+      textarea.focus();
+      textarea.setSelectionRange(nextCaret, nextCaret);
+    }, 0);
+  }
+
+  private hideInlineMentionSuggestions(): void {
+    this.showInlineMentionList.set(false);
+    this.inlineMentionSuggestions.set([]);
+    this.activeInlineMentionIndex.set(0);
+    this.inlineMentionRange = null;
+  }
+
+  private getInlineMentionCandidates(): Array<{ id: string; name: string; tag: string }> {
+    const seen = new Set<string>();
+    const candidates: Array<{ id: string; name: string; tag: string }> = [];
+
+    this.editorUsers().forEach((editor) => {
+      const id = editor.id;
+      if (!id || seen.has(id)) return;
+
+      const name = editor.fullName || editor.userName || editor.email;
+      if (!name) return;
+
+      const tag = name.replace(/[^a-zA-Z0-9]/g, '');
+      if (!tag) return;
+
+      candidates.push({ id, name, tag });
+      seen.add(id);
+    });
+
+    return candidates;
   }
 
   getInitials(name: string): string {
@@ -2606,12 +2842,70 @@ export class DocumentEditorComponent implements OnInit {
     return this.translateService.instant('DOCUMENT_EDITOR.COMMENT_DAYS_AGO', { count: diffDays });
   }
 
+  /**
+   * Returns editor user IDs mentioned in content by @tag.
+   * Example: "@AlexMorgan" matches editor "Alex Morgan".
+   */
+  getMentionedEditorUserIds(content: string): string[] {
+    if (!content) return [];
+
+    const editors = this.editorUsers().filter((editor) => !!editor.id);
+    if (editors.length === 0) return [];
+
+    const mentionTags = Array.from(content.matchAll(/@([^\s@]+)/g)).map((match) => this.normalizeMentionTag(match[1]));
+    if (mentionTags.length === 0) return [];
+
+    const userIdsByTag = new Map<string, string[]>();
+    editors.forEach((editor) => {
+      const editorId = editor.id;
+      if (!editorId) return;
+
+      const candidateTags = [editor.fullName, editor.userName]
+        .filter((value): value is string => !!value)
+        .map((value) => this.normalizeMentionTag(value))
+        .filter((value) => value.length > 0);
+
+      candidateTags.forEach((tag) => {
+        const existing = userIdsByTag.get(tag);
+        if (existing) {
+          if (!existing.includes(editorId)) existing.push(editorId);
+        } else {
+          userIdsByTag.set(tag, [editorId]);
+        }
+      });
+    });
+
+    const mentionedIds = new Set<string>();
+    mentionTags.forEach((tag) => {
+      const ids = userIdsByTag.get(tag);
+      if (!ids) return;
+      ids.forEach((id) => mentionedIds.add(id));
+    });
+
+    return Array.from(mentionedIds);
+  }
+
+  private normalizeMentionTag(value: string): string {
+    return value
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-zA-Z0-9]/g, '')
+      .toLowerCase();
+  }
+
   isTeamOwnerOrTeamAdmin(): boolean {
     return this.isTeamAdmin() || this.isOwner();
   }
 
+  isMentionedInComment(comment: CommentDto): boolean {
+    const userId = this.user()?.id;
+    if (!userId) return false;
+    
+    return comment.mentions?.some(mention => mention.mentionedUserId === userId) ?? false;
+  }
+
   isElligableForCommentResolution(comment: CommentDto): boolean {
-    return comment.userId === this.user()?.id || this.isTeamOwnerOrTeamAdmin();
+    return comment.userId === this.user()?.id || this.isTeamOwnerOrTeamAdmin() || this.isMentionedInComment(comment);
   }
 
   // ─── Colaboração/Highlights ──────────────────────────────

@@ -90,12 +90,14 @@ namespace Fluxnote.Backend.Data
         /// <summary>
         /// DbSet para comentários em documentos
         /// </summary>
-        public DbSet<DocumentComment> DocumentComments { get; set; }
+        public DbSet<DocumentComment> DocumentComments { get; set; } = default!;
 
         /// <summary>
         /// DbSet para versões de documentos (criadas ao fechar sessão de edição).
         /// </summary>
         public DbSet<Fluxnote.Backend.Models.DocumentVersion> DocumentVersion { get; set; } = default!;
+
+        public DbSet<CommentMention> CommentMentions { get; set; } = default!;
 
         /// <summary>
         /// DbSet para refresh tokens de autenticação.
@@ -272,6 +274,25 @@ namespace Fluxnote.Backend.Data
                 entity.HasIndex(v => v.DocumentId);
                 entity.HasIndex(v => v.CreatedAt);
             });
+
+            builder.Entity<CommentMention>(entity =>
+            {
+                entity.HasOne(cm => cm.Comment)
+                      .WithMany(c => c.Mentions) // adiciona esta coleção em DocumentComment
+                      .HasForeignKey(cm => cm.CommentId)
+                      .OnDelete(DeleteBehavior.NoAction); // se um comentário for apagado, apaga as mentions
+
+                // Relação com User
+                entity.HasOne(cm => cm.User)
+                      .WithMany() // não adicionamos navegação no User por enquanto
+                      .HasForeignKey(cm => cm.UserId)
+                      .OnDelete(DeleteBehavior.Restrict); // evita múltiplos paths de cascade no SQL Server
+
+                // Índice para performance
+                entity.HasIndex(cm => cm.CommentId);
+                entity.HasIndex(cm => cm.UserId);
+            }
+            );
 
             // Configuração específica para SQL Server (SQLite usa BLOB por defeito)
             if (Database.IsSqlServer())

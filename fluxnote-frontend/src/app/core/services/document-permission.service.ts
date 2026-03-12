@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { DocumentPermissionSummary } from '../models';
 
 export interface CreateDocumentPermissionRequest {
@@ -17,6 +17,12 @@ export class DocumentPermissionService {
 
   getPermissionsByDocument(documentId: number): Observable<DocumentPermissionSummary[]> {
     return this.http.get<DocumentPermissionSummary[]>(`/api/documentPermissions/by-document/${documentId}`);
+  }
+
+  getEditorsByDocument(documentId: number): Observable<DocumentPermissionSummary[]> {
+    return this.getPermissionsByDocument(documentId).pipe(
+      map((permissions) => permissions.filter((permission) => permission.documentRole === 1))
+    );
   }
 
   addPermission(request: CreateDocumentPermissionRequest): Observable<DocumentPermissionSummary> {
