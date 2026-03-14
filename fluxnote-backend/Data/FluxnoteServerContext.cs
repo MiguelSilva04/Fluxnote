@@ -73,6 +73,10 @@ namespace Fluxnote.Backend.Data
         /// DbSet para documentos colaborativos.
         /// </summary>
         public DbSet<Fluxnote.Backend.Models.Document> Document { get; set; } = default!;
+
+        /// <summary>
+        /// Representa o set de Permissões de Documento.
+        /// </summary>
         public DbSet<Fluxnote.Backend.Models.DocumentPermission> DocumentPermission { get; set; } = default!;
 
         /// <summary>
@@ -97,6 +101,9 @@ namespace Fluxnote.Backend.Data
         /// </summary>
         public DbSet<Fluxnote.Backend.Models.DocumentVersion> DocumentVersion { get; set; } = default!;
 
+        /// <summary>
+        /// Representa a coleção de Comment Mention na base de dados.
+        /// </summary>
         public DbSet<CommentMention> CommentMentions { get; set; } = default!;
 
         /// <summary>

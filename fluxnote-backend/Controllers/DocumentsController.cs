@@ -1515,8 +1515,11 @@ namespace Fluxnote.Backend.Controllers
             return Ok(new { snapshot = (string?)null });
         }
 
-        // GET /api/documents/{id}/comments
-        // Devolve os comentários associados ao documento, ordenados por data de criação
+        /// <summary>
+        /// Devolve os comentários associados ao documento, ordenados por data de criação
+        /// </summary>
+        /// <param name="id">O id do documento de qual os comentários serão obtidos.</param>
+        /// <returns>Lista de comentários e as suas replies.</returns>
         [HttpGet("{id}/comments")]
         public async Task<ActionResult<IEnumerable<DocumentCommentDto>>> GetComments(int id)
         {
