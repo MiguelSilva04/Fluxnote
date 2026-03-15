@@ -1,1 +1,1 @@
-search_result['372']=["topic_00000000000000E9.html","EmailOptions.SmtpHost Property","Hostname ou IP do servidor SMTP."];
+search_result['372']=["topic_00000000000000AD.html","CreateDocumentInviteRequest.DocumentId Property","ID do documento para o qual o convite será criado."];

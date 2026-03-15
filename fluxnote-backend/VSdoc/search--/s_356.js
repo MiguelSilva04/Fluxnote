@@ -1,1 +1,1 @@
-search_result['356']=["topic_00000000000000E3.html","DevEmailStore Class","Implementação em memória de IDevEmailStore."];
+search_result['356']=["topic_00000000000000A7.html","AcceptDocumentInviteResponseDto.TeamId Property","Identificador do documento para o qual o convite foi aceito.\r\nEste campo é necessário para que o frontend saiba qual documento abrir após o utilizador aceitar o convite."];

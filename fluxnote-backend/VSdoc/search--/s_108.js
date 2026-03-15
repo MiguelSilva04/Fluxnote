@@ -1,1 +1,1 @@
-search_result['108']=["topic_000000000000003D_methods--.html","UpdateProfileRequest Methods",""];
+search_result['108']=["topic_000000000000003B.html","DocumentsController.DeleteComment Method","Elimina um comentário e todas as suas respostas. Apenas o autor do comentário\r\nou um administrador da equipa pode eliminar."];

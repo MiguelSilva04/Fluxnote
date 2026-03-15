@@ -1,7 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace Fluxnote.Backend.Dtos.DocumentInvites;
 
+/// <summary>
+/// DTO de pedido para criação de convite de acesso a um documento.
+/// </summary>
 public class CreateDocumentInviteRequest
 {
     /// <summary>
@@ -10,7 +13,7 @@ public class CreateDocumentInviteRequest
     [Required]
     public int DocumentId { get; set; }
     /// <summary>
-    /// Role a ser atribuído ao usuário convidado ao aceitar o convite. 
+    /// Role a ser atribuído ao utilizador convidado ao aceitar o convite. 
     /// 0 = Viewer, 1 = Editor.
     /// </summary>
     [Required]

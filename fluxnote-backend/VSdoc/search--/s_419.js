@@ -1,0 +1,1 @@
+search_result['419']=["topic_00000000000000C3.html","CreateDocumentCommentDto.Content Property","Conteúdo do comentário. Pode ser texto simples ou conter formatação (ex: Markdown ou HTML)\r\ndependendo de como o frontend lida com os comentários."];

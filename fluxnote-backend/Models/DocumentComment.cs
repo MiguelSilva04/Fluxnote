@@ -1,8 +1,8 @@
-﻿namespace Fluxnote.Backend.Models
+namespace Fluxnote.Backend.Models
 {
 
     /// <summary>
-    /// Representa um comentário feito em um documento. Os comentários podem ser hierárquicos, permitindo respostas a outros comentários. Cada comentário está associado a um documento e a um usuário (autor). Os comentários também armazenam informações sobre a posição no texto onde foram feitos, o conteúdo do comentário, se estão resolvidos ou não, e a cor associada ao autor para destaque visual.
+    /// Representa um comentário feito num documento. Os comentários podem ser hierárquicos, permitindo respostas a outros comentários. Cada comentário está associado a um documento e a um utilizador (autor). Os comentários também armazenam informações sobre a posição no texto onde foram feitos, o conteúdo do comentário, se estão resolvidos ou não, e a cor associada ao autor para destaque visual.
     /// </summary>
     public class DocumentComment
     {
@@ -17,7 +17,7 @@
         public int DocumentId { get; set; }
         
         /// <summary>
-        /// ID do usuário que criou o comentário. Pode ser usado para exibir o nome do autor, associar uma cor ou para controle de permissões (ex: permitir que apenas o autor edite ou exclua o comentário).
+        /// ID do utilizador que criou o comentário. Pode ser usado para exibir o nome do autor, associar uma cor ou para controle de permissões (ex: permitir que apenas o autor edite ou exclua o comentário).
         /// </summary>
         public string UserId { get; set; }
 
@@ -35,29 +35,29 @@
         // posição no Quill
 
         /// <summary>
-        /// Posição no editor Quill onde o comentário foi feito. Isso pode ser usado para destacar a parte do texto que está sendo comentada. Se for um comentário de seleção, isso indica o índice inicial da seleção. Se for um comentário de posição (sem seleção), isso indica a posição do cursor onde o comentário foi feito.
+        /// Posição no editor Quill onde o comentário foi feito. Isto pode ser usado para destacar a parte do texto que está a ser comentada. Se for um comentário de seleção, isto indica o índice inicial da seleção. Se for um comentário de posição (sem seleção), isto indica a posição do cursor onde o comentário foi feito.
         /// </summary>
         public int? RangeIndex { get; set; }
         
         /// <summary>
-        /// Comprimento do texto selecionado no editor Quill. Se for um comentário de seleção, isso indica quantos caracteres estão sendo comentados. Se for um comentário de posição (sem seleção), esse campo pode ser nulo ou zero.
+        /// Comprimento do texto selecionado no editor Quill. Se for um comentário de seleção, isto indica quantos caracteres estão a ser comentados. Se for um comentário de posição (sem seleção), este campo pode ser nulo ou zero.
         /// </summary>
         public int? RangeLength { get; set; }
 
         //public string? SelectedText { get; set; } = string.Empty;
 
         /// <summary>
-        /// Indica se o comentário foi resolvido ou não. Isso pode ser usado para marcar visualmente os comentários que já foram tratados ou respondidos, ajudando os usuários a focar nos comentários que ainda precisam de atenção.
+        /// Indica se o comentário foi resolvido ou não. Isto pode ser usado para marcar visualmente os comentários que já foram tratados ou respondidos, ajudando os utilizadores a focar nos comentários que ainda precisam de atenção.
         /// </summary>
         public bool Resolved { get; set; } = false;
 
         /// <summary>
-        /// Cor associada ao usuário que criou o comentário. Isso pode ser usado para destacar visualmente os comentários de diferentes usuários no frontend.
+        /// Cor associada ao utilizador que criou o comentário. Isto pode ser usado para destacar visualmente os comentários de diferentes utilizadores no frontend.
         /// </summary>
         public string CreatedByColor { get; set; } = string.Empty;
 
         /// <summary>
-        /// Referência de navegação para o usuário que criou o comentário. Permite acessar informações adicionais do usuário, como nome, email, etc. Dependendo de como o backend lida com os usuários, isso pode ser útil para exibir o nome do autor ou outras informações no frontend.
+        /// Referência de navegação para o utilizador que criou o comentário. Permite aceder a informações adicionais do utilizador, como nome, email, etc. Dependendo de como o backend lida com os utilizadores, isto pode ser útil para exibir o nome do autor ou outras informações no frontend.
         /// </summary>
         public User CreatedBy { get; set; } = null!;
 
@@ -67,12 +67,12 @@
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         /// <summary>
-        /// Referência de navegação para o documento ao qual o comentário pertence. Permite acessar informações adicionais do documento, como título, conteúdo, etc. Dependendo de como o backend lida com os documentos, isso pode ser útil para exibir o título do documento ou outras informações no frontend.
+        /// Referência de navegação para o documento ao qual o comentário pertence. Permite aceder a informações adicionais do documento, como título, conteúdo, etc. Dependendo de como o backend lida com os documentos, isto pode ser útil para exibir o título do documento ou outras informações no frontend.
         /// </summary>
         public Document Document { get; set; } = null!;
 
         /// <summary>
-        /// Coleção de respostas ao comentário. Permite acessar todas as respostas associadas a este comentário.
+        /// Coleção de respostas ao comentário. Permite aceder todas as respostas associadas a este comentário.
         /// </summary>
         public ICollection<DocumentComment> CommentReplies { get; set; } = new List<DocumentComment>();
         
@@ -82,7 +82,7 @@
         public DocumentComment? ParentComment { get; set; }
 
         /// <summary>
-        /// Referênça de navegação para as menções feitas dentro do comentário.
+        /// Referência de navegação para as menções feitas dentro do comentário.
         /// </summary>
         public ICollection<CommentMention> Mentions { get; set; } = new List<CommentMention>();
     }

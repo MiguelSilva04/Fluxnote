@@ -1,6 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
 namespace Fluxnote.Backend.Dtos.TeamInvites;
+
+/// <summary>
+/// DTO de pedido para criação de convite de entrada numa equipa.
+/// </summary>
 public class CreateTeamInviteRequest
 {
     /// <summary>

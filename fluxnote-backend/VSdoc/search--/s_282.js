@@ -1,1 +1,1 @@
-search_result['282']=["topic_00000000000000B1_attached_props--.html","TeamMember Attached Properties",""];
+search_result['282']=["topic_0000000000000085.html","RegisterRequest Class","DTO para pedido de registo de novo utilizador.\r\nUsado no endpoint POST /api/auth/register."];

@@ -5,6 +5,14 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Fluxnote.Backend.Controllers;
 
+/// <summary>
+/// Controlador responsável por upload e entrega de ficheiros de imagem.
+/// </summary>
+/// <remarks>
+/// <b>Rota Base:</b> api/uploads<br/>
+/// <b>Autenticação:</b> JWT Bearer para upload; endpoint de leitura pode ser anónimo.<br/>
+/// Valida tipo e tamanho de ficheiros antes de armazenar no provedor configurado.
+/// </remarks>
 [Route("api/[controller]")]
 [ApiController]
 [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]

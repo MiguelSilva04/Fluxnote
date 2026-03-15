@@ -1,0 +1,1 @@
+search_result['1093']=["topic_0000000000000227.html","TeamMember.TeamId Property","Identificador da equipa a que pertence (FK para Team)."];

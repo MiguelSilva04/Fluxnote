@@ -1,0 +1,1 @@
+search_result['469']=["topic_00000000000000DC.html","DocumentContextDto Class","DTO para representar um ficheiro de contexto associado a um documento.\r\ndevolvido nos endpoints GET e POST de contexto.\r\nO ExtractedText não é exposto - é exclusivamente usado server-side pela IA."];

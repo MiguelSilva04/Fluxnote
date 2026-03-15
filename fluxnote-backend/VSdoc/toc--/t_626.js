@@ -1,0 +1,1 @@
+c['626']=[['627',"GenerateContentAsync Method","topic_000000000000024D.html",0],['628',"GenerateSummaryAsync Method","topic_000000000000024B.html",0],['629',"ImproveTextAsync Method","topic_000000000000024C.html",0]];

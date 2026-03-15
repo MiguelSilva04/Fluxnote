@@ -1,1 +1,1 @@
-search_result['239']=["topic_0000000000000091.html","Document.IsDeleted Property","Indica se o documento está na lixeira (soft delete)."];
+search_result['239']=["topic_0000000000000074_props--.html","ExternalAuthErrorResponse Properties",""];

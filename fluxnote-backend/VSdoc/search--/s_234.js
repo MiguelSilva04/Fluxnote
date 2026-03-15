@@ -1,1 +1,1 @@
-search_result['234']=["topic_000000000000008C.html","Document.Content Property","Conteúdo binário do documento (Y.Doc serializado ou HTML em UTF-8)."];
+search_result['234']=["topic_0000000000000073.html","ChangePasswordRequest.ConfirmPassword Property","Confirmação da nova password (deve ser igual a NewPassword)."];

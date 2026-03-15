@@ -1,1 +1,1 @@
-search_result['177']=["topic_000000000000006C.html","DocumentDetailDto.PlainText Property","Texto plano extraído do HTML (sem tags)."];
+search_result['177']=["topic_0000000000000058.html","TeamsController.PatchTeamName Method","Atualiza o nome de uma equipa. Apenas o Owner pode executar esta operação."];

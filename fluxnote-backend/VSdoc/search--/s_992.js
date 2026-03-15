@@ -1,0 +1,1 @@
+search_result['992']=["topic_00000000000001DE.html","DocumentPermission.UpdatedAt Property","Data da última atualização da permissão (UTC)."];

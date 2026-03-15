@@ -5,7 +5,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta name="GENERATOR" content="VSdocman - documentation generator; https://www.helixoft.com" />
 	<link rel="icon" href="favicon.ico">
-	<title>TokenService Class</title>
+	<title>DocumentCommentDto.RangeIndex Property</title>
 
 	<link rel="stylesheet" type="text/css" href="msdn2019/toc.css" />
 	<script src="msdn2019/toc.js"></script>
@@ -75,11 +75,11 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
   </div>
 
 <div id="mainBody">
-		<h1 class="title">TokenService Class</h1>
+		<h1 class="title">DocumentCommentDto.RangeIndex Property</h1>
         
 		<div class="metadata">
         Namespace:
-<a href="topic_00000000000000D6.html">Fluxnote.Backend.Services.Auth</a>
+<a href="topic_00000000000000BD.html">Fluxnote.Backend.Dtos.Documents</a>
 
 
 
@@ -90,7 +90,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 
        
        
-        <summary-info>Serviço responsável pela geração e gestão de tokens de autenticação.</summary-info>
+        <summary-info>Posição no editor Quill onde o comentário foi feito. Isto pode ser usado para destacar a parte do texto que está a ser comentada. Se for um comentário de seleção, isto indica o índice inicial da seleção. Se for um comentário de posição (sem seleção), isto indica a posição do cursor onde o comentário foi feito.</summary-info>
 
 
 
@@ -140,7 +140,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 				</div>
 				
 				<div class="codeSnippetCode codeVB">
-					<pre xml:space="preserve" class="brush: vb">Public Class TokenService</pre>			
+					<pre xml:space="preserve" class="brush: vb">Public Property RangeIndex() As <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.nullable-1">Nullable</a>(Of <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.int32">Integer</a>)</pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -179,7 +179,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 				</div>
 				
 				<div class="codeSnippetCode codeCsharp">
-					<pre xml:space="preserve" class="brush: csharp">public class TokenService</pre>			
+					<pre xml:space="preserve" class="brush: csharp">public <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.nullable-1">Nullable</a>&lt;<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.int32">int</a>&gt; RangeIndex {get; set;}</pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -219,7 +219,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 				</div>
 				
 				<div class="codeSnippetCode codeCpp">
-					<pre xml:space="preserve" class="brush: cpp">public ref class TokenService </pre>			
+					<pre xml:space="preserve" class="brush: cpp">public: &nbsp;<br />property <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.nullable-1">Nullable</a>&lt;<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.int32">int</a>&gt; RangeIndex {&nbsp;<br /> <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.nullable-1">Nullable</a>&lt;<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.int32">int</a>&gt; get( );&nbsp;<br /> void set(&nbsp;<br />   <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.nullable-1">Nullable</a>&lt;<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.int32">int</a>&gt; value&nbsp;<br /> );&nbsp;<br />}</pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -258,7 +258,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 				</div>
 				
 				<div class="codeSnippetCode codeJScript">
-					<pre xml:space="preserve" class="brush: js">public class TokenService</pre>			
+					<pre xml:space="preserve" class="brush: js">JScript does not support generic types and methods.</pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -270,6 +270,11 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 
 
 
+	<h4 class="subHeading">
+		Property Value</h4>
+	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.nullable-1">Nullable</a>&lt;<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.int32">int</a>&gt; 
+	
+
 
 
 
@@ -288,514 +293,12 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 
 
 
-<div class="section_container">
-	<div class="section_heading">
-		<span><a href="javascript:void(0)" title="Collapse" onclick="toggleSection(this);">Constructors</a></span>
-		<div>&nbsp;</div>
-	</div>
 
-	<div id="ConstructorsSection" class="section">	
-  <table class="memberListTable">
-    <tr>
-      <th></th>
-      <th>
-        Name
-      </th>
-      <th>
-        Description
-      </th>
-    </tr>
 
 
-	
-			<tr class="
-	
-	
-	">
-	  <td>
-    <img alt="Public constructor" title="Public constructor" src="msdn2019/pubmethod.png"></img>
 
-	
-	    
-	  </td>
-	  <td>
-	    <a href="topic_00000000000000D8.html">TokenService(IConfiguration)</a>
 
-	  </td>
-	  <td>
-	
-	Construtor com injeção de configuração.
-	
-		</td>
-	</tr>
-	
 
-
-  </table>
-
-  <a href="#mainBody">
-    Top
-  </a>
-
-	</div>					
-</div>
-
-
-
-
-
-
-
-<div class="section_container">
-	<div class="section_heading">
-		<span><a href="javascript:void(0)" title="Collapse" onclick="toggleSection(this);">Methods</a></span>
-		<div>&nbsp;</div>
-	</div>
-
-	<div id="MethodsSection" class="section">	
-  <table class="memberListTable">
-    <tr>
-      <th></th>
-      <th>
-        Name
-      </th>
-      <th>
-        Description
-      </th>
-    </tr>
-
-
-
-
-	<tr class="
-
-
-">
-	<td>
-<img alt="Public method" title="Public method" src="msdn2019/pubmethod.png"></img>
-
-
-    
-	</td>
-	<td>
-	<a href="topic_00000000000000D9.html">CreateAccessToken(User)</a>
-
-	</td>
-	<td>
-
-Cria um access token JWT para um utilizador autenticado.
-
-	</td>
-</tr>
-
-
-
-
-
-
-
-			<tr class="
-inheritedMember 
-
-
-">
-	<td>
-<img alt="Public method" title="Public method" src="msdn2019/pubmethod.png"></img>
-
-	<img alt="Static" title="Static" src="msdn2019/static.png"></img>
-
-    
-	</td>
-	<td>
-	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.object.equals">Equals(object?, object?)</a>
-
-	</td>
-	<td>
-
-Determines whether the specified object instances are considered equal.
-(inherited from <a target="_top" href=".html" onclick="this.target='';return true;">object</a>).
-
-	</td>
-</tr>
-			<tr class="
-inheritedMember 
-
-
-">
-	<td>
-<img alt="Public method" title="Public method" src="msdn2019/pubmethod.png"></img>
-
-
-    
-	</td>
-	<td>
-	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.object.equals">Equals(object?)</a>
-
-	</td>
-	<td>
-
-Determines whether the specified object is equal to the current object.
-(inherited from <a target="_top" href=".html" onclick="this.target='';return true;">object</a>).
-
-	</td>
-</tr>
-	
-
-
-
-
-
-
-
-
-	<tr class="
-inheritedMember 
-
-
-">
-	<td>
-   <img alt="Protected method" title="Protected method" src="msdn2019/protmethod.png"></img>
-
-    
-	  
-
-
-    
-	</td>
-	<td>
-	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.object.finalize">~Object()</a>
-
-	</td>
-	<td>
-
-Allows an object to try to free resources and perform other cleanup operations before it is reclaimed by garbage collection.
-(inherited from <a target="_top" href=".html" onclick="this.target='';return true;">object</a>).
-
-	</td>
-</tr>
-
-
-
-
-
-
-
-
-	<tr class="
-
-
-">
-	<td>
-<img alt="Public method" title="Public method" src="msdn2019/pubmethod.png"></img>
-
-	<img alt="Static" title="Static" src="msdn2019/static.png"></img>
-
-    
-	</td>
-	<td>
-	<a href="topic_00000000000000DA.html">GenerateRefreshTokenPlain()</a>
-
-	</td>
-	<td>
-
-Gera um refresh token aleatório em texto plano.
-
-	</td>
-</tr>
-
-
-
-
-
-
-
-
-	<tr class="
-inheritedMember 
-
-
-">
-	<td>
-<img alt="Public method" title="Public method" src="msdn2019/pubmethod.png"></img>
-
-
-    
-	</td>
-	<td>
-	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.object.gethashcode">GetHashCode()</a>
-
-	</td>
-	<td>
-
-Serves as the default hash function.
-(inherited from <a target="_top" href=".html" onclick="this.target='';return true;">object</a>).
-
-	</td>
-</tr>
-
-
-
-
-
-
-
-
-	<tr class="
-inheritedMember 
-
-
-">
-	<td>
-<img alt="Public method" title="Public method" src="msdn2019/pubmethod.png"></img>
-
-
-    
-	</td>
-	<td>
-	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.object.gettype">GetType()</a>
-
-	</td>
-	<td>
-
-Gets the <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.type">Type</a> of the current instance.
-(inherited from <a target="_top" href=".html" onclick="this.target='';return true;">object</a>).
-
-	</td>
-</tr>
-
-
-
-
-
-
-
-
-	<tr class="
-
-
-">
-	<td>
-<img alt="Public method" title="Public method" src="msdn2019/pubmethod.png"></img>
-
-	<img alt="Static" title="Static" src="msdn2019/static.png"></img>
-
-    
-	</td>
-	<td>
-	<a href="topic_00000000000000DB.html">HashRefreshToken(string)</a>
-
-	</td>
-	<td>
-
-Calcula o hash SHA256 de um refresh token para armazenamento seguro.
-
-	</td>
-</tr>
-
-
-
-
-
-
-
-
-	<tr class="
-inheritedMember 
-
-
-">
-	<td>
-   <img alt="Protected method" title="Protected method" src="msdn2019/protmethod.png"></img>
-
-    
-	  
-
-
-    
-	</td>
-	<td>
-	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.object.memberwiseclone">MemberwiseClone()</a>
-
-	</td>
-	<td>
-
-Creates a shallow copy of the current <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.object">object</a>.
-(inherited from <a target="_top" href=".html" onclick="this.target='';return true;">object</a>).
-
-	</td>
-</tr>
-
-
-
-
-
-
-
-
-	<tr class="
-inheritedMember 
-
-
-">
-	<td>
-<img alt="Public method" title="Public method" src="msdn2019/pubmethod.png"></img>
-
-	<img alt="Static" title="Static" src="msdn2019/static.png"></img>
-
-    
-	</td>
-	<td>
-	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.object.referenceequals">ReferenceEquals(object?, object?)</a>
-
-	</td>
-	<td>
-
-Determines whether the specified <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.object">object</a> instances are the same instance.
-(inherited from <a target="_top" href=".html" onclick="this.target='';return true;">object</a>).
-
-	</td>
-</tr>
-
-
-
-
-
-
-
-
-	<tr class="
-inheritedMember 
-
-
-">
-	<td>
-<img alt="Public method" title="Public method" src="msdn2019/pubmethod.png"></img>
-
-
-    
-	</td>
-	<td>
-	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.object.tostring">ToString()</a>
-
-	</td>
-	<td>
-
-Returns a string that represents the current object.
-(inherited from <a target="_top" href=".html" onclick="this.target='';return true;">object</a>).
-
-	</td>
-</tr>
-
-
-
-
-
-
-  </table>
-
-  <a href="#mainBody">
-    Top
-  </a>
-
-	</div>					
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
-
-<!-- Classes -->
-
-<!-- Classes End -->
-
-<!-- Standard Modules -->
-
-<!-- Standard Modules End -->
-
-  
-
-
-
-
-
-
-
-
-<div class="section_container">
-	<div class="section_heading">
-		<span><a href="javascript:void(0)" title="Collapse" onclick="toggleSection(this);">Remarks</a></span>
-		<div>&nbsp;</div>
-	</div>
-
-	<div id="remarksSection" class="section">	
-			<strong>Funcionalidades:</strong>
-<ul><li>Geração de access tokens JWT</li><li>Geração de refresh tokens aleatórios</li><li>Hash de refresh tokens para armazenamento seguro</li></ul>
-
-<strong>Configuração (appsettings.json):</strong>
-			<div class="codeSnippetCodeCollection">
-				<div class="codeSnippetToolbar">
-					<a title="Copy to clipboard." href="javascript:void(0)" onclick="CopyCode(this);">Copy</a>
-				</div>
-				
-				<div class="codeSnippetCode">
-					<pre xml:space="preserve">
- {
-     &quot;Jwt&quot;: {
-         &quot;Key&quot;: &quot;CHAVE_SECRETA_256_BITS&quot;,
-         &quot;Issuer&quot;: &quot;Fluxnote&quot;,
-         &quot;Audience&quot;: &quot;Fluxnote&quot;,
-         &quot;AccessTokenMinutes&quot;: 15
-     }
- }
- 					</pre>			
-				</div>
-			</div>
-
-<strong>Especificações de Segurança:</strong>
-<ul><li><strong>Algoritmo JWT:</strong> HMAC-SHA256 (simétrico)</li><li><strong>Refresh Token:</strong> 64 bytes aleatórios (512 bits de entropia)</li><li><strong>Hash:</strong> SHA256 para armazenamento de refresh tokens</li></ul>
-	</div>					
-</div>
-
-
-
-
-<div class="section_container">
-	<div class="section_heading">
-		<span><a href="javascript:void(0)" title="Collapse" onclick="toggleSection(this);">Inheritance Hierarchy</a></span>
-		<div>&nbsp;</div>
-	</div>
-
-<div id="inheritanceHierarchySection" class="section">
-
-<div style="padding-left:0em;"><a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.object">object</a>
-</div>
-
-
-
-<div style="padding-left:1em;">Fluxnote.Backend.Services.Auth.TokenService</div>
-
-				
-</div>
-</div>
 
 
 
@@ -850,7 +353,6 @@ Returns a string that represents the current object.
 	</div>					
 </div>
 
-
 <div class="section_container">
 	<div class="section_heading">
 		<span><a href="javascript:void(0)" title="Collapse" onclick="toggleSection(this);">See Also</a></span>
@@ -859,10 +361,14 @@ Returns a string that represents the current object.
 
 	<div id="seeAlsoSection" class="section">	
 		<div>
-	<a href="topic_00000000000000D6.html">Fluxnote.Backend.Services.Auth Namespace</a><br />
+			<a href="topic_00000000000000CE.html">DocumentCommentDto Class</a><br />
 
 
-	
+
+<a href="topic_00000000000000BD.html">Fluxnote.Backend.Dtos.Documents Namespace</a><br />
+
+
+			
 
 		</div>
 	</div>					

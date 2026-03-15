@@ -1,1 +1,1 @@
-search_result['300']=["topic_00000000000000BD.html","User.FullName Property","Nome completo do utilizador para exibição."];
+search_result['300']=["topic_000000000000008A_methods--.html","ResetPasswordRequest Methods",""];

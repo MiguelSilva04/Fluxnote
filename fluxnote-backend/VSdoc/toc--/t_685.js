@@ -1,0 +1,1 @@
+c['685']=[['686',"BlobStorageOptions Class","topic_0000000000000282.html",1],['691',"BlobStorageService Class","topic_0000000000000286.html",1],['698',"LocalStorageService Class","topic_0000000000000291.html",1],['705',"IStorageService Interface","topic_000000000000028C.html",1]];

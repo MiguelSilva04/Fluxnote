@@ -1,1 +1,1 @@
-search_result['272']=["topic_00000000000000A8.html","Team.Id Property","Identificador único da equipa (chave primária)."];
+search_result['272']=["topic_0000000000000080_vars--.html","LoginRequest Fields",""];

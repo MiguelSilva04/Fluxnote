@@ -1,0 +1,1 @@
+search_result['1007']=["topic_00000000000001EA.html","DocumentVersion.Summary Property","Resumo automático da versão (ex: \"Session by João Silva\")."];

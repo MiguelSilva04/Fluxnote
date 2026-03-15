@@ -20,6 +20,6 @@ public interface IStorageService
     /// <summary>
     /// Elimina um ficheiro de contexto previamente armazenado.
     /// </summary>
-    /// <param name="storedPath">A referência retornada pelo UploadContextFileAsync.</param>
+    /// <param name="storedPath">A referência devolvida pelo UploadContextFileAsync.</param>
     Task DeleteContextFileAsync(string storedPath);
 }

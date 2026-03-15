@@ -1,0 +1,1 @@
+search_result['1096']=["topic_000000000000022A.html","TeamRole Enumeration","Define os níveis de permissão disponíveis para membros de equipa."];

@@ -1,0 +1,1 @@
+search_result['1124']=["topic_0000000000000246.html","AccountStatusExtensions Class","Métodos de extensão para AccountStatus."];

@@ -1,1 +1,1 @@
-search_result['105']=["topic_000000000000003D.html","UpdateProfileRequest Class","DTO para pedido de atualização de perfil de utilizador.\r\nUsado no endpoint PUT /api/auth/users/me."];
+search_result['105']=["topic_0000000000000039_props--.html","RegisterRequest Properties",""];

@@ -1,1 +1,1 @@
-search_result['305']=["topic_00000000000000C2.html","User.UpdatedAt Property","Data e hora da última atualização do perfil (UTC)."];
+search_result['305']=["topic_000000000000008D.html","ResetPasswordRequest.NewPassword Property","Nova password."];

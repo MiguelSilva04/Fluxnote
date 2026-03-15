@@ -1,1 +1,1 @@
-search_result['97']=["topic_0000000000000039_attached_props--.html","RegisterRequest Attached Properties",""];
+search_result['97']=["topic_0000000000000035.html","DocumentsController.GetContextFiles Method","Lista os ficheiros de contexto associados ao documento.\r\nApenas Editors e Owners podem listar (Viewers não têm acesso ao painel de IA)."];

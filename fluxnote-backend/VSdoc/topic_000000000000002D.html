@@ -5,7 +5,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta name="GENERATOR" content="VSdocman - documentation generator; https://www.helixoft.com" />
 	<link rel="icon" href="favicon.ico">
-	<title>FluxnoteServerContext.RefreshTokens Property</title>
+	<title>DocumentsController.GenerateContent Method</title>
 
 	<link rel="stylesheet" type="text/css" href="msdn2019/toc.css" />
 	<script src="msdn2019/toc.js"></script>
@@ -75,11 +75,11 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
   </div>
 
 <div id="mainBody">
-		<h1 class="title">FluxnoteServerContext.RefreshTokens Property</h1>
+		<h1 class="title">DocumentsController.GenerateContent Method</h1>
         
 		<div class="metadata">
         Namespace:
-<a href="topic_0000000000000027.html">Fluxnote.Backend.Data</a>
+<a href="topic_0000000000000000.html">Fluxnote.Backend.Controllers</a>
 
 
 
@@ -90,7 +90,8 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 
        
        
-        <summary-info>DbSet para refresh tokens de autenticação.</summary-info>
+        <summary-info>Gera conteúdo novo usando IA com base num prompt do utilizador.
+O conteúdo do documento e os ficheiros de contexto são incluídos para informar a geração.</summary-info>
 
 
 
@@ -140,7 +141,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 				</div>
 				
 				<div class="codeSnippetCode codeVB">
-					<pre xml:space="preserve" class="brush: vb">Public ReadOnly Property RefreshTokens() As <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.entityframeworkcore.dbset-1">DbSet</a>(Of <a target="_top" href="topic_0000000000000095.html" onclick="this.target='';return true;">RefreshToken</a>)</pre>			
+					<pre xml:space="preserve" class="brush: vb">&lt;HttpPost(&quot;{id}/generate&quot;)&gt; _&nbsp;<br />Public Function GenerateContent( _&nbsp;<br />   ByVal <i>id</i> As <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.int32">Integer</a>, _&nbsp;<br />   &lt;FromBody()&gt; _&nbsp;<br />   ByVal <i>request</i> As <a target="_top" href="topic_0000000000000116.html" onclick="this.target='';return true;">GenerateContentRequest</a> _&nbsp;<br />) As <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1">Task</a>(Of <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.actionresult">ActionResult</a>)</pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -179,7 +180,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 				</div>
 				
 				<div class="codeSnippetCode codeCsharp">
-					<pre xml:space="preserve" class="brush: csharp">public <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.entityframeworkcore.dbset-1">DbSet</a>&lt;<a target="_top" href="topic_0000000000000095.html" onclick="this.target='';return true;">RefreshToken</a>&gt; RefreshTokens {get;}</pre>			
+					<pre xml:space="preserve" class="brush: csharp">[HttpPost(&quot;{id}/generate&quot;)]&nbsp;<br />public <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.actionresult">ActionResult</a>&gt; GenerateContent(&nbsp;<br />   <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.int32">int</a> <i>id</i>,&nbsp;<br />   [FromBody()]&nbsp;<br />   <a target="_top" href="topic_0000000000000116.html" onclick="this.target='';return true;">GenerateContentRequest</a> <i>request</i>&nbsp;<br />)</pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -219,7 +220,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 				</div>
 				
 				<div class="codeSnippetCode codeCpp">
-					<pre xml:space="preserve" class="brush: cpp">public: &nbsp;<br />property <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.entityframeworkcore.dbset-1">DbSet</a>&lt;<a target="_top" href="topic_0000000000000095.html" onclick="this.target='';return true;">RefreshToken</a>&gt;^ RefreshTokens {&nbsp;<br /> <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.entityframeworkcore.dbset-1">DbSet</a>&lt;<a target="_top" href="topic_0000000000000095.html" onclick="this.target='';return true;">RefreshToken</a>&gt;^ get( );&nbsp;<br />}</pre>			
+					<pre xml:space="preserve" class="brush: cpp">[HttpPost(&quot;{id}/generate&quot;)]&nbsp;<br />public: &nbsp;<br /><a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.actionresult">ActionResult</a>^&gt;^ GenerateContent(&nbsp;<br />   <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.int32">int</a> <i>id</i>,&nbsp;<br />   [FromBody()]&nbsp;<br />   <a target="_top" href="topic_0000000000000116.html" onclick="this.target='';return true;">GenerateContentRequest</a>^ <i>request</i>&nbsp;<br />) </pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -269,10 +270,42 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 	</div>
 
 
+<h4 class="subHeading">
+	Parameters</h4><dl paramName="id" class="parameterList">
+	<dt>
+		<span class="parameter">
+			id
+		</span>
+	</dt>
+	<dd>
+		<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.int32">int</a> 
+	</dd>
+</dl>
+<p>
+	ID do documento. 
+</p>
+<dl paramName="request" class="parameterList">
+	<dt>
+		<span class="parameter">
+			request
+		</span>
+	</dt>
+	<dd>
+		<a target="_top" href="topic_0000000000000116.html" onclick="this.target='';return true;">GenerateContentRequest</a> 
+	</dd>
+</dl>
+<p>
+	Corpo com o prompt do utilizador. 
+</p>
+
+<p />
 
 	<h4 class="subHeading">
-		Property Value</h4>
-	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.entityframeworkcore.dbset-1">DbSet</a>&lt;<a target="_top" href="topic_0000000000000095.html" onclick="this.target='';return true;">RefreshToken</a>&gt; 
+		Return Value</h4>
+	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.actionresult">ActionResult</a>&gt; 
+		<p>
+		<ul><li></li><li></li><li></li><li></li><li></li><li></li><li></li></ul> 
+	</p>
 	
 
 
@@ -361,11 +394,11 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 
 	<div id="seeAlsoSection" class="section">	
 		<div>
-			<a href="topic_0000000000000028.html">FluxnoteServerContext Class</a><br />
+			<a href="topic_0000000000000026.html">DocumentsController Class</a><br />
 
 
 
-<a href="topic_0000000000000027.html">Fluxnote.Backend.Data Namespace</a><br />
+<a href="topic_0000000000000000.html">Fluxnote.Backend.Controllers Namespace</a><br />
 
 
 			

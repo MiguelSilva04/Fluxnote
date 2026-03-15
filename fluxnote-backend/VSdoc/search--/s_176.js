@@ -1,1 +1,1 @@
-search_result['176']=["topic_000000000000006B.html","DocumentDetailDto.Content Property","Conteúdo HTML completo do documento."];
+search_result['176']=["topic_0000000000000057.html","TeamsController.PutTeam Method","Atualiza os dados de uma equipa."];

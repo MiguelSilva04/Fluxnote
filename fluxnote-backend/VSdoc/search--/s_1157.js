@@ -1,0 +1,1 @@
+search_result['1157']=["topic_0000000000000253.html","IAIService.ImproveTextAsync Method","Sugere melhorias para o texto selecionado, tendo em conta o contexto do documento."];

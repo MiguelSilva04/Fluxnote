@@ -1,1 +1,1 @@
-search_result['58']=["topic_0000000000000022.html","TeamsController.GetTeams Method","Lista todas as equipas onde o utilizador é membro."];
+search_result['58']=["topic_0000000000000022.html","DocumentPermissionsController.GetByDocument Method","Lista as permissões de um documento específico.\r\nRequer ser membro da equipa do documento."];

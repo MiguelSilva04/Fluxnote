@@ -5,7 +5,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta name="GENERATOR" content="VSdocman - documentation generator; https://www.helixoft.com" />
 	<link rel="icon" href="favicon.ico">
-	<title>DocumentsController.GetTrash Method</title>
+	<title>AuthController.ForgotPassword Method</title>
 
 	<link rel="stylesheet" type="text/css" href="msdn2019/toc.css" />
 	<script src="msdn2019/toc.js"></script>
@@ -75,7 +75,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
   </div>
 
 <div id="mainBody">
-		<h1 class="title">DocumentsController.GetTrash Method</h1>
+		<h1 class="title">AuthController.ForgotPassword Method</h1>
         
 		<div class="metadata">
         Namespace:
@@ -90,7 +90,8 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 
        
        
-        <summary-info>Lista documentos na lixeira do utilizador (apenas documentos criados pelo próprio).</summary-info>
+        <summary-info>Inicia o fluxo de recuperação de password.
+Gera um token de reset e envia email com link (prod) ou guarda em memória (dev).</summary-info>
 
 
 
@@ -140,7 +141,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 				</div>
 				
 				<div class="codeSnippetCode codeVB">
-					<pre xml:space="preserve" class="brush: vb">&lt;HttpGet(&quot;trash&quot;)&gt; _&nbsp;<br />Public Function GetTrash() As <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1">Task</a>(Of <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.actionresult-1">ActionResult</a>(Of <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>(Of <a target="_top" href="topic_0000000000000056.html" onclick="this.target='';return true;">DocumentDto</a>)))</pre>			
+					<pre xml:space="preserve" class="brush: vb">&lt;HttpPost(&quot;forgot-password&quot;)&gt; _&nbsp;<br />Public Function ForgotPassword( _&nbsp;<br />   &lt;FromBody()&gt; _&nbsp;<br />   ByVal <i>request</i> As <a target="_top" href="topic_000000000000007D.html" onclick="this.target='';return true;">ForgotPasswordRequest</a> _&nbsp;<br />) As <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1">Task</a>(Of <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.iactionresult">IActionResult</a>)</pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -179,7 +180,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 				</div>
 				
 				<div class="codeSnippetCode codeCsharp">
-					<pre xml:space="preserve" class="brush: csharp">[HttpGet(&quot;trash&quot;)]&nbsp;<br />public <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.actionresult-1">ActionResult</a>&lt;<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a target="_top" href="topic_0000000000000056.html" onclick="this.target='';return true;">DocumentDto</a>&gt;&gt;&gt; GetTrash()</pre>			
+					<pre xml:space="preserve" class="brush: csharp">[HttpPost(&quot;forgot-password&quot;)]&nbsp;<br />public <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.iactionresult">IActionResult</a>&gt; ForgotPassword(&nbsp;<br />   [FromBody()]&nbsp;<br />   <a target="_top" href="topic_000000000000007D.html" onclick="this.target='';return true;">ForgotPasswordRequest</a> <i>request</i>&nbsp;<br />)</pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -219,7 +220,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 				</div>
 				
 				<div class="codeSnippetCode codeCpp">
-					<pre xml:space="preserve" class="brush: cpp">[HttpGet(&quot;trash&quot;)]&nbsp;<br />public: &nbsp;<br /><a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.actionresult-1">ActionResult</a>&lt;<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a target="_top" href="topic_0000000000000056.html" onclick="this.target='';return true;">DocumentDto</a>&gt;^&gt;^&gt;^ GetTrash() </pre>			
+					<pre xml:space="preserve" class="brush: cpp">[HttpPost(&quot;forgot-password&quot;)]&nbsp;<br />public: &nbsp;<br /><a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.iactionresult">IActionResult</a>^&gt;^ ForgotPassword(&nbsp;<br />   [FromBody()]&nbsp;<br />   <a target="_top" href="topic_000000000000007D.html" onclick="this.target='';return true;">ForgotPasswordRequest</a>^ <i>request</i>&nbsp;<br />) </pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -269,10 +270,29 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 	</div>
 
 
+<h4 class="subHeading">
+	Parameters</h4><dl paramName="request" class="parameterList">
+	<dt>
+		<span class="parameter">
+			request
+		</span>
+	</dt>
+	<dd>
+		<a target="_top" href="topic_000000000000007D.html" onclick="this.target='';return true;">ForgotPasswordRequest</a> 
+	</dd>
+</dl>
+<p>
+	Email do utilizador. 
+</p>
+
+<p />
 
 	<h4 class="subHeading">
 		Return Value</h4>
-	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.actionresult-1">ActionResult</a>&lt;<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a target="_top" href="topic_0000000000000056.html" onclick="this.target='';return true;">DocumentDto</a>&gt;&gt;&gt; 
+	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.iactionresult">IActionResult</a>&gt; 
+		<p>
+		200 OK sempre (para não revelar se o email existe). 
+	</p>
 	
 
 
@@ -295,6 +315,17 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 
 
 
+<div class="section_container">
+	<div class="section_heading">
+		<span><a href="javascript:void(0)" title="Collapse" onclick="toggleSection(this);">Remarks</a></span>
+		<div>&nbsp;</div>
+	</div>
+
+	<div id="remarksSection" class="section">	
+			<strong>Rate Limit:</strong> Recomendado 3 pedidos por hora por IP.&nbsp;<br />
+<strong>Segurança:</strong> Resposta sempre igual independentemente de o email existir ou não.
+	</div>					
+</div>
 
 
 
@@ -361,7 +392,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 
 	<div id="seeAlsoSection" class="section">	
 		<div>
-			<a href="topic_000000000000000F.html">DocumentsController Class</a><br />
+			<a href="topic_0000000000000001.html">AuthController Class</a><br />
 
 
 

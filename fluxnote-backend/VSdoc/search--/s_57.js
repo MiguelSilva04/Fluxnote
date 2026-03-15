@@ -1,1 +1,1 @@
-search_result['57']=["topic_0000000000000021.html","TeamsController Constructor","Construtor com injeção de dependências."];
+search_result['57']=["topic_0000000000000021.html","DocumentPermissionsController Constructor",""];

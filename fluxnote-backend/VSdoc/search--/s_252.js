@@ -1,1 +1,1 @@
-search_result['252']=["topic_0000000000000099.html","RefreshToken.User Property","Referência de navegação para o utilizador."];
+search_result['252']=["topic_000000000000007B.html","ExternalUserInfo.FullName Property",""];

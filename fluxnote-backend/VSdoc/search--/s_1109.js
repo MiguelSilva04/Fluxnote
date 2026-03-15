@@ -1,0 +1,1 @@
+search_result['1109']=["topic_0000000000000235.html","User.ProfilePictureUrl Property","URL da foto de perfil do utilizador.\r\nPode ser URL externa ou base64 data URI."];

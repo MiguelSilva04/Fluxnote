@@ -1,1 +1,1 @@
-search_result['280']=["topic_00000000000000B0.html","Team.Documents Property","Coleção de documentos pertencentes à equipa."];
+search_result['280']=["topic_0000000000000083.html","LoginRequest.RememberMe Property","Indica se a sessão deve ter duração prolongada (30 dias vs 7 dias)."];

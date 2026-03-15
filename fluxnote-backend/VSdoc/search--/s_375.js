@@ -1,1 +1,1 @@
-search_result['375']=["topic_00000000000000EC.html","EmailOptions.SmtpPass Property","Password para autenticação SMTP."];
+search_result['375']=["topic_00000000000000B0.html","DocumentInviteDto Class","DTO de resposta para exibição de um convite de documento."];

@@ -1,1 +1,1 @@
-search_result['347']=["topic_00000000000000DF.html","ConsoleEmailSender.SendEmailConfirmationAsync Method","Simula o envio de um email de confirmação."];
+search_result['347']=["topic_00000000000000A3.html","UserProfile.CreatedAt Property","Data de criação da conta (UTC)."];

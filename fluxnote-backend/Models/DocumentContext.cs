@@ -40,7 +40,7 @@ namespace Fluxnote.Backend.Models
         public string ContentType { get; set; } = string.Empty;
 
         /// <summary>
-        /// Caminho ou referência ao ficheiro armazenado, retornado pelo IStorageService.
+        /// Caminho ou referência ao ficheiro armazenado, devolvido pelo IStorageService.
         /// Em dev: "local://context/{uniqueName}". Em produção: "blob://context/{blobName}".
         /// Usado para eliminar o ficheiro do storage quando o contexto for removido.
         /// </summary>

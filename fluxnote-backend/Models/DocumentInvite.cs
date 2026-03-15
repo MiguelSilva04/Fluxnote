@@ -2,6 +2,9 @@
 
 namespace Fluxnote.Backend.Models;
 
+/// <summary>
+/// Entidade que representa um convite por link para acesso a um documento.
+/// </summary>
 public class DocumentInvite
 {
     /// <summary>

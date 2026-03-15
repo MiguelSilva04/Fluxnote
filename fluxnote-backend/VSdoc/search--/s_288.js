@@ -1,1 +1,1 @@
-search_result['288']=["topic_00000000000000B3.html","TeamMember.Name Property","Nome de exibição do membro na equipa (obrigatório)."];
+search_result['288']=["topic_0000000000000086.html","RegisterRequest.Email Property","Endereço de email para a conta (será usado como login)."];

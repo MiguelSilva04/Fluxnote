@@ -1,1 +1,1 @@
-search_result['339']=["topic_00000000000000DC.html","Fluxnote.Backend.Services.Email Namespace",""];
+search_result['339']=["topic_000000000000009B.html","UserProfile.Email Property","Endereço de email do utilizador (também usado como login)."];

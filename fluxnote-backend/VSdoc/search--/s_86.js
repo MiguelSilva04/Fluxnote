@@ -1,1 +1,1 @@
-search_result['86']=["topic_0000000000000034.html","LoginRequest Class","DTO para pedido de autenticação (login).\r\nUsado no endpoint POST /api/auth/login."];
+search_result['86']=["topic_0000000000000030_props--.html","ChangePasswordRequest Properties",""];

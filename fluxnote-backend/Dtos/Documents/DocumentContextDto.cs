@@ -2,7 +2,7 @@ namespace Fluxnote.Backend.Dtos.Documents
 {
     /// <summary>
     /// DTO para representar um ficheiro de contexto associado a um documento.
-    /// Retornado nos endpoints GET e POST de contexto.
+    /// devolvido nos endpoints GET e POST de contexto.
     /// O ExtractedText não é exposto - é exclusivamente usado server-side pela IA.
     /// </summary>
     public class DocumentContextDto

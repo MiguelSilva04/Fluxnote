@@ -1,0 +1,1 @@
+search_result['943']=["topic_00000000000001BC.html","DocumentComment.Document Property","Referência de navegação para o documento ao qual o comentário pertence. Permite aceder a informações adicionais do documento, como título, conteúdo, etc. Dependendo de como o backend lida com os docum..."];

@@ -1,1 +1,1 @@
-search_result['348']=["topic_00000000000000E0.html","IDevEmailStore Interface","Interface para armazenamento de links de confirmação de email em desenvolvimento."];
+search_result['348']=["topic_00000000000000A4.html","UserProfile.UsernameChangesRemaining Property","Número de alterações de username restantes este mês (máx. 3)."];

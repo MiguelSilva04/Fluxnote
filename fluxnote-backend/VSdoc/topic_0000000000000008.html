@@ -5,7 +5,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta name="GENERATOR" content="VSdocman - documentation generator; https://www.helixoft.com" />
 	<link rel="icon" href="favicon.ico">
-	<title>AuthController.ChangePassword Method</title>
+	<title>AuthController.LinkExternalLogin Method</title>
 
 	<link rel="stylesheet" type="text/css" href="msdn2019/toc.css" />
 	<script src="msdn2019/toc.js"></script>
@@ -75,7 +75,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
   </div>
 
 <div id="mainBody">
-		<h1 class="title">AuthController.ChangePassword Method</h1>
+		<h1 class="title">AuthController.LinkExternalLogin Method</h1>
         
 		<div class="metadata">
         Namespace:
@@ -90,7 +90,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 
        
        
-        <summary-info>Altera a password do utilizador autenticado.</summary-info>
+        <summary-info>Inicia o fluxo de vinculação de um provider externo à conta atual.</summary-info>
 
 
 
@@ -140,7 +140,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 				</div>
 				
 				<div class="codeSnippetCode codeVB">
-					<pre xml:space="preserve" class="brush: vb">&lt;Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)&gt; _&nbsp;<br />&lt;HttpPut(&quot;users/me/password&quot;)&gt; _&nbsp;<br />Public Function ChangePassword( _&nbsp;<br />   &lt;FromBody()&gt; _&nbsp;<br />   ByVal <i>request</i> As <a target="_top" href="topic_0000000000000030.html" onclick="this.target='';return true;">ChangePasswordRequest</a> _&nbsp;<br />) As <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1">Task</a>(Of <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.iactionresult">IActionResult</a>)</pre>			
+					<pre xml:space="preserve" class="brush: vb">&lt;AllowAnonymous()&gt; _&nbsp;<br />&lt;HttpGet(&quot;link-external/{provider}&quot;)&gt; _&nbsp;<br />&lt;HttpPost(&quot;link-external/{provider}&quot;)&gt; _&nbsp;<br />Public Function LinkExternalLogin( _&nbsp;<br />   ByVal <i>provider</i> As <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.string">String</a>, _&nbsp;<br />   &lt;FromQuery()&gt; _&nbsp;<br />   Optional ByVal <i>accessToken</i> As <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.string">String</a> = null, _&nbsp;<br />   &lt;FromQuery()&gt; _&nbsp;<br />   Optional ByVal <i>returnUrl</i> As <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.string">String</a> = null _&nbsp;<br />) As <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1">Task</a>(Of <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.iactionresult">IActionResult</a>)</pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -179,7 +179,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 				</div>
 				
 				<div class="codeSnippetCode codeCsharp">
-					<pre xml:space="preserve" class="brush: csharp">[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]&nbsp;<br />[HttpPut(&quot;users/me/password&quot;)]&nbsp;<br />public <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.iactionresult">IActionResult</a>&gt; ChangePassword(&nbsp;<br />   [FromBody()]&nbsp;<br />   <a target="_top" href="topic_0000000000000030.html" onclick="this.target='';return true;">ChangePasswordRequest</a> <i>request</i>&nbsp;<br />)</pre>			
+					<pre xml:space="preserve" class="brush: csharp">[AllowAnonymous()]&nbsp;<br />[HttpGet(&quot;link-external/{provider}&quot;)]&nbsp;<br />[HttpPost(&quot;link-external/{provider}&quot;)]&nbsp;<br />public <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.iactionresult">IActionResult</a>&gt; LinkExternalLogin(&nbsp;<br />   <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.string">string</a> <i>provider</i>,&nbsp;<br />   [FromQuery()]&nbsp;<br />   <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.string">string</a> <i>accessToken</i> = null,&nbsp;<br />   [FromQuery()]&nbsp;<br />   <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.string">string</a> <i>returnUrl</i> = null&nbsp;<br />)</pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -219,7 +219,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 				</div>
 				
 				<div class="codeSnippetCode codeCpp">
-					<pre xml:space="preserve" class="brush: cpp">[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]&nbsp;<br />[HttpPut(&quot;users/me/password&quot;)]&nbsp;<br />public: &nbsp;<br /><a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.iactionresult">IActionResult</a>^&gt;^ ChangePassword(&nbsp;<br />   [FromBody()]&nbsp;<br />   <a target="_top" href="topic_0000000000000030.html" onclick="this.target='';return true;">ChangePasswordRequest</a>^ <i>request</i>&nbsp;<br />) </pre>			
+					<pre xml:space="preserve" class="brush: cpp">[AllowAnonymous()]&nbsp;<br />[HttpGet(&quot;link-external/{provider}&quot;)]&nbsp;<br />[HttpPost(&quot;link-external/{provider}&quot;)]&nbsp;<br />public: &nbsp;<br /><a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.iactionresult">IActionResult</a>^&gt;^ LinkExternalLogin(&nbsp;<br />   <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.string">String</a>^ <i>provider</i>,&nbsp;<br />   [FromQuery()]&nbsp;<br />   <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.string">String</a>^ <i>accessToken</i>,&nbsp;<br />   [FromQuery()]&nbsp;<br />   <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.string">String</a>^ <i>returnUrl</i>&nbsp;<br />) </pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -270,18 +270,44 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 
 
 <h4 class="subHeading">
-	Parameters</h4><dl paramName="request" class="parameterList">
+	Parameters</h4><dl paramName="provider" class="parameterList">
 	<dt>
 		<span class="parameter">
-			request
+			provider
 		</span>
 	</dt>
 	<dd>
-		<a target="_top" href="topic_0000000000000030.html" onclick="this.target='';return true;">ChangePasswordRequest</a> 
+		<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.string">string</a> 
 	</dd>
 </dl>
 <p>
-	CurrentPassword, NewPassword, ConfirmPassword. 
+	Provider externo: <code>google</code> ou <code>microsoft</code>. 
+</p>
+<dl paramName="accessToken" class="parameterList">
+	<dt>
+		<span class="parameter">
+			accessToken
+		</span>
+	</dt>
+	<dd>
+		<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.string">string</a> 
+	</dd>
+</dl>
+<p>
+	 
+</p>
+<dl paramName="returnUrl" class="parameterList">
+	<dt>
+		<span class="parameter">
+			returnUrl
+		</span>
+	</dt>
+	<dd>
+		<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.string">string</a> 
+	</dd>
+</dl>
+<p>
+	 
 </p>
 
 <p />
@@ -314,20 +340,6 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 
 
 
-<div class="section_container">
-	<div class="section_heading">
-		<span><a href="javascript:void(0)" title="Collapse" onclick="toggleSection(this);">Remarks</a></span>
-		<div>&nbsp;</div>
-	</div>
-
-	<div id="remarksSection" class="section">	
-			<strong>Autenticação:</strong> JWT Bearer obrigatório.&nbsp;<br />
-<strong>Restrições:</strong>
-<ul><li>Apenas disponível para contas com AuthProvider.Local</li><li>Requer password atual correta para segurança</li><li>Nova password deve cumprir requisitos do Identity</li></ul>
-<strong>Requisitos de Password:</strong>
-<ul><li>Mínimo 8 caracteres</li><li>1 letra maiúscula, 1 minúscula, 1 dígito, 1 especial</li></ul>
-	</div>					
-</div>
 
 
 

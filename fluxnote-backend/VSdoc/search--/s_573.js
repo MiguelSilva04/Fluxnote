@@ -1,0 +1,1 @@
+search_result['573']=["topic_0000000000000108.html","CreateDocumentPermissionRequest Class","DTO de pedido para criação de uma permissão de documento."];

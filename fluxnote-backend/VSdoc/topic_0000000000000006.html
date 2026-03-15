@@ -5,7 +5,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta name="GENERATOR" content="VSdocman - documentation generator; https://www.helixoft.com" />
 	<link rel="icon" href="favicon.ico">
-	<title>AuthController.CheckUsernameAvailability Method</title>
+	<title>AuthController.ExternalLoginCallback Method</title>
 
 	<link rel="stylesheet" type="text/css" href="msdn2019/toc.css" />
 	<script src="msdn2019/toc.js"></script>
@@ -75,7 +75,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
   </div>
 
 <div id="mainBody">
-		<h1 class="title">AuthController.CheckUsernameAvailability Method</h1>
+		<h1 class="title">AuthController.ExternalLoginCallback Method</h1>
         
 		<div class="metadata">
         Namespace:
@@ -90,7 +90,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 
        
        
-        <summary-info>Verifica se um username está disponível para uso.</summary-info>
+        <summary-info>Callback OAuth chamado pelo provider após autenticação externa.</summary-info>
 
 
 
@@ -140,7 +140,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 				</div>
 				
 				<div class="codeSnippetCode codeVB">
-					<pre xml:space="preserve" class="brush: vb">&lt;Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)&gt; _&nbsp;<br />&lt;HttpGet(&quot;users/check-username/{username}&quot;)&gt; _&nbsp;<br />Public Function CheckUsernameAvailability( _&nbsp;<br />   ByVal <i>username</i> As <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.string">String</a> _&nbsp;<br />) As <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1">Task</a>(Of <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.iactionresult">IActionResult</a>)</pre>			
+					<pre xml:space="preserve" class="brush: vb">&lt;HttpGet(&quot;external-callback&quot;)&gt; _&nbsp;<br />&lt;AllowAnonymous()&gt; _&nbsp;<br />Public Function ExternalLoginCallback( _&nbsp;<br />   &lt;FromQuery()&gt; _&nbsp;<br />   Optional ByVal <i>returnUrl</i> As <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.string">String</a> = null, _&nbsp;<br />   &lt;FromQuery()&gt; _&nbsp;<br />   Optional ByVal <i>remoteError</i> As <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.string">String</a> = null _&nbsp;<br />) As <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1">Task</a>(Of <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.iactionresult">IActionResult</a>)</pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -179,7 +179,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 				</div>
 				
 				<div class="codeSnippetCode codeCsharp">
-					<pre xml:space="preserve" class="brush: csharp">[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]&nbsp;<br />[HttpGet(&quot;users/check-username/{username}&quot;)]&nbsp;<br />public <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.iactionresult">IActionResult</a>&gt; CheckUsernameAvailability(&nbsp;<br />   <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.string">string</a> <i>username</i>&nbsp;<br />)</pre>			
+					<pre xml:space="preserve" class="brush: csharp">[HttpGet(&quot;external-callback&quot;)]&nbsp;<br />[AllowAnonymous()]&nbsp;<br />public <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.iactionresult">IActionResult</a>&gt; ExternalLoginCallback(&nbsp;<br />   [FromQuery()]&nbsp;<br />   <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.string">string</a> <i>returnUrl</i> = null,&nbsp;<br />   [FromQuery()]&nbsp;<br />   <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.string">string</a> <i>remoteError</i> = null&nbsp;<br />)</pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -219,7 +219,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 				</div>
 				
 				<div class="codeSnippetCode codeCpp">
-					<pre xml:space="preserve" class="brush: cpp">[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]&nbsp;<br />[HttpGet(&quot;users/check-username/{username}&quot;)]&nbsp;<br />public: &nbsp;<br /><a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.iactionresult">IActionResult</a>^&gt;^ CheckUsernameAvailability(&nbsp;<br />   <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.string">String</a>^ <i>username</i>&nbsp;<br />) </pre>			
+					<pre xml:space="preserve" class="brush: cpp">[HttpGet(&quot;external-callback&quot;)]&nbsp;<br />[AllowAnonymous()]&nbsp;<br />public: &nbsp;<br /><a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.iactionresult">IActionResult</a>^&gt;^ ExternalLoginCallback(&nbsp;<br />   [FromQuery()]&nbsp;<br />   <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.string">String</a>^ <i>returnUrl</i>,&nbsp;<br />   [FromQuery()]&nbsp;<br />   <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.string">String</a>^ <i>remoteError</i>&nbsp;<br />) </pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -270,10 +270,10 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 
 
 <h4 class="subHeading">
-	Parameters</h4><dl paramName="username" class="parameterList">
+	Parameters</h4><dl paramName="returnUrl" class="parameterList">
 	<dt>
 		<span class="parameter">
-			username
+			returnUrl
 		</span>
 	</dt>
 	<dd>
@@ -281,7 +281,20 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 	</dd>
 </dl>
 <p>
-	Username a verificar (3-30 caracteres, alfanumérico + underscore). 
+	Rota opcional para redirecionamento no frontend. 
+</p>
+<dl paramName="remoteError" class="parameterList">
+	<dt>
+		<span class="parameter">
+			remoteError
+		</span>
+	</dt>
+	<dd>
+		<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.string">string</a> 
+	</dd>
+</dl>
+<p>
+	Erro devolvido pelo provider (se existir). 
 </p>
 
 <p />
@@ -290,7 +303,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 		Return Value</h4>
 	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.iactionresult">IActionResult</a>&gt; 
 		<p>
-		<ul><li></li><li></li><li></li></ul> 
+		<ul><li></li></ul> 
 	</p>
 	
 
@@ -321,9 +334,8 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 	</div>
 
 	<div id="remarksSection" class="section">	
-			<strong>Autenticação:</strong> JWT Bearer obrigatório.&nbsp;<br />
-<strong>Validações:</strong>
-<ul><li>3-30 caracteres de comprimento</li><li>Apenas letras, números e underscore (_)</li><li>Não pode estar em uso por outro utilizador</li></ul>
+			Fluxo principal:
+<ol><li>Lê claims do provider externo.</li><li>Faz sign-in de login externo existente, ou vincula por email, ou cria conta nova.</li><li>Gera access token + refresh cookie e redireciona para o frontend.</li></ol>
 	</div>					
 </div>
 

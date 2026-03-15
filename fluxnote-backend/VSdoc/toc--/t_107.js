@@ -1,1 +1,1 @@
-c['107']=[['108',"CreateDocumentRequest Class","topic_0000000000000052.html",1],['113',"DocumentDetailDto Class","topic_0000000000000061.html",1],['126',"DocumentDto Class","topic_0000000000000056.html",1],['138',"UpdateDocumentRequest Class","topic_000000000000006D.html",1]];
+c['107']=[['108',"DeleteTeamMember Method","topic_0000000000000052.html",0],['109',"PostTeamMember Method","topic_0000000000000050.html",0],['110',"PutTeamMember Method","topic_0000000000000051.html",0]];

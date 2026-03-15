@@ -1,0 +1,1 @@
+search_result['1187']=["topic_0000000000000262.html","TeamAutorizationService Class","Serviço de autorização para validar papéis de utilizador no contexto de equipa."];

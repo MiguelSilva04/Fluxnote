@@ -1,1 +1,1 @@
-search_result['12']=["topic_0000000000000005.html","AuthController.Me Method","Obtém o perfil completo do utilizador autenticado."];
+search_result['12']=["topic_0000000000000005.html","AuthController.ExternalLogin Method","Inicia o fluxo OAuth para um provider externo (Google/Microsoft)."];

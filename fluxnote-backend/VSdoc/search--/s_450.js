@@ -1,0 +1,1 @@
+search_result['450']=["topic_00000000000000D3.html","DocumentCommentDto.CreatedByName Property","Nome do utilizador que criou o comentário. Pode ser obtido a partir do UserId, dependendo de como o backend lida com os utilizadores. Útil para exibir o nome do autor no frontend."];

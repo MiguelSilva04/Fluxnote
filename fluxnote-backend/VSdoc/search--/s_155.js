@@ -1,1 +1,1 @@
-search_result['155']=["topic_000000000000005B.html","DocumentDto.CreatedById Property","ID do utilizador que criou o documento."];
+search_result['155']=["topic_0000000000000051.html","TeamMembersController.PutTeamMember Method","Atualiza o papel (TeamRole) de um membro de equipa.\r\nApenas o Owner pode alterar roles."];

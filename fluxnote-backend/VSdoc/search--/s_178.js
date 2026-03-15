@@ -1,1 +1,1 @@
-search_result['178']=["topic_000000000000006D.html","UpdateDocumentRequest Class","DTO para pedido de atualização de documento.\r\nUsado no endpoint PUT /api/documents/{id}."];
+search_result['178']=["topic_0000000000000059.html","TeamsController.PostTeam Method","Cria uma nova equipa."];

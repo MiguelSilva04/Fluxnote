@@ -1,0 +1,1 @@
+search_result['659']=["topic_000000000000012C.html","AcceptTeamInviteResponseDto Class","DTO de resposta devolvido após aceitação de convite de equipa."];

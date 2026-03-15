@@ -1,1 +1,1 @@
-search_result['221']=["topic_0000000000000084.html","TeamDocumentDto.Title Property","Título do documento."];
+search_result['221']=["topic_0000000000000070.html","ChangePasswordRequest Class","DTO para pedido de alteração de password.\r\nUsado no endpoint PUT /api/auth/users/me/password."];

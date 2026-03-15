@@ -5,7 +5,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta name="GENERATOR" content="VSdocman - documentation generator; https://www.helixoft.com" />
 	<link rel="icon" href="favicon.ico">
-	<title>TeamsController Methods</title>
+	<title>DocumentPermissionsController Methods</title>
 
 	<link rel="stylesheet" type="text/css" href="msdn2019/toc.css" />
 	<script src="msdn2019/toc.js"></script>
@@ -76,11 +76,11 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
   </div>
 
 <div id="mainBody">
-		<h1 class="title">TeamsController Methods</h1>
+		<h1 class="title">DocumentPermissionsController Methods</h1>
         <p />
         <p>
           The following tables list the members exposed by the  
-              <a href="topic_0000000000000020.html">TeamsController</a>
+              <a href="topic_0000000000000020.html">DocumentPermissionsController</a>
              type.
         </p>
 
@@ -850,6 +850,35 @@ Creates a <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/mic
 
 
 
+
+	<tr class="
+
+
+">
+	<td>
+<img alt="Public method" title="Public method" src="msdn2019/pubmethod.png"></img>
+
+
+    
+	</td>
+	<td>
+	<a href="topic_0000000000000023.html">CreatePermission(CreateDocumentPermissionRequest)</a>
+
+	</td>
+	<td>
+
+Adiciona uma permissão de documento a um membro.
+Requer Owner ou TeamAdmin. Não pode adicionar Owner/TeamAdmin (já têm acesso implícito).
+
+	</td>
+</tr>
+
+
+
+
+
+
+
 			<tr class="
 inheritedMember 
 
@@ -1084,12 +1113,13 @@ Creates a <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/mic
     
 	</td>
 	<td>
-	<a href="topic_0000000000000026.html">DeleteTeam(int)</a>
+	<a href="topic_0000000000000025.html">DeletePermission(int)</a>
 
 	</td>
 	<td>
 
-Elimina uma equipa e todos os seus dados associados.
+Remove uma permissão de documento (retira acesso ao membro).
+Requer Owner ou TeamAdmin. Não pode remover Owner/TeamAdmin.
 
 	</td>
 </tr>
@@ -1823,40 +1853,13 @@ Creates a <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/mic
     
 	</td>
 	<td>
-	<a href="topic_0000000000000023.html">GetTeam(int)</a>
+	<a href="topic_0000000000000022.html">GetByDocument(int)</a>
 
 	</td>
 	<td>
 
-Obtém os detalhes de uma equipa específica.
-
-	</td>
-</tr>
-
-
-
-
-
-
-
-
-	<tr class="
-
-
-">
-	<td>
-<img alt="Public method" title="Public method" src="msdn2019/pubmethod.png"></img>
-
-
-    
-	</td>
-	<td>
-	<a href="topic_0000000000000022.html">GetTeams()</a>
-
-	</td>
-	<td>
-
-Lista todas as equipas onde o utilizador é membro.
+Lista as permissões de um documento específico.
+Requer ser membro da equipa do documento.
 
 	</td>
 </tr>
@@ -2340,34 +2343,6 @@ Returns the file specified by <i>physicalPath</i> (<a target="_top" href="https:
 
 
 	<tr class="
-
-
-">
-	<td>
-<img alt="Public method" title="Public method" src="msdn2019/pubmethod.png"></img>
-
-
-    
-	</td>
-	<td>
-	<a href="topic_0000000000000025.html">PostTeam(Team)</a>
-
-	</td>
-	<td>
-
-Cria uma nova equipa.
-
-	</td>
-</tr>
-
-
-
-
-
-
-
-
-	<tr class="
 inheritedMember 
 
 
@@ -2386,34 +2361,6 @@ inheritedMember
 
 Creates an <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.objectresult">ObjectResult</a> that produces a <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.problemdetails">ProblemDetails</a> response.
 (inherited from <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.controllerbase">ControllerBase</a>).
-
-	</td>
-</tr>
-
-
-
-
-
-
-
-
-	<tr class="
-
-
-">
-	<td>
-<img alt="Public method" title="Public method" src="msdn2019/pubmethod.png"></img>
-
-
-    
-	</td>
-	<td>
-	<a href="topic_0000000000000024.html">PutTeam(int, Team)</a>
-
-	</td>
-	<td>
-
-Atualiza os dados de uma equipa.
 
 	</td>
 </tr>
@@ -4215,6 +4162,35 @@ Creates an <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/mi
 
 
 
+
+	<tr class="
+
+
+">
+	<td>
+<img alt="Public method" title="Public method" src="msdn2019/pubmethod.png"></img>
+
+
+    
+	</td>
+	<td>
+	<a href="topic_0000000000000024.html">UpdatePermission(int, UpdateDocumentPermissionRequest)</a>
+
+	</td>
+	<td>
+
+Atualiza a DocumentRole de uma permissão existente.
+Requer Owner ou TeamAdmin. Não pode alterar permissão de Owner/TeamAdmin.
+
+	</td>
+</tr>
+
+
+
+
+
+
+
 			<tr class="
 inheritedMember 
 
@@ -4382,7 +4358,6 @@ Creates an <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/mi
 
 
 
-
 <div class="section_container">
 	<div class="section_heading">
 		<span><a href="javascript:void(0)" title="Collapse" onclick="toggleSection(this);">See Also</a></span>
@@ -4391,7 +4366,7 @@ Creates an <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/mi
 
 	<div id="seeAlsoSection" class="section">	
 		<div>
-			<a href="topic_0000000000000020.html">TeamsController Class</a><br />
+			<a href="topic_0000000000000020.html">DocumentPermissionsController Class</a><br />
 	<a href="topic_0000000000000000.html">Fluxnote.Backend.Controllers Namespace</a><br />
 
 

@@ -1,10 +1,13 @@
-﻿namespace Fluxnote.Backend.Dtos.DocumentInvites
+namespace Fluxnote.Backend.Dtos.DocumentInvites
 {
+    /// <summary>
+    /// DTO de resposta devolvido após aceitação de convite de documento.
+    /// </summary>
     public class AcceptDocumentInviteResponseDto
     {
         /// <summary>
         /// Identificador do documento para o qual o convite foi aceito. 
-        /// Este campo é necessário para que o frontend saiba qual documento abrir após o usuário aceitar o convite.
+        /// Este campo é necessário para que o frontend saiba qual documento abrir após o utilizador aceitar o convite.
         /// </summary>
         public int TeamId { get; set; }
         /// <summary>
@@ -23,9 +26,9 @@
         /// </summary>
         public string TeamName { get; set; } = string.Empty;
         /// <summary>
-        /// Role a ser atribuído ao usuário convidado ao aceitar o convite.
+        /// Role a ser atribuído ao utilizador convidado ao aceitar o convite.
         /// 0 = Viewer, 1 = Editor. Este campo é necessário para que o 
-        /// frontend saiba qual permissão atribuir ao usuário quando ele aceitar o convite.
+        /// frontend saiba qual permissão atribuir ao utilizador quando ele aceitar o convite.
         /// </summary>
         public int DocumentRole { get; set; }
     }

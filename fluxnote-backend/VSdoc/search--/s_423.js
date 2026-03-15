@@ -1,0 +1,1 @@
+search_result['423']=["topic_00000000000000C7.html","CreateDocumentCommentDto.UserId Property","ID do utilizador que criou o comentário. Pode ser obtido do contexto de autenticação."];

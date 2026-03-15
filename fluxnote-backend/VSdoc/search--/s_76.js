@@ -1,1 +1,1 @@
-search_result['76']=["topic_000000000000002F.html","Fluxnote.Backend.Dtos.Auth Namespace",""];
+search_result['76']=["topic_000000000000002A.html","DocumentsController.DuplicateDocument Method","Duplica um documento existente."];

@@ -1,1 +1,1 @@
-search_result['277']=["topic_00000000000000AD.html","Team.IsActive Property","Indica se a equipa está ativa."];
+search_result['277']=["topic_0000000000000082_methods--.html","TeamDocumentDto Methods",""];

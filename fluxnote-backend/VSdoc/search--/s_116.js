@@ -1,1 +1,1 @@
-search_result['116']=["topic_0000000000000043.html","UpdateProfileRequest.Bio Property","Biografia ou descrição pessoal."];
+search_result['116']=["topic_000000000000003E.html","DocumentsController.RestoreVersion Method","Restaura o conteúdo do documento para uma versão anterior.\r\nApenas o Owner da equipa pode executar esta operação.\r\nCria uma nova entrada de versão com o conteúdo restaurado e notifica os clientes via ..."];

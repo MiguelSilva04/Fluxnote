@@ -5,7 +5,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta name="GENERATOR" content="VSdocman - documentation generator; https://www.helixoft.com" />
 	<link rel="icon" href="favicon.ico">
-	<title>IEmailSender Interface</title>
+	<title>DocumentDto.IsDeleted Property</title>
 
 	<link rel="stylesheet" type="text/css" href="msdn2019/toc.css" />
 	<script src="msdn2019/toc.js"></script>
@@ -75,11 +75,11 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
   </div>
 
 <div id="mainBody">
-		<h1 class="title">IEmailSender Interface</h1>
+		<h1 class="title">DocumentDto.IsDeleted Property</h1>
         
 		<div class="metadata">
         Namespace:
-<a href="topic_00000000000000DC.html">Fluxnote.Backend.Services.Email</a>
+<a href="topic_00000000000000BD.html">Fluxnote.Backend.Dtos.Documents</a>
 
 
 
@@ -90,7 +90,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 
        
        
-        <summary-info>Interface para serviços de envio de email.</summary-info>
+        <summary-info>Indica se o documento está na lixeira.</summary-info>
 
 
 
@@ -140,7 +140,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 				</div>
 				
 				<div class="codeSnippetCode codeVB">
-					<pre xml:space="preserve" class="brush: vb">Public Interface IEmailSender</pre>			
+					<pre xml:space="preserve" class="brush: vb">Public Property IsDeleted() As <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.boolean">Boolean</a></pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -179,7 +179,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 				</div>
 				
 				<div class="codeSnippetCode codeCsharp">
-					<pre xml:space="preserve" class="brush: csharp">public interface IEmailSender</pre>			
+					<pre xml:space="preserve" class="brush: csharp">public <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.boolean">bool</a> IsDeleted {get; set;}</pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -219,7 +219,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 				</div>
 				
 				<div class="codeSnippetCode codeCpp">
-					<pre xml:space="preserve" class="brush: cpp">public interface class IEmailSender</pre>			
+					<pre xml:space="preserve" class="brush: cpp">public: &nbsp;<br />property <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.boolean">bool</a> IsDeleted {&nbsp;<br /> <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.boolean">bool</a> get( );&nbsp;<br /> void set(&nbsp;<br />   <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.boolean">bool</a> value&nbsp;<br /> );&nbsp;<br />}</pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -258,7 +258,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 				</div>
 				
 				<div class="codeSnippetCode codeJScript">
-					<pre xml:space="preserve" class="brush: js">public interface IEmailSender</pre>			
+					<pre xml:space="preserve" class="brush: js">public function get IsDeleted() : <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.boolean">boolean</a>;&nbsp;<br />public function set IsDeleted(value : <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.boolean">boolean</a>);</pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -270,6 +270,11 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 
 
 
+	<h4 class="subHeading">
+		Property Value</h4>
+	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.boolean">bool</a> 
+	
+
 
 
 
@@ -290,124 +295,6 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 
 
 
-
-
-
-
-
-<div class="section_container">
-	<div class="section_heading">
-		<span><a href="javascript:void(0)" title="Collapse" onclick="toggleSection(this);">Methods</a></span>
-		<div>&nbsp;</div>
-	</div>
-
-	<div id="MethodsSection" class="section">	
-  <table class="memberListTable">
-    <tr>
-      <th></th>
-      <th>
-        Name
-      </th>
-      <th>
-        Description
-      </th>
-    </tr>
-
-
-
-
-	<tr class="
-
-
-">
-	<td>
-<img alt="Public method" title="Public method" src="msdn2019/pubmethod.png"></img>
-
-
-    
-	</td>
-	<td>
-	<a href="topic_00000000000000EF.html">SendEmailConfirmationAsync(string, string)</a>
-
-	</td>
-	<td>
-
-Envia um email de confirmação de conta para um utilizador.
-
-	</td>
-</tr>
-
-
-
-
-
-
-  </table>
-
-  <a href="#mainBody">
-    Top
-  </a>
-
-	</div>					
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
-
-<!-- Classes -->
-
-<!-- Classes End -->
-
-<!-- Standard Modules -->
-
-<!-- Standard Modules End -->
-
-  
-
-
-
-
-
-
-
-
-<div class="section_container">
-	<div class="section_heading">
-		<span><a href="javascript:void(0)" title="Collapse" onclick="toggleSection(this);">Remarks</a></span>
-		<div>&nbsp;</div>
-	</div>
-
-	<div id="remarksSection" class="section">	
-			<strong>Implementações disponíveis:</strong>
-<ul><li><a target="_top" href="topic_00000000000000DD.html" onclick="this.target='';return true;">ConsoleEmailSender</a>: Desenvolvimento - escreve para consola e armazena em memória</li><li><a target="_top" href="topic_00000000000000F0.html" onclick="this.target='';return true;">SmtpEmailSender</a>: Produção - envia via SMTP usando MailKit</li></ul>
-<strong>Configuração em Program.cs:</strong>
-			<div class="codeSnippetCodeCollection">
-				<div class="codeSnippetToolbar">
-					<a title="Copy to clipboard." href="javascript:void(0)" onclick="CopyCode(this);">Copy</a>
-				</div>
-				
-				<div class="codeSnippetCode">
-					<pre xml:space="preserve">
- if (env.IsDevelopment())
-     services.AddScoped&lt;IEmailSender, ConsoleEmailSender&gt;();
- else
-     services.AddScoped&lt;IEmailSender, SmtpEmailSender&gt;();
- 					</pre>			
-				</div>
-			</div>
-	</div>					
-</div>
 
 
 
@@ -474,10 +361,14 @@ Envia um email de confirmação de conta para um utilizador.
 
 	<div id="seeAlsoSection" class="section">	
 		<div>
-	<a href="topic_00000000000000DC.html">Fluxnote.Backend.Services.Email Namespace</a><br />
+			<a href="topic_00000000000000E5.html">DocumentDto Class</a><br />
 
 
-	
+
+<a href="topic_00000000000000BD.html">Fluxnote.Backend.Dtos.Documents Namespace</a><br />
+
+
+			
 
 		</div>
 	</div>					

@@ -1,0 +1,1 @@
+search_result['512']=["topic_00000000000000E9.html","DocumentDto.TeamName Property","Nome da equipa (denormalizado para evitar joins)."];

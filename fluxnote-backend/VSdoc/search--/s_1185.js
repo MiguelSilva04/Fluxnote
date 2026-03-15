@@ -1,0 +1,1 @@
+search_result['1185']=["topic_0000000000000260.html","TokenService.HashRefreshToken Method","Calcula o hash SHA256 de um refresh token para armazenamento seguro."];

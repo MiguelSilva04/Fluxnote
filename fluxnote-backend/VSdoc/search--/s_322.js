@@ -1,1 +1,1 @@
-search_result['322']=["topic_00000000000000D4_attached_props--.html","AccountStatusExtensions Attached Properties",""];
+search_result['322']=["topic_0000000000000094.html","UpdateProfileRequest.Location Property","Localização geográfica do utilizador."];

@@ -1,1 +1,1 @@
-search_result['259']=["topic_00000000000000A0.html","RefreshToken.RevokedAt Property","Momento em que o token foi revogado (UTC)."];
+search_result['259']=["topic_000000000000007D.html","ForgotPasswordRequest Class","DTO para pedido de recuperação de password."];

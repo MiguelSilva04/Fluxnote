@@ -1,5 +1,8 @@
-﻿namespace Fluxnote.Backend.Dtos.DocumentInvites
+namespace Fluxnote.Backend.Dtos.DocumentInvites
 {
+    /// <summary>
+    /// DTO de resposta para exibição de um convite de documento.
+    /// </summary>
     public class DocumentInviteDto
     {
         /// <summary>
@@ -35,15 +38,15 @@
         /// </summary>
         public string TeamName { get; set; } = string.Empty;
         /// <summary>
-        /// Nome do usuário que criou o convite. Este campo é incluído para facilitar a exibição de 
+        /// Nome do utilizador que criou o convite. Este campo é incluído para facilitar a exibição de 
         /// informações sobre o convite, sem a necessidade de uma consulta adicional para obter o nome do utilizador. 
         /// Ele é preenchido no momento da criação do DTO com base na relação entre o convite e o membro da equipa que o criou.
         /// </summary>
         public string CreatedByName { get; set; } = string.Empty;
         /// <summary>
-        /// Role a ser atribuído ao usuário convidado ao aceitar o convite.
+        /// Role a ser atribuído ao utilizador convidado ao aceitar o convite.
         /// 0 = Viewer, 1 = Editor. Este campo é necessário para que o frontend 
-        /// saiba qual permissão atribuir ao usuário quando ele aceitar o convite.
+        /// saiba qual permissão atribuir ao utilizador quando ele aceitar o convite.
         /// </summary>
         public int Role { get; set; }
         /// <summary>
@@ -58,12 +61,12 @@
         public bool IsRevoked { get; set; }
         /// <summary>
         /// Indica se o convite já foi utilizado. Um convite é considerado utilizado 
-        /// se já tiver sido aceito por um usuário.
+        /// se já tiver sido aceito por um utilizador.
         /// </summary>
         public bool IsUsed { get; set; }
         /// <summary>
-        /// Url do convite que pode ser compartilhada com o usuário convidado. 
-        /// Este é o link que o usuário deve acessar para aceitar o convite.
+        /// Url do convite que pode ser partilhada com o utilizador convidado. 
+        /// Este é o link que o utilizador deve aceder para aceitar o convite.
         /// </summary>
         public string InviteUrl { get; set; } = string.Empty;
     }

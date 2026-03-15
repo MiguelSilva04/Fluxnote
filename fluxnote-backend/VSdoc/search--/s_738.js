@@ -1,0 +1,1 @@
+search_result['738']=["topic_0000000000000158.html","DocumentPermissionSummaryDto Class","DTO resumido de permissão de documento em contexto de equipa."];

@@ -1,1 +1,1 @@
-search_result['340']=["topic_00000000000000DD.html","ConsoleEmailSender Class","Implementação de IEmailSender para ambiente de desenvolvimento.\r\nSimula o envio de emails escrevendo para a consola e armazenando em memória."];
+search_result['340']=["topic_000000000000009C.html","UserProfile.FullName Property","Nome completo para exibição."];

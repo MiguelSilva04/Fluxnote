@@ -1,0 +1,1 @@
+search_result['698']=["topic_000000000000013F.html","TeamDto Class","DTO completo de resposta de equipa.\r\nUsado na resposta dos endpoints GET /api/teams e GET /api/teams/{id}."];

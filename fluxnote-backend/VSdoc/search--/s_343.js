@@ -1,1 +1,1 @@
-search_result['343']=["topic_00000000000000DD_methods--.html","ConsoleEmailSender Methods",""];
+search_result['343']=["topic_000000000000009F.html","UserProfile.Location Property","Localização geográfica."];

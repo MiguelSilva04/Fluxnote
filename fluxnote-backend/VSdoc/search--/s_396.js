@@ -1,1 +1,1 @@
-search_result['396']=["topic_00000000000000F4_methods--.html","RegisterRequestValidator Methods",""];
+search_result['396']=["topic_00000000000000BB.html","DocumentInviteDto.IsUsed Property","Indica se o convite já foi utilizado. Um convite é considerado utilizado\r\nse já tiver sido aceito por um utilizador."];

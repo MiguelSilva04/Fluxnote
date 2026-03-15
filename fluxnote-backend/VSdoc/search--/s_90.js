@@ -1,1 +1,1 @@
-search_result['90']=["topic_0000000000000034_props--.html","LoginRequest Properties",""];
+search_result['90']=["topic_0000000000000033.html","DocumentsController.PermanentDeleteDocument Method","Elimina permanentemente um documento da lixeira. Apenas o criador pode eliminar."];

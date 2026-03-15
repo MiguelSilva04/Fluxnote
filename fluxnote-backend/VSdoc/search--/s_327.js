@@ -1,1 +1,1 @@
-search_result['327']=["topic_00000000000000D5.html","AccountStatusExtensions.ToDisplayString Method","Converte o valor do enum para string legível."];
+search_result['327']=["topic_0000000000000095_props--.html","RefreshToken Properties",""];

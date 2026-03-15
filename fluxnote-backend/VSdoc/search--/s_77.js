@@ -1,1 +1,1 @@
-search_result['77']=["topic_0000000000000030.html","ChangePasswordRequest Class","DTO para pedido de alteração de password.\r\nUsado no endpoint PUT /api/auth/users/me/password."];
+search_result['77']=["topic_000000000000002B.html","DocumentsController.GenerateSummary Method","Gera um resumo do documento usando IA (Google Gemini)."];

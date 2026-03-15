@@ -5,7 +5,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta name="GENERATOR" content="VSdocman - documentation generator; https://www.helixoft.com" />
 	<link rel="icon" href="favicon.ico">
-	<title>AuthProviderExtensions.ToDisplayString Method</title>
+	<title>DocumentCommentDto Class</title>
 
 	<link rel="stylesheet" type="text/css" href="msdn2019/toc.css" />
 	<script src="msdn2019/toc.js"></script>
@@ -75,11 +75,11 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
   </div>
 
 <div id="mainBody">
-		<h1 class="title">AuthProviderExtensions.ToDisplayString Method</h1>
+		<h1 class="title">DocumentCommentDto Class</h1>
         
 		<div class="metadata">
         Namespace:
-<a href="topic_0000000000000087.html">Fluxnote.Backend.Models</a>
+<a href="topic_00000000000000BD.html">Fluxnote.Backend.Dtos.Documents</a>
 
 
 
@@ -90,7 +90,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 
        
        
-        <summary-info>Converte o valor do enum para string legível.</summary-info>
+        <summary-info>DTO para representar um comentário num documento. Inclui informações sobre o comentário, como conteúdo, autor, data de criação, posição no texto e se o comentário está resolvido ou não. Também inclui uma lista de respostas (replies), caso existam.</summary-info>
 
 
 
@@ -140,7 +140,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 				</div>
 				
 				<div class="codeSnippetCode codeVB">
-					<pre xml:space="preserve" class="brush: vb">&lt;Extension()&gt; _&nbsp;<br />Public Shared Function ToDisplayString( _&nbsp;<br />   ByVal <i>provider</i> As <a target="_top" href="topic_00000000000000C9.html" onclick="this.target='';return true;">AuthProvider</a> _&nbsp;<br />) As <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.string">String</a></pre>			
+					<pre xml:space="preserve" class="brush: vb">Public Class DocumentCommentDto</pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -179,7 +179,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 				</div>
 				
 				<div class="codeSnippetCode codeCsharp">
-					<pre xml:space="preserve" class="brush: csharp">public static <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.string">string</a> ToDisplayString(&nbsp;<br />   this <a target="_top" href="topic_00000000000000C9.html" onclick="this.target='';return true;">AuthProvider</a> <i>provider</i>&nbsp;<br />)</pre>			
+					<pre xml:space="preserve" class="brush: csharp">public class DocumentCommentDto</pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -219,7 +219,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 				</div>
 				
 				<div class="codeSnippetCode codeCpp">
-					<pre xml:space="preserve" class="brush: cpp">[Extension()]&nbsp;<br />public: &nbsp;<br />static <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.string">String</a>^ ToDisplayString(&nbsp;<br />   <a target="_top" href="topic_00000000000000C9.html" onclick="this.target='';return true;">AuthProvider</a> <i>provider</i>&nbsp;<br />) </pre>			
+					<pre xml:space="preserve" class="brush: cpp">public ref class DocumentCommentDto </pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -258,7 +258,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 				</div>
 				
 				<div class="codeSnippetCode codeJScript">
-					<pre xml:space="preserve" class="brush: js">public &nbsp;<br />   Extension()&nbsp;<br />static function ToDisplayString(&nbsp;<br />    <i>provider</i> : <a target="_top" href="topic_00000000000000C9.html" onclick="this.target='';return true;">AuthProvider</a>&nbsp;<br />) : <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.string">String</a>;</pre>			
+					<pre xml:space="preserve" class="brush: js">public class DocumentCommentDto</pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -269,30 +269,6 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 	</div>
 
 
-<h4 class="subHeading">
-	Parameters</h4><dl paramName="provider" class="parameterList">
-	<dt>
-		<span class="parameter">
-			provider
-		</span>
-	</dt>
-	<dd>
-		<a target="_top" href="topic_00000000000000C9.html" onclick="this.target='';return true;">AuthProvider</a> 
-	</dd>
-</dl>
-<p>
-	Provedor de autenticação. 
-</p>
-
-<p />
-
-	<h4 class="subHeading">
-		Return Value</h4>
-	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.string">string</a> 
-		<p>
-		Nome do provedor em formato legível. 
-	</p>
-	
 
 
 
@@ -313,11 +289,679 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 
 
 
+<div class="section_container">
+	<div class="section_heading">
+		<span><a href="javascript:void(0)" title="Collapse" onclick="toggleSection(this);">Properties</a></span>
+		<div>&nbsp;</div>
+	</div>
+
+	<div id="PropertiesSection" class="section">	
+  <table class="memberListTable">
+    <tr>
+      <th></th>
+      <th>
+        Name
+      </th>
+      <th>
+        Description
+      </th>
+    </tr>
+
+
+	
+		<tr class="
+
+
+">
+	<td>
+<img alt="Public property" title="Public property" src="msdn2019/pubproperty.png"></img>
+
+
+    
+	</td>
+	<td>
+	<a href="topic_00000000000000D6.html">Content</a>
+
+	</td>
+	<td>
+
+Conteúdo do comentário. Pode ser texto simples ou conter formatação (ex: Markdown ou HTML)
+dependendo de como o frontend lida com os comentários.
+
+	</td>
+</tr>
+	
+
+
+	
+		<tr class="
+
+
+">
+	<td>
+<img alt="Public property" title="Public property" src="msdn2019/pubproperty.png"></img>
+
+
+    
+	</td>
+	<td>
+	<a href="topic_00000000000000D5.html">CreatedAt</a>
+
+	</td>
+	<td>
+
+Data e hora em que o comentário foi criado.
+
+	</td>
+</tr>
+	
+
+
+	
+		<tr class="
+
+
+">
+	<td>
+<img alt="Public property" title="Public property" src="msdn2019/pubproperty.png"></img>
+
+
+    
+	</td>
+	<td>
+	<a href="topic_00000000000000D4.html">CreatedByColor</a>
+
+	</td>
+	<td>
+
+Cor associada ao utilizador que criou o comentário. Isto pode ser usado para destacar visualmente os comentários de diferentes utilizadores no frontend.
+
+	</td>
+</tr>
+	
+
+
+	
+		<tr class="
+
+
+">
+	<td>
+<img alt="Public property" title="Public property" src="msdn2019/pubproperty.png"></img>
+
+
+    
+	</td>
+	<td>
+	<a href="topic_00000000000000D3.html">CreatedByName</a>
+
+	</td>
+	<td>
+
+Nome do utilizador que criou o comentário. Pode ser obtido a partir do UserId, dependendo de como o backend lida com os utilizadores. Útil para exibir o nome do autor no frontend.
+
+	</td>
+</tr>
+	
+
+
+	
+		<tr class="
+
+
+">
+	<td>
+<img alt="Public property" title="Public property" src="msdn2019/pubproperty.png"></img>
+
+
+    
+	</td>
+	<td>
+	<a href="topic_00000000000000D0.html">DocumentId</a>
+
+	</td>
+	<td>
+
+ID do documento ao qual o comentário pertence.
+
+	</td>
+</tr>
+	
+
+
+	
+		<tr class="
+
+
+">
+	<td>
+<img alt="Public property" title="Public property" src="msdn2019/pubproperty.png"></img>
+
+
+    
+	</td>
+	<td>
+	<a href="topic_00000000000000CF.html">Id</a>
+
+	</td>
+	<td>
+
+ID do comentário. Útil para identificar o comentário, especialmente para operações de resposta, edição ou exclusão.
+
+	</td>
+</tr>
+	
+
+
+	
+		<tr class="
+
+
+">
+	<td>
+<img alt="Public property" title="Public property" src="msdn2019/pubproperty.png"></img>
+
+
+    
+	</td>
+	<td>
+	<a href="topic_00000000000000DB.html">Mentions</a>
+
+	</td>
+	<td>
+
+Lista de menções de utilizadores associadas ao comentário.
+
+	</td>
+</tr>
+	
+
+
+	
+		<tr class="
+
+
+">
+	<td>
+<img alt="Public property" title="Public property" src="msdn2019/pubproperty.png"></img>
+
+
+    
+	</td>
+	<td>
+	<a href="topic_00000000000000D2.html">ParentCommentId</a>
+
+	</td>
+	<td>
+
+ID do comentário pai, caso este seja uma resposta a outro comentário. Se for um comentário raiz, esse campo pode ser nulo.
+
+	</td>
+</tr>
+	
+
+
+	
+		<tr class="
+
+
+">
+	<td>
+<img alt="Public property" title="Public property" src="msdn2019/pubproperty.png"></img>
+
+
+    
+	</td>
+	<td>
+	<a href="topic_00000000000000D7.html">RangeIndex</a>
+
+	</td>
+	<td>
+
+Posição no editor Quill onde o comentário foi feito. Isto pode ser usado para destacar a parte do texto que está a ser comentada. Se for um comentário de seleção, isto indica o índice inicial da seleção. Se for um comentário de posição (sem seleção), isto indica a posição do cursor onde o comentário foi feito.
+
+	</td>
+</tr>
+	
+
+
+	
+		<tr class="
+
+
+">
+	<td>
+<img alt="Public property" title="Public property" src="msdn2019/pubproperty.png"></img>
+
+
+    
+	</td>
+	<td>
+	<a href="topic_00000000000000D8.html">RangeLength</a>
+
+	</td>
+	<td>
+
+Comprimento do texto selecionado no editor Quill. Se for um comentário de seleção, isto indica quantos caracteres estão a ser comentados. Se for um comentário de posição (sem seleção), este campo pode ser nulo ou zero.
+
+	</td>
+</tr>
+	
+
+
+	
+		<tr class="
+
+
+">
+	<td>
+<img alt="Public property" title="Public property" src="msdn2019/pubproperty.png"></img>
+
+
+    
+	</td>
+	<td>
+	<a href="topic_00000000000000DA.html">Replies</a>
+
+	</td>
+	<td>
+
+Lista de respostas (replies) a este comentário. Cada resposta é também um DocumentCommentDto, permitindo uma estrutura hierárquica de comentários e respostas. Se não houver respostas, essa lista pode estar vazia.
+
+	</td>
+</tr>
+	
+
+
+	
+		<tr class="
+
+
+">
+	<td>
+<img alt="Public property" title="Public property" src="msdn2019/pubproperty.png"></img>
+
+
+    
+	</td>
+	<td>
+	<a href="topic_00000000000000D9.html">Resolved</a>
+
+	</td>
+	<td>
+
+Indica se o comentário foi resolvido ou não. Isto pode ser usado para marcar visualmente os comentários que já foram tratados ou respondidos, ajudando os utilizadores a focar nos comentários que ainda precisam de atenção.
+
+	</td>
+</tr>
+	
+
+
+	
+		<tr class="
+
+
+">
+	<td>
+<img alt="Public property" title="Public property" src="msdn2019/pubproperty.png"></img>
+
+
+    
+	</td>
+	<td>
+	<a href="topic_00000000000000D1.html">UserId</a>
+
+	</td>
+	<td>
+
+ID do utilizador que criou o comentário. Pode ser usado para exibir o nome do autor, associar uma cor ou para controle de permissões (ex: permitir que apenas o autor edite ou exclua o comentário).
+
+	</td>
+</tr>
+	
+
+
+  </table>
+
+  <a href="#mainBody">
+    Top
+  </a>
+
+	</div>					
+</div>
 
 
 
 
 
+
+<div class="section_container">
+	<div class="section_heading">
+		<span><a href="javascript:void(0)" title="Collapse" onclick="toggleSection(this);">Methods</a></span>
+		<div>&nbsp;</div>
+	</div>
+
+	<div id="MethodsSection" class="section">	
+  <table class="memberListTable">
+    <tr>
+      <th></th>
+      <th>
+        Name
+      </th>
+      <th>
+        Description
+      </th>
+    </tr>
+
+
+
+			<tr class="
+inheritedMember 
+
+
+">
+	<td>
+<img alt="Public method" title="Public method" src="msdn2019/pubmethod.png"></img>
+
+	<img alt="Static" title="Static" src="msdn2019/static.png"></img>
+
+    
+	</td>
+	<td>
+	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.object.equals">Equals(object?, object?)</a>
+
+	</td>
+	<td>
+
+Determines whether the specified object instances are considered equal.
+(inherited from <a target="_top" href=".html" onclick="this.target='';return true;">object</a>).
+
+	</td>
+</tr>
+			<tr class="
+inheritedMember 
+
+
+">
+	<td>
+<img alt="Public method" title="Public method" src="msdn2019/pubmethod.png"></img>
+
+
+    
+	</td>
+	<td>
+	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.object.equals">Equals(object?)</a>
+
+	</td>
+	<td>
+
+Determines whether the specified object is equal to the current object.
+(inherited from <a target="_top" href=".html" onclick="this.target='';return true;">object</a>).
+
+	</td>
+</tr>
+	
+
+
+
+
+
+
+
+
+	<tr class="
+inheritedMember 
+
+
+">
+	<td>
+   <img alt="Protected method" title="Protected method" src="msdn2019/protmethod.png"></img>
+
+    
+	  
+
+
+    
+	</td>
+	<td>
+	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.object.finalize">~Object()</a>
+
+	</td>
+	<td>
+
+Allows an object to try to free resources and perform other cleanup operations before it is reclaimed by garbage collection.
+(inherited from <a target="_top" href=".html" onclick="this.target='';return true;">object</a>).
+
+	</td>
+</tr>
+
+
+
+
+
+
+
+
+	<tr class="
+inheritedMember 
+
+
+">
+	<td>
+<img alt="Public method" title="Public method" src="msdn2019/pubmethod.png"></img>
+
+
+    
+	</td>
+	<td>
+	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.object.gethashcode">GetHashCode()</a>
+
+	</td>
+	<td>
+
+Serves as the default hash function.
+(inherited from <a target="_top" href=".html" onclick="this.target='';return true;">object</a>).
+
+	</td>
+</tr>
+
+
+
+
+
+
+
+
+	<tr class="
+inheritedMember 
+
+
+">
+	<td>
+<img alt="Public method" title="Public method" src="msdn2019/pubmethod.png"></img>
+
+
+    
+	</td>
+	<td>
+	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.object.gettype">GetType()</a>
+
+	</td>
+	<td>
+
+Gets the <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.type">Type</a> of the current instance.
+(inherited from <a target="_top" href=".html" onclick="this.target='';return true;">object</a>).
+
+	</td>
+</tr>
+
+
+
+
+
+
+
+
+	<tr class="
+inheritedMember 
+
+
+">
+	<td>
+   <img alt="Protected method" title="Protected method" src="msdn2019/protmethod.png"></img>
+
+    
+	  
+
+
+    
+	</td>
+	<td>
+	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.object.memberwiseclone">MemberwiseClone()</a>
+
+	</td>
+	<td>
+
+Creates a shallow copy of the current <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.object">object</a>.
+(inherited from <a target="_top" href=".html" onclick="this.target='';return true;">object</a>).
+
+	</td>
+</tr>
+
+
+
+
+
+
+
+
+	<tr class="
+inheritedMember 
+
+
+">
+	<td>
+<img alt="Public method" title="Public method" src="msdn2019/pubmethod.png"></img>
+
+	<img alt="Static" title="Static" src="msdn2019/static.png"></img>
+
+    
+	</td>
+	<td>
+	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.object.referenceequals">ReferenceEquals(object?, object?)</a>
+
+	</td>
+	<td>
+
+Determines whether the specified <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.object">object</a> instances are the same instance.
+(inherited from <a target="_top" href=".html" onclick="this.target='';return true;">object</a>).
+
+	</td>
+</tr>
+
+
+
+
+
+
+
+
+	<tr class="
+inheritedMember 
+
+
+">
+	<td>
+<img alt="Public method" title="Public method" src="msdn2019/pubmethod.png"></img>
+
+
+    
+	</td>
+	<td>
+	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.object.tostring">ToString()</a>
+
+	</td>
+	<td>
+
+Returns a string that represents the current object.
+(inherited from <a target="_top" href=".html" onclick="this.target='';return true;">object</a>).
+
+	</td>
+</tr>
+
+
+
+
+
+
+  </table>
+
+  <a href="#mainBody">
+    Top
+  </a>
+
+	</div>					
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+<!-- Classes -->
+
+<!-- Classes End -->
+
+<!-- Standard Modules -->
+
+<!-- Standard Modules End -->
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="section_container">
+	<div class="section_heading">
+		<span><a href="javascript:void(0)" title="Collapse" onclick="toggleSection(this);">Inheritance Hierarchy</a></span>
+		<div>&nbsp;</div>
+	</div>
+
+<div id="inheritanceHierarchySection" class="section">
+
+<div style="padding-left:0em;"><a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.object">object</a>
+</div>
+
+
+
+<div style="padding-left:1em;">Fluxnote.Backend.Dtos.Documents.DocumentCommentDto</div>
+
+				
+</div>
+</div>
 
 
 
@@ -372,6 +1016,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 	</div>					
 </div>
 
+
 <div class="section_container">
 	<div class="section_heading">
 		<span><a href="javascript:void(0)" title="Collapse" onclick="toggleSection(this);">See Also</a></span>
@@ -380,14 +1025,10 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 
 	<div id="seeAlsoSection" class="section">	
 		<div>
-			<a href="topic_00000000000000CD.html">AuthProviderExtensions Class</a><br />
+	<a href="topic_00000000000000BD.html">Fluxnote.Backend.Dtos.Documents Namespace</a><br />
 
 
-
-<a href="topic_0000000000000087.html">Fluxnote.Backend.Models Namespace</a><br />
-
-
-			
+	
 
 		</div>
 	</div>					

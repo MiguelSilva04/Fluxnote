@@ -10,6 +10,14 @@ using System.Security.Claims;
 
 namespace Fluxnote.Backend.Controllers
 {
+    /// <summary>
+    /// Controlador responsável pela gestão de permissões de documentos por membro.
+    /// </summary>
+    /// <remarks>
+    /// <b>Rota Base:</b> api/documentpermissions<br/>
+    /// <b>Autenticação:</b> JWT Bearer obrigatório.<br/>
+    /// Permite listar, criar, atualizar e remover permissões explícitas de documentos.
+    /// </remarks>
     [Route("api/[controller]")]
     [ApiController]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]

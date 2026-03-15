@@ -1,0 +1,1 @@
+search_result['745']=["topic_000000000000015A.html","DocumentPermissionSummaryDto.TeamMemberId Property","ID do membro da equipa associado à permissão."];

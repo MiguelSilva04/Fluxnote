@@ -1,1 +1,1 @@
-search_result['104']=["topic_000000000000003C.html","RegisterRequest.FullName Property","Nome completo do utilizador para exibição."];
+search_result['104']=["topic_0000000000000039_methods--.html","RegisterRequest Methods",""];

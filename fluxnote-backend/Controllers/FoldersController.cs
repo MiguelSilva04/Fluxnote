@@ -9,6 +9,14 @@ using System.Security.Claims;
 
 namespace Fluxnote.Backend.Controllers
 {
+    /// <summary>
+    /// Controlador responsável pela organização de documentos em pastas por equipa.
+    /// </summary>
+    /// <remarks>
+    /// <b>Rota Base:</b> api/folders<br/>
+    /// <b>Autenticação:</b> JWT Bearer obrigatório.<br/>
+    /// Suporta listagem, criação, edição, remoção de pastas e movimentação de documentos.
+    /// </remarks>
     [Route("api/[controller]")]
     [ApiController]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]

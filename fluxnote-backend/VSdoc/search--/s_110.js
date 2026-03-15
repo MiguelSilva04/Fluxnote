@@ -1,1 +1,1 @@
-search_result['110']=["topic_000000000000003D_vars--.html","UpdateProfileRequest Fields",""];
+search_result['110']=["topic_000000000000003D.html","DocumentsController.GetVersionDetail Method","Obtém o detalhe de uma versão específica, incluindo conteúdo HTML para visualização.\r\nAcessível a Owner, TeamAdmin e Editores do documento."];

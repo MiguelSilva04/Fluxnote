@@ -1,1 +1,1 @@
-search_result['332']=["topic_00000000000000D7_methods--.html","TokenService Methods",""];
+search_result['332']=["topic_0000000000000099.html","UserProfile Class","DTO de resposta com o perfil completo do utilizador.\r\nUsado na resposta dos endpoints GET/PUT /api/auth/users/me."];

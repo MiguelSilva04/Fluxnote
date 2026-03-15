@@ -5,7 +5,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta name="GENERATOR" content="VSdocman - documentation generator; https://www.helixoft.com" />
 	<link rel="icon" href="favicon.ico">
-	<title>TeamsController.PostTeam Method</title>
+	<title>DocumentPermissionsController.DeletePermission Method</title>
 
 	<link rel="stylesheet" type="text/css" href="msdn2019/toc.css" />
 	<script src="msdn2019/toc.js"></script>
@@ -75,7 +75,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
   </div>
 
 <div id="mainBody">
-		<h1 class="title">TeamsController.PostTeam Method</h1>
+		<h1 class="title">DocumentPermissionsController.DeletePermission Method</h1>
         
 		<div class="metadata">
         Namespace:
@@ -90,7 +90,8 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 
        
        
-        <summary-info>Cria uma nova equipa.</summary-info>
+        <summary-info>Remove uma permissão de documento (retira acesso ao membro).
+Requer Owner ou TeamAdmin. Não pode remover Owner/TeamAdmin.</summary-info>
 
 
 
@@ -140,7 +141,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 				</div>
 				
 				<div class="codeSnippetCode codeVB">
-					<pre xml:space="preserve" class="brush: vb">&lt;HttpPost()&gt; _&nbsp;<br />Public Function PostTeam( _&nbsp;<br />   ByVal <i>team</i> As <a target="_top" href="topic_00000000000000A7.html" onclick="this.target='';return true;">Team</a> _&nbsp;<br />) As <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1">Task</a>(Of <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.actionresult-1">ActionResult</a>(Of <a target="_top" href="topic_00000000000000A7.html" onclick="this.target='';return true;">Team</a>))</pre>			
+					<pre xml:space="preserve" class="brush: vb">&lt;HttpDelete(&quot;{id}&quot;)&gt; _&nbsp;<br />Public Function DeletePermission( _&nbsp;<br />   ByVal <i>id</i> As <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.int32">Integer</a> _&nbsp;<br />) As <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1">Task</a>(Of <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.iactionresult">IActionResult</a>)</pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -179,7 +180,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 				</div>
 				
 				<div class="codeSnippetCode codeCsharp">
-					<pre xml:space="preserve" class="brush: csharp">[HttpPost()]&nbsp;<br />public <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.actionresult-1">ActionResult</a>&lt;<a target="_top" href="topic_00000000000000A7.html" onclick="this.target='';return true;">Team</a>&gt;&gt; PostTeam(&nbsp;<br />   <a target="_top" href="topic_00000000000000A7.html" onclick="this.target='';return true;">Team</a> <i>team</i>&nbsp;<br />)</pre>			
+					<pre xml:space="preserve" class="brush: csharp">[HttpDelete(&quot;{id}&quot;)]&nbsp;<br />public <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.iactionresult">IActionResult</a>&gt; DeletePermission(&nbsp;<br />   <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.int32">int</a> <i>id</i>&nbsp;<br />)</pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -219,7 +220,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 				</div>
 				
 				<div class="codeSnippetCode codeCpp">
-					<pre xml:space="preserve" class="brush: cpp">[HttpPost()]&nbsp;<br />public: &nbsp;<br /><a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.actionresult-1">ActionResult</a>&lt;<a target="_top" href="topic_00000000000000A7.html" onclick="this.target='';return true;">Team</a>&gt;^&gt;^ PostTeam(&nbsp;<br />   <a target="_top" href="topic_00000000000000A7.html" onclick="this.target='';return true;">Team</a>^ <i>team</i>&nbsp;<br />) </pre>			
+					<pre xml:space="preserve" class="brush: cpp">[HttpDelete(&quot;{id}&quot;)]&nbsp;<br />public: &nbsp;<br /><a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.iactionresult">IActionResult</a>^&gt;^ DeletePermission(&nbsp;<br />   <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.int32">int</a> <i>id</i>&nbsp;<br />) </pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -270,28 +271,25 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 
 
 <h4 class="subHeading">
-	Parameters</h4><dl paramName="team" class="parameterList">
+	Parameters</h4><dl paramName="id" class="parameterList">
 	<dt>
 		<span class="parameter">
-			team
+			id
 		</span>
 	</dt>
 	<dd>
-		<a target="_top" href="topic_00000000000000A7.html" onclick="this.target='';return true;">Team</a> 
+		<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.int32">int</a> 
 	</dd>
 </dl>
 <p>
-	Dados da equipa a criar. 
+	 
 </p>
 
 <p />
 
 	<h4 class="subHeading">
 		Return Value</h4>
-	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.actionresult-1">ActionResult</a>&lt;<a target="_top" href="topic_00000000000000A7.html" onclick="this.target='';return true;">Team</a>&gt;&gt; 
-		<p>
-		<ul><li></li></ul> 
-	</p>
+	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.iactionresult">IActionResult</a>&gt; 
 	
 
 
@@ -314,17 +312,6 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 
 
 
-<div class="section_container">
-	<div class="section_heading">
-		<span><a href="javascript:void(0)" title="Collapse" onclick="toggleSection(this);">Remarks</a></span>
-		<div>&nbsp;</div>
-	</div>
-
-	<div id="remarksSection" class="section">	
-			<strong>Nota:</strong> Na prática, equipas são normalmente criadas através do
-DocumentsController quando um documento é criado sem especificar equipa.
-	</div>					
-</div>
 
 
 
@@ -391,7 +378,7 @@ DocumentsController quando um documento é criado sem especificar equipa.
 
 	<div id="seeAlsoSection" class="section">	
 		<div>
-			<a href="topic_0000000000000020.html">TeamsController Class</a><br />
+			<a href="topic_0000000000000020.html">DocumentPermissionsController Class</a><br />
 
 
 

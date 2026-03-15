@@ -1,0 +1,1 @@
+search_result['763']=["topic_0000000000000162.html","CreateTeamMemberRequest.Role Property","Role do membro na equipa (0=Member, 1=TeamAdmin, 2=Owner)."];

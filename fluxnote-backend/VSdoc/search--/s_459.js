@@ -1,0 +1,1 @@
+search_result['459']=["topic_00000000000000D7.html","DocumentCommentDto.RangeIndex Property","Posição no editor Quill onde o comentário foi feito. Isto pode ser usado para destacar a parte do texto que está a ser comentada. Se for um comentário de seleção, isto indica o índice inicial da seleç..."];

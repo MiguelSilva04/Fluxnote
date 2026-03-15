@@ -1,0 +1,1 @@
+search_result['1141']=["topic_000000000000024D.html","GeminiAIService.GenerateContentAsync Method","Gera conteúdo novo com base num prompt do utilizador, tendo em conta o documento e ficheiros de contexto."];

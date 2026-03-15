@@ -10,6 +10,14 @@ using System.Security.Claims;
 
 namespace Fluxnote.Backend.Controllers
 {
+    /// <summary>
+    /// Controlador responsável por convites de entrada em equipas através de link.
+    /// </summary>
+    /// <remarks>
+    /// <b>Rota Base:</b> api/team-invites<br/>
+    /// <b>Autenticação:</b> JWT Bearer obrigatório.<br/>
+    /// Permite criar, listar, consultar, aceitar e revogar convites de equipa.
+    /// </remarks>
     [Route("api/team-invites")]
     [ApiController]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]

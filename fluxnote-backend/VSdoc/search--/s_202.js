@@ -1,1 +1,1 @@
-search_result['202']=["topic_000000000000007B.html","TeamDto.Documents Property","Lista de documentos da equipa (apenas não eliminados)."];
+search_result['202']=["topic_0000000000000062.html","FluxnoteServerContext.Team Property","DbSet para equipas colaborativas."];

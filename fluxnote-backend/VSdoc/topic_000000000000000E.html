@@ -5,7 +5,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta name="GENERATOR" content="VSdocman - documentation generator; https://www.helixoft.com" />
 	<link rel="icon" href="favicon.ico">
-	<title>AuthController.Ping Method</title>
+	<title>AuthController.ChangePassword Method</title>
 
 	<link rel="stylesheet" type="text/css" href="msdn2019/toc.css" />
 	<script src="msdn2019/toc.js"></script>
@@ -75,7 +75,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
   </div>
 
 <div id="mainBody">
-		<h1 class="title">AuthController.Ping Method</h1>
+		<h1 class="title">AuthController.ChangePassword Method</h1>
         
 		<div class="metadata">
         Namespace:
@@ -90,6 +90,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 
        
        
+        <summary-info>Altera a password do utilizador autenticado.</summary-info>
 
 
 
@@ -139,7 +140,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 				</div>
 				
 				<div class="codeSnippetCode codeVB">
-					<pre xml:space="preserve" class="brush: vb">&lt;HttpPost(&quot;ping&quot;)&gt; _&nbsp;<br />Public Function Ping() As <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.iactionresult">IActionResult</a></pre>			
+					<pre xml:space="preserve" class="brush: vb">&lt;Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)&gt; _&nbsp;<br />&lt;HttpPut(&quot;users/me/password&quot;)&gt; _&nbsp;<br />Public Function ChangePassword( _&nbsp;<br />   &lt;FromBody()&gt; _&nbsp;<br />   ByVal <i>request</i> As <a target="_top" href="topic_0000000000000070.html" onclick="this.target='';return true;">ChangePasswordRequest</a> _&nbsp;<br />) As <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1">Task</a>(Of <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.iactionresult">IActionResult</a>)</pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -178,7 +179,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 				</div>
 				
 				<div class="codeSnippetCode codeCsharp">
-					<pre xml:space="preserve" class="brush: csharp">[HttpPost(&quot;ping&quot;)]&nbsp;<br />public <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.iactionresult">IActionResult</a> Ping()</pre>			
+					<pre xml:space="preserve" class="brush: csharp">[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]&nbsp;<br />[HttpPut(&quot;users/me/password&quot;)]&nbsp;<br />public <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.iactionresult">IActionResult</a>&gt; ChangePassword(&nbsp;<br />   [FromBody()]&nbsp;<br />   <a target="_top" href="topic_0000000000000070.html" onclick="this.target='';return true;">ChangePasswordRequest</a> <i>request</i>&nbsp;<br />)</pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -218,7 +219,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 				</div>
 				
 				<div class="codeSnippetCode codeCpp">
-					<pre xml:space="preserve" class="brush: cpp">[HttpPost(&quot;ping&quot;)]&nbsp;<br />public: &nbsp;<br /><a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.iactionresult">IActionResult</a>^ Ping() </pre>			
+					<pre xml:space="preserve" class="brush: cpp">[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]&nbsp;<br />[HttpPut(&quot;users/me/password&quot;)]&nbsp;<br />public: &nbsp;<br /><a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.iactionresult">IActionResult</a>^&gt;^ ChangePassword(&nbsp;<br />   [FromBody()]&nbsp;<br />   <a target="_top" href="topic_0000000000000070.html" onclick="this.target='';return true;">ChangePasswordRequest</a>^ <i>request</i>&nbsp;<br />) </pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -257,7 +258,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 				</div>
 				
 				<div class="codeSnippetCode codeJScript">
-					<pre xml:space="preserve" class="brush: js">public &nbsp;<br />   HttpPost(&quot;ping&quot;)&nbsp;<br />function Ping() : <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.iactionresult">IActionResult</a>;</pre>			
+					<pre xml:space="preserve" class="brush: js">JScript does not support generic types and methods.</pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -268,10 +269,29 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 	</div>
 
 
+<h4 class="subHeading">
+	Parameters</h4><dl paramName="request" class="parameterList">
+	<dt>
+		<span class="parameter">
+			request
+		</span>
+	</dt>
+	<dd>
+		<a target="_top" href="topic_0000000000000070.html" onclick="this.target='';return true;">ChangePasswordRequest</a> 
+	</dd>
+</dl>
+<p>
+	CurrentPassword, NewPassword, ConfirmPassword. 
+</p>
+
+<p />
 
 	<h4 class="subHeading">
 		Return Value</h4>
-	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.iactionresult">IActionResult</a> 
+	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.iactionresult">IActionResult</a>&gt; 
+		<p>
+		<ul><li></li><li></li><li></li></ul> 
+	</p>
 	
 
 
@@ -294,6 +314,20 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 
 
 
+<div class="section_container">
+	<div class="section_heading">
+		<span><a href="javascript:void(0)" title="Collapse" onclick="toggleSection(this);">Remarks</a></span>
+		<div>&nbsp;</div>
+	</div>
+
+	<div id="remarksSection" class="section">	
+			<strong>Autenticação:</strong> JWT Bearer obrigatório.&nbsp;<br />
+<strong>Restrições:</strong>
+<ul><li>Apenas disponível para contas com AuthProvider.Local</li><li>Requer password atual correta para segurança</li><li>Nova password deve cumprir requisitos do Identity</li></ul>
+<strong>Requisitos de Password:</strong>
+<ul><li>Mínimo 8 caracteres</li><li>1 letra maiúscula, 1 minúscula, 1 dígito, 1 especial</li></ul>
+	</div>					
+</div>
 
 
 

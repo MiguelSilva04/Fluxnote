@@ -1,1 +1,1 @@
-c['113']=[['114',"Properties","topic_0000000000000061_props--.html",1]];
+c['113']=[['114',"DeleteTeam Method","topic_000000000000005A.html",0],['115',"GetTeam Method","topic_0000000000000056.html",0],['116',"GetTeams Method","topic_0000000000000055.html",0],['117',"PatchTeamName Method","topic_0000000000000058.html",0],['118',"PostTeam Method","topic_0000000000000059.html",0],['119',"PutTeam Method","topic_0000000000000057.html",0]];

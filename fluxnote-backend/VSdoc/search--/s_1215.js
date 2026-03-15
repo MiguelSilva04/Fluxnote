@@ -1,0 +1,1 @@
+search_result['1215']=["topic_000000000000026F.html","DevEmailStore Class","Implementação em memória de IDevEmailStore."];

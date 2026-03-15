@@ -1,8 +1,8 @@
-﻿namespace Fluxnote.Backend.Dtos.Documents
+namespace Fluxnote.Backend.Dtos.Documents
 {
-    ///<summary>
-    ///DTO para criar um comentário em um documento. Pode ser um comentário raiz ou uma resposta a outro comentário.
-    ///</summary>
+    /// <summary>
+    /// DTO para criar um comentário num documento. Pode ser um comentário raiz ou uma resposta a outro comentário.
+    /// </summary>
     public class CreateDocumentCommentDto
     {
         /// <summary>
@@ -17,7 +17,7 @@
         public string Content { get; set; } = string.Empty;
 
         /// <summary>
-        /// Cor associada ao usuário que criou o comentário. Isso pode ser usado para destacar visualmente os comentários de diferentes usuários no frontend.
+        /// Cor associada ao utilizador que criou o comentário. Isto pode ser usado para destacar visualmente os comentários de diferentes utilizadores no frontend.
         /// </summary>
         public string CreatedByColor { get; set; } = string.Empty;
 
@@ -27,15 +27,15 @@
         public int? RangeIndex { get; set; }
 
         /// <summary>
-        /// Comprimento do texto selecionado no editor Quill. Se for um comentário de seleção, isso indica quantos caracteres estão sendo comentados.
-        /// Se for um comentário de posição (sem seleção), esse campo pode ser nulo ou zero.
+        /// Comprimento do texto selecionado no editor Quill. Se for um comentário de seleção, isto indica quantos caracteres estão a ser comentados.
+        /// Se for um comentário de posição (sem seleção), este campo pode ser nulo ou zero.
         /// </summary>
         public int? RangeLength { get; set; }
 
         /// <summary>
-        /// ID do usuário que criou o comentário. Pode ser obtido do contexto de autenticação.
+        /// ID do utilizador que criou o comentário. Pode ser obtido do contexto de autenticação.
         /// </summary>
-        public string UserId { get; set; } // ou pegar do contexto logado
+        public string UserId { get; set; } // ou obter do contexto autenticado
 
         /// <summary>
         /// ID do comentário pai, caso este seja uma resposta a outro comentário. Se for um comentário raiz, esse campo pode ser nulo.
@@ -43,7 +43,7 @@
         public int? ParentCommentId { get; set; } // se for reply
 
         /// <summary>
-        /// Lista de IDs de usuários mencionados no comentário
+        /// Lista de IDs de utilizadores mencionados no comentário
         /// </summary>
         public List<string>? MentionedUserIds { get; set; }
 

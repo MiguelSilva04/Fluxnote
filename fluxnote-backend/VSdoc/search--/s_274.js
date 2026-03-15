@@ -1,1 +1,1 @@
-search_result['274']=["topic_00000000000000AA.html","Team.OwnerId Property","Identificador do proprietário da equipa."];
+search_result['274']=["topic_0000000000000082.html","LoginRequest.Password Property","Password do utilizador."];

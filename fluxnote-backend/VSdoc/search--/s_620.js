@@ -1,0 +1,1 @@
+search_result['620']=["topic_0000000000000119.html","ImproveTextRequest.SelectedText Property","Texto selecionado pelo utilizador no editor."];

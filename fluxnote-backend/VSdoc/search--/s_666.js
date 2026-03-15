@@ -1,0 +1,1 @@
+search_result['666']=["topic_000000000000012E.html","AcceptTeamInviteResponseDto.TeamName Property","Nome da equipa à qual o documento pertence.\r\nEste campo é incluído para facilitar a exibição de informações sobre a equipa,\r\nsem a necessidade de uma consulta adicional para obter o nome da equipa."];

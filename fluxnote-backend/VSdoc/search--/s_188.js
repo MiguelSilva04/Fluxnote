@@ -1,1 +1,1 @@
-search_result['188']=["topic_0000000000000071_attached_props--.html","TeamDto Attached Properties",""];
+search_result['188']=["topic_000000000000005E.html","UploadsController.GetImage Method","Serve imagens — em dev a partir do sistema de ficheiros local,\r\nem produção via proxy ao Azure Blob Storage (sem necessidade de acesso anónimo ao blob)."];

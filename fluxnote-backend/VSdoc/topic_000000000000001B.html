@@ -5,7 +5,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta name="GENERATOR" content="VSdocman - documentation generator; https://www.helixoft.com" />
 	<link rel="icon" href="favicon.ico">
-	<title>TeamMembersController.GetTeamMember  Method</title>
+	<title>DocumentInvitesController.CreateInvite Method</title>
 
 	<link rel="stylesheet" type="text/css" href="msdn2019/toc.css" />
 	<script src="msdn2019/toc.js"></script>
@@ -75,7 +75,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
   </div>
 
 <div id="mainBody">
-		<h1 class="title">TeamMembersController.GetTeamMember  Method</h1>
+		<h1 class="title">DocumentInvitesController.CreateInvite Method</h1>
         
 		<div class="metadata">
         Namespace:
@@ -90,7 +90,8 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 
        
        
-        <summary-info>Lista todos os membros de todas as equipas.</summary-info>
+        <summary-info>Cria um convite por link para um documento.
+Apenas Owner ou TeamAdmin podem criar convites.</summary-info>
 
 
 
@@ -140,7 +141,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 				</div>
 				
 				<div class="codeSnippetCode codeVB">
-					<pre xml:space="preserve" class="brush: vb">&lt;HttpGet()&gt; _&nbsp;<br />Public Function GetTeamMember() As <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1">Task</a>(Of <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.actionresult-1">ActionResult</a>(Of <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>(Of <a target="_top" href="topic_00000000000000B1.html" onclick="this.target='';return true;">TeamMember</a>)))</pre>			
+					<pre xml:space="preserve" class="brush: vb">&lt;HttpPost()&gt; _&nbsp;<br />Public Function CreateInvite( _&nbsp;<br />   &lt;FromBody()&gt; _&nbsp;<br />   ByVal <i>request</i> As <a target="_top" href="topic_00000000000000AC.html" onclick="this.target='';return true;">CreateDocumentInviteRequest</a> _&nbsp;<br />) As <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1">Task</a>(Of <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.actionresult-1">ActionResult</a>(Of <a target="_top" href="topic_00000000000000B0.html" onclick="this.target='';return true;">DocumentInviteDto</a>))</pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -179,7 +180,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 				</div>
 				
 				<div class="codeSnippetCode codeCsharp">
-					<pre xml:space="preserve" class="brush: csharp">[HttpGet()]&nbsp;<br />public <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.actionresult-1">ActionResult</a>&lt;<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a target="_top" href="topic_00000000000000B1.html" onclick="this.target='';return true;">TeamMember</a>&gt;&gt;&gt; GetTeamMember()</pre>			
+					<pre xml:space="preserve" class="brush: csharp">[HttpPost()]&nbsp;<br />public <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.actionresult-1">ActionResult</a>&lt;<a target="_top" href="topic_00000000000000B0.html" onclick="this.target='';return true;">DocumentInviteDto</a>&gt;&gt; CreateInvite(&nbsp;<br />   [FromBody()]&nbsp;<br />   <a target="_top" href="topic_00000000000000AC.html" onclick="this.target='';return true;">CreateDocumentInviteRequest</a> <i>request</i>&nbsp;<br />)</pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -219,7 +220,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 				</div>
 				
 				<div class="codeSnippetCode codeCpp">
-					<pre xml:space="preserve" class="brush: cpp">[HttpGet()]&nbsp;<br />public: &nbsp;<br /><a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.actionresult-1">ActionResult</a>&lt;<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a target="_top" href="topic_00000000000000B1.html" onclick="this.target='';return true;">TeamMember</a>&gt;^&gt;^&gt;^ GetTeamMember() </pre>			
+					<pre xml:space="preserve" class="brush: cpp">[HttpPost()]&nbsp;<br />public: &nbsp;<br /><a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.actionresult-1">ActionResult</a>&lt;<a target="_top" href="topic_00000000000000B0.html" onclick="this.target='';return true;">DocumentInviteDto</a>&gt;^&gt;^ CreateInvite(&nbsp;<br />   [FromBody()]&nbsp;<br />   <a target="_top" href="topic_00000000000000AC.html" onclick="this.target='';return true;">CreateDocumentInviteRequest</a>^ <i>request</i>&nbsp;<br />) </pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -269,13 +270,26 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 	</div>
 
 
+<h4 class="subHeading">
+	Parameters</h4><dl paramName="request" class="parameterList">
+	<dt>
+		<span class="parameter">
+			request
+		</span>
+	</dt>
+	<dd>
+		<a target="_top" href="topic_00000000000000AC.html" onclick="this.target='';return true;">CreateDocumentInviteRequest</a> 
+	</dd>
+</dl>
+<p>
+	 
+</p>
+
+<p />
 
 	<h4 class="subHeading">
 		Return Value</h4>
-	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.actionresult-1">ActionResult</a>&lt;<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a target="_top" href="topic_00000000000000B1.html" onclick="this.target='';return true;">TeamMember</a>&gt;&gt;&gt; 
-		<p>
-		Lista de todos os TeamMember no sistema. 
-	</p>
+	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.actionresult-1">ActionResult</a>&lt;<a target="_top" href="topic_00000000000000B0.html" onclick="this.target='';return true;">DocumentInviteDto</a>&gt;&gt; 
 	
 
 
@@ -298,17 +312,6 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 
 
 
-<div class="section_container">
-	<div class="section_heading">
-		<span><a href="javascript:void(0)" title="Collapse" onclick="toggleSection(this);">Remarks</a></span>
-		<div>&nbsp;</div>
-	</div>
-
-	<div id="remarksSection" class="section">	
-			<strong>⚠️ VULNERABILIDADE:</strong> Este endpoint não tem filtros nem autenticação.&nbsp;<br />
-Expõe informação de membros de TODAS as equipas.
-	</div>					
-</div>
 
 
 
@@ -375,7 +378,7 @@ Expõe informação de membros de TODAS as equipas.
 
 	<div id="seeAlsoSection" class="section">	
 		<div>
-			<a href="topic_0000000000000019.html">TeamMembersController Class</a><br />
+			<a href="topic_0000000000000019.html">DocumentInvitesController Class</a><br />
 
 
 

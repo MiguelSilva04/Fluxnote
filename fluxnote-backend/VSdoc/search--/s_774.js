@@ -1,0 +1,1 @@
+search_result['774']=["topic_0000000000000168.html","UpdateTeamRequest.OwnerId Property","ID do membro proprietário (usado somente durante o fluxo de criação)."];

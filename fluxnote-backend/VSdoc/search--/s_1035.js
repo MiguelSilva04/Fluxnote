@@ -1,0 +1,1 @@
+search_result['1035']=["topic_00000000000001FC.html","RefreshToken.UserId Property","Identificador do utilizador proprietário da sessão (FK para User)."];

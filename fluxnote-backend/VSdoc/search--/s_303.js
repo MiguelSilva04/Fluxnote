@@ -1,1 +1,1 @@
-search_result['303']=["topic_00000000000000C0.html","User.Timezone Property","Fuso horário preferido do utilizador (formato IANA)."];
+search_result['303']=["topic_000000000000008B.html","ResetPasswordRequest.UserId Property","ID do utilizador."];

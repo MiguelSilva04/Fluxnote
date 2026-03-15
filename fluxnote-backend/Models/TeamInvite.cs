@@ -2,6 +2,9 @@
 
 namespace Fluxnote.Backend.Models;
 
+/// <summary>
+/// Entidade que representa um convite por link para entrada numa equipa.
+/// </summary>
 public class TeamInvite
 {
     /// <summary>

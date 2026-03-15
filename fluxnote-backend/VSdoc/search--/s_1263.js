@@ -1,0 +1,1 @@
+search_result['1263']=["topic_0000000000000286.html","BlobStorageService Class","Implementação de IStorageService para produção usando Azure Blob Storage.\r\nImagens: servidas via backend API (/api/uploads/images/{name}) para evitar dependência\r\nde acesso anónimo ao blob (desativado..."];

@@ -1,0 +1,1 @@
+search_result['1104']=["topic_0000000000000230.html","User.Location Property","Localização geográfica do utilizador (cidade, país)."];

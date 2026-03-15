@@ -1,1 +1,1 @@
-search_result['33']=["topic_0000000000000015.html","DocumentsController.DeleteDocument Method","Move um documento para a lixeira (soft delete). Apenas o criador pode apagar."];
+search_result['33']=["topic_0000000000000015.html","AuthController.Ping Method",""];

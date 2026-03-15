@@ -1,1 +1,1 @@
-search_result['101']=["topic_0000000000000039_vars--.html","RegisterRequest Fields",""];
+search_result['101']=["topic_0000000000000039.html","DocumentsController.CreateComment Method","Cria um novo comentário para o documento. Pode ser um comentário raiz ou uma resposta\r\n a outro comentário (se ParentCommentId for fornecido). O campo RangeIndex e RangeLength\r\n permitem associar o co..."];

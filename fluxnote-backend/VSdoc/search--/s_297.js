@@ -1,1 +1,1 @@
-search_result['297']=["topic_00000000000000BC_methods--.html","User Methods",""];
+search_result['297']=["topic_000000000000008A.html","ResetPasswordRequest Class","DTO para redefinição de password com token."];

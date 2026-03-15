@@ -1,0 +1,1 @@
+search_result['683']=["topic_0000000000000135.html","TeamInviteDto.TeamId Property","TeamId é o identificador da equipa para o qual o convite foi criado."];

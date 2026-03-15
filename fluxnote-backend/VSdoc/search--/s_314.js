@@ -1,1 +1,1 @@
-search_result['314']=["topic_00000000000000CD_attached_props--.html","AuthProviderExtensions Attached Properties",""];
+search_result['314']=["topic_0000000000000091.html","UpdateProfileRequest Class","DTO para pedido de atualização de perfil de utilizador.\r\nUsado no endpoint PUT /api/auth/users/me."];

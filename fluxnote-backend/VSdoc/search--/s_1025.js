@@ -1,0 +1,1 @@
+search_result['1025']=["topic_00000000000001F7.html","Folder.CreatedBy Property","Utilizador que criou a pasta."];

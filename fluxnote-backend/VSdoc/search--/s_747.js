@@ -1,0 +1,1 @@
+search_result['747']=["topic_000000000000015C.html","DocumentPermissionSummaryDto.MemberRole Property","Role do membro na equipa (0=Member, 1=TeamAdmin, 2=Owner)."];

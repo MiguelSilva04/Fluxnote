@@ -1,1 +1,1 @@
-search_result['142']=["topic_0000000000000053.html","CreateDocumentRequest.Title Property","Título do documento (obrigatório, máx. 255 caracteres)."];
+search_result['142']=["topic_0000000000000049.html","TeamInvitesController.CreateInvite Method","Cria um convite por link para um documento.\r\nApenas Owner ou TeamAdmin podem criar convites."];

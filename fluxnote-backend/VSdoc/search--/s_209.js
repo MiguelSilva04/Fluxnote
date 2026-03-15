@@ -1,1 +1,1 @@
-search_result['209']=["topic_000000000000007D.html","TeamMemberDto.Id Property","Identificador único do membro."];
+search_result['209']=["topic_0000000000000069.html","FluxnoteServerContext.DocumentContext Property","DbSet para ficheiros de contexto de documentos (uso pela IA)."];

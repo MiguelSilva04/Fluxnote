@@ -1,1 +1,1 @@
-search_result['96']=["topic_0000000000000039.html","RegisterRequest Class","DTO para pedido de registo de novo utilizador.\r\nUsado no endpoint POST /api/auth/register."];
+search_result['96']=["topic_0000000000000034_vars--.html","LoginRequest Fields",""];

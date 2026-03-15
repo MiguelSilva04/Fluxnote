@@ -1,0 +1,1 @@
+c['657']=[['658',"GetTeamMemberAsync Method","topic_0000000000000266.html",0],['659',"IsTeamOwnerAsync Method","topic_0000000000000264.html",0],['660',"IsTeamOwnerOrAdminAsync Method","topic_0000000000000265.html",0]];

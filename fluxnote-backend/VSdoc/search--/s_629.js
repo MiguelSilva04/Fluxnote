@@ -1,0 +1,1 @@
+search_result['629']=["topic_000000000000011D.html","UpdateDocumentRequest.YDocSnapshot Property","Snapshot Y.Doc (CRDT) codificado em Base64."];

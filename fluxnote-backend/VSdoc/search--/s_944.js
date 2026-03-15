@@ -1,0 +1,1 @@
+search_result['944']=["topic_00000000000001BD.html","DocumentComment.CommentReplies Property","Coleção de respostas ao comentário. Permite aceder todas as respostas associadas a este comentário."];

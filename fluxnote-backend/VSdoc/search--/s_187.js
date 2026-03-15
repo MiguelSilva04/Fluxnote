@@ -1,1 +1,1 @@
-search_result['187']=["topic_0000000000000071.html","TeamDto Class","DTO completo de resposta de equipa.\r\nUsado na resposta dos endpoints GET /api/teams e GET /api/teams/{id}."];
+search_result['187']=["topic_000000000000005D.html","UploadsController.UploadImage Method","Faz upload de uma imagem e retorna a URL pública."];

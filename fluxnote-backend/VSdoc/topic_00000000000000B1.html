@@ -5,7 +5,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta name="GENERATOR" content="VSdocman - documentation generator; https://www.helixoft.com" />
 	<link rel="icon" href="favicon.ico">
-	<title>TeamMember Class</title>
+	<title>DocumentInviteDto.Id Property</title>
 
 	<link rel="stylesheet" type="text/css" href="msdn2019/toc.css" />
 	<script src="msdn2019/toc.js"></script>
@@ -75,11 +75,11 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
   </div>
 
 <div id="mainBody">
-		<h1 class="title">TeamMember Class</h1>
+		<h1 class="title">DocumentInviteDto.Id Property</h1>
         
 		<div class="metadata">
         Namespace:
-<a href="topic_0000000000000087.html">Fluxnote.Backend.Models</a>
+<a href="topic_00000000000000A5.html">Fluxnote.Backend.Dtos.DocumentInvites</a>
 
 
 
@@ -90,8 +90,8 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 
        
        
-        <summary-info>Representa a associação entre um utilizador e uma equipa.
-Define o papel/permissões do utilizador dentro da equipa.</summary-info>
+        <summary-info>Identificador único do convite.
+Este é o ID do convite na base de dados e é usado para referência interna.</summary-info>
 
 
 
@@ -141,7 +141,7 @@ Define o papel/permissões do utilizador dentro da equipa.</summary-info>
 				</div>
 				
 				<div class="codeSnippetCode codeVB">
-					<pre xml:space="preserve" class="brush: vb">Public Class TeamMember</pre>			
+					<pre xml:space="preserve" class="brush: vb">Public Property Id() As <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.int32">Integer</a></pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -180,7 +180,7 @@ Define o papel/permissões do utilizador dentro da equipa.</summary-info>
 				</div>
 				
 				<div class="codeSnippetCode codeCsharp">
-					<pre xml:space="preserve" class="brush: csharp">public class TeamMember</pre>			
+					<pre xml:space="preserve" class="brush: csharp">public <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.int32">int</a> Id {get; set;}</pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -220,7 +220,7 @@ Define o papel/permissões do utilizador dentro da equipa.</summary-info>
 				</div>
 				
 				<div class="codeSnippetCode codeCpp">
-					<pre xml:space="preserve" class="brush: cpp">public ref class TeamMember </pre>			
+					<pre xml:space="preserve" class="brush: cpp">public: &nbsp;<br />property <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.int32">int</a> Id {&nbsp;<br /> <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.int32">int</a> get( );&nbsp;<br /> void set(&nbsp;<br />   <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.int32">int</a> value&nbsp;<br /> );&nbsp;<br />}</pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -259,7 +259,7 @@ Define o papel/permissões do utilizador dentro da equipa.</summary-info>
 				</div>
 				
 				<div class="codeSnippetCode codeJScript">
-					<pre xml:space="preserve" class="brush: js">public class TeamMember</pre>			
+					<pre xml:space="preserve" class="brush: js">public function get Id() : <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.int32">int</a>;&nbsp;<br />public function set Id(value : <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.int32">int</a>);</pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -271,6 +271,11 @@ Define o papel/permissões do utilizador dentro da equipa.</summary-info>
 
 
 
+	<h4 class="subHeading">
+		Property Value</h4>
+	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.int32">int</a> 
+	
+
 
 
 
@@ -290,525 +295,11 @@ Define o papel/permissões do utilizador dentro da equipa.</summary-info>
 
 
 
-<div class="section_container">
-	<div class="section_heading">
-		<span><a href="javascript:void(0)" title="Collapse" onclick="toggleSection(this);">Properties</a></span>
-		<div>&nbsp;</div>
-	</div>
 
-	<div id="PropertiesSection" class="section">	
-  <table class="memberListTable">
-    <tr>
-      <th></th>
-      <th>
-        Name
-      </th>
-      <th>
-        Description
-      </th>
-    </tr>
 
 
-	
-		<tr class="
 
 
-">
-	<td>
-<img alt="Public property" title="Public property" src="msdn2019/pubproperty.png"></img>
-
-
-    
-	</td>
-	<td>
-	<a href="topic_00000000000000B2.html">Id</a>
-
-	</td>
-	<td>
-
-Identificador único do membro (chave primária).
-
-	</td>
-</tr>
-	
-
-
-	
-		<tr class="
-
-
-">
-	<td>
-<img alt="Public property" title="Public property" src="msdn2019/pubproperty.png"></img>
-
-
-    
-	</td>
-	<td>
-	<a href="topic_00000000000000B7.html">JoinedAt</a>
-
-	</td>
-	<td>
-
-Data e hora em que o membro entrou na equipa (UTC).
-
-	</td>
-</tr>
-	
-
-
-	
-		<tr class="
-
-
-">
-	<td>
-<img alt="Public property" title="Public property" src="msdn2019/pubproperty.png"></img>
-
-
-    
-	</td>
-	<td>
-	<a href="topic_00000000000000B3.html">Name</a>
-
-	</td>
-	<td>
-
-Nome de exibição do membro na equipa (obrigatório).
-
-	</td>
-</tr>
-	
-
-
-	
-		<tr class="
-
-
-">
-	<td>
-<img alt="Public property" title="Public property" src="msdn2019/pubproperty.png"></img>
-
-
-    
-	</td>
-	<td>
-	<a href="topic_00000000000000B4.html">Role</a>
-
-	</td>
-	<td>
-
-Papel/nível de permissão do membro na equipa.
-
-	</td>
-</tr>
-	
-
-
-	
-		<tr class="
-
-
-">
-	<td>
-<img alt="Public property" title="Public property" src="msdn2019/pubproperty.png"></img>
-
-
-    
-	</td>
-	<td>
-	<a href="topic_00000000000000B6.html">TeamId</a>
-
-	</td>
-	<td>
-
-Identificador da equipa a que pertence (FK para Team).
-
-	</td>
-</tr>
-	
-
-
-	
-		<tr class="
-
-
-">
-	<td>
-<img alt="Public property" title="Public property" src="msdn2019/pubproperty.png"></img>
-
-
-    
-	</td>
-	<td>
-	<a href="topic_00000000000000B5.html">UserId</a>
-
-	</td>
-	<td>
-
-Identificador do utilizador associado (FK para User).
-
-	</td>
-</tr>
-	
-
-
-  </table>
-
-  <a href="#mainBody">
-    Top
-  </a>
-
-	</div>					
-</div>
-
-
-
-
-
-
-<div class="section_container">
-	<div class="section_heading">
-		<span><a href="javascript:void(0)" title="Collapse" onclick="toggleSection(this);">Methods</a></span>
-		<div>&nbsp;</div>
-	</div>
-
-	<div id="MethodsSection" class="section">	
-  <table class="memberListTable">
-    <tr>
-      <th></th>
-      <th>
-        Name
-      </th>
-      <th>
-        Description
-      </th>
-    </tr>
-
-
-
-			<tr class="
-inheritedMember 
-
-
-">
-	<td>
-<img alt="Public method" title="Public method" src="msdn2019/pubmethod.png"></img>
-
-	<img alt="Static" title="Static" src="msdn2019/static.png"></img>
-
-    
-	</td>
-	<td>
-	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.object.equals">Equals(object?, object?)</a>
-
-	</td>
-	<td>
-
-Determines whether the specified object instances are considered equal.
-(inherited from <a target="_top" href=".html" onclick="this.target='';return true;">object</a>).
-
-	</td>
-</tr>
-			<tr class="
-inheritedMember 
-
-
-">
-	<td>
-<img alt="Public method" title="Public method" src="msdn2019/pubmethod.png"></img>
-
-
-    
-	</td>
-	<td>
-	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.object.equals">Equals(object?)</a>
-
-	</td>
-	<td>
-
-Determines whether the specified object is equal to the current object.
-(inherited from <a target="_top" href=".html" onclick="this.target='';return true;">object</a>).
-
-	</td>
-</tr>
-	
-
-
-
-
-
-
-
-
-	<tr class="
-inheritedMember 
-
-
-">
-	<td>
-   <img alt="Protected method" title="Protected method" src="msdn2019/protmethod.png"></img>
-
-    
-	  
-
-
-    
-	</td>
-	<td>
-	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.object.finalize">~Object()</a>
-
-	</td>
-	<td>
-
-Allows an object to try to free resources and perform other cleanup operations before it is reclaimed by garbage collection.
-(inherited from <a target="_top" href=".html" onclick="this.target='';return true;">object</a>).
-
-	</td>
-</tr>
-
-
-
-
-
-
-
-
-	<tr class="
-inheritedMember 
-
-
-">
-	<td>
-<img alt="Public method" title="Public method" src="msdn2019/pubmethod.png"></img>
-
-
-    
-	</td>
-	<td>
-	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.object.gethashcode">GetHashCode()</a>
-
-	</td>
-	<td>
-
-Serves as the default hash function.
-(inherited from <a target="_top" href=".html" onclick="this.target='';return true;">object</a>).
-
-	</td>
-</tr>
-
-
-
-
-
-
-
-
-	<tr class="
-inheritedMember 
-
-
-">
-	<td>
-<img alt="Public method" title="Public method" src="msdn2019/pubmethod.png"></img>
-
-
-    
-	</td>
-	<td>
-	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.object.gettype">GetType()</a>
-
-	</td>
-	<td>
-
-Gets the <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.type">Type</a> of the current instance.
-(inherited from <a target="_top" href=".html" onclick="this.target='';return true;">object</a>).
-
-	</td>
-</tr>
-
-
-
-
-
-
-
-
-	<tr class="
-inheritedMember 
-
-
-">
-	<td>
-   <img alt="Protected method" title="Protected method" src="msdn2019/protmethod.png"></img>
-
-    
-	  
-
-
-    
-	</td>
-	<td>
-	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.object.memberwiseclone">MemberwiseClone()</a>
-
-	</td>
-	<td>
-
-Creates a shallow copy of the current <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.object">object</a>.
-(inherited from <a target="_top" href=".html" onclick="this.target='';return true;">object</a>).
-
-	</td>
-</tr>
-
-
-
-
-
-
-
-
-	<tr class="
-inheritedMember 
-
-
-">
-	<td>
-<img alt="Public method" title="Public method" src="msdn2019/pubmethod.png"></img>
-
-	<img alt="Static" title="Static" src="msdn2019/static.png"></img>
-
-    
-	</td>
-	<td>
-	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.object.referenceequals">ReferenceEquals(object?, object?)</a>
-
-	</td>
-	<td>
-
-Determines whether the specified <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.object">object</a> instances are the same instance.
-(inherited from <a target="_top" href=".html" onclick="this.target='';return true;">object</a>).
-
-	</td>
-</tr>
-
-
-
-
-
-
-
-
-	<tr class="
-inheritedMember 
-
-
-">
-	<td>
-<img alt="Public method" title="Public method" src="msdn2019/pubmethod.png"></img>
-
-
-    
-	</td>
-	<td>
-	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.object.tostring">ToString()</a>
-
-	</td>
-	<td>
-
-Returns a string that represents the current object.
-(inherited from <a target="_top" href=".html" onclick="this.target='';return true;">object</a>).
-
-	</td>
-</tr>
-
-
-
-
-
-
-  </table>
-
-  <a href="#mainBody">
-    Top
-  </a>
-
-	</div>					
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
-
-<!-- Classes -->
-
-<!-- Classes End -->
-
-<!-- Standard Modules -->
-
-<!-- Standard Modules End -->
-
-  
-
-
-
-
-
-
-
-
-<div class="section_container">
-	<div class="section_heading">
-		<span><a href="javascript:void(0)" title="Collapse" onclick="toggleSection(this);">Remarks</a></span>
-		<div>&nbsp;</div>
-	</div>
-
-	<div id="remarksSection" class="section">	
-			Funcionalidades principais:
-<ul><li>Liga utilizadores a equipas com papéis específicos</li><li>Suporta membros sem conta (UserId nullable) para convites pendentes</li><li>Regista data de entrada na equipa</li></ul>
-Relacionamentos:
-<ul><li>N:1 com User (opcional) - membro pode estar associado a um utilizador</li><li>N:1 com Team - membro pertence a uma equipa</li></ul>
-Níveis de Permissão (TeamRole):
-<ul><li>Member (0): Visualizar e editar documentos da equipa</li><li>TeamAdmin (1): Gerir membros + permissões de Member</li><li>Owner (2): Controlo total, incluir criar/eliminar documentos e equipa</li></ul>
-	</div>					
-</div>
-
-
-
-
-<div class="section_container">
-	<div class="section_heading">
-		<span><a href="javascript:void(0)" title="Collapse" onclick="toggleSection(this);">Inheritance Hierarchy</a></span>
-		<div>&nbsp;</div>
-	</div>
-
-<div id="inheritanceHierarchySection" class="section">
-
-<div style="padding-left:0em;"><a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.object">object</a>
-</div>
-
-
-
-<div style="padding-left:1em;">Fluxnote.Backend.Models.TeamMember</div>
-
-				
-</div>
-</div>
 
 
 
@@ -863,7 +354,6 @@ Níveis de Permissão (TeamRole):
 	</div>					
 </div>
 
-
 <div class="section_container">
 	<div class="section_heading">
 		<span><a href="javascript:void(0)" title="Collapse" onclick="toggleSection(this);">See Also</a></span>
@@ -872,10 +362,14 @@ Níveis de Permissão (TeamRole):
 
 	<div id="seeAlsoSection" class="section">	
 		<div>
-	<a href="topic_0000000000000087.html">Fluxnote.Backend.Models Namespace</a><br />
+			<a href="topic_00000000000000B0.html">DocumentInviteDto Class</a><br />
 
 
-	
+
+<a href="topic_00000000000000A5.html">Fluxnote.Backend.Dtos.DocumentInvites Namespace</a><br />
+
+
+			
 
 		</div>
 	</div>					

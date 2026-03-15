@@ -1,1 +1,1 @@
-search_result['267']=["topic_00000000000000A7_attached_props--.html","Team Attached Properties",""];
+search_result['267']=["topic_0000000000000080.html","LoginRequest Class","DTO para pedido de autenticação (login).\r\nUsado no endpoint POST /api/auth/login."];

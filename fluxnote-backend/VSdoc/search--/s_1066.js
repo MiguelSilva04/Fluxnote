@@ -1,0 +1,1 @@
+search_result['1066']=["topic_0000000000000216.html","TeamInvite Class","Entidade que representa um convite por link para entrada numa equipa."];

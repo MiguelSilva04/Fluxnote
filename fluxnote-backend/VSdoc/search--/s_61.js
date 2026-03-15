@@ -1,1 +1,1 @@
-search_result['61']=["topic_0000000000000025.html","TeamsController.PostTeam Method","Cria uma nova equipa."];
+search_result['61']=["topic_0000000000000025.html","DocumentPermissionsController.DeletePermission Method","Remove uma permissão de documento (retira acesso ao membro).\r\nRequer Owner ou TeamAdmin. Não pode remover Owner/TeamAdmin."];

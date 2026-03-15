@@ -1,0 +1,1 @@
+search_result['466']=["topic_00000000000000D9.html","DocumentCommentDto.Resolved Property","Indica se o comentário foi resolvido ou não. Isto pode ser usado para marcar visualmente os comentários que já foram tratados ou respondidos, ajudando os utilizadores a focar nos comentários que ainda..."];

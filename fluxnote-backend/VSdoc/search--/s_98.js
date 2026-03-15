@@ -1,1 +1,1 @@
-search_result['98']=["topic_0000000000000039_events--.html","RegisterRequest Events",""];
+search_result['98']=["topic_0000000000000036.html","DocumentsController.DeleteContext Method","Remove um ficheiro de contexto do documento.\r\nApenas Editors podem remover contexto."];

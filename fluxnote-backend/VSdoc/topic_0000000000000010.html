@@ -5,7 +5,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta name="GENERATOR" content="VSdocman - documentation generator; https://www.helixoft.com" />
 	<link rel="icon" href="favicon.ico">
-	<title>DocumentsController Constructor</title>
+	<title>AuthController.Refresh Method</title>
 
 	<link rel="stylesheet" type="text/css" href="msdn2019/toc.css" />
 	<script src="msdn2019/toc.js"></script>
@@ -75,7 +75,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
   </div>
 
 <div id="mainBody">
-		<h1 class="title">DocumentsController Constructor</h1>
+		<h1 class="title">AuthController.Refresh Method</h1>
         
 		<div class="metadata">
         Namespace:
@@ -90,7 +90,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 
        
        
-        <summary-info>Construtor com injeção de dependências.</summary-info>
+        <summary-info>Renova o access token usando o refresh token do cookie.</summary-info>
 
 
 
@@ -140,7 +140,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 				</div>
 				
 				<div class="codeSnippetCode codeVB">
-					<pre xml:space="preserve" class="brush: vb">Public Sub New( _&nbsp;<br />   ByVal <i>context</i> As <a target="_top" href="topic_0000000000000028.html" onclick="this.target='';return true;">FluxnoteServerContext</a>, _&nbsp;<br />   ByVal <i>userManager</i> As <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.identity.usermanager-1">UserManager</a>(Of <a target="_top" href="topic_00000000000000BC.html" onclick="this.target='';return true;">User</a>) _&nbsp;<br />)</pre>			
+					<pre xml:space="preserve" class="brush: vb">&lt;HttpPost(&quot;refresh&quot;)&gt; _&nbsp;<br />Public Function Refresh() As <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1">Task</a>(Of <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.iactionresult">IActionResult</a>)</pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -179,7 +179,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 				</div>
 				
 				<div class="codeSnippetCode codeCsharp">
-					<pre xml:space="preserve" class="brush: csharp">public DocumentsController(&nbsp;<br />   <a target="_top" href="topic_0000000000000028.html" onclick="this.target='';return true;">FluxnoteServerContext</a> <i>context</i>,&nbsp;<br />   <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.identity.usermanager-1">UserManager</a>&lt;<a target="_top" href="topic_00000000000000BC.html" onclick="this.target='';return true;">User</a>&gt; <i>userManager</i>&nbsp;<br />)</pre>			
+					<pre xml:space="preserve" class="brush: csharp">[HttpPost(&quot;refresh&quot;)]&nbsp;<br />public <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.iactionresult">IActionResult</a>&gt; Refresh()</pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -219,7 +219,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 				</div>
 				
 				<div class="codeSnippetCode codeCpp">
-					<pre xml:space="preserve" class="brush: cpp">public: &nbsp;<br />DocumentsController(&nbsp;<br />   <a target="_top" href="topic_0000000000000028.html" onclick="this.target='';return true;">FluxnoteServerContext</a>^ <i>context</i>,&nbsp;<br />   <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.identity.usermanager-1">UserManager</a>&lt;<a target="_top" href="topic_00000000000000BC.html" onclick="this.target='';return true;">User</a>&gt;^ <i>userManager</i>&nbsp;<br />) </pre>			
+					<pre xml:space="preserve" class="brush: cpp">[HttpPost(&quot;refresh&quot;)]&nbsp;<br />public: &nbsp;<br /><a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.iactionresult">IActionResult</a>^&gt;^ Refresh() </pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -269,36 +269,14 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 	</div>
 
 
-<h4 class="subHeading">
-	Parameters</h4><dl paramName="context" class="parameterList">
-	<dt>
-		<span class="parameter">
-			context
-		</span>
-	</dt>
-	<dd>
-		<a target="_top" href="topic_0000000000000028.html" onclick="this.target='';return true;">FluxnoteServerContext</a> 
-	</dd>
-</dl>
-<p>
-	Contexto da base de dados. 
-</p>
-<dl paramName="userManager" class="parameterList">
-	<dt>
-		<span class="parameter">
-			userManager
-		</span>
-	</dt>
-	<dd>
-		<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.identity.usermanager-1">UserManager</a>&lt;<a target="_top" href="topic_00000000000000BC.html" onclick="this.target='';return true;">User</a>&gt; 
-	</dd>
-</dl>
-<p>
-	Gestor de utilizadores do Identity. 
-</p>
 
-<p />
-
+	<h4 class="subHeading">
+		Return Value</h4>
+	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.iactionresult">IActionResult</a>&gt; 
+		<p>
+		<ul><li></li><li></li></ul> 
+	</p>
+	
 
 
 
@@ -320,6 +298,23 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 
 
 
+<div class="section_container">
+	<div class="section_heading">
+		<span><a href="javascript:void(0)" title="Collapse" onclick="toggleSection(this);">Remarks</a></span>
+		<div>&nbsp;</div>
+	</div>
+
+	<div id="remarksSection" class="section">	
+			<strong>Rate Limit:</strong> 10 pedidos por minuto por IP.&nbsp;<br />
+<strong>Mecanismo de Rotação:</strong>
+<ol><li>Valida refresh token do cookie</li><li>Verifica se não está revogado, expirado, ou em idle timeout</li><li>Revoga token atual</li><li>Gera novo refresh token</li><li>Calcula nova expiração: min(agora+idleDays, sessionStart+absoluteDays)</li><li>Define novo cookie</li><li>Retorna novo access token</li></ol>
+<strong>Deteção de Reutilização:</strong>&nbsp;<br />
+Se um token já revogado for usado novamente, toda a sessão é revogada por segurança
+(indica possível roubo de token).&nbsp;<br />
+<strong>Verificações Adicionais:</strong>
+<ul><li>Email deve estar confirmado</li><li>AccountStatus deve ser Active</li><li>Timeout de inatividade (idleDays)</li><li>Expiração absoluta (absoluteDays desde início da sessão)</li></ul>
+	</div>					
+</div>
 
 
 
@@ -386,7 +381,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 
 	<div id="seeAlsoSection" class="section">	
 		<div>
-			<a href="topic_000000000000000F.html">DocumentsController Class</a><br />
+			<a href="topic_0000000000000001.html">AuthController Class</a><br />
 
 
 

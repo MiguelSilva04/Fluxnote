@@ -5,7 +5,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta name="GENERATOR" content="VSdocman - documentation generator; https://www.helixoft.com" />
 	<link rel="icon" href="favicon.ico">
-	<title>AuthController.Me Method</title>
+	<title>AuthController.ExternalLogin Method</title>
 
 	<link rel="stylesheet" type="text/css" href="msdn2019/toc.css" />
 	<script src="msdn2019/toc.js"></script>
@@ -75,7 +75,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
   </div>
 
 <div id="mainBody">
-		<h1 class="title">AuthController.Me Method</h1>
+		<h1 class="title">AuthController.ExternalLogin Method</h1>
         
 		<div class="metadata">
         Namespace:
@@ -90,7 +90,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 
        
        
-        <summary-info>Obtém o perfil completo do utilizador autenticado.</summary-info>
+        <summary-info>Inicia o fluxo OAuth para um provider externo (Google/Microsoft).</summary-info>
 
 
 
@@ -140,7 +140,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 				</div>
 				
 				<div class="codeSnippetCode codeVB">
-					<pre xml:space="preserve" class="brush: vb">&lt;Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)&gt; _&nbsp;<br />&lt;HttpGet(&quot;users/me&quot;)&gt; _&nbsp;<br />Public Function Me() As <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1">Task</a>(Of <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.iactionresult">IActionResult</a>)</pre>			
+					<pre xml:space="preserve" class="brush: vb">&lt;HttpGet(&quot;external-login/{provider}&quot;)&gt; _&nbsp;<br />&lt;AllowAnonymous()&gt; _&nbsp;<br />Public Function ExternalLogin( _&nbsp;<br />   ByVal <i>provider</i> As <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.string">String</a>, _&nbsp;<br />   &lt;FromQuery()&gt; _&nbsp;<br />   Optional ByVal <i>returnUrl</i> As <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.string">String</a> = null _&nbsp;<br />) As <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1">Task</a>(Of <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.iactionresult">IActionResult</a>)</pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -179,7 +179,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 				</div>
 				
 				<div class="codeSnippetCode codeCsharp">
-					<pre xml:space="preserve" class="brush: csharp">[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]&nbsp;<br />[HttpGet(&quot;users/me&quot;)]&nbsp;<br />public <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.iactionresult">IActionResult</a>&gt; Me()</pre>			
+					<pre xml:space="preserve" class="brush: csharp">[HttpGet(&quot;external-login/{provider}&quot;)]&nbsp;<br />[AllowAnonymous()]&nbsp;<br />public <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.iactionresult">IActionResult</a>&gt; ExternalLogin(&nbsp;<br />   <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.string">string</a> <i>provider</i>,&nbsp;<br />   [FromQuery()]&nbsp;<br />   <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.string">string</a> <i>returnUrl</i> = null&nbsp;<br />)</pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -219,7 +219,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 				</div>
 				
 				<div class="codeSnippetCode codeCpp">
-					<pre xml:space="preserve" class="brush: cpp">[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]&nbsp;<br />[HttpGet(&quot;users/me&quot;)]&nbsp;<br />public: &nbsp;<br /><a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.iactionresult">IActionResult</a>^&gt;^ Me() </pre>			
+					<pre xml:space="preserve" class="brush: cpp">[HttpGet(&quot;external-login/{provider}&quot;)]&nbsp;<br />[AllowAnonymous()]&nbsp;<br />public: &nbsp;<br /><a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.iactionresult">IActionResult</a>^&gt;^ ExternalLogin(&nbsp;<br />   <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.string">String</a>^ <i>provider</i>,&nbsp;<br />   [FromQuery()]&nbsp;<br />   <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.string">String</a>^ <i>returnUrl</i>&nbsp;<br />) </pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -269,6 +269,35 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 	</div>
 
 
+<h4 class="subHeading">
+	Parameters</h4><dl paramName="provider" class="parameterList">
+	<dt>
+		<span class="parameter">
+			provider
+		</span>
+	</dt>
+	<dd>
+		<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.string">string</a> 
+	</dd>
+</dl>
+<p>
+	Provider externo: <code>google</code> ou <code>microsoft</code>. 
+</p>
+<dl paramName="returnUrl" class="parameterList">
+	<dt>
+		<span class="parameter">
+			returnUrl
+		</span>
+	</dt>
+	<dd>
+		<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.string">string</a> 
+	</dd>
+</dl>
+<p>
+	Rota opcional do frontend para onde redirecionar após login. 
+</p>
+
+<p />
 
 	<h4 class="subHeading">
 		Return Value</h4>
@@ -298,40 +327,6 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 
 
 
-<div class="section_container">
-	<div class="section_heading">
-		<span><a href="javascript:void(0)" title="Collapse" onclick="toggleSection(this);">Remarks</a></span>
-		<div>&nbsp;</div>
-	</div>
-
-	<div id="remarksSection" class="section">	
-			<strong>Autenticação:</strong> JWT Bearer obrigatório.&nbsp;<br />
-<strong>Resposta (UserProfile):</strong>
-			<div class="codeSnippetCodeCollection">
-				<div class="codeSnippetToolbar">
-					<a title="Copy to clipboard." href="javascript:void(0)" onclick="CopyCode(this);">Copy</a>
-				</div>
-				
-				<div class="codeSnippetCode">
-					<pre xml:space="preserve">
- {
-     &quot;id&quot;: &quot;guid&quot;,
-     &quot;email&quot;: &quot;user@example.com&quot;,
-     &quot;fullName&quot;: &quot;Nome Completo&quot;,
-     &quot;userName&quot;: &quot;username&quot;,
-     &quot;profilePictureUrl&quot;: &quot;https://...&quot;,
-     &quot;location&quot;: &quot;Lisboa, Portugal&quot;,
-     &quot;phoneNumber&quot;: &quot;+351...&quot;,
-     &quot;bio&quot;: &quot;Descrição&quot;,
-     &quot;timezone&quot;: &quot;Europe/Lisbon&quot;,
-     &quot;createdAt&quot;: &quot;2024-01-01T00:00:00Z&quot;,
-     &quot;usernameChangesRemaining&quot;: 3
- }
- 					</pre>			
-				</div>
-			</div>
-	</div>					
-</div>
 
 
 

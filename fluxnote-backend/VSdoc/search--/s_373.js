@@ -1,1 +1,1 @@
-search_result['373']=["topic_00000000000000EA.html","EmailOptions.SmtpPort Property","Porta do servidor SMTP."];
+search_result['373']=["topic_00000000000000AE.html","CreateDocumentInviteRequest.Role Property","Role a ser atribuído ao utilizador convidado ao aceitar o convite.\r\n0 = Viewer, 1 = Editor."];

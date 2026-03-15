@@ -1,1 +1,1 @@
-search_result['91']=["topic_0000000000000034_vars--.html","LoginRequest Fields",""];
+search_result['91']=["topic_0000000000000034.html","DocumentsController.UploadContext Method","Faz upload de um ficheiro de contexto para o documento.\r\nO texto é extraído e guardado na BD para uso futuro pela IA.\r\nApenas Editors e Owners podem adicionar contexto."];

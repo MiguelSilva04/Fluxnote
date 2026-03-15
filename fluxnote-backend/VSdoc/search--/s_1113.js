@@ -1,0 +1,1 @@
+search_result['1113']=["topic_0000000000000239.html","User.UsernameChangesThisMonth Property","Contador de alterações de username no mês atual.\r\nLimite máximo: 3 alterações por mês."];

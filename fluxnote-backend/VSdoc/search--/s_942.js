@@ -1,0 +1,1 @@
+search_result['942']=["topic_00000000000001BB.html","DocumentComment.CreatedAt Property","Data e hora em que o comentário foi criado."];

@@ -1,1 +1,1 @@
-search_result['19']=["topic_000000000000000C.html","AuthController.Logout Method","Termina a sessão atual do utilizador."];
+search_result['19']=["topic_000000000000000C.html","AuthController.CheckUsernameAvailability Method","Verifica se um username está disponível para uso."];

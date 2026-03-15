@@ -1,1 +1,1 @@
-search_result['60']=["topic_0000000000000024.html","TeamsController.PutTeam Method","Atualiza os dados de uma equipa."];
+search_result['60']=["topic_0000000000000024.html","DocumentPermissionsController.UpdatePermission Method","Atualiza a DocumentRole de uma permissão existente.\r\nRequer Owner ou TeamAdmin. Não pode alterar permissão de Owner/TeamAdmin."];

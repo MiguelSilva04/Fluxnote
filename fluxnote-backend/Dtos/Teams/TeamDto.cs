@@ -114,12 +114,24 @@ namespace Fluxnote.Backend.Dtos.Teams
         public List<DocumentPermissionSummaryDto> Permissions { get; set; } = new();
     }
 
+    /// <summary>
+    /// DTO resumido de permissão de documento em contexto de equipa.
+    /// </summary>
     public class DocumentPermissionSummaryDto
     {
+        /// <summary>Identificador único da permissão.</summary>
         public int Id { get; set; }
+
+        /// <summary>ID do membro da equipa associado à permissão.</summary>
         public int TeamMemberId { get; set; }
+
+        /// <summary>Nome do membro da equipa.</summary>
         public string MemberName { get; set; } = string.Empty;
+
+        /// <summary>Role do membro na equipa (0=Member, 1=TeamAdmin, 2=Owner).</summary>
         public int MemberRole { get; set; } // TeamRole: 0=Member, 1=TeamAdmin, 2=Owner
+
+        /// <summary>Role no documento (0=Viewer, 1=Editor).</summary>
         public int DocumentRole { get; set; } // 0=Viewer, 1=Editor
     }
 }

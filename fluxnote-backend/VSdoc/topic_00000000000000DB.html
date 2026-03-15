@@ -5,7 +5,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta name="GENERATOR" content="VSdocman - documentation generator; https://www.helixoft.com" />
 	<link rel="icon" href="favicon.ico">
-	<title>TokenService.HashRefreshToken Method</title>
+	<title>DocumentCommentDto.Mentions Property</title>
 
 	<link rel="stylesheet" type="text/css" href="msdn2019/toc.css" />
 	<script src="msdn2019/toc.js"></script>
@@ -75,11 +75,11 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
   </div>
 
 <div id="mainBody">
-		<h1 class="title">TokenService.HashRefreshToken Method</h1>
+		<h1 class="title">DocumentCommentDto.Mentions Property</h1>
         
 		<div class="metadata">
         Namespace:
-<a href="topic_00000000000000D6.html">Fluxnote.Backend.Services.Auth</a>
+<a href="topic_00000000000000BD.html">Fluxnote.Backend.Dtos.Documents</a>
 
 
 
@@ -90,7 +90,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 
        
        
-        <summary-info>Calcula o hash SHA256 de um refresh token para armazenamento seguro.</summary-info>
+        <summary-info>Lista de menções de utilizadores associadas ao comentário.</summary-info>
 
 
 
@@ -140,7 +140,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 				</div>
 				
 				<div class="codeSnippetCode codeVB">
-					<pre xml:space="preserve" class="brush: vb">Public Shared Function HashRefreshToken( _&nbsp;<br />   ByVal <i>refreshTokenPlain</i> As <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.string">String</a> _&nbsp;<br />) As <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.string">String</a></pre>			
+					<pre xml:space="preserve" class="brush: vb">Public Property Mentions() As <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.list-1">List</a>(Of <a target="_top" href="topic_00000000000000BE.html" onclick="this.target='';return true;">CommentMentionDto</a>)</pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -179,7 +179,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 				</div>
 				
 				<div class="codeSnippetCode codeCsharp">
-					<pre xml:space="preserve" class="brush: csharp">public static <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.string">string</a> HashRefreshToken(&nbsp;<br />   <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.string">string</a> <i>refreshTokenPlain</i>&nbsp;<br />)</pre>			
+					<pre xml:space="preserve" class="brush: csharp">public <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a target="_top" href="topic_00000000000000BE.html" onclick="this.target='';return true;">CommentMentionDto</a>&gt; Mentions {get; set;}</pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -219,7 +219,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 				</div>
 				
 				<div class="codeSnippetCode codeCpp">
-					<pre xml:space="preserve" class="brush: cpp">public: &nbsp;<br />static <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.string">String</a>^ HashRefreshToken(&nbsp;<br />   <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.string">String</a>^ <i>refreshTokenPlain</i>&nbsp;<br />) </pre>			
+					<pre xml:space="preserve" class="brush: cpp">public: &nbsp;<br />property <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a target="_top" href="topic_00000000000000BE.html" onclick="this.target='';return true;">CommentMentionDto</a>^&gt;^ Mentions {&nbsp;<br /> <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a target="_top" href="topic_00000000000000BE.html" onclick="this.target='';return true;">CommentMentionDto</a>^&gt;^ get( );&nbsp;<br /> void set(&nbsp;<br />   <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a target="_top" href="topic_00000000000000BE.html" onclick="this.target='';return true;">CommentMentionDto</a>^&gt;^ value&nbsp;<br /> );&nbsp;<br />}</pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -258,7 +258,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 				</div>
 				
 				<div class="codeSnippetCode codeJScript">
-					<pre xml:space="preserve" class="brush: js">public static function HashRefreshToken(&nbsp;<br />    <i>refreshTokenPlain</i> : <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.string">String</a>&nbsp;<br />) : <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.string">String</a>;</pre>			
+					<pre xml:space="preserve" class="brush: js">JScript does not support generic types and methods.</pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -269,29 +269,10 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 	</div>
 
 
-<h4 class="subHeading">
-	Parameters</h4><dl paramName="refreshTokenPlain" class="parameterList">
-	<dt>
-		<span class="parameter">
-			refreshTokenPlain
-		</span>
-	</dt>
-	<dd>
-		<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.string">string</a> 
-	</dd>
-</dl>
-<p>
-	Token em texto plano (do cliente). 
-</p>
-
-<p />
 
 	<h4 class="subHeading">
-		Return Value</h4>
-	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.string">string</a> 
-		<p>
-		Hash SHA256 do token em Base64 (44 caracteres). 
-	</p>
+		Property Value</h4>
+	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.list-1">List</a>&lt;<a target="_top" href="topic_00000000000000BE.html" onclick="this.target='';return true;">CommentMentionDto</a>&gt; 
 	
 
 
@@ -314,19 +295,6 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 
 
 
-<div class="section_container">
-	<div class="section_heading">
-		<span><a href="javascript:void(0)" title="Collapse" onclick="toggleSection(this);">Remarks</a></span>
-		<div>&nbsp;</div>
-	</div>
-
-	<div id="remarksSection" class="section">	
-			<strong>Uso:</strong>
-<ul><li>SEMPRE usar este hash para armazenar na base de dados</li><li>SEMPRE usar este hash para pesquisar na base de dados</li><li>Se a BD for comprometida, os tokens continuam seguros</li></ul>
-<strong>Processo de Validação:</strong>
-<ol><li>Cliente envia token via cookie</li><li>Servidor calcula hash do token recebido</li><li>Servidor pesquisa na BD pelo hash</li><li>Se encontrar e estiver válido, aceita a autenticação</li></ol>
-	</div>					
-</div>
 
 
 
@@ -393,11 +361,11 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 
 	<div id="seeAlsoSection" class="section">	
 		<div>
-			<a href="topic_00000000000000D7.html">TokenService Class</a><br />
+			<a href="topic_00000000000000CE.html">DocumentCommentDto Class</a><br />
 
 
 
-<a href="topic_00000000000000D6.html">Fluxnote.Backend.Services.Auth Namespace</a><br />
+<a href="topic_00000000000000BD.html">Fluxnote.Backend.Dtos.Documents Namespace</a><br />
 
 
 			

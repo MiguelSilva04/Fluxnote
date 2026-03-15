@@ -10,7 +10,7 @@ public class ExternalAuthErrorResponse
 }
 
 /// <summary>
-/// Informação do utilizador retornada por provider externo.
+/// Informação do utilizador devolvida por provider externo.
 /// </summary>
 public class ExternalUserInfo
 {

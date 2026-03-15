@@ -1,1 +1,1 @@
-search_result['377']=["topic_00000000000000EE.html","IEmailSender Interface","Interface para serviços de envio de email."];
+search_result['377']=["topic_00000000000000B0_events--.html","DocumentInviteDto Events",""];

@@ -1,1 +1,1 @@
-search_result['391']=["topic_00000000000000F2.html","SmtpEmailSender.SendEmailConfirmationAsync Method","Envia um email de confirmação de conta via SMTP."];
+search_result['391']=["topic_00000000000000B6.html","DocumentInviteDto.TeamName Property","Nome da equipa à qual o documento pertence. Este campo é incluído para\r\nfacilitar a exibição"];

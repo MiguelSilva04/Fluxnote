@@ -1,0 +1,1 @@
+search_result['1012']=["topic_00000000000001EF.html","Folder Class","Entidade que representa uma pasta para organização de documentos numa equipa."];

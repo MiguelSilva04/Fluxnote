@@ -1,1 +1,1 @@
-search_result['364']=["topic_00000000000000E6.html","EmailOptions Class","Opções de configuração para o serviço de email SMTP."];
+search_result['364']=["topic_00000000000000AA.html","AcceptDocumentInviteResponseDto.TeamName Property","Nome da equipa à qual o documento pertence.\r\nEste campo é incluído para facilitar a exibição de informações sobre a equipa,\r\nsem a necessidade de uma consulta adicional para obter o nome da equipa."];

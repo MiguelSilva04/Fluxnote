@@ -1,1 +1,1 @@
-search_result['304']=["topic_00000000000000C1.html","User.CreatedAt Property","Data e hora de criação da conta (UTC)."];
+search_result['304']=["topic_000000000000008C.html","ResetPasswordRequest.Token Property","Token de reset codificado em Base64Url."];

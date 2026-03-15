@@ -1,1 +1,1 @@
-search_result['381']=["topic_00000000000000EE_props--.html","IEmailSender Properties",""];
+search_result['381']=["topic_00000000000000B1.html","DocumentInviteDto.Id Property","Identificador único do convite.\r\nEste é o ID do convite na base de dados e é usado para referência interna."];

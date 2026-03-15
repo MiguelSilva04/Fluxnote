@@ -1,1 +1,1 @@
-search_result['205']=["topic_000000000000007C_events--.html","TeamMemberDto Events",""];
+search_result['205']=["topic_0000000000000065.html","FluxnoteServerContext.Document Property","DbSet para documentos colaborativos."];

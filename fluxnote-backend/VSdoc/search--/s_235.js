@@ -1,1 +1,1 @@
-search_result['235']=["topic_000000000000008D.html","Document.PlainText Property","Texto extraído do conteúdo para pesquisa full-text."];
+search_result['235']=["topic_0000000000000074.html","ExternalAuthErrorResponse Class","Resposta de erro para autenticação externa."];

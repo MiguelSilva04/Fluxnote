@@ -1,1 +1,1 @@
-search_result['387']=["topic_00000000000000F0_methods--.html","SmtpEmailSender Methods",""];
+search_result['387']=["topic_00000000000000B2.html","DocumentInviteDto.Token Property","Token único para o link do convite."];

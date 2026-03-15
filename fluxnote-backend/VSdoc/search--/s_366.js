@@ -1,1 +1,1 @@
-search_result['366']=["topic_00000000000000E6_events--.html","EmailOptions Events",""];
+search_result['366']=["topic_00000000000000AC.html","CreateDocumentInviteRequest Class","DTO de pedido para criação de convite de acesso a um documento."];

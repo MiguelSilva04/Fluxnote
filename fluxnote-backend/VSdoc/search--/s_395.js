@@ -1,1 +1,1 @@
-search_result['395']=["topic_00000000000000F4_events--.html","RegisterRequestValidator Events",""];
+search_result['395']=["topic_00000000000000BA.html","DocumentInviteDto.IsRevoked Property","Indica se o convite foi revogado.\r\nUm convite revogado não pode ser aceito, mesmo que ainda não tenha expirado."];

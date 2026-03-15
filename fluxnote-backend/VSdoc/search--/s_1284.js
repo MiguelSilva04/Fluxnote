@@ -1,0 +1,1 @@
+search_result['1284']=["topic_0000000000000291.html","LocalStorageService Class","Implementação de IStorageService para desenvolvimento.\r\nGuarda imagens localmente em wwwroot/uploads/ e retorna URL relativa\r\nservida pelo UploadsController (GET /api/uploads/images/{fileName}).\r\nGuar..."];

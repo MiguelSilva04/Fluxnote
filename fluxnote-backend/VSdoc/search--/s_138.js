@@ -1,1 +1,1 @@
-search_result['138']=["topic_0000000000000052_events--.html","CreateDocumentRequest Events",""];
+search_result['138']=["topic_0000000000000047_methods--.html","TeamInvitesController Methods",""];

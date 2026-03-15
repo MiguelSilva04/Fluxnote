@@ -1,1 +1,1 @@
-search_result['80']=["topic_0000000000000030_methods--.html","ChangePasswordRequest Methods",""];
+search_result['80']=["topic_000000000000002E.html","DocumentsController.GetDocument Method","Obtém os detalhes completos de um documento, incluindo conteúdo."];

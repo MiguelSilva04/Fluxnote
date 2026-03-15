@@ -1,1 +1,1 @@
-search_result['203']=["topic_000000000000007C.html","TeamMemberDto Class","DTO para membro de equipa em respostas."];
+search_result['203']=["topic_0000000000000063.html","FluxnoteServerContext.TeamMember Property","DbSet para membros de equipas."];

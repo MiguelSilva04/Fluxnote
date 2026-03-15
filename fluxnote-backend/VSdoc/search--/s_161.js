@@ -1,1 +1,1 @@
-search_result['161']=["topic_0000000000000061.html","DocumentDetailDto Class","DTO completo para detalhes de documento (com conteúdo).\r\nUsado na resposta dos endpoints GET/PUT /api/documents/{id}."];
+search_result['161']=["topic_0000000000000052_vars--.html","CreateDocumentRequest Fields",""];

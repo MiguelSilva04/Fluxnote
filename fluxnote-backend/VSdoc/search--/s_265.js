@@ -1,1 +1,1 @@
-search_result['265']=["topic_00000000000000A6.html","RefreshToken.isActive Property","Indica se o token está ativo (não revogado e não expirado)."];
+search_result['265']=["topic_000000000000007E.html","ForgotPasswordRequest.Email Property","Email do utilizador que pretende recuperar a password."];

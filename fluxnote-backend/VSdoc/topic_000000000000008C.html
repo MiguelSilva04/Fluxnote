@@ -5,7 +5,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta name="GENERATOR" content="VSdocman - documentation generator; https://www.helixoft.com" />
 	<link rel="icon" href="favicon.ico">
-	<title>Document.Content Property</title>
+	<title>ResetPasswordRequest.Token Property</title>
 
 	<link rel="stylesheet" type="text/css" href="msdn2019/toc.css" />
 	<script src="msdn2019/toc.js"></script>
@@ -75,11 +75,11 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
   </div>
 
 <div id="mainBody">
-		<h1 class="title">Document.Content Property</h1>
+		<h1 class="title">ResetPasswordRequest.Token Property</h1>
         
 		<div class="metadata">
         Namespace:
-<a href="topic_0000000000000087.html">Fluxnote.Backend.Models</a>
+<a href="topic_000000000000006F.html">Fluxnote.Backend.Dtos.Auth</a>
 
 
 
@@ -90,7 +90,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 
        
        
-        <summary-info>Conteúdo binário do documento (Y.Doc serializado ou HTML em UTF-8).</summary-info>
+        <summary-info>Token de reset codificado em Base64Url.</summary-info>
 
 
 
@@ -140,7 +140,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 				</div>
 				
 				<div class="codeSnippetCode codeVB">
-					<pre xml:space="preserve" class="brush: vb">Public Property Content() As <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.byte">Byte</a>()</pre>			
+					<pre xml:space="preserve" class="brush: vb">&lt;Required(ErrorMessage = &quot;Token is required.&quot;)&gt; _&nbsp;<br />Public Property Token() As <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.string">String</a></pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -179,7 +179,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 				</div>
 				
 				<div class="codeSnippetCode codeCsharp">
-					<pre xml:space="preserve" class="brush: csharp">public <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.byte">byte</a>[] Content {get; set;}</pre>			
+					<pre xml:space="preserve" class="brush: csharp">[Required(ErrorMessage = &quot;Token is required.&quot;)]&nbsp;<br />public <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.string">string</a> Token {get; set;}</pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -219,7 +219,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 				</div>
 				
 				<div class="codeSnippetCode codeCpp">
-					<pre xml:space="preserve" class="brush: cpp">public: &nbsp;<br />property array&lt; <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.byte">Byte</a> &gt;^ Content {&nbsp;<br /> array&lt; <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.byte">Byte</a> &gt;^ get( );&nbsp;<br /> void set(&nbsp;<br />   array&lt; <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.byte">Byte</a> &gt;^ value&nbsp;<br /> );&nbsp;<br />}</pre>			
+					<pre xml:space="preserve" class="brush: cpp">[Required(ErrorMessage = &quot;Token is required.&quot;)]&nbsp;<br />public: &nbsp;<br />property <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.string">String</a>^ Token {&nbsp;<br /> <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.string">String</a>^ get( );&nbsp;<br /> void set(&nbsp;<br />   <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.string">String</a>^ value&nbsp;<br /> );&nbsp;<br />}</pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -258,7 +258,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 				</div>
 				
 				<div class="codeSnippetCode codeJScript">
-					<pre xml:space="preserve" class="brush: js">public function get Content() : <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.byte">byte</a>[];&nbsp;<br />public function set Content(value : <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.byte">byte</a>[]);</pre>			
+					<pre xml:space="preserve" class="brush: js">public &nbsp;<br />   Required(ErrorMessage = &quot;Token is required.&quot;)&nbsp;<br />function get Token() : <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.string">String</a>;&nbsp;<br />public &nbsp;<br />   Required(ErrorMessage = &quot;Token is required.&quot;)&nbsp;<br />function set Token(value : <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.string">String</a>);</pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -272,7 +272,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 
 	<h4 class="subHeading">
 		Property Value</h4>
-	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.byte">byte</a>[] 
+	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.string">string</a> 
 	
 
 
@@ -295,18 +295,6 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 
 
 
-<div class="section_container">
-	<div class="section_heading">
-		<span><a href="javascript:void(0)" title="Collapse" onclick="toggleSection(this);">Remarks</a></span>
-		<div>&nbsp;</div>
-	</div>
-
-	<div id="remarksSection" class="section">	
-			Mapeado para varbinary(max) no SQL Server.
-O frontend envia HTML que é convertido para bytes UTF-8.
-Pode conter dados de editores colaborativos (ex: Yjs).
-	</div>					
-</div>
 
 
 
@@ -373,11 +361,11 @@ Pode conter dados de editores colaborativos (ex: Yjs).
 
 	<div id="seeAlsoSection" class="section">	
 		<div>
-			<a href="topic_0000000000000088.html">Document Class</a><br />
+			<a href="topic_000000000000008A.html">ResetPasswordRequest Class</a><br />
 
 
 
-<a href="topic_0000000000000087.html">Fluxnote.Backend.Models Namespace</a><br />
+<a href="topic_000000000000006F.html">Fluxnote.Backend.Dtos.Auth Namespace</a><br />
 
 
 			

@@ -1,0 +1,1 @@
+search_result['420']=["topic_00000000000000C4.html","CreateDocumentCommentDto.CreatedByColor Property","Cor associada ao utilizador que criou o comentário. Isto pode ser usado para destacar visualmente os comentários de diferentes utilizadores no frontend."];

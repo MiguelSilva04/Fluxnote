@@ -1,1 +1,1 @@
-search_result['17']=["topic_000000000000000A.html","AuthController.ConfirmEmail Method","Confirma o endereço de email de um utilizador."];
+search_result['17']=["topic_000000000000000A.html","AuthController.UnlinkExternalLogin Method","Remove a vinculação de um provider externo da conta autenticada."];

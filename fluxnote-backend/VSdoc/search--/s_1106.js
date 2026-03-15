@@ -1,0 +1,1 @@
+search_result['1106']=["topic_0000000000000232.html","User.Timezone Property","Fuso horário preferido do utilizador (formato IANA)."];

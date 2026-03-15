@@ -1,5 +1,8 @@
 ﻿namespace Fluxnote.Backend.Dtos.TeamInvites
 {
+    /// <summary>
+    /// DTO de resposta devolvido após aceitação de convite de equipa.
+    /// </summary>
     public class AcceptTeamInviteResponseDto
     {
         /// <summary>

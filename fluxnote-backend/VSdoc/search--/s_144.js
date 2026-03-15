@@ -1,1 +1,1 @@
-search_result['144']=["topic_0000000000000055.html","CreateDocumentRequest.TeamName Property","Nome para nova equipa a criar (usado se TeamId não for especificado)."];
+search_result['144']=["topic_000000000000004B.html","TeamInvitesController.GetInviteInfo Method","Obtém informação pública de um convite (preview antes de aceitar).\r\nRequer autenticação mas não precisa ser membro da equipa."];

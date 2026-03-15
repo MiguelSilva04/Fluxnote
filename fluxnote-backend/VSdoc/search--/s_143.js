@@ -1,1 +1,1 @@
-search_result['143']=["topic_0000000000000054.html","CreateDocumentRequest.TeamId Property","ID da equipa onde o documento será criado."];
+search_result['143']=["topic_000000000000004A.html","TeamInvitesController.GetByTeam Method","Lista convites ativos de uma equipa.\r\nApenas Owner ou TeamAdmin podem ver."];

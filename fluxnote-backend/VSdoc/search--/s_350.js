@@ -1,1 +1,1 @@
-search_result['350']=["topic_00000000000000E0_events--.html","IDevEmailStore Events",""];
+search_result['350']=["topic_00000000000000A6.html","AcceptDocumentInviteResponseDto Class","DTO de resposta devolvido após aceitação de convite de documento."];

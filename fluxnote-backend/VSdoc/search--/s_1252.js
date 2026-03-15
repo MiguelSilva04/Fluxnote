@@ -1,0 +1,1 @@
+search_result['1252']=["topic_0000000000000280.html","SmtpEmailSender.SendPasswordResetAsync Method","Envia um email de recuperação de password via SMTP."];

@@ -1,0 +1,1 @@
+search_result['1097']=["topic_000000000000022E.html","User Class","Representa um utilizador do sistema Fluxnote.\r\nEstende IdentityUser do ASP.NET Core Identity para gestão de autenticação."];

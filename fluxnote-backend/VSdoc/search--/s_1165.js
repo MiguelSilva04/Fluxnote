@@ -1,0 +1,1 @@
+search_result['1165']=["topic_0000000000000256.html","ITextExtractionService.ExtractTextAsync Method","Extrai texto plano de um stream de ficheiro."];

@@ -1,9 +1,9 @@
-﻿using Fluxnote.Backend.Models;
+using Fluxnote.Backend.Models;
 
 namespace Fluxnote.Backend.Dtos.Documents
 {
     /// <summary>
-    /// DTO para representar um comentário em um documento. Inclui informações sobre o comentário, como conteúdo, autor, data de criação, posição no texto e se o comentário está resolvido ou não. Também inclui uma lista de respostas (replies) caso existam.
+    /// DTO para representar um comentário num documento. Inclui informações sobre o comentário, como conteúdo, autor, data de criação, posição no texto e se o comentário está resolvido ou não. Também inclui uma lista de respostas (replies), caso existam.
     /// </summary>
     public class DocumentCommentDto
     {
@@ -18,7 +18,7 @@ namespace Fluxnote.Backend.Dtos.Documents
         public int DocumentId { get; set; }
 
         /// <summary>
-        /// ID do usuário que criou o comentário. Pode ser usado para exibir o nome do autor, associar uma cor ou para controle de permissões (ex: permitir que apenas o autor edite ou exclua o comentário).
+        /// ID do utilizador que criou o comentário. Pode ser usado para exibir o nome do autor, associar uma cor ou para controle de permissões (ex: permitir que apenas o autor edite ou exclua o comentário).
         /// </summary>
         public string UserId { get; set; }
 
@@ -28,12 +28,12 @@ namespace Fluxnote.Backend.Dtos.Documents
         public int? ParentCommentId { get; set; } //  referência ao comentário pai (se for reply)
 
         /// <summary>
-        /// Nome do usuário que criou o comentário. Pode ser obtido a partir do UserId, dependendo de como o backend lida com os usuários. Útil para exibir o nome do autor no frontend.
+        /// Nome do utilizador que criou o comentário. Pode ser obtido a partir do UserId, dependendo de como o backend lida com os utilizadores. Útil para exibir o nome do autor no frontend.
         /// </summary>
         public string CreatedByName { get; set; } = string.Empty;
 
         /// <summary>
-        /// Cor associada ao usuário que criou o comentário. Isso pode ser usado para destacar visualmente os comentários de diferentes usuários no frontend.
+        /// Cor associada ao utilizador que criou o comentário. Isto pode ser usado para destacar visualmente os comentários de diferentes utilizadores no frontend.
         /// </summary>
         public string CreatedByColor { get; set; } = string.Empty;
 
@@ -51,19 +51,19 @@ namespace Fluxnote.Backend.Dtos.Documents
         // posição no Quill
         
         /// <summary>
-        /// Posição no editor Quill onde o comentário foi feito. Isso pode ser usado para destacar a parte do texto que está sendo comentada. Se for um comentário de seleção, isso indica o índice inicial da seleção. Se for um comentário de posição (sem seleção), isso indica a posição do cursor onde o comentário foi feito.
+        /// Posição no editor Quill onde o comentário foi feito. Isto pode ser usado para destacar a parte do texto que está a ser comentada. Se for um comentário de seleção, isto indica o índice inicial da seleção. Se for um comentário de posição (sem seleção), isto indica a posição do cursor onde o comentário foi feito.
         /// </summary>
         public int? RangeIndex { get; set; }
 
         /// <summary>
-        /// Comprimento do texto selecionado no editor Quill. Se for um comentário de seleção, isso indica quantos caracteres estão sendo comentados. Se for um comentário de posição (sem seleção), esse campo pode ser nulo ou zero.
+        /// Comprimento do texto selecionado no editor Quill. Se for um comentário de seleção, isto indica quantos caracteres estão a ser comentados. Se for um comentário de posição (sem seleção), este campo pode ser nulo ou zero.
         /// </summary>
         public int? RangeLength { get; set; }
 
         //public string? SelectedText { get; set; } = string.Empty;
 
         /// <summary>
-        /// Indica se o comentário foi resolvido ou não. Isso pode ser usado para marcar visualmente os comentários que já foram tratados ou respondidos, ajudando os usuários a focar nos comentários que ainda precisam de atenção.
+        /// Indica se o comentário foi resolvido ou não. Isto pode ser usado para marcar visualmente os comentários que já foram tratados ou respondidos, ajudando os utilizadores a focar nos comentários que ainda precisam de atenção.
         /// </summary>
         public bool Resolved { get; set; } = false;
 
@@ -73,7 +73,7 @@ namespace Fluxnote.Backend.Dtos.Documents
         public List<DocumentCommentDto> Replies { get; set; } = new();
 
         /// <summary>
-        /// Gets or sets the list of user mentions associated with the comment.
+        /// Lista de menções de utilizadores associadas ao comentário.
         /// </summary>
         public List<CommentMentionDto> Mentions { get; set; } = new();
 

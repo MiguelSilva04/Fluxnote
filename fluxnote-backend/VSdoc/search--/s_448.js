@@ -1,0 +1,1 @@
+search_result['448']=["topic_00000000000000D1.html","DocumentCommentDto.UserId Property","ID do utilizador que criou o comentário. Pode ser usado para exibir o nome do autor, associar uma cor ou para controle de permissões (ex: permitir que apenas o autor edite ou exclua o comentário)."];

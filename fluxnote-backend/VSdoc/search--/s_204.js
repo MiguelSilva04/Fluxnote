@@ -1,1 +1,1 @@
-search_result['204']=["topic_000000000000007C_attached_props--.html","TeamMemberDto Attached Properties",""];
+search_result['204']=["topic_0000000000000064.html","FluxnoteServerContext.TeamInvite Property","DbSet para convites de equipas (permite gerir convites pendentes e aceites)."];

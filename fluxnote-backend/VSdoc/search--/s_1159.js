@@ -1,0 +1,1 @@
+search_result['1159']=["topic_0000000000000255.html","ITextExtractionService Interface","Serviço para extração de texto plano de ficheiros carregados como contexto para a IA.\r\nSuporta PDF e TXT;"];

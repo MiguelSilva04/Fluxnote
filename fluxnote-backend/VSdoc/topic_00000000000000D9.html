@@ -5,7 +5,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta name="GENERATOR" content="VSdocman - documentation generator; https://www.helixoft.com" />
 	<link rel="icon" href="favicon.ico">
-	<title>TokenService.CreateAccessToken Method</title>
+	<title>DocumentCommentDto.Resolved Property</title>
 
 	<link rel="stylesheet" type="text/css" href="msdn2019/toc.css" />
 	<script src="msdn2019/toc.js"></script>
@@ -75,11 +75,11 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
   </div>
 
 <div id="mainBody">
-		<h1 class="title">TokenService.CreateAccessToken Method</h1>
+		<h1 class="title">DocumentCommentDto.Resolved Property</h1>
         
 		<div class="metadata">
         Namespace:
-<a href="topic_00000000000000D6.html">Fluxnote.Backend.Services.Auth</a>
+<a href="topic_00000000000000BD.html">Fluxnote.Backend.Dtos.Documents</a>
 
 
 
@@ -90,7 +90,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 
        
        
-        <summary-info>Cria um access token JWT para um utilizador autenticado.</summary-info>
+        <summary-info>Indica se o comentário foi resolvido ou não. Isto pode ser usado para marcar visualmente os comentários que já foram tratados ou respondidos, ajudando os utilizadores a focar nos comentários que ainda precisam de atenção.</summary-info>
 
 
 
@@ -140,7 +140,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 				</div>
 				
 				<div class="codeSnippetCode codeVB">
-					<pre xml:space="preserve" class="brush: vb">Public Function CreateAccessToken( _&nbsp;<br />   ByVal <i>user</i> As <a target="_top" href="topic_00000000000000BC.html" onclick="this.target='';return true;">User</a> _&nbsp;<br />) As <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.string">String</a></pre>			
+					<pre xml:space="preserve" class="brush: vb">Public Property Resolved() As <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.boolean">Boolean</a></pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -179,7 +179,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 				</div>
 				
 				<div class="codeSnippetCode codeCsharp">
-					<pre xml:space="preserve" class="brush: csharp">public <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.string">string</a> CreateAccessToken(&nbsp;<br />   <a target="_top" href="topic_00000000000000BC.html" onclick="this.target='';return true;">User</a> <i>user</i>&nbsp;<br />)</pre>			
+					<pre xml:space="preserve" class="brush: csharp">public <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.boolean">bool</a> Resolved {get; set;}</pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -219,7 +219,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 				</div>
 				
 				<div class="codeSnippetCode codeCpp">
-					<pre xml:space="preserve" class="brush: cpp">public: &nbsp;<br /><a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.string">String</a>^ CreateAccessToken(&nbsp;<br />   <a target="_top" href="topic_00000000000000BC.html" onclick="this.target='';return true;">User</a>^ <i>user</i>&nbsp;<br />) </pre>			
+					<pre xml:space="preserve" class="brush: cpp">public: &nbsp;<br />property <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.boolean">bool</a> Resolved {&nbsp;<br /> <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.boolean">bool</a> get( );&nbsp;<br /> void set(&nbsp;<br />   <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.boolean">bool</a> value&nbsp;<br /> );&nbsp;<br />}</pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -258,7 +258,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 				</div>
 				
 				<div class="codeSnippetCode codeJScript">
-					<pre xml:space="preserve" class="brush: js">public function CreateAccessToken(&nbsp;<br />    <i>user</i> : <a target="_top" href="topic_00000000000000BC.html" onclick="this.target='';return true;">User</a>&nbsp;<br />) : <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.string">String</a>;</pre>			
+					<pre xml:space="preserve" class="brush: js">public function get Resolved() : <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.boolean">boolean</a>;&nbsp;<br />public function set Resolved(value : <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.boolean">boolean</a>);</pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -269,29 +269,10 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 	</div>
 
 
-<h4 class="subHeading">
-	Parameters</h4><dl paramName="user" class="parameterList">
-	<dt>
-		<span class="parameter">
-			user
-		</span>
-	</dt>
-	<dd>
-		<a target="_top" href="topic_00000000000000BC.html" onclick="this.target='';return true;">User</a> 
-	</dd>
-</dl>
-<p>
-	Utilizador para o qual criar o token. 
-</p>
-
-<p />
 
 	<h4 class="subHeading">
-		Return Value</h4>
-	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.string">string</a> 
-		<p>
-		Token JWT assinado em formato string. 
-	</p>
+		Property Value</h4>
+	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.boolean">bool</a> 
 	
 
 
@@ -314,19 +295,6 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 
 
 
-<div class="section_container">
-	<div class="section_heading">
-		<span><a href="javascript:void(0)" title="Collapse" onclick="toggleSection(this);">Remarks</a></span>
-		<div>&nbsp;</div>
-	</div>
-
-	<div id="remarksSection" class="section">	
-			<strong>Claims incluídas no token:</strong>
-<ul><li><strong>sub (Subject):</strong> User.Id - identificador único do utilizador</li><li><strong>email:</strong> User.Email - email do utilizador</li><li><strong>name:</strong> User.FullName ou UserName - nome para exibição</li></ul>
-<strong>Expiração:</strong> Configurável via Jwt:AccessTokenMinutes (padrão: 15 minutos)&nbsp;<br />
-<strong>Assinatura:</strong> HMAC-SHA256 com chave simétrica de Jwt:Key
-	</div>					
-</div>
 
 
 
@@ -393,11 +361,11 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 
 	<div id="seeAlsoSection" class="section">	
 		<div>
-			<a href="topic_00000000000000D7.html">TokenService Class</a><br />
+			<a href="topic_00000000000000CE.html">DocumentCommentDto Class</a><br />
 
 
 
-<a href="topic_00000000000000D6.html">Fluxnote.Backend.Services.Auth Namespace</a><br />
+<a href="topic_00000000000000BD.html">Fluxnote.Backend.Dtos.Documents Namespace</a><br />
 
 
 			

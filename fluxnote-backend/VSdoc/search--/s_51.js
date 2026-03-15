@@ -1,1 +1,1 @@
-search_result['51']=["topic_0000000000000020.html","TeamsController Class","Controlador responsável pela gestão de equipas colaborativas."];
+search_result['51']=["topic_0000000000000020.html","DocumentPermissionsController Class","Controlador responsável pela gestão de permissões de documentos por membro."];

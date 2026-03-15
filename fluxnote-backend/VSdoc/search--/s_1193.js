@@ -1,0 +1,1 @@
+search_result['1193']=["topic_0000000000000263.html","TeamAutorizationService Constructor","Inicializa uma nova instância de TeamAutorizationService."];

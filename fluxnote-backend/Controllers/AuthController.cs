@@ -1,4 +1,4 @@
-﻿using Fluxnote.Backend.Contracts.Auth;
+using Fluxnote.Backend.Contracts.Auth;
 using Fluxnote.Backend.Data;
 using Fluxnote.Backend.Dtos.Auth;
 using Fluxnote.Backend.Models;
@@ -351,7 +351,7 @@ public class AuthController : ControllerBase
     /// Callback OAuth chamado pelo provider após autenticação externa.
     /// </summary>
     /// <param name="returnUrl">Rota opcional para redirecionamento no frontend.</param>
-    /// <param name="remoteError">Erro retornado pelo provider (se existir).</param>
+    /// <param name="remoteError">Erro devolvido pelo provider (se existir).</param>
     /// <returns>
     /// <list type="bullet">
     ///     <item><b>302 Redirect:</b> Para callback/error page do frontend.</item>
@@ -610,7 +610,7 @@ public class AuthController : ControllerBase
     /// Callback do fluxo de vinculação de provider externo.
     /// </summary>
     /// <param name="linkUserId">ID do utilizador para concluir a ligação.</param>
-    /// <param name="remoteError">Erro retornado pelo provider (se existir).</param>
+    /// <param name="remoteError">Erro devolvido pelo provider (se existir).</param>
     /// <returns>Redireciona para callback/error page do frontend.</returns>
     [HttpGet("link-external-callback")]
     [AllowAnonymous]
@@ -1606,7 +1606,7 @@ public class AuthController : ControllerBase
     }
 
     /// <summary>
-    /// Extrai URL de avatar das claims retornadas por providers externos.
+    /// Extrai URL de avatar das claims devolvidas por providers externos.
     /// </summary>
     private static string? ExtractProfilePicture(ClaimsPrincipal principal)
     {

@@ -1,1 +1,1 @@
-search_result['273']=["topic_00000000000000A9.html","Team.Name Property","Nome da equipa (obrigatório)."];
+search_result['273']=["topic_0000000000000081.html","LoginRequest.Email Property","Endereço de email do utilizador."];

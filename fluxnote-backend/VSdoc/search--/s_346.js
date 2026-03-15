@@ -1,1 +1,1 @@
-search_result['346']=["topic_00000000000000DE.html","ConsoleEmailSender Constructor","Construtor com injeção de dependências."];
+search_result['346']=["topic_00000000000000A2.html","UserProfile.Timezone Property","Fuso horário preferido (formato IANA)."];

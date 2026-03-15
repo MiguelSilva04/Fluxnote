@@ -1,1 +1,1 @@
-search_result['46']=["topic_000000000000001C.html","TeamMembersController.GetTeamMember (Int32) Method","Obtém um membro específico pelo ID."];
+search_result['46']=["topic_000000000000001C.html","DocumentInvitesController.GetByDocument Method","Lista convites ativos de um documento.\r\nApenas Owner ou TeamAdmin podem ver."];

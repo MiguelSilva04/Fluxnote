@@ -1,1 +1,1 @@
-search_result['125']=["topic_0000000000000047.html","UserProfile.Email Property","Endereço de email do utilizador (também usado como login)."];
+search_result['125']=["topic_0000000000000042.html","FoldersController.CreateFolder Method","Cria uma nova pasta numa equipa. Apenas Owner ou TeamAdmin."];

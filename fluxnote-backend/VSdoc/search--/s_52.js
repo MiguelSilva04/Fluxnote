@@ -1,1 +1,1 @@
-search_result['52']=["topic_0000000000000020_attached_props--.html","TeamsController Attached Properties",""];
+search_result['52']=["topic_0000000000000020_attached_props--.html","DocumentPermissionsController Attached Properties",""];

@@ -1,0 +1,1 @@
+search_result['1302']=["topic_0000000000000299.html","RegisterRequestValidator Constructor","Configura as regras de validação para RegisterRequest."];

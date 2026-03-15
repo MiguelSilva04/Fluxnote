@@ -10,6 +10,14 @@ using System.Security.Claims;
 
 namespace Fluxnote.Backend.Controllers
 {
+    /// <summary>
+    /// Controlador responsável pela gestão de membros e roles numa equipa.
+    /// </summary>
+    /// <remarks>
+    /// <b>Rota Base:</b> api/teammembers<br/>
+    /// <b>Autenticação:</b> JWT Bearer obrigatório.<br/>
+    /// Permite adicionar membros, alterar roles e remover membros respeitando hierarquia de permissões.
+    /// </remarks>
     [Route("api/[controller]")]
     [ApiController]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]

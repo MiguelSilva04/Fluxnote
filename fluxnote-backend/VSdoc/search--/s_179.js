@@ -1,1 +1,1 @@
-search_result['179']=["topic_000000000000006D_attached_props--.html","UpdateDocumentRequest Attached Properties",""];
+search_result['179']=["topic_000000000000005A.html","TeamsController.DeleteTeam Method","Elimina uma equipa e todos os seus dados associados."];

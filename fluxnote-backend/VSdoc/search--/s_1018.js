@@ -1,0 +1,1 @@
+search_result['1018']=["topic_00000000000001F0.html","Folder.Id Property","Identificador único da pasta."];

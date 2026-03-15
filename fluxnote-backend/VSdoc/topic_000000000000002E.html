@@ -5,7 +5,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta name="GENERATOR" content="VSdocman - documentation generator; https://www.helixoft.com" />
 	<link rel="icon" href="favicon.ico">
-	<title>FluxnoteServerContext.OnModelCreating Method</title>
+	<title>DocumentsController.GetDocument Method</title>
 
 	<link rel="stylesheet" type="text/css" href="msdn2019/toc.css" />
 	<script src="msdn2019/toc.js"></script>
@@ -75,11 +75,11 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
   </div>
 
 <div id="mainBody">
-		<h1 class="title">FluxnoteServerContext.OnModelCreating Method</h1>
+		<h1 class="title">DocumentsController.GetDocument Method</h1>
         
 		<div class="metadata">
         Namespace:
-<a href="topic_0000000000000027.html">Fluxnote.Backend.Data</a>
+<a href="topic_0000000000000000.html">Fluxnote.Backend.Controllers</a>
 
 
 
@@ -90,8 +90,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 
        
        
-        <summary-info>Configuração do modelo de dados via Fluent API.
-Define relacionamentos, índices e configurações específicas do provider.</summary-info>
+        <summary-info>Obtém os detalhes completos de um documento, incluindo conteúdo.</summary-info>
 
 
 
@@ -141,7 +140,7 @@ Define relacionamentos, índices e configurações específicas do provider.</su
 				</div>
 				
 				<div class="codeSnippetCode codeVB">
-					<pre xml:space="preserve" class="brush: vb">Protected Overrides Sub OnModelCreating( _&nbsp;<br />   ByVal <i>builder</i> As <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.entityframeworkcore.modelbuilder">ModelBuilder</a> _&nbsp;<br />)</pre>			
+					<pre xml:space="preserve" class="brush: vb">&lt;HttpGet(&quot;{id}&quot;)&gt; _&nbsp;<br />Public Function GetDocument( _&nbsp;<br />   ByVal <i>id</i> As <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.int32">Integer</a> _&nbsp;<br />) As <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1">Task</a>(Of <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.actionresult-1">ActionResult</a>(Of <a target="_top" href="topic_00000000000000F2.html" onclick="this.target='';return true;">DocumentDetailDto</a>))</pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -180,7 +179,7 @@ Define relacionamentos, índices e configurações específicas do provider.</su
 				</div>
 				
 				<div class="codeSnippetCode codeCsharp">
-					<pre xml:space="preserve" class="brush: csharp">protected override <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.void">void</a> OnModelCreating(&nbsp;<br />   <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.entityframeworkcore.modelbuilder">ModelBuilder</a> <i>builder</i>&nbsp;<br />)</pre>			
+					<pre xml:space="preserve" class="brush: csharp">[HttpGet(&quot;{id}&quot;)]&nbsp;<br />public <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.actionresult-1">ActionResult</a>&lt;<a target="_top" href="topic_00000000000000F2.html" onclick="this.target='';return true;">DocumentDetailDto</a>&gt;&gt; GetDocument(&nbsp;<br />   <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.int32">int</a> <i>id</i>&nbsp;<br />)</pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -220,7 +219,7 @@ Define relacionamentos, índices e configurações específicas do provider.</su
 				</div>
 				
 				<div class="codeSnippetCode codeCpp">
-					<pre xml:space="preserve" class="brush: cpp">protected: &nbsp;<br /><a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.void">void</a> OnModelCreating(&nbsp;<br />   <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.entityframeworkcore.modelbuilder">ModelBuilder</a>^ <i>builder</i>&nbsp;<br />) </pre>			
+					<pre xml:space="preserve" class="brush: cpp">[HttpGet(&quot;{id}&quot;)]&nbsp;<br />public: &nbsp;<br /><a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.actionresult-1">ActionResult</a>&lt;<a target="_top" href="topic_00000000000000F2.html" onclick="this.target='';return true;">DocumentDetailDto</a>&gt;^&gt;^ GetDocument(&nbsp;<br />   <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.int32">int</a> <i>id</i>&nbsp;<br />) </pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -259,7 +258,7 @@ Define relacionamentos, índices e configurações específicas do provider.</su
 				</div>
 				
 				<div class="codeSnippetCode codeJScript">
-					<pre xml:space="preserve" class="brush: js">protected function OnModelCreating(&nbsp;<br />    <i>builder</i> : <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.entityframeworkcore.modelbuilder">ModelBuilder</a>&nbsp;<br />);</pre>			
+					<pre xml:space="preserve" class="brush: js">JScript does not support generic types and methods.</pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -271,22 +270,29 @@ Define relacionamentos, índices e configurações específicas do provider.</su
 
 
 <h4 class="subHeading">
-	Parameters</h4><dl paramName="builder" class="parameterList">
+	Parameters</h4><dl paramName="id" class="parameterList">
 	<dt>
 		<span class="parameter">
-			builder
+			id
 		</span>
 	</dt>
 	<dd>
-		<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.entityframeworkcore.modelbuilder">ModelBuilder</a> 
+		<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.int32">int</a> 
 	</dd>
 </dl>
 <p>
-	Builder para configuração do modelo. 
+	ID do documento. 
 </p>
 
 <p />
 
+	<h4 class="subHeading">
+		Return Value</h4>
+	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.actionresult-1">ActionResult</a>&lt;<a target="_top" href="topic_00000000000000F2.html" onclick="this.target='';return true;">DocumentDetailDto</a>&gt;&gt; 
+		<p>
+		<ul><li></li><li></li><li></li><li></li></ul> 
+	</p>
+	
 
 
 
@@ -308,6 +314,17 @@ Define relacionamentos, índices e configurações específicas do provider.</su
 
 
 
+<div class="section_container">
+	<div class="section_heading">
+		<span><a href="javascript:void(0)" title="Collapse" onclick="toggleSection(this);">Remarks</a></span>
+		<div>&nbsp;</div>
+	</div>
+
+	<div id="remarksSection" class="section">	
+			<strong>Conteúdo:</strong> O campo Content contém o HTML armazenado (convertido de bytes UTF-8).&nbsp;<br />
+<strong>Acesso:</strong> Requer que o utilizador seja membro da equipa do documento.
+	</div>					
+</div>
 
 
 
@@ -374,11 +391,11 @@ Define relacionamentos, índices e configurações específicas do provider.</su
 
 	<div id="seeAlsoSection" class="section">	
 		<div>
-			<a href="topic_0000000000000028.html">FluxnoteServerContext Class</a><br />
+			<a href="topic_0000000000000026.html">DocumentsController Class</a><br />
 
 
 
-<a href="topic_0000000000000027.html">Fluxnote.Backend.Data Namespace</a><br />
+<a href="topic_0000000000000000.html">Fluxnote.Backend.Controllers Namespace</a><br />
 
 
 			
