@@ -688,7 +688,7 @@ import { diffWords } from 'diff';
           }
         </div>
 
-        @if (showShareModal()) {
+        @if (showShareModal() && isTeamOwnerOrTeamAdmin()) {
           <app-document-share-modal
             [isOpen]="true"
             [role]="shareRole()"
@@ -1500,7 +1500,6 @@ export class DocumentEditorComponent implements OnInit {
   isOwner = signal(false);
   isTeamAdmin = signal(false);
 
-  // TODO: Implementar colaboração em tempo real
   collaborators: Collaborator[] = [];
   editorUsers = signal<User[]>([]);
   editorUsersByPermissionId = signal<Record<number, User>>({});
@@ -1776,7 +1775,7 @@ export class DocumentEditorComponent implements OnInit {
   }
 
   openShareModal(): void {
-    if (!this.documentId) return;
+    if (!this.documentId || !this.isTeamOwnerOrTeamAdmin()) return;
     this.shareRole.set(0);
     this.shareExpirationDays.set(7);
     this.shareGeneratedUrl.set(null);
