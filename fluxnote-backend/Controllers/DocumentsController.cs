@@ -1699,7 +1699,7 @@ namespace Fluxnote.Backend.Controllers
         // PATCH /api/documents/{id}/comments/{commentId}/resolve
         /// <summary>
         /// Alterna o estado de resolução de um comentário (resolved <-> unresolved). Apenas o autor do comentário
-        /// ou um administrador da equipa pode resolver.
+        /// ,um administrador da equipa ou pessoa mencionada pode resolver.
         /// </summary>
         [HttpPatch("{id}/comments/{commentId}/resolve")]
         public async Task<ActionResult<DocumentCommentDto>> ResolveComment(int id, int commentId)
