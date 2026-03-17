@@ -548,7 +548,18 @@
     "DISCONNECT_GOOGLE_ONLY": "Google is your only login method. Disconnecting it will permanently delete your account. This action cannot be undone.",
     "DISCONNECT_GOOGLE_SAFE": "Disconnect Google from this account? Your profile and documents will remain available.",
     "SAVE_CONFIRM_TITLE": "Confirm Changes",
-    "SAVE_CONFIRM_DESC": "Are you sure you want to save these changes to your profile?"
+    "SAVE_CONFIRM_DESC": "Are you sure you want to save these changes to your profile?",
+    "VALIDATION": {
+      "FULL_NAME_REQUIRED": "Full name is required.",
+      "MIN_2_CHARS": "Must be at least 2 characters.",
+      "MIN_3_CHARS": "Must be at least 3 characters.",
+      "MAX_50_CHARS": "Must not exceed 50 characters.",
+      "MAX_100_CHARS": "Must not exceed 100 characters.",
+      "FULL_NAME_INVALID": "Only letters, spaces, hyphens, and apostrophes allowed.",
+      "USERNAME_INVALID": "Only letters, numbers, @, and underscores allowed.",
+      "PHONE_INVALID": "Enter a valid phone number (e.g. +351 912 345 678).",
+      "LOCATION_INVALID": "Location contains invalid characters."
+    }
   },
   "NOTIFICATIONS_PAGE": {
     "TITLE": "Notifications"

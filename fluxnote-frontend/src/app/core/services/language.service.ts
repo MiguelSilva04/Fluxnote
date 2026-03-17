@@ -1,4 +1,4 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, Injector, inject } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { AuthService } from './auth.service';
 import { NotificationService } from './notification.service';
@@ -11,7 +11,7 @@ const DEFAULT_LANG: AppLanguage = 'en';
 @Injectable({ providedIn: 'root' })
 export class LanguageService {
   private translate = inject(TranslateService);
-  private authService = inject(AuthService);
+  private injector = inject(Injector);
   private notificationService = inject(NotificationService);
 
   get currentLang(): AppLanguage {
@@ -38,8 +38,9 @@ export class LanguageService {
   setLanguage(lang: AppLanguage): void {
     this.translate.use(lang);
     localStorage.setItem(STORAGE_KEY, lang);
-    if (this.authService.isAuthenticated()) {
-      this.syncLanguagePreferences();
+    const authService = this.injector.get(AuthService);
+    if (authService.isAuthenticated()) {
+      this.syncLanguagePreferences(lang);
     }
   }
 
@@ -47,11 +48,11 @@ export class LanguageService {
    * Sincroniza o idioma do frontend para o backend.
    * Garante que a preferência guardada no backend está sempre alinhada com o que o utilizador vê.
    */
-  syncLanguagePreferences(): void {
-    const localLang = this.currentLang;
+  syncLanguagePreferences(lang?: AppLanguage): void {
+    const targetLang = lang ?? this.currentLang;
     this.notificationService.getPreferences().subscribe(prefs => {
-      if (prefs.language !== localLang) {
-        this.notificationService.updatePreferences({ ...prefs, language: localLang }).subscribe();
+      if (prefs.language !== targetLang) {
+        this.notificationService.updatePreferences({ ...prefs, language: targetLang }).subscribe();
       }
     });
   }

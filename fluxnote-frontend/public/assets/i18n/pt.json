@@ -548,7 +548,18 @@
     "DISCONNECT_GOOGLE_ONLY": "O Google é o seu único método de login. Desligá-lo irá eliminar permanentemente a sua conta. Esta ação não pode ser revertida.",
     "DISCONNECT_GOOGLE_SAFE": "Desligar o Google desta conta? O seu perfil e documentos continuarão disponíveis.",
     "SAVE_CONFIRM_TITLE": "Confirmar Alterações",
-    "SAVE_CONFIRM_DESC": "Tem a certeza que quer guardar estas alterações no seu perfil?"
+    "SAVE_CONFIRM_DESC": "Tem a certeza que quer guardar estas alterações no seu perfil?",
+    "VALIDATION": {
+      "FULL_NAME_REQUIRED": "O nome completo é obrigatório.",
+      "MIN_2_CHARS": "Deve ter pelo menos 2 caracteres.",
+      "MIN_3_CHARS": "Deve ter pelo menos 3 caracteres.",
+      "MAX_50_CHARS": "Não pode exceder 50 caracteres.",
+      "MAX_100_CHARS": "Não pode exceder 100 caracteres.",
+      "FULL_NAME_INVALID": "Apenas letras, espaços, hífens e apóstrofos são permitidos.",
+      "USERNAME_INVALID": "Apenas letras, números, @ e underscores são permitidos.",
+      "PHONE_INVALID": "Introduza um número de telefone válido (ex: +351 912 345 678).",
+      "LOCATION_INVALID": "A localização contém caracteres inválidos."
+    }
   },
   "NOTIFICATIONS_PAGE": {
     "TITLE": "Notificações"

@@ -1025,43 +1025,45 @@ export class ProfileComponent {
     const d = this.formData();
     const errors: Record<string, string> = {};
 
+    const t = (key: string) => this.translateService.instant(`PROFILE.VALIDATION.${key}`);
+
     // Full Name — obrigatório, 2-50 chars, só letras e pontuação de nome
     const name = d.fullName.trim();
     if (!name) {
-      errors['fullName'] = 'Full name is required.';
+      errors['fullName'] = t('FULL_NAME_REQUIRED');
     } else if (name.length < 2) {
-      errors['fullName'] = 'Must be at least 2 characters.';
+      errors['fullName'] = t('MIN_2_CHARS');
     } else if (name.length > 50) {
-      errors['fullName'] = 'Must not exceed 50 characters.';
+      errors['fullName'] = t('MAX_50_CHARS');
     } else if (!/^[a-zA-ZÀ-ÿ\s'\-]+$/.test(name)) {
-      errors['fullName'] = 'Only letters, spaces, hyphens, and apostrophes allowed.';
+      errors['fullName'] = t('FULL_NAME_INVALID');
     }
 
-    // Username — opcional; se preenchido: mín 3 chars, sem espaços, só [a-zA-Z0-9_@]
+    // Username - só validar se foi alterado pelo utilizador
     const username = d.userName.trim();
-    if (username) {
+    if (username && username !== this.originalData.userName) {
       if (username.length < 3) {
-        errors['userName'] = 'Must be at least 3 characters.';
+        errors['userName'] = t('MIN_3_CHARS');
       } else if (!/^[a-zA-Z0-9_@]+$/.test(username)) {
-        errors['userName'] = 'Only letters, numbers, @, and underscores allowed.';
+        errors['userName'] = t('USERNAME_INVALID');
       }
     }
 
     // Phone — opcional; se preenchido: formato internacional básico (7-20 chars)
     const phone = d.phoneNumber.trim();
     if (phone && !/^\+?[\d\s\-(). ]{7,20}$/.test(phone)) {
-      errors['phoneNumber'] = 'Enter a valid phone number (e.g. +351 912 345 678).';
+      errors['phoneNumber'] = t('PHONE_INVALID');
     }
 
-    // Location — opcional; se preenchido: 2-100 chars, sem caracteres estranhos
+    // Location - opcional; se preenchido: 2-100 chars, sem caracteres estranhos
     const location = d.location.trim();
     if (location) {
       if (location.length < 2) {
-        errors['location'] = 'Must be at least 2 characters.';
+        errors['location'] = t('MIN_2_CHARS');
       } else if (location.length > 100) {
-        errors['location'] = 'Must not exceed 100 characters.';
+        errors['location'] = t('MAX_100_CHARS');
       } else if (!/^[a-zA-ZÀ-ÿ0-9\s,.\-']+$/.test(location)) {
-        errors['location'] = 'Location contains invalid characters.';
+        errors['location'] = t('LOCATION_INVALID');
       }
     }
 
