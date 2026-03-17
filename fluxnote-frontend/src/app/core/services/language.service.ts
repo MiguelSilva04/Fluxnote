@@ -1,4 +1,4 @@
-import { Injectable, Injector, inject } from '@angular/core';
+import { Injectable, Injector, inject, signal } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { AuthService } from './auth.service';
 import { NotificationService } from './notification.service';
@@ -13,6 +13,8 @@ export class LanguageService {
   private translate = inject(TranslateService);
   private injector = inject(Injector);
   private notificationService = inject(NotificationService);
+
+  readonly activeLang = signal<AppLanguage>(DEFAULT_LANG);
 
   get currentLang(): AppLanguage {
     return (this.translate.getCurrentLang() as AppLanguage) || DEFAULT_LANG;
@@ -29,6 +31,7 @@ export class LanguageService {
     const lang = saved && ['en', 'pt'].includes(saved) ? saved : DEFAULT_LANG;
 
     this.translate.use(lang);
+    this.activeLang.set(lang);
   }
 
   /**
@@ -37,6 +40,7 @@ export class LanguageService {
    */
   setLanguage(lang: AppLanguage): void {
     this.translate.use(lang);
+    this.activeLang.set(lang);
     localStorage.setItem(STORAGE_KEY, lang);
     const authService = this.injector.get(AuthService);
     if (authService.isAuthenticated()) {

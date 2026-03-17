@@ -2,7 +2,7 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LucideAngularModule } from 'lucide-angular';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { PanelStateService, NotificationService } from '../../core/services';
+import { PanelStateService, NotificationService, LanguageService } from '../../core/services';
 import { ButtonComponent } from '../../shared/components/ui';
 import { NotificationType } from '../../core/models/notification.model';
 import { Router } from '@angular/router';
@@ -54,7 +54,7 @@ import { Router } from '@angular/router';
                 <div class="flex-1 min-w-0">
                   <div class="flex items-start justify-between gap-2 mb-0.5">
                     <div class="flex items-center gap-2">
-                      <h4 class="text-sm font-semibold text-gray-900 dark:text-gray-100">{{ getLocalizedTitle(notification) }}</h4>
+                      <h4 class="text-sm font-semibold text-gray-900 dark:text-gray-100">{{ languageService.activeLang() === 'pt' && notification.titlePt ? notification.titlePt : notification.title }}</h4>
                       @if (!notification.isRead) {
                         <span class="h-2 w-2 rounded-full bg-[#155347] dark:bg-emerald-400 shrink-0"></span>
                       }
@@ -75,7 +75,7 @@ import { Router } from '@angular/router';
                       </button>
                     </div>
                   </div>
-                  <p class="text-sm text-gray-600 dark:text-gray-400 mb-2 line-clamp-2">{{ getLocalizedMessage(notification) }}</p>
+                  <p class="text-sm text-gray-600 dark:text-gray-400 mb-2 line-clamp-2">{{ languageService.activeLang() === 'pt' && notification.messagePt ? notification.messagePt : notification.message }}</p>
                   <div class="flex items-center gap-1.5 text-xs text-gray-400 dark:text-gray-500">
                     <lucide-icon name="clock" class="h-3 w-3"></lucide-icon>
                     <span>{{ getTimeAgo(notification.createdAt) }}</span>
@@ -111,6 +111,7 @@ export class NotificationsPanelComponent implements OnInit {
   panelState = inject(PanelStateService);
   notificationService = inject(NotificationService);
   private router = inject(Router);
+  languageService = inject(LanguageService);
   private translateService = inject(TranslateService);
 
   deletingIds = signal<Set<number>>(new Set());
@@ -187,15 +188,6 @@ export class NotificationsPanelComponent implements OnInit {
     }
   }
 
-  getLocalizedTitle(notification: any): string {
-    const lang = this.translateService.currentLang || 'en';
-    return lang === 'pt' && notification.titlePt ? notification.titlePt : notification.title;
-  }
-
-  getLocalizedMessage(notification: any): string {
-    const lang = this.translateService.currentLang || 'en';
-    return lang === 'pt' && notification.messagePt ? notification.messagePt : notification.message;
-  }
 
   getTimeAgo(dateStr: string): string {
     const date = new Date(dateStr);
