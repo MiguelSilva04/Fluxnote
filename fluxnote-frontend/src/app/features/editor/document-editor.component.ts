@@ -596,16 +596,18 @@ import { diffWords } from 'diff';
                               (click)="toggleReply(comment.id)">
                               {{ 'DOCUMENT_EDITOR.REPLY' | translate }}
                             </button>
-                             @if (this.isElligableForCommentResolution(comment)) {
-                            <button class="text-xs hover:text-emerald-600 dark:hover:text-emerald-400 flex items-center gap-1"
-                              [ngClass]="comment.resolved ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-500'"
-                              [disabled]="commentResolving() === comment.id"
-                              (click)="resolveComment(comment)">
-                              @if (commentResolving() === comment.id) {
-                                <lucide-icon name="loader-circle" class="h-3 w-3 animate-spin"></lucide-icon>
-                              }
-                              {{ (comment.resolved ? 'DOCUMENT_EDITOR.UNRESOLVE' : 'DOCUMENT_EDITOR.RESOLVE') | translate }}
-                            </button>
+                            @if (comment.userId === this.user()?.id || this.isTeamOwnerOrTeamAdmin() || this.isMentionedInComment(comment)) {
+                              <button class="text-xs hover:text-emerald-600 dark:hover:text-emerald-400 flex items-center gap-1"
+                                [ngClass]="comment.resolved ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-500'"
+                                [disabled]="commentResolving() === comment.id"
+                                (click)="resolveComment(comment)">
+                                @if (commentResolving() === comment.id) {
+                                  <lucide-icon name="loader-circle" class="h-3 w-3 animate-spin"></lucide-icon>
+                                }
+                                {{ (comment.resolved ? 'DOCUMENT_EDITOR.UNRESOLVE' : 'DOCUMENT_EDITOR.RESOLVE') | translate }}
+                              </button>
+                            }
+                            @if(comment.userId === this.user()?.id || this.isTeamOwnerOrTeamAdmin() ){
                               <button class="text-xs flex items-center gap-1 transition-colors"
                                 [ngClass]="pendingDeleteCommentId === comment.id ? 'text-red-600 dark:text-red-400 font-medium' : 'text-gray-500 hover:text-red-600 dark:hover:text-red-400'"
                                 [disabled]="commentDeleting() === comment.id"
@@ -2903,9 +2905,9 @@ export class DocumentEditorComponent implements OnInit {
     return comment.mentions?.some(mention => mention.mentionedUserId === userId) ?? false;
   }
 
-  isElligableForCommentResolution(comment: CommentDto): boolean {
+  /* isElligableForCommentResolution(comment: CommentDto): boolean {
     return comment.userId === this.user()?.id || this.isTeamOwnerOrTeamAdmin() || this.isMentionedInComment(comment);
-  }
+  } */
 
   // ─── Colaboração/Highlights ──────────────────────────────
 
