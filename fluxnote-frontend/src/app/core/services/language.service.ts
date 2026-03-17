@@ -1,5 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
+import { AuthService } from './auth.service';
 import { NotificationService } from './notification.service';
 
 export type AppLanguage = 'en' | 'pt';
@@ -10,6 +11,7 @@ const DEFAULT_LANG: AppLanguage = 'en';
 @Injectable({ providedIn: 'root' })
 export class LanguageService {
   private translate = inject(TranslateService);
+  private authService = inject(AuthService);
   private notificationService = inject(NotificationService);
 
   get currentLang(): AppLanguage {
@@ -36,7 +38,9 @@ export class LanguageService {
   setLanguage(lang: AppLanguage): void {
     this.translate.use(lang);
     localStorage.setItem(STORAGE_KEY, lang);
-    this.syncLanguagePreferences();
+    if (this.authService.isAuthenticated()) {
+      this.syncLanguagePreferences();
+    }
   }
 
   /**
