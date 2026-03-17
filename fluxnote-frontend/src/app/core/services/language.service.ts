@@ -36,12 +36,11 @@ export class LanguageService {
   setLanguage(lang: AppLanguage): void {
     this.translate.use(lang);
     localStorage.setItem(STORAGE_KEY, lang);
-    this.syncNotificationLanguage(lang);
+    this.syncLanguagePreferences();
   }
 
   /**
-   * Sincroniza o idioma após autenticação.
-   * O frontend sincroniza o idioma atual para o backend.
+   * Sincroniza o idioma do frontend para o backend.
    * Garante que a preferência guardada no backend está sempre alinhada com o que o utilizador vê.
    */
   syncLanguagePreferences(): void {
@@ -58,13 +57,5 @@ export class LanguageService {
    */
   getLabel(lang: AppLanguage): string {
     return lang === 'pt' ? 'Português' : 'English';
-  }
-
-  private syncNotificationLanguage(lang: AppLanguage): void {
-    this.notificationService.getPreferences().subscribe(prefs => {
-      if (prefs.language !== lang) {
-        this.notificationService.updatePreferences({ ...prefs, language: lang }).subscribe();
-      }
-    });
   }
 }
