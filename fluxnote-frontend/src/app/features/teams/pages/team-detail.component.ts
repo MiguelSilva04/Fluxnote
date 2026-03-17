@@ -8,7 +8,7 @@ import { DashboardLayoutComponent } from '../../../layout/dashboard-layout/dashb
 import { ButtonComponent, CardComponent, CardContentComponent, BadgeComponent, ModalComponent } from '../../../shared/components/ui';
 import { DocumentShareModalComponent } from '../../../shared/components/document-share-modal/document-share-modal.component';
 import { TeamShareModalComponent } from '../../../shared/components/team-share-modal/team-share-modal.component';
-import { TeamService, DocumentPermissionService, AuthService, DocumentInviteService, DocumentService, TeamInviteService, FolderService } from '../../../core/services';
+import { TeamService, DocumentPermissionService, AuthService, DocumentInviteService, DocumentService, TeamInviteService, FolderService, NotificationService } from '../../../core/services';
 import { ToastService } from '../../../shared/services/toast.service';
 import { TourService } from '../../../shared/services/tour.service';
 import { TourStep } from '../../../shared/components/ui/tour/tour.models';
@@ -47,6 +47,7 @@ export class TeamDetailComponent {
   private teamInviteService = inject(TeamInviteService);
   private tourService = inject(TourService);
   private folderService = inject(FolderService);
+  private notificationService = inject(NotificationService);
 
   shareDocId = signal<number | null>(null);
   shareRole = signal<number>(0); // 0=Viewer, 1=Editor
@@ -55,10 +56,15 @@ export class TeamDetailComponent {
   shareLoading = signal(false);
   shareCopied = signal(false);
   documentInvites = signal<DocumentInviteDto[]>([]);
-  
+
   shareTeamId = signal<number | null>(null);
   shareTeamOpen = signal(false);
   teamInvites = signal<TeamInviteDto[]>([]);
+
+  emailLoading = signal(false);
+  emailMessage = signal<string | null>(null);
+  emailShouldUseLink = signal(false);
+  emailRole = signal<number>(1);
 
   selectedTeam = this.teamService.selectedTeam;
 
@@ -623,6 +629,8 @@ export class TeamDetailComponent {
     this.shareDocId.set(null);
     this.shareGeneratedUrl.set(null);
     this.documentInvites.set([]);
+    this.emailMessage.set(null);
+    this.emailShouldUseLink.set(false);
   }
 
   generateDocumentInviteLink(): void {
@@ -979,6 +987,8 @@ export class TeamDetailComponent {
     this.shareGeneratedUrl.set(null);
     this.shareTeamOpen.set(false);
     this.teamInvites.set([]);
+    this.emailMessage.set(null);
+    this.emailShouldUseLink.set(false);
   }
 
   generateTeamInviteLink(): void {
@@ -1116,5 +1126,57 @@ export class TeamDetailComponent {
     }
 
     this.tourService.start(steps);
+  }
+
+  sendDocumentEmailInvite(email: string): void {
+    const docId = this.shareDocId();
+    if (!docId) return;
+
+    this.emailLoading.set(true);
+    this.emailMessage.set(null);
+    this.notificationService.inviteToDocumentByEmail(docId, email, this.emailRole()).subscribe({
+      next: () => {
+        this.emailLoading.set(false);
+        this.emailMessage.set(this.translateService.instant('SHARE_MODAL.INVITE_SENT'));
+        this.emailShouldUseLink.set(false);
+      },
+      error: (err) => {
+        this.emailLoading.set(false);
+        this.emailMessage.set(this.translateEmailError(err.error?.message));
+        this.emailShouldUseLink.set(true);
+      }
+    });
+  }
+
+  sendTeamEmailInvite(email: string): void {
+    const teamId = this.shareTeamId();
+    if (!teamId) return;
+
+    this.emailLoading.set(true);
+    this.emailMessage.set(null);
+    this.notificationService.inviteToTeamByEmail(teamId, email).subscribe({
+      next: () => {
+        this.emailLoading.set(false);
+        this.emailMessage.set(this.translateService.instant('SHARE_MODAL.INVITE_SENT'));
+        this.emailShouldUseLink.set(false);
+      },
+      error: (err) => {
+        this.emailLoading.set(false);
+        this.emailMessage.set(this.translateEmailError(err.error?.message));
+        this.emailShouldUseLink.set(true);
+      }
+    });
+  }
+
+  private translateEmailError(backendMessage?: string): string {
+    const errorMap: Record<string, string> = {
+      'No account found with this email address. The user must register first.': 'SHARE_MODAL.ERROR_NO_ACCOUNT',
+      'This user has all notifications disabled and cannot be invited by email. Please use a link invite instead.': 'SHARE_MODAL.ERROR_NOTIFICATIONS_DISABLED',
+      'User already has access to this document.': 'SHARE_MODAL.ERROR_ALREADY_ACCESS',
+      'User already has full access to this document.': 'SHARE_MODAL.ERROR_ALREADY_FULL_ACCESS',
+      'User is already a member of this team.': 'SHARE_MODAL.ERROR_ALREADY_MEMBER',
+    };
+    const key = backendMessage ? errorMap[backendMessage] : undefined;
+    return this.translateService.instant(key || 'SHARE_MODAL.ERROR_GENERIC');
   }
 }

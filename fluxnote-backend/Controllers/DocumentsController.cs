@@ -3,6 +3,7 @@ using Fluxnote.Backend.Dtos.Documents;
 using Fluxnote.Backend.Hubs;
 using Fluxnote.Backend.Models;
 using Fluxnote.Backend.Services.AI;
+using Fluxnote.Backend.Services.Notifications;
 using Fluxnote.Backend.Services.Storage;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -66,6 +67,7 @@ namespace Fluxnote.Backend.Controllers
         private readonly IStorageService _storageService;
         private readonly ITextExtractionService _textExtractionService;
         private readonly IHubContext<DocumentHub> _hubContext;
+        private readonly INotificationService _notificationService;
 
         /// <summary>
         /// Limite de documentos para o plano Free.
@@ -86,7 +88,8 @@ namespace Fluxnote.Backend.Controllers
             IAIService aiService,
             IStorageService storageService,
             ITextExtractionService textExtractionService,
-            IHubContext<DocumentHub> hubContext)
+            IHubContext<DocumentHub> hubContext,
+            INotificationService notificationService)
         {
             _context = context;
             _userManager = userManager;
@@ -94,6 +97,7 @@ namespace Fluxnote.Backend.Controllers
             _storageService = storageService;
             _textExtractionService = textExtractionService;
             _hubContext = hubContext;
+            _notificationService = notificationService;
         }
 
         /// <summary>
@@ -1674,7 +1678,46 @@ namespace Fluxnote.Backend.Controllers
                 })
                 .ToListAsync();
 
+            var doc = await _context.Document.FindAsync(comment.DocumentId);
+            var docTitle = doc?.Title ?? "a document";
+            var commenterName = user.FullName ?? user.Email;
 
+            // Notificações de menção
+            if (dto.MentionedUserIds != null)
+            {
+                foreach (var mentionedUserId in dto.MentionedUserIds.Where(uid => uid != currentUserId))
+                {
+                    await _notificationService.SendAsync(new NotificationRequest
+                    {
+                        UserId = mentionedUserId,
+                        Type = NotificationType.CommentMention,
+                        Title = "You were mentioned",
+                        TitlePt = "Foste mencionado",
+                        Message = $"{commenterName} mentioned you in a comment on \"{docTitle}\".",
+                        MessagePt = $"{commenterName} mencionou-te num comentário em \"{docTitle}\".",
+                        ReferenceId = comment.DocumentId,
+                        ReferenceType = "Document",
+                        ActorId = currentUserId
+                    });
+                }
+            }
+
+            // Notificação de resposta a comentário
+            if (parent != null && parent.UserId != currentUserId)
+            {
+                await _notificationService.SendAsync(new NotificationRequest
+                {
+                    UserId = parent.UserId,
+                    Type = NotificationType.CommentReply,
+                    Title = "Reply to your comment",
+                    TitlePt = "Resposta ao teu comentário",
+                    Message = $"{commenterName} replied to your comment on \"{docTitle}\".",
+                    MessagePt = $"{commenterName} respondeu ao teu comentário em \"{docTitle}\".",
+                    ReferenceId = comment.DocumentId,
+                    ReferenceType = "Document",
+                    ActorId = currentUserId
+                });
+            }
 
             // Devolve como DTO
             var result = new DocumentCommentDto
@@ -1710,6 +1753,7 @@ namespace Fluxnote.Backend.Controllers
 
             var comment = await _context.DocumentComments
                 .Include(c => c.CreatedBy)
+                .Include(c => c.Mentions)
                 .FirstOrDefaultAsync(c => c.Id == commentId && c.DocumentId == id);
 
             if (comment is null)
@@ -1728,6 +1772,27 @@ namespace Fluxnote.Backend.Controllers
 
             comment.Resolved = !comment.Resolved;
             await _context.SaveChangesAsync();
+
+            // Notificar o autor do comentário quando é resolvido
+            if (comment.Resolved && comment.UserId != userId)
+            {
+                var resolverUser = await _context.Users.FindAsync(userId);
+                var resolverName = resolverUser?.FullName ?? resolverUser?.Email;
+                var docTitle = doc?.Title ?? "a document";
+
+                await _notificationService.SendAsync(new NotificationRequest
+                {
+                    UserId = comment.UserId,
+                    Type = NotificationType.CommentResolved,
+                    Title = "Comment resolved",
+                    TitlePt = "Comentário resolvido",
+                    Message = $"{resolverName} resolved your comment on \"{docTitle}\".",
+                    MessagePt = $"{resolverName} resolveu o teu comentário em \"{docTitle}\".",
+                    ReferenceId = comment.DocumentId,
+                    ReferenceType = "Document",
+                    ActorId = userId
+                });
+            }
 
             var result = new DocumentCommentDto
             {

@@ -72,5 +72,17 @@ public class ConsoleEmailSender : IEmailSender
         _logger.LogInformation("Simulated sending password reset email to {ToEmail} with link: {ResetLink}", toEmail, resetLink);
         return Task.CompletedTask;
     }
+
+    /// <summary>
+    /// Simula o envio de um email de notificação genérico.
+    /// </summary>
+    public Task SendNotificationEmailAsync(string toEmail, string subject, string htmlBody)
+    {
+        Console.WriteLine($"[DEV EMAIL - NOTIFICATION] To: {toEmail}");
+        Console.WriteLine($"[DEV EMAIL - NOTIFICATION] Subject: {subject}");
+        Console.WriteLine($"[DEV EMAIL - NOTIFICATION] Body length: {htmlBody.Length} chars");
+        _logger.LogInformation("Simulated sending notification email to {ToEmail} with subject: {Subject}", toEmail, subject);
+        return Task.CompletedTask;
+    }
 }
 

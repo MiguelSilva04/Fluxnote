@@ -646,6 +646,10 @@
       [loading]="shareLoading()"
       [copied]="shareCopied()"
       [invites]="documentInvites()"
+      [emailLoading]="emailLoading()"
+      [emailMessage]="emailMessage()"
+      [emailShouldUseLink]="emailShouldUseLink()"
+      [emailRole]="emailRole()"
       (close)="closeDocumentShareModal()"
       (roleChange)="shareRole.set($event)"
       (expirationDaysChange)="shareExpirationDays.set($event)"
@@ -654,6 +658,8 @@
       (revokeInvite)="revokeDocumentInvite($event)"
       (clearInvites)="clearDocumentInvitesList()"
       (viewInvite)="viewInviteLink($event)"
+      (emailInvite)="sendDocumentEmailInvite($event)"
+      (emailRoleChange)="emailRole.set($event)"
     />
   }
 
@@ -754,6 +760,9 @@
         [loading]="shareLoading()"
         [copied]="shareCopied()"
         [invites]="teamInvites()"
+        [emailLoading]="emailLoading()"
+        [emailMessage]="emailMessage()"
+        [emailShouldUseLink]="emailShouldUseLink()"
         (close)="closeTeamShareModal()"
         (expirationDaysChange)="shareExpirationDays.set($event)"
         (generateInvite)="generateTeamInviteLink()"
@@ -761,6 +770,7 @@
         (revokeInvite)="revokeTeamInvite($event)"
         (clearInvites)="clearTeamInvitesList()"
         (viewInvite)="viewInviteLink($event)"
+        (emailInvite)="sendTeamEmailInvite($event)"
       />
   }
   

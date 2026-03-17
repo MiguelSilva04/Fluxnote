@@ -1,12 +1,13 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LucideAngularModule } from 'lucide-angular';
 import { TranslateModule } from '@ngx-translate/core';
 import { DashboardLayoutComponent } from '../../../layout/dashboard-layout/dashboard-layout.component';
-import { ButtonComponent, CardComponent, CardContentComponent, WorkInProgressComponent } from '../../../shared/components/ui';
-import { AuthService, LanguageService, ThemeService } from '../../../core/services';
+import { ButtonComponent, CardComponent, CardContentComponent } from '../../../shared/components/ui';
+import { AuthService, LanguageService, NotificationService, ThemeService } from '../../../core/services';
 import { AppLanguage } from '../../../core/services/language.service';
 import { AppTheme } from '../../../core/services/theme.service';
+import { NotificationPreferences } from '../../../core/models/notification.model';
 
 @Component({
   selector: 'app-settings',
@@ -18,8 +19,7 @@ import { AppTheme } from '../../../core/services/theme.service';
     DashboardLayoutComponent,
     ButtonComponent,
     CardComponent,
-    CardContentComponent,
-    WorkInProgressComponent
+    CardContentComponent
   ],
   template: `
     <app-dashboard-layout>
@@ -97,19 +97,34 @@ import { AppTheme } from '../../../core/services/theme.service';
               </div>
               <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">{{ 'SETTINGS.NOTIFICATIONS.DESC' | translate }}</p>
               <div class="space-y-3">
-                @for (notif of notificationOptions; track notif.key) {
-                  <div class="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-600 rounded-lg">
-                    <span class="text-sm font-medium text-gray-900 dark:text-gray-100">{{ notif.labelKey | translate }}</span>
-                    <button
-                      (click)="showWipModal.set(true)"
-                      [class]="'relative inline-flex h-6 w-11 items-center rounded-full transition-colors cursor-pointer ' + (notifications[notif.key] ? 'bg-[#155347]' : 'bg-gray-200 dark:bg-gray-600')"
-                    >
-                      <span
-                        [class]="'inline-block h-4 w-4 transform rounded-full bg-white transition-transform ' + (notifications[notif.key] ? 'translate-x-6' : 'translate-x-1')"
-                      ></span>
-                    </button>
+                <div class="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-600 rounded-lg">
+                  <div>
+                    <span class="text-sm font-medium text-gray-900 dark:text-gray-100">{{ 'SETTINGS.NOTIFICATIONS.EMAIL' | translate }}</span>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">{{ 'SETTINGS.NOTIFICATIONS.EMAIL_DESC' | translate }}</p>
                   </div>
-                }
+                  <button
+                    (click)="toggleEmailNotifications()"
+                    [class]="'relative inline-flex h-6 w-11 items-center rounded-full transition-colors cursor-pointer ' + (notifPreferences().emailEnabled ? 'bg-[#155347]' : 'bg-gray-200 dark:bg-gray-600')"
+                  >
+                    <span
+                      [class]="'inline-block h-4 w-4 transform rounded-full bg-white transition-transform ' + (notifPreferences().emailEnabled ? 'translate-x-6' : 'translate-x-1')"
+                    ></span>
+                  </button>
+                </div>
+                <div class="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-600 rounded-lg">
+                  <div>
+                    <span class="text-sm font-medium text-gray-900 dark:text-gray-100">{{ 'SETTINGS.NOTIFICATIONS.IN_APP' | translate }}</span>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">{{ 'SETTINGS.NOTIFICATIONS.IN_APP_DESC' | translate }}</p>
+                  </div>
+                  <button
+                    (click)="toggleInAppNotifications()"
+                    [class]="'relative inline-flex h-6 w-11 items-center rounded-full transition-colors cursor-pointer ' + (notifPreferences().inAppEnabled ? 'bg-[#155347]' : 'bg-gray-200 dark:bg-gray-600')"
+                  >
+                    <span
+                      [class]="'inline-block h-4 w-4 transform rounded-full bg-white transition-transform ' + (notifPreferences().inAppEnabled ? 'translate-x-6' : 'translate-x-1')"
+                    ></span>
+                  </button>
+                </div>
               </div>
             </app-card-content>
           </app-card>
@@ -142,13 +157,8 @@ import { AppTheme } from '../../../core/services/theme.service';
               </app-card-content>
             </app-card>
 
-          <div class="flex justify-end">
-            <app-button (click)="showWipModal.set(true)" customClass="bg-[#155347] hover:bg-[#0d3d31]">{{ 'COMMON.SAVE_CHANGES' | translate }}</app-button>
-          </div>
         </div>
       </div>
-
-      <app-work-in-progress [show]="showWipModal()" (close)="showWipModal.set(false)" />
 
       <!-- Logout Confirmation Modal -->
       @if (showLogoutModal()) {
@@ -206,15 +216,21 @@ import { AppTheme } from '../../../core/services/theme.service';
     </app-dashboard-layout>
   `
 })
-export class SettingsComponent {
+export class SettingsComponent implements OnInit {
   languageService = inject(LanguageService);
   themeService = inject(ThemeService);
-  notifications: Record<string, boolean> = { email: true, push: true, desktop: false };
-  showWipModal = signal(false);
-  showLanguageDropdown = signal(false);
   private authService = inject(AuthService);
+  private notificationService = inject(NotificationService);
+
+  showLanguageDropdown = signal(false);
   showLogoutModal = signal(false);
   showLogoutAllModal = signal(false);
+
+  notifPreferences = signal<NotificationPreferences>({
+    emailEnabled: true,
+    inAppEnabled: true,
+    language: 'en'
+  });
 
   availableLanguages: { code: AppLanguage; label: string }[] = [
     { code: 'en', label: 'English' },
@@ -227,11 +243,12 @@ export class SettingsComponent {
     { value: 'auto', labelKey: 'SETTINGS.THEME.AUTO' }
   ];
 
-  notificationOptions = [
-    { key: 'email', labelKey: 'SETTINGS.NOTIFICATIONS.EMAIL' },
-    { key: 'push', labelKey: 'SETTINGS.NOTIFICATIONS.PUSH' },
-    { key: 'desktop', labelKey: 'SETTINGS.NOTIFICATIONS.DESKTOP' }
-  ];
+  ngOnInit(): void {
+    this.notificationService.getPreferences().subscribe({
+      next: (prefs) => this.notifPreferences.set(prefs),
+      error: () => {}
+    });
+  }
 
   toggleLanguageDropdown(): void {
     this.showLanguageDropdown.update(v => !v);
@@ -244,6 +261,16 @@ export class SettingsComponent {
 
   selectTheme(theme: string): void {
     this.themeService.setTheme(theme as AppTheme);
+  }
+
+  toggleEmailNotifications(): void {
+    this.notifPreferences.update(p => ({ ...p, emailEnabled: !p.emailEnabled }));
+    this.notificationService.updatePreferences(this.notifPreferences()).subscribe();
+  }
+
+  toggleInAppNotifications(): void {
+    this.notifPreferences.update(p => ({ ...p, inAppEnabled: !p.inAppEnabled }));
+    this.notificationService.updatePreferences(this.notifPreferences()).subscribe();
   }
 
   confirmLogout(): void {

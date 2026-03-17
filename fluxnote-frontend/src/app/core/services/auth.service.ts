@@ -6,57 +6,57 @@ import { User } from '../models';
 import { LanguageService } from './language.service';
 
 /**
- * interface que representa a resposta do servidor após uma tentativa de registo.
- * contém informações sobre o sucesso ou falha da operação, incluindo possíveis erros de validação.
+ * Interface que representa a resposta do servidor após uma tentativa de registo.
+ * Contém informações sobre o sucesso ou falha da operação, incluindo possíveis erros de validação.
  */
 export interface RegisterResponse {
-  /** mensagem descritiva sobre o resultado da operação de registo */
+  /** Mensagem descritiva sobre o resultado da operação de registo. */
   message: string;
-  /** status opcional da operação (ex: 'success', 'error') */
+  /** Status opcional da operação (ex: 'success', 'error'). */
   status?: string;
-  /** lista opcional de erros de validação ou processamento */
+  /** Lista opcional de erros de validação ou processamento. */
   errors?: string[]
 }
 
 /**
- * interface que representa a resposta do servidor após uma tentativa de autenticação bem-sucedida.
- * contém o token de acesso e informação sobre a sua duração de validade.
+ * Interface que representa a resposta do servidor após uma tentativa de autenticação bem-sucedida.
+ * Contém o token de acesso e informação sobre a sua duração de validade.
  */
 export interface LoginResponse {
-  /** token de acesso JWT que será utilizado para autenticar requisições subsequentes */
+  /** Token de acesso JWT que será utilizado para autenticar requisições subsequentes. */
   accessToken: string;
-  /** duração de validade do token em segundos */
+  /** Duração de validade do token em segundos. */
   expiresInSeconds: number;
 }
 
 /**
- * interface que representa o resultado de uma operação de login.
- * contém informação sobre o sucesso da operação e mensagens de erro, se aplicável.
+ * Interface que representa o resultado de uma operação de login.
+ * Contém informação sobre o sucesso da operação e mensagens de erro, se aplicável.
  */
 export interface LoginResult {
-  /** indica se o login foi bem-sucedido */
+  /** Indica se o login foi bem-sucedido. */
   success: boolean;
-  /** mensagem de erro principal, se houver */
+  /** Mensagem de erro principal, se houver. */
   message?: string;
-  /** lista de erros detalhados, se houver */
+  /** Lista de erros detalhados, se houver. */
   errors?: string[];
 }
 
 /**
- * interface que representa a resposta do servidor ao solicitar um novo token de acesso.
- * utilizada no processo de refresh token para obter um novo access token sem reautenticação.
+ * Interface que representa a resposta do servidor ao solicitar um novo token de acesso.
+ * Utilizada no processo de refresh token para obter um novo access token sem reautenticação.
  */
 export interface TokenResponse {
-  /** novo token de acesso JWT obtido através do refresh token */
+  /** Novo token de acesso JWT obtido através do refresh token. */
   accessToken: string;
-  /** duração de validade do novo token em segundos */
+  /** Duração de validade do novo token em segundos. */
   expiresInSeconds: number;
 }
 
 export type ExternalAuthProvider = 'google' | 'microsoft';
 
 /**
- * resultado do processamento do callback OAuth no frontend.
+ * Resultado do processamento do callback OAuth no frontend.
  */
 export interface ExternalCallbackResult {
   success: boolean;
@@ -102,7 +102,7 @@ export interface ApiResult {
 }
 
 /**
- * providers externos ligados e disponíveis para o utilizador autenticado.
+ * Providers externos ligados e disponíveis para o utilizador autenticado.
  */
 export interface ExternalLoginsResponse {
   linkedProviders: Array<{
@@ -121,7 +121,7 @@ export interface UnlinkExternalLoginResponse {
 }
 
 /**
- * tipo que representa os possíveis estados de autenticação do utilizador na aplicação.
+ * Tipo que representa os possíveis estados de autenticação do utilizador na aplicação.
  * 'unknown' indica que o estado ainda não foi determinado (inicialização),
  * 'authenticated' indica que o utilizador está autenticado,
  * 'unauthenticated' indica que o utilizador não está autenticado.
@@ -508,8 +508,8 @@ export class AuthService {
         )
       );
 
-      // access token fica APENAS em memória (não localStorage)
-      // refresh token fica em cookie HttpOnly (gerido pelo backend)
+      // Access token fica APENAS em memória (não localStorage)
+      // Refresh token fica em cookie HttpOnly (gerido pelo backend)
       this._accessToken.set(res.accessToken);
       this._status.set('authenticated');
 
@@ -518,9 +518,9 @@ export class AuthService {
 
       return { success: true };
     } catch (error: any) {
-      // extrai mensagens de erro diretamente do corpo da resposta HTTP
+      // Extrai mensagens de erro diretamente do corpo da resposta HTTP
       if (error.status === 0) {
-        // servidor não está acessível (offline, CORS, etc.)
+        // Servidor não está acessível (offline, CORS, etc.)
         return {
           success: false,
           message: 'Server error. Check your internet connection or try again later.',
@@ -528,7 +528,7 @@ export class AuthService {
         };
       }
 
-      // Rate limit exceeded (429)
+      // Rate limit excedido (429)
       if (error.status === 429) {
         const retryAfter = error.headers?.get('Retry-After');
         const totalSeconds = retryAfter ? parseInt(retryAfter, 10) : 900; // default 15min
@@ -540,7 +540,7 @@ export class AuthService {
         };
       }
 
-      // o backend retorna { message, errors } no corpo da resposta
+      // O backend retorna { message, errors } no corpo da resposta
       const errorBody = error.error || {};
       return {
         success: false,
@@ -589,9 +589,9 @@ export class AuthService {
         this.http.post<RegisterResponse>(`${this.baseUrl}/register`, { fullName, email, password, lang: this.languageService.currentLang })
       );
     } catch (error: any) {
-      // extrai mensagens de erro diretamente do corpo da resposta HTTP
+      // Extrai mensagens de erro diretamente do corpo da resposta HTTP
       if (error.status === 0) {
-        // servidor não está acessível (offline, CORS, etc.)
+        // Servidor não está acessível (offline, CORS, etc.)
         return {
           message: 'Server error. Check your internet connection or try again later.',
           status: 'error',
@@ -599,7 +599,7 @@ export class AuthService {
         };
       }
 
-      // Rate limit exceeded (429)
+      // Rate limit excedido (429)
       if (error.status === 429) {
         const retryAfter = error.headers?.get('Retry-After');
         const totalSeconds = retryAfter ? parseInt(retryAfter, 10) : 3600; // default 1 hora
@@ -611,7 +611,7 @@ export class AuthService {
         };
       }
 
-      // o backend retorna { message, errors } no corpo da resposta
+      // O backend retorna { message, errors } no corpo da resposta
       const errorBody = error.error || {};
       return {
         message: errorBody.message || 'Failed to create account. Please try again.',
@@ -623,6 +623,9 @@ export class AuthService {
     }
   }
 
+  /**
+   * [DEV] Obtém o último link de confirmação de email enviado para um email.
+   */
   async getDevLastConfirmationLink(email: string): Promise<string | null> {
     try {
       const params = new HttpParams().set('email', email);
@@ -639,7 +642,7 @@ export class AuthService {
   }
 
   /**
-   * [DEV] obtém o último link de reset de password enviado para um email.
+   * [DEV] Obtém o último link de reset de password enviado para um email.
    */
   async getDevLastResetLink(email: string): Promise<string | null> {
     try {
@@ -784,7 +787,7 @@ export class AuthService {
       );
       return true;
     } catch {
-      // Always return true for security (don't reveal if email exists)
+      // Retorna sempre true por segurança (não revelar se o email existe)
       return true;
     } finally {
       this._isLoading.set(false);
@@ -845,7 +848,7 @@ export class AuthService {
         })
       );
 
-      // Atualiza o utilizador atual com os novos dados
+      // Atualiza o signal do utilizador atual com os novos dados do perfil
       const updatedUser: User = {
         id: res.id,
         email: res.email,

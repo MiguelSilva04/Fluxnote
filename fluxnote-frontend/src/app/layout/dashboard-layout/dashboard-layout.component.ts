@@ -1,8 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SidebarComponent } from '../sidebar/sidebar.component';
 import { HeaderComponent } from '../header/header.component';
 import { SettingsPanelComponent, ProfilePanelComponent, NotificationsPanelComponent } from '../panels';
+import { LanguageService } from '../../core/services';
 
 @Component({
   selector: 'app-dashboard-layout',
@@ -32,4 +33,10 @@ import { SettingsPanelComponent, ProfilePanelComponent, NotificationsPanelCompon
     </div>
   `
 })
-export class DashboardLayoutComponent {}
+export class DashboardLayoutComponent implements OnInit {
+  private languageService = inject(LanguageService);
+
+  ngOnInit(): void {
+    this.languageService.syncLanguagePreferences();
+  }
+}

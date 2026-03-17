@@ -18,6 +18,7 @@
     "DUPLICATE": "Duplicar",
     "RESTORE": "Restaurar",
     "SAVE": "Guardar",
+    "SAVING": "A guardar...",
     "JUST_NOW": "agora mesmo",
     "UNIT_SECOND": "segundo",
     "UNIT_SECONDS": "segundos",
@@ -340,8 +341,12 @@
       "TITLE": "Preferências de Notificação",
       "DESC": "Gerir como recebe notificações",
       "EMAIL": "Notificações por Email",
-      "PUSH": "Notificações Push",
-      "DESKTOP": "Notificações no Ambiente de Trabalho"
+      "EMAIL_DESC": "Receber notificações por email",
+      "IN_APP": "Notificações na Aplicação",
+      "IN_APP_DESC": "Mostrar notificações dentro da aplicação",
+      "EMAIL_LANGUAGE": "Idioma dos Emails",
+      "SAVE": "Guardar Preferências",
+      "SAVED": "Preferências guardadas com sucesso"
     },
     "SESSION": {
       "TITLE": "Sessão",
@@ -886,7 +891,20 @@
     "USED": "Usado",
     "EXPIRES_ON": "expira",
     "VIEW_LINK": "Ver link",
-    "REVOKE": "Revogar"
+    "REVOKE": "Revogar",
+    "INVITE_LINK": "Link de Convite",
+    "INVITE_BY_EMAIL": "Convidar por Email",
+    "EMAIL_LABEL": "Endereço de email",
+    "EMAIL_PLACEHOLDER": "Introduza o endereço de email",
+    "SENDING": "A enviar...",
+    "SEND": "Enviar",
+    "INVITE_SENT": "Convite enviado com sucesso.",
+    "ERROR_NO_ACCOUNT": "Não existe conta com este endereço de email. O utilizador deve registar-se primeiro.",
+    "ERROR_NOTIFICATIONS_DISABLED": "Este utilizador tem todas as notificações desativadas e não pode ser convidado por email. Utilize um convite por link.",
+    "ERROR_ALREADY_ACCESS": "O utilizador já tem acesso a este documento.",
+    "ERROR_ALREADY_FULL_ACCESS": "O utilizador já tem acesso total a este documento.",
+    "ERROR_ALREADY_MEMBER": "O utilizador já é membro desta equipa.",
+    "ERROR_GENERIC": "Ocorreu um erro. Tente novamente."
   },
   "EASTER_EGG": {
     "LOADING": "A carregar os teus dados...",
@@ -916,5 +934,27 @@
     "RATING_GREAT": "Muito bem!",
     "RATING_GOOD": "Nada mau!",
     "RATING_TRY": "Continua a praticar!"
+  },
+  "NOTIFICATIONS_PANEL": {
+    "TITLE": "Notificações",
+    "UNREAD_COUNT": "{{count}} notificações não lidas",
+    "EMPTY": "Sem notificações",
+    "MARK_ALL_READ": "Marcar todas como lidas",
+    "DELETE": "Apagar",
+    "DELETE_ALL": "Apagar todas as notificações",
+    "DELETING": "A apagar...",
+    "CLOSE": "Fechar",
+    "JUST_NOW": "Agora mesmo",
+    "MINUTES_AGO": "{{count}}m atrás",
+    "HOURS_AGO": "{{count}}h atrás",
+    "DAYS_AGO": "{{count}}d atrás",
+    "TYPE_DOCUMENT_INVITE": "Convite",
+    "TYPE_TEAM_INVITE": "Equipa",
+    "TYPE_MENTION": "Menção",
+    "TYPE_ADDED": "Acesso",
+    "TYPE_RESOLVED": "Resolvido",
+    "TYPE_REPLY": "Resposta",
+    "TYPE_SECURITY": "Segurança",
+    "TYPE_OTHER": "Info"
   }
 }

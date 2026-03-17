@@ -3,15 +3,15 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
 import { TranslateModule } from '@ngx-translate/core';
-import { PanelStateService, LanguageService, ThemeService } from '../../core/services';
-import { ButtonComponent, WorkInProgressComponent } from '../../shared/components/ui';
+import { PanelStateService, LanguageService, ThemeService, NotificationService } from '../../core/services';
+import { ButtonComponent } from '../../shared/components/ui';
 import { AppLanguage } from '../../core/services/language.service';
 import { AppTheme } from '../../core/services/theme.service';
 
 @Component({
   selector: 'app-settings-panel',
   standalone: true,
-  imports: [CommonModule, RouterLink, LucideAngularModule, TranslateModule, ButtonComponent, WorkInProgressComponent],
+  imports: [CommonModule, RouterLink, LucideAngularModule, TranslateModule, ButtonComponent],
   template: `
       <!-- Backdrop -->
       <div class="fixed inset-0 bg-black/20 z-40 transition-opacity duration-300"
@@ -93,19 +93,28 @@ import { AppTheme } from '../../core/services/theme.service';
               <h3 class="text-base font-bold text-gray-900 dark:text-gray-100">{{ 'SETTINGS.NOTIFICATIONS.TITLE' | translate }}</h3>
             </div>
             <div class="space-y-3">
-              @for (notif of notificationOptions; track notif.key) {
-                <div class="flex items-center justify-between p-3 border border-gray-200 dark:border-gray-600 rounded-lg">
-                  <span class="text-sm font-medium text-gray-900 dark:text-gray-100">{{ notif.labelKey | translate }}</span>
-                  <button
-                    (click)="showWipModal.set(true)"
-                    [class]="'relative inline-flex h-6 w-11 items-center rounded-full transition-colors cursor-pointer ' + (notifications[notif.key] ? 'bg-[#155347]' : 'bg-gray-200 dark:bg-gray-600')"
-                  >
-                    <span
-                      [class]="'inline-block h-4 w-4 transform rounded-full bg-white transition-transform ' + (notifications[notif.key] ? 'translate-x-6' : 'translate-x-1')"
-                    ></span>
-                  </button>
-                </div>
-              }
+              <div class="flex items-center justify-between p-3 border border-gray-200 dark:border-gray-600 rounded-lg">
+                <span class="text-sm font-medium text-gray-900 dark:text-gray-100">{{ 'SETTINGS.NOTIFICATIONS.EMAIL' | translate }}</span>
+                <button
+                  (click)="toggleEmail()"
+                  [class]="'relative inline-flex h-6 w-11 items-center rounded-full transition-colors cursor-pointer ' + (notifPreferences().emailEnabled ? 'bg-[#155347]' : 'bg-gray-200 dark:bg-gray-600')"
+                >
+                  <span
+                    [class]="'inline-block h-4 w-4 transform rounded-full bg-white transition-transform ' + (notifPreferences().emailEnabled ? 'translate-x-6' : 'translate-x-1')"
+                  ></span>
+                </button>
+              </div>
+              <div class="flex items-center justify-between p-3 border border-gray-200 dark:border-gray-600 rounded-lg">
+                <span class="text-sm font-medium text-gray-900 dark:text-gray-100">{{ 'SETTINGS.NOTIFICATIONS.IN_APP' | translate }}</span>
+                <button
+                  (click)="toggleInApp()"
+                  [class]="'relative inline-flex h-6 w-11 items-center rounded-full transition-colors cursor-pointer ' + (notifPreferences().inAppEnabled ? 'bg-[#155347]' : 'bg-gray-200 dark:bg-gray-600')"
+                >
+                  <span
+                    [class]="'inline-block h-4 w-4 transform rounded-full bg-white transition-transform ' + (notifPreferences().inAppEnabled ? 'translate-x-6' : 'translate-x-1')"
+                  ></span>
+                </button>
+              </div>
             </div>
           </div>
           
@@ -122,23 +131,21 @@ import { AppTheme } from '../../core/services/theme.service';
         </div>
 
         <div class="p-6 border-t border-gray-200 dark:border-gray-700">
-          <app-button (onClick)="showWipModal.set(true)" customClass="w-full bg-[#155347] hover:bg-[#0d3d31]">
-            {{ 'COMMON.SAVE_CHANGES' | translate }}
+          <app-button (onClick)="panelState.closeSettingsPanel()" customClass="w-full bg-[#155347] hover:bg-[#0d3d31]">
+            {{ 'COMMON.CLOSE' | translate }}
           </app-button>
         </div>
       </aside>
-
-      <app-work-in-progress [show]="showWipModal()" (close)="showWipModal.set(false)" />
   `
 })
 export class SettingsPanelComponent {
   panelState = inject(PanelStateService);
   languageService = inject(LanguageService);
   themeService = inject(ThemeService);
-  showWipModal = signal(false);
-  showLanguageDropdown = signal(false);
+  private notificationService = inject(NotificationService);
 
-  notifications: Record<string, boolean> = { email: true, push: true, desktop: false };
+  showLanguageDropdown = signal(false);
+  notifPreferences = signal({ emailEnabled: true, inAppEnabled: true, language: 'en' });
 
   availableLanguages: { code: AppLanguage; label: string }[] = [
     { code: 'en', label: 'English' },
@@ -151,11 +158,11 @@ export class SettingsPanelComponent {
     { value: 'auto', labelKey: 'SETTINGS.THEME.AUTO' }
   ];
 
-  notificationOptions = [
-    { key: 'email', labelKey: 'SETTINGS.NOTIFICATIONS.EMAIL' },
-    { key: 'push', labelKey: 'SETTINGS.NOTIFICATIONS.PUSH' },
-    { key: 'desktop', labelKey: 'SETTINGS.NOTIFICATIONS.DESKTOP' }
-  ];
+  constructor() {
+    this.notificationService.getPreferences().subscribe(prefs => {
+      this.notifPreferences.set(prefs);
+    });
+  }
 
   toggleLanguageDropdown(): void {
     this.showLanguageDropdown.update(v => !v);
@@ -168,5 +175,19 @@ export class SettingsPanelComponent {
 
   selectTheme(theme: string): void {
     this.themeService.setTheme(theme as AppTheme);
+  }
+
+  toggleEmail(): void {
+    const current = this.notifPreferences();
+    const updated = { ...current, emailEnabled: !current.emailEnabled };
+    this.notifPreferences.set(updated);
+    this.notificationService.updatePreferences(updated).subscribe();
+  }
+
+  toggleInApp(): void {
+    const current = this.notifPreferences();
+    const updated = { ...current, inAppEnabled: !current.inAppEnabled };
+    this.notifPreferences.set(updated);
+    this.notificationService.updatePreferences(updated).subscribe();
   }
 }

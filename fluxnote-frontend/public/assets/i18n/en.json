@@ -18,6 +18,7 @@
     "DUPLICATE": "Duplicate",
     "RESTORE": "Restore",
     "SAVE": "Save",
+    "SAVING": "Saving...",
     "JUST_NOW": "just now",
     "UNIT_SECOND": "second",
     "UNIT_SECONDS": "seconds",
@@ -340,8 +341,12 @@
       "TITLE": "Notification Preferences",
       "DESC": "Manage how you receive notifications",
       "EMAIL": "Email Notifications",
-      "PUSH": "Push Notifications",
-      "DESKTOP": "Desktop Notifications"
+      "EMAIL_DESC": "Receive notifications via email",
+      "IN_APP": "In-App Notifications",
+      "IN_APP_DESC": "Show notifications inside the app",
+      "EMAIL_LANGUAGE": "Email Language",
+      "SAVE": "Save Preferences",
+      "SAVED": "Preferences saved successfully"
     },
     "SESSION": {
       "TITLE": "Session",
@@ -886,7 +891,20 @@
     "USED": "Used",
     "EXPIRES_ON": "expires",
     "VIEW_LINK": "View link",
-    "REVOKE": "Revoke"
+    "REVOKE": "Revoke",
+    "INVITE_LINK": "Invite Link",
+    "INVITE_BY_EMAIL": "Invite by Email",
+    "EMAIL_LABEL": "Email address",
+    "EMAIL_PLACEHOLDER": "Enter email address",
+    "SENDING": "Sending...",
+    "SEND": "Send",
+    "INVITE_SENT": "Invite sent successfully.",
+    "ERROR_NO_ACCOUNT": "No account found with this email address. The user must register first.",
+    "ERROR_NOTIFICATIONS_DISABLED": "This user has all notifications disabled and cannot be invited by email. Please use a link invite instead.",
+    "ERROR_ALREADY_ACCESS": "User already has access to this document.",
+    "ERROR_ALREADY_FULL_ACCESS": "User already has full access to this document.",
+    "ERROR_ALREADY_MEMBER": "User is already a member of this team.",
+    "ERROR_GENERIC": "An error occurred. Please try again."
   },
   "EASTER_EGG": {
     "LOADING": "Loading your data...",
@@ -916,5 +934,27 @@
     "RATING_GREAT": "Great job!",
     "RATING_GOOD": "Not bad!",
     "RATING_TRY": "Keep practicing!"
+  },
+  "NOTIFICATIONS_PANEL": {
+    "TITLE": "Notifications",
+    "UNREAD_COUNT": "{{count}} unread notifications",
+    "EMPTY": "No notifications yet",
+    "MARK_ALL_READ": "Mark all as read",
+    "DELETE": "Delete",
+    "DELETE_ALL": "Delete all notifications",
+    "DELETING": "Deleting...",
+    "CLOSE": "Close",
+    "JUST_NOW": "Just now",
+    "MINUTES_AGO": "{{count}}m ago",
+    "HOURS_AGO": "{{count}}h ago",
+    "DAYS_AGO": "{{count}}d ago",
+    "TYPE_DOCUMENT_INVITE": "Invite",
+    "TYPE_TEAM_INVITE": "Team",
+    "TYPE_MENTION": "Mention",
+    "TYPE_ADDED": "Access",
+    "TYPE_RESOLVED": "Resolved",
+    "TYPE_REPLY": "Reply",
+    "TYPE_SECURITY": "Security",
+    "TYPE_OTHER": "Info"
   }
 }
