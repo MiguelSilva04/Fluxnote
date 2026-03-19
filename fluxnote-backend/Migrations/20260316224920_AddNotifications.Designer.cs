@@ -4,6 +4,7 @@ using Fluxnote.Backend.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace fluxnotebackend.Migrations
 {
     [DbContext(typeof(FluxnoteServerContext))]
-    partial class FluxnoteServerContextModelSnapshot : ModelSnapshot
+    [Migration("20260316224920_AddNotifications")]
+    partial class AddNotifications
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -385,23 +388,14 @@ namespace fluxnotebackend.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("MessagePt")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<int?>("ReferenceId")
                         .HasColumnType("int");
-
-                    b.Property<string>("ReferenceToken")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ReferenceType")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Title")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("TitlePt")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Type")

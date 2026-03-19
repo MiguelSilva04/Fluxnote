@@ -43,4 +43,12 @@ public interface IEmailSender
     /// Formato típico: {FrontendBaseUrl}/reset-password?userId={id}&amp;token={encodedToken}
     /// </remarks>
     Task SendPasswordResetAsync(string toEmail, string resetLink, string lang = "en");
+
+    /// <summary>
+    /// Envia um email de notificação genérico (convites, menções, alertas de segurança, etc.).
+    /// </summary>
+    /// <param name="toEmail">Endereço de email do destinatário.</param>
+    /// <param name="subject">Assunto do email.</param>
+    /// <param name="htmlBody">Corpo HTML do email.</param>
+    Task SendNotificationEmailAsync(string toEmail, string subject, string htmlBody);
 }

@@ -1,6 +1,8 @@
 ﻿using Fluxnote.Backend.Data;
+using Fluxnote.Backend.Dtos.Notifications;
 using Fluxnote.Backend.Dtos.TeamInvites;
 using Fluxnote.Backend.Models;
+using Fluxnote.Backend.Services.Notifications;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -11,13 +13,8 @@ using System.Security.Claims;
 namespace Fluxnote.Backend.Controllers
 {
     /// <summary>
-    /// Controlador responsável por convites de entrada em equipas através de link.
+    /// Controlador responsável por convites de entrada em equipas através de link e email.
     /// </summary>
-    /// <remarks>
-    /// <b>Rota Base:</b> api/team-invites<br/>
-    /// <b>Autenticação:</b> JWT Bearer obrigatório.<br/>
-    /// Permite criar, listar, consultar, aceitar e revogar convites de equipa.
-    /// </remarks>
     [Route("api/team-invites")]
     [ApiController]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
@@ -26,16 +23,19 @@ namespace Fluxnote.Backend.Controllers
         private readonly FluxnoteServerContext _context;
         private readonly UserManager<User> _userManager;
         private readonly IConfiguration _configuration;
+        private readonly INotificationService _notificationService;
 
         public TeamInvitesController(
             FluxnoteServerContext context,
             UserManager<User> userManager,
-            IConfiguration configuration
+            IConfiguration configuration,
+            INotificationService notificationService
         )
         {
             _context = context;
             _userManager = userManager;
             _configuration = configuration;
+            _notificationService = notificationService;
         }
 
         /// <summary>
@@ -381,6 +381,173 @@ namespace Fluxnote.Backend.Controllers
             await _context.SaveChangesAsync();
 
             return NoContent();
+        }
+
+        /// <summary>
+        /// Convida um utilizador para uma equipa por email.
+        /// Se o utilizador existir e tiver notificações ativas, envia notificação in-app e/ou email.
+        /// Se não tiver nenhum canal ativo, retorna aviso para usar convite por link.
+        /// Se o utilizador não existir, envia email de convite direto.
+        /// </summary>
+        [HttpPost("by-email")]
+        public async Task<IActionResult> InviteByEmail(
+            [FromBody] EmailInviteRequest request,
+            [FromQuery] int teamId)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId is null)
+                return Unauthorized(new { message = "User not authenticated." });
+
+            var team = await _context.Team.FirstOrDefaultAsync(t => t.Id == teamId);
+            if (team is null)
+                return NotFound(new { message = "Team not found." });
+
+            // Verificar permissões do caller
+            var callerMember = await _context.TeamMember
+                .FirstOrDefaultAsync(m => m.TeamId == team.Id && m.UserId == userId);
+
+            if (callerMember == null || (callerMember.Role != TeamRole.Owner && callerMember.Role != TeamRole.TeamAdmin))
+            {
+                return StatusCode(StatusCodes.Status403Forbidden, new
+                {
+                    message = "Permission denied.",
+                    errors = new[] { "Only Owner or Team Admin can invite by email." }
+                });
+            }
+
+            var callerUser = await _context.Users.FindAsync(userId);
+            var callerName = callerUser?.FullName ?? callerUser?.Email;
+
+            var targetUser = await _userManager.FindByEmailAsync(request.Email);
+
+            if (targetUser == null)
+            {
+                return BadRequest(new { message = "No account found with this email address. The user must register first." });
+            }
+
+            // Verificar se já é membro
+            var existingMember = await _context.TeamMember
+                .FirstOrDefaultAsync(m => m.TeamId == team.Id && m.UserId == targetUser.Id);
+
+            if (existingMember != null)
+                return BadRequest(new { message = "User is already a member of this team." });
+
+            // Verificar canais de notificação
+            var hasChannels = await _notificationService.HasAnyChannelEnabledAsync(targetUser.Id);
+            if (!hasChannels)
+            {
+                return BadRequest(new { message = "This user has all notifications disabled and cannot be invited by email. Please use a link invite instead." });
+            }
+
+            // Criar convite e enviar notificação
+            var token = Guid.NewGuid().ToString();
+            var invite = new TeamInvite
+            {
+                Team = team,
+                Token = token,
+                CreatedByTeamMemberId = callerMember.Id,
+                CreatedAt = DateTime.UtcNow,
+                ExpiresAt = DateTime.UtcNow.AddDays(7),
+                IsRevoked = false,
+                UsedByUserId = null
+            };
+
+            _context.TeamInvite.Add(invite);
+            await _context.SaveChangesAsync();
+
+            var frontendUrl = GetFrontendUrl();
+            var inviteUrl = $"{frontendUrl}/team-invite/{token}";
+
+            await _notificationService.SendAsync(new NotificationRequest
+            {
+                UserId = targetUser.Id,
+                Type = NotificationType.TeamInvite,
+                Title = "Team Invite",
+                TitlePt = "Convite para equipa",
+                Message = $"{callerName} invited you to the team \"{team.Name}\".",
+                MessagePt = $"{callerName} convidou-te para a equipa \"{team.Name}\".",
+                ReferenceId = team.Id,
+                ReferenceType = "Team",
+                ReferenceToken = token,
+                ActorId = userId,
+                EmailSubject = $"You've been invited to \"{team.Name}\" on Fluxnote",
+                EmailSubjectPt = $"Foste convidado para a equipa \"{team.Name}\" no Fluxnote",
+                EmailHtmlBody = BuildInviteEmailHtml(callerName, team.Name, "team", inviteUrl, false),
+                EmailHtmlBodyPt = BuildInviteEmailHtml(callerName, team.Name, "equipa", inviteUrl, true)
+            });
+
+            return Ok(new { message = "Invite sent successfully." });
+        }
+
+        private static string BuildInviteEmailHtml(string inviterName, string resourceName, string resourceType, string inviteUrl, bool isPt = false)
+        {
+            var heading = isPt ? "Foste convidado!" : "You've been invited!";
+            var body = isPt
+                ? $"<b>{inviterName}</b> convidou-te para o {resourceType} <b>\"{resourceName}\"</b> no Fluxnote."
+                : $"<b>{inviterName}</b> invited you to the {resourceType} <b>\"{resourceName}\"</b> on Fluxnote.";
+            var btnText = isPt ? "Aceitar convite" : "Accept Invite";
+            var fallback = isPt
+                ? "Se o botão não funcionar, copie e cole este link no seu browser:"
+                : "If the button doesn't work, copy and paste this link into your browser:";
+            var footer = isPt
+                ? "Recebeu este email porque alguém o convidou para colaborar no Fluxnote."
+                : "You received this email because someone invited you to collaborate on Fluxnote.";
+            var htmlLang = isPt ? "pt" : "en";
+
+            return $@"
+<!DOCTYPE html>
+<html lang=""{htmlLang}"">
+<head>
+  <meta charset=""UTF-8"">
+  <meta name=""viewport"" content=""width=device-width, initial-scale=1.0"">
+</head>
+<body style=""margin:0; padding:0; background-color:#f3f4f6; font-family:Arial, Helvetica, sans-serif;"">
+  <table role=""presentation"" width=""100%"" cellpadding=""0"" cellspacing=""0"" style=""background-color:#f3f4f6; padding:40px 0;"">
+    <tr>
+      <td align=""center"">
+        <table role=""presentation"" width=""480"" cellpadding=""0"" cellspacing=""0"" style=""background-color:#ffffff; border-radius:12px; overflow:hidden; box-shadow:0 4px 6px rgba(0,0,0,0.07);"">
+          <tr>
+            <td style=""background-color:#155347; padding:32px 40px; text-align:center;"">
+              <h1 style=""margin:0; color:#ffffff; font-size:28px; font-weight:700; letter-spacing:-0.5px;"">Fluxnote</h1>
+            </td>
+          </tr>
+          <tr>
+            <td style=""padding:40px;"">
+              <h2 style=""margin:0 0 8px; color:#111827; font-size:22px; font-weight:600;"">{heading}</h2>
+              <p style=""margin:0 0 24px; color:#6b7280; font-size:15px; line-height:1.6;"">
+                {body}
+              </p>
+              <table role=""presentation"" width=""100%"" cellpadding=""0"" cellspacing=""0"">
+                <tr>
+                  <td align=""center"" style=""padding:8px 0 32px;"">
+                    <a href=""{inviteUrl}""
+                       style=""display:inline-block; padding:14px 36px; background-color:#155347; color:#ffffff; text-decoration:none; font-size:15px; font-weight:600; border-radius:8px; letter-spacing:0.3px;"">
+                      {btnText}
+                    </a>
+                  </td>
+                </tr>
+              </table>
+              <p style=""margin:0 0 16px; color:#9ca3af; font-size:13px; line-height:1.5;"">
+                {fallback}
+              </p>
+              <p style=""margin:0; word-break:break-all; color:#155347; font-size:13px; line-height:1.5;"">
+                {inviteUrl}
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td style=""padding:24px 40px; background-color:#f9fafb; border-top:1px solid #e5e7eb; text-align:center;"">
+              <p style=""margin:0; color:#9ca3af; font-size:12px; line-height:1.5;"">
+                {footer}
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>";
         }
 
         /// <summary>

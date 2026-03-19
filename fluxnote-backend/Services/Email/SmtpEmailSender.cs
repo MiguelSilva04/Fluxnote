@@ -258,4 +258,23 @@ public class SmtpEmailSender : IEmailSender
         await client.SendAsync(message);
         await client.DisconnectAsync(true);
     }
+
+    /// <summary>
+    /// Envia um email de notificação genérico via SMTP.
+    /// </summary>
+    public async Task SendNotificationEmailAsync(string toEmail, string subject, string htmlBody)
+    {
+        var message = new MimeMessage();
+        message.From.Add(new MailboxAddress(_options.FromName, _options.FromEmail));
+        message.To.Add(MailboxAddress.Parse(toEmail));
+        message.Subject = subject;
+        message.Body = new BodyBuilder { HtmlBody = htmlBody }.ToMessageBody();
+
+        using var client = new SmtpClient();
+        var secure = _options.UseStartTls ? SecureSocketOptions.StartTls : SecureSocketOptions.Auto;
+        await client.ConnectAsync(_options.SmtpHost, _options.SmtpPort, secure);
+        await client.AuthenticateAsync(_options.SmtpUser, _options.SmtpPass);
+        await client.SendAsync(message);
+        await client.DisconnectAsync(true);
+    }
 }

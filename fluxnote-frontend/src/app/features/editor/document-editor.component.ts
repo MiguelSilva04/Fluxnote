@@ -12,7 +12,7 @@ import {
 } from '../../shared/components/ui';
 import { DocumentShareModalComponent } from '../../shared/components/document-share-modal/document-share-modal.component';
 import { ToastService } from '../../shared/services/toast.service';
-import { DocumentService, DocumentInviteService, CollaborationService, DocumentPermissionService, TeamService } from '../../core/services';
+import { DocumentService, DocumentInviteService, CollaborationService, DocumentPermissionService, TeamService, NotificationService } from '../../core/services';
 import { Collaborator, Version, CommentDto, CreateCommentDto, AISuggestion, DocumentInviteDto, DocumentContextDto, DocumentVersionDto, DocumentVersionDetailDto, User } from '../../core/models';
 import { TextEditorComponent } from './components/text-editor.component';
 import { AuthService } from '../../core/services';
@@ -177,16 +177,18 @@ import { diffWords } from 'diff';
               </div>
             }
             @if (canEdit()) {
-              <app-button
-                variant="outline"
-                size="sm"
-                [leftIcon]="true"
-                (onClick)="openShareModal()"
-                customClass="hidden md:inline-flex"
-              >
-                <lucide-icon leftIcon name="share-2" class="h-4 w-4"></lucide-icon>
-                {{ 'DOCUMENT_EDITOR.SHARE' | translate }}
-              </app-button>
+              @if (isTeamOwnerOrTeamAdmin()) {
+                <app-button
+                  variant="outline"
+                  size="sm"
+                  [leftIcon]="true"
+                  (onClick)="openShareModal()"
+                  customClass="hidden md:inline-flex"
+                >
+                  <lucide-icon leftIcon name="share-2" class="h-4 w-4"></lucide-icon>
+                  {{ 'DOCUMENT_EDITOR.SHARE' | translate }}
+                </app-button>
+              }
               <!-- Mobile 3-dots menu -->
               <div class="relative md:hidden">
                 <button
@@ -219,14 +221,16 @@ import { diffWords } from 'diff';
                       <lucide-icon name="message-square" class="h-4 w-4 shrink-0"></lucide-icon>
                       {{ 'DOCUMENT_EDITOR.COMMENTS' | translate }}
                     </button>
-                    <div class="border-t border-gray-100 dark:border-gray-700 my-1"></div>
-                    <button
-                      (click)="openShareModal(); showMobileMenu.set(false)"
-                      class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-left"
-                    >
-                      <lucide-icon name="share-2" class="h-4 w-4 shrink-0"></lucide-icon>
-                      {{ 'DOCUMENT_EDITOR.SHARE' | translate }}
-                    </button>
+                    @if (isTeamOwnerOrTeamAdmin()) {
+                      <div class="border-t border-gray-100 dark:border-gray-700 my-1"></div>
+                      <button
+                        (click)="openShareModal(); showMobileMenu.set(false)"
+                        class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-left"
+                      >
+                        <lucide-icon name="share-2" class="h-4 w-4 shrink-0"></lucide-icon>
+                        {{ 'DOCUMENT_EDITOR.SHARE' | translate }}
+                      </button>
+                    }
                   </div>
                 }
               </div>
@@ -699,6 +703,10 @@ import { diffWords } from 'diff';
             [loading]="shareLoading()"
             [copied]="shareCopied()"
             [invites]="documentInvites()"
+            [emailLoading]="emailLoading()"
+            [emailMessage]="emailMessage()"
+            [emailShouldUseLink]="emailShouldUseLink()"
+            [emailRole]="emailRole()"
             (close)="closeShareModal()"
             (roleChange)="shareRole.set($event)"
             (expirationDaysChange)="shareExpirationDays.set($event)"
@@ -707,6 +715,8 @@ import { diffWords } from 'diff';
             (revokeInvite)="revokeInvite($event)"
             (clearInvites)="clearUsedInvites()"
             (viewInvite)="shareGeneratedUrl.set($event); shareCopied.set(false)"
+            (emailInvite)="sendDocumentEmailInvite($event)"
+            (emailRoleChange)="emailRole.set($event)"
           />
         }
 
@@ -1515,6 +1525,12 @@ export class DocumentEditorComponent implements OnInit {
   showInvitesPanel = signal(false);
   lastCopiedInviteId = signal<number | null>(null);
 
+  emailLoading = signal(false);
+  emailMessage = signal<string | null>(null);
+  emailShouldUseLink = signal(false);
+  emailRole = signal<number>(1);
+  private notificationService = inject(NotificationService);
+
   versions: Version[] = this.documentService.getVersions();
   comments: CommentDto[] = [];
   aiSuggestions: AISuggestion[] = this.documentService.getAISuggestions();
@@ -1789,6 +1805,8 @@ export class DocumentEditorComponent implements OnInit {
   closeShareModal(): void {
     this.showShareModal.set(false);
     this.shareGeneratedUrl.set(null);
+    this.emailMessage.set(null);
+    this.emailShouldUseLink.set(false);
   }
 
   generateInviteLink(): void {
@@ -2954,4 +2972,35 @@ export class DocumentEditorComponent implements OnInit {
   }
 
   //---------------- comentarios------------------
+
+  sendDocumentEmailInvite(email: string): void {
+    const docId = this.documentId;
+    if (!docId) return;
+
+    this.emailLoading.set(true);
+    this.emailMessage.set(null);
+    this.notificationService.inviteToDocumentByEmail(docId, email, this.emailRole()).subscribe({
+      next: () => {
+        this.emailLoading.set(false);
+        this.emailMessage.set(this.translateService.instant('SHARE_MODAL.INVITE_SENT'));
+        this.emailShouldUseLink.set(false);
+      },
+      error: (err) => {
+        this.emailLoading.set(false);
+        this.emailMessage.set(this.translateEmailError(err.error?.message));
+        this.emailShouldUseLink.set(true);
+      }
+    });
+  }
+
+  private translateEmailError(backendMessage?: string): string {
+    const errorMap: Record<string, string> = {
+      'No account found with this email address. The user must register first.': 'SHARE_MODAL.ERROR_NO_ACCOUNT',
+      'This user has all notifications disabled and cannot be invited by email. Please use a link invite instead.': 'SHARE_MODAL.ERROR_NOTIFICATIONS_DISABLED',
+      'User already has access to this document.': 'SHARE_MODAL.ERROR_ALREADY_ACCESS',
+      'User already has full access to this document.': 'SHARE_MODAL.ERROR_ALREADY_FULL_ACCESS',
+    };
+    const key = backendMessage ? errorMap[backendMessage] : undefined;
+    return this.translateService.instant(key || 'SHARE_MODAL.ERROR_GENERIC');
+  }
 }

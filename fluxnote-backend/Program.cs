@@ -33,6 +33,7 @@ using Fluxnote.Backend.Services.AI;
 using Fluxnote.Backend.Services.Auth;
 using Fluxnote.Backend.Services.Authorization;
 using Fluxnote.Backend.Services.Email;
+using Fluxnote.Backend.Services.Notifications;
 using Fluxnote.Backend.Services.Storage;
 using Fluxnote.Backend.Validators;
 using Microsoft.AspNetCore.Authentication.Google;
@@ -221,6 +222,9 @@ else
 }
 
 builder.Services.AddScoped<TeamAutorizationService>();
+
+// Serviço de notificações (in-app + email)
+builder.Services.AddScoped<INotificationService, NotificationService>();
 
 // Serviço de geração e validação de tokens JWT
 builder.Services.AddScoped<TokenService>();

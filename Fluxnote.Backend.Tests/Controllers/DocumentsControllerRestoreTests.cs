@@ -4,6 +4,7 @@ using Fluxnote.Backend.Data;
 using Fluxnote.Backend.Hubs;
 using Fluxnote.Backend.Models;
 using Fluxnote.Backend.Services.AI;
+using Fluxnote.Backend.Services.Notifications;
 using Fluxnote.Backend.Services.Storage;
 using Fluxnote.Backend.Tests.Helpers;
 using Microsoft.AspNetCore.Identity;
@@ -44,7 +45,8 @@ public class DocumentsControllerRestoreTests
         var mockHub = new Mock<IHubContext<DocumentHub>>();
         mockHub.Setup(h => h.Clients).Returns(mockClients.Object);
 
-        var ctrl = new DocumentsController(db, mockUserMgr.Object, mockAI.Object, mockStorage.Object, mockText.Object, mockHub.Object)
+        var mockNotification = new Mock<INotificationService>();
+        var ctrl = new DocumentsController(db, mockUserMgr.Object, mockAI.Object, mockStorage.Object, mockText.Object, mockHub.Object, mockNotification.Object)
         {
             ControllerContext = ControllerTestHelper.CreateControllerContext(userId)
         };

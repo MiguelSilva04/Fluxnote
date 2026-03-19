@@ -4,6 +4,7 @@ using Fluxnote.Backend.Dtos.Auth;
 using Fluxnote.Backend.Models;
 using Fluxnote.Backend.Services.Auth;
 using Fluxnote.Backend.Services.Email;
+using Fluxnote.Backend.Services.Notifications;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -77,6 +78,7 @@ public class AuthController : ControllerBase
     private readonly IWebHostEnvironment _env;
     private readonly IEmailSender _emailSender;
     private readonly IConfiguration _configuration;
+    private readonly INotificationService _notificationService;
 
     /// <summary>Duração padrão do access token em minutos.</summary>
     private const int AccessTokenMinutesDefault = 15;
@@ -95,7 +97,8 @@ public class AuthController : ControllerBase
         IConfiguration configuration,
         FluxnoteServerContext db,
         TokenService tokenService,
-        IWebHostEnvironment env
+        IWebHostEnvironment env,
+        INotificationService notificationService
     )
     {
         _userManager = userManager;
@@ -105,6 +108,7 @@ public class AuthController : ControllerBase
         _db = db;
         _tokenService = tokenService;
         _env = env;
+        _notificationService = notificationService;
     }
     /// <summary>
     /// Regista um novo utilizador no sistema.
@@ -1126,7 +1130,65 @@ public class AuthController : ControllerBase
         user.UpdatedAt = DateTime.UtcNow;
         await _userManager.UpdateAsync(user);
 
+        // Email de segurança que contorna preferências de notificação
+        if (user.Email != null)
+        {
+            var prefs = await _notificationService.GetOrCreatePreferencesAsync(userId);
+            var isPt = prefs.Language == "pt";
+            await _notificationService.SendSecurityEmailAsync(
+                user.Email,
+                isPt ? "A sua password do Fluxnote foi alterada" : "Your Fluxnote password was changed",
+                BuildPasswordChangedEmailHtml(isPt));
+        }
+
         return Ok(new { message = "Password changed successfully." });
+    }
+
+    private static string BuildPasswordChangedEmailHtml(bool isPt)
+    {
+        var heading = isPt ? "Password alterada" : "Password Changed";
+        var body = isPt
+            ? "A password da sua conta Fluxnote foi alterada com sucesso. Se não fez esta alteração, redefina a sua password imediatamente."
+            : "Your Fluxnote account password was changed successfully. If you did not make this change, please reset your password immediately.";
+        var footer = isPt
+            ? "Esta é uma notificação de segurança. Não é possível cancelar a subscrição destes emails."
+            : "This is a security notification. You cannot unsubscribe from these emails.";
+        var htmlLang = isPt ? "pt" : "en";
+
+        return $@"
+<!DOCTYPE html>
+<html lang=""{htmlLang}"">
+<head>
+  <meta charset=""UTF-8"">
+  <meta name=""viewport"" content=""width=device-width, initial-scale=1.0"">
+</head>
+<body style=""margin:0; padding:0; background-color:#f3f4f6; font-family:Arial, Helvetica, sans-serif;"">
+  <table role=""presentation"" width=""100%"" cellpadding=""0"" cellspacing=""0"" style=""background-color:#f3f4f6; padding:40px 0;"">
+    <tr>
+      <td align=""center"">
+        <table role=""presentation"" width=""480"" cellpadding=""0"" cellspacing=""0"" style=""background-color:#ffffff; border-radius:12px; overflow:hidden; box-shadow:0 4px 6px rgba(0,0,0,0.07);"">
+          <tr>
+            <td style=""background-color:#155347; padding:32px 40px; text-align:center;"">
+              <h1 style=""margin:0; color:#ffffff; font-size:28px; font-weight:700; letter-spacing:-0.5px;"">Fluxnote</h1>
+            </td>
+          </tr>
+          <tr>
+            <td style=""padding:40px;"">
+              <h2 style=""margin:0 0 8px; color:#111827; font-size:22px; font-weight:600;"">{heading}</h2>
+              <p style=""margin:0 0 24px; color:#6b7280; font-size:15px; line-height:1.6;"">{body}</p>
+            </td>
+          </tr>
+          <tr>
+            <td style=""padding:24px 40px; background-color:#f9fafb; border-top:1px solid #e5e7eb; text-align:center;"">
+              <p style=""margin:0; color:#9ca3af; font-size:12px; line-height:1.5;"">{footer}</p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>";
     }
 
     /// <summary>
