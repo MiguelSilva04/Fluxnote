@@ -15,15 +15,15 @@ export class ThemeService {
   }
 
   /**
-   * Initializes theme from localStorage and applies it.
-   * Should be called once at app startup.
+   * Inicializa o tema a partir do localStorage e aplica-o.
+   * Deve ser chamado uma vez no arranque da aplicação.
    */
   init(): void {
     const saved = localStorage.getItem(STORAGE_KEY) as AppTheme | null;
     this._theme = saved && ['light', 'dark', 'auto'].includes(saved) ? saved : DEFAULT_THEME;
     this.applyTheme();
 
-    // Listen for OS preference changes (relevant when theme is 'auto')
+    // Escuta alterações de preferência do SO (relevante quando o tema é 'auto')
     this.mediaQuery.addEventListener('change', () => {
       if (this._theme === 'auto') {
         this.applyTheme();
@@ -32,7 +32,7 @@ export class ThemeService {
   }
 
   /**
-   * Change and persist the theme preference.
+   * Altera e persiste a preferência de tema.
    */
   setTheme(theme: AppTheme): void {
     this._theme = theme;
@@ -41,7 +41,7 @@ export class ThemeService {
   }
 
   /**
-   * Returns true when the effective appearance is dark.
+   * Retorna true quando a aparência efetiva é escura.
    */
   get isDark(): boolean {
     if (this._theme === 'dark') return true;
@@ -50,7 +50,7 @@ export class ThemeService {
   }
 
   /**
-   * Applies or removes the 'dark' class on <html>.
+   * Aplica ou remove a classe 'dark' no elemento <html>.
    */
   private applyTheme(): void {
     const html = document.documentElement;

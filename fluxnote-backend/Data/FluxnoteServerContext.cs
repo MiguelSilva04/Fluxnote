@@ -107,6 +107,16 @@ namespace Fluxnote.Backend.Data
         public DbSet<CommentMention> CommentMentions { get; set; } = default!;
 
         /// <summary>
+        /// DbSet para notificações in-app.
+        /// </summary>
+        public DbSet<Notification> Notifications { get; set; } = default!;
+
+        /// <summary>
+        /// DbSet para preferências de notificação dos utilizadores.
+        /// </summary>
+        public DbSet<NotificationPreference> NotificationPreferences { get; set; } = default!;
+
+        /// <summary>
         /// DbSet para refresh tokens de autenticação.
         /// </summary>
         public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
@@ -300,6 +310,33 @@ namespace Fluxnote.Backend.Data
                 entity.HasIndex(cm => cm.UserId);
             }
             );
+
+            builder.Entity<Notification>(entity =>
+            {
+                entity.HasOne(n => n.User)
+                      .WithMany()
+                      .HasForeignKey(n => n.UserId)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(n => n.Actor)
+                      .WithMany()
+                      .HasForeignKey(n => n.ActorId)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasIndex(n => n.UserId);
+                entity.HasIndex(n => n.IsRead);
+                entity.HasIndex(n => n.CreatedAt);
+            });
+
+            builder.Entity<NotificationPreference>(entity =>
+            {
+                entity.HasOne(np => np.User)
+                      .WithMany()
+                      .HasForeignKey(np => np.UserId)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasIndex(np => np.UserId).IsUnique();
+            });
 
             // Configuração específica para SQL Server (SQLite usa BLOB por defeito)
             if (Database.IsSqlServer())

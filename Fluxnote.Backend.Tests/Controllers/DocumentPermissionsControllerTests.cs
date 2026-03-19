@@ -3,8 +3,10 @@ using Fluxnote.Backend.Controllers;
 using Fluxnote.Backend.Data;
 using Fluxnote.Backend.Dtos.Documents;
 using Fluxnote.Backend.Models;
+using Fluxnote.Backend.Services.Notifications;
 using Fluxnote.Backend.Tests.Helpers;
 using Microsoft.AspNetCore.Mvc;
+using Moq;
 
 namespace Fluxnote.Backend.Tests.Controllers;
 
@@ -13,7 +15,8 @@ public class DocumentPermissionsControllerTests
     private static (DocumentPermissionsController ctrl, FluxnoteServerContext db) Create(string userId = "u1")
     {
         var db   = TestDbHelper.CreateInMemoryContext();
-        var ctrl = new DocumentPermissionsController(db)
+        var mockNotification = new Mock<INotificationService>();
+        var ctrl = new DocumentPermissionsController(db, mockNotification.Object)
         {
             ControllerContext = ControllerTestHelper.CreateControllerContext(userId)
         };

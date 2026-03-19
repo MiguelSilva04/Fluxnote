@@ -289,6 +289,21 @@ export class RegisterComponent {
     return v.length && v.number && v.special && v.match;
   });
 
+  private readonly errorMap: Record<string, string> = {
+    'Email is already registered.': 'TOASTS.REGISTER_EMAIL_EXISTS',
+    'User creation failed.': 'TOASTS.REGISTER_CREATION_FAILED',
+    'Passwords must be at least 8 characters.': 'TOASTS.REGISTER_PASSWORD_LENGTH',
+    'Passwords must have at least one digit': 'TOASTS.REGISTER_PASSWORD_NUMBER',
+    'Passwords must have at least one non alphanumeric character.': 'TOASTS.REGISTER_PASSWORD_SPECIAL',
+    'Passwords must have at least one uppercase': 'TOASTS.REGISTER_PASSWORD_UPPERCASE',
+    'Passwords must have at least one lowercase': 'TOASTS.REGISTER_PASSWORD_LOWERCASE',
+  };
+
+  private translateError(error: string): string {
+    const key = this.errorMap[error];
+    return key ? this.translateService.instant(key) : error;
+  }
+
   async handleSubmit(): Promise<void> {
     if (!this.isFormValid()) {
       this.toastService.warning(this.translateService.instant('TOASTS.REGISTER_FILL_FIELDS'));
@@ -301,17 +316,13 @@ export class RegisterComponent {
       this.password(),
     );
 
-    // verifica se houve erros na resposta
     if (result.errors && result.errors.length > 0) {
-      // mostra todos os erros do backend
-      result.errors.forEach(error => {
-        this.toastService.error(error);
+      result.errors.forEach((error: string) => {
+        this.toastService.error(this.translateError(error));
       });
     } else if (result.status === 'error') {
-      // erro genérico (sem lista de erros)
-      this.toastService.error(result.message || this.translateService.instant('TOASTS.REGISTER_FAILED'));
+      this.toastService.error(this.translateError(result.message) || this.translateService.instant('TOASTS.REGISTER_FAILED'));
     } else {
-      // sucesso
       this.toastService.success(this.translateService.instant('TOASTS.REGISTER_SUCCESS'));
       this.router.navigate(['/pending-email'], {
         queryParams: { email: this.email() },

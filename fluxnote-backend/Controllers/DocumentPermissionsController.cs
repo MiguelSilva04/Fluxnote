@@ -1,6 +1,7 @@
 using Fluxnote.Backend.Data;
 using Fluxnote.Backend.Dtos.Documents;
 using Fluxnote.Backend.Models;
+using Fluxnote.Backend.Services.Notifications;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -13,21 +14,18 @@ namespace Fluxnote.Backend.Controllers
     /// <summary>
     /// Controlador responsável pela gestão de permissões de documentos por membro.
     /// </summary>
-    /// <remarks>
-    /// <b>Rota Base:</b> api/documentpermissions<br/>
-    /// <b>Autenticação:</b> JWT Bearer obrigatório.<br/>
-    /// Permite listar, criar, atualizar e remover permissões explícitas de documentos.
-    /// </remarks>
     [Route("api/[controller]")]
     [ApiController]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class DocumentPermissionsController : ControllerBase
     {
         private readonly FluxnoteServerContext _context;
+        private readonly INotificationService _notificationService;
 
-        public DocumentPermissionsController(FluxnoteServerContext context)
+        public DocumentPermissionsController(FluxnoteServerContext context, INotificationService notificationService)
         {
             _context = context;
+            _notificationService = notificationService;
         }
 
         /// <summary>
@@ -178,6 +176,27 @@ namespace Fluxnote.Backend.Controllers
 
             _context.DocumentPermission.Add(permission);
             await _context.SaveChangesAsync();
+
+            // Notificar o utilizador que foi adicionado ao documento
+            if (targetMember.UserId != userId)
+            {
+                var callerUser = await _context.Users.FindAsync(userId);
+                var callerName = callerUser?.FullName ?? callerUser?.Email;
+                var docTitle = document.Title;
+
+                await _notificationService.SendAsync(new NotificationRequest
+                {
+                    UserId = targetMember.UserId,
+                    Type = NotificationType.AddedToDocument,
+                    Title = "Added to document",
+                    TitlePt = "Adicionado a documento",
+                    Message = $"{callerName} added you to \"{docTitle}\".",
+                    MessagePt = $"{callerName} adicionou-te a \"{docTitle}\".",
+                    ReferenceId = document.Id,
+                    ReferenceType = "Document",
+                    ActorId = userId
+                });
+            }
 
             var dto = new DocumentPermissionDto
             {

@@ -3,8 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
-import { AuthService, PanelStateService, DocumentService } from '../../core/services';
-import { WorkInProgressComponent } from '../../shared/components/ui';
+import { AuthService, PanelStateService, DocumentService, NotificationService } from '../../core/services';
 import { TranslateModule } from '@ngx-translate/core';
 import { DocumentDto } from '../../core/models';
 import { Subject, debounceTime, takeUntil, distinctUntilChanged } from 'rxjs';
@@ -12,7 +11,7 @@ import { Subject, debounceTime, takeUntil, distinctUntilChanged } from 'rxjs';
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [CommonModule, FormsModule, LucideAngularModule, WorkInProgressComponent, TranslateModule],
+  imports: [CommonModule, FormsModule, LucideAngularModule, TranslateModule],
   template: `
     <header class="h-14 md:h-16 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-3 md:px-6 flex items-center gap-2 md:gap-4 shrink-0">
       <!-- Hamburger (mobile only) -->
@@ -83,11 +82,13 @@ import { Subject, debounceTime, takeUntil, distinctUntilChanged } from 'rxjs';
       </div>
       <div class="flex items-center gap-1 md:gap-2 flex-shrink-0">
         <button
-          (click)="showWipModal.set(true)"
+          (click)="panelState.openNotificationsPanel()"
           class="relative p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
         >
           <lucide-icon name="bell" class="h-5 w-5"></lucide-icon>
-          <span class="absolute top-1.5 right-1.5 h-2 w-2 bg-red-500 rounded-full"></span>
+          @if (notificationService.hasUnread()) {
+            <span class="absolute top-1.5 right-1.5 h-2 w-2 bg-red-500 rounded-full"></span>
+          }
         </button>
         <button
           (click)="panelState.openSettingsPanel()"
@@ -113,7 +114,6 @@ import { Subject, debounceTime, takeUntil, distinctUntilChanged } from 'rxjs';
       </div>
     </header>
 
-    <app-work-in-progress [show]="showWipModal()" (close)="showWipModal.set(false)" />
   `,
   styles: [`
     .line-clamp-2 {
@@ -204,5 +204,5 @@ export class HeaderComponent implements OnDestroy {
   private escapeRegex(str: string): string {
     return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   }
-  showWipModal = signal(false);
+  notificationService = inject(NotificationService);
 }

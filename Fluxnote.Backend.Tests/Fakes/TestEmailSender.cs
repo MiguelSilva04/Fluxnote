@@ -21,4 +21,15 @@ public class TestEmailSender : IEmailSender
         LastResetLink = resetLink;
         return Task.CompletedTask;
     }
+
+    public string? LastNotificationSubject { get; private set; }
+    public string? LastNotificationBody { get; private set; }
+
+    public Task SendNotificationEmailAsync(string toEmail, string subject, string htmlBody)
+    {
+        LastToEmail = toEmail;
+        LastNotificationSubject = subject;
+        LastNotificationBody = htmlBody;
+        return Task.CompletedTask;
+    }
 }

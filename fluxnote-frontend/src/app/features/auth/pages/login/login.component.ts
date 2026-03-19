@@ -168,16 +168,7 @@ export class LoginComponent {
         this.router.navigate(['/dashboard']);
       }
     } else {
-      // mostra erros do backend usando o toast service
-      if (result.errors && result.errors.length > 0) {
-        // mostra todos os erros
-        result.errors.forEach(error => {
-          this.toastService.error(error);
-        });
-      } else {
-        // mostra mensagem principal se não houver erros detalhados
-        this.toastService.error(result.message || this.translateService.instant('TOASTS.LOGIN_FAILED'));
-      }
+      this.toastService.error(this.translateService.instant('TOASTS.LOGIN_FAILED'));
     }
   }
 

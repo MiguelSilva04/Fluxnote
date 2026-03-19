@@ -362,13 +362,14 @@
                           <option [ngValue]="1">{{ 'ROLES.EDITOR' | translate }}</option>
                         </select>
                       }
-                      <button
-                        (click)="confirmAddMember()"
+                      <app-button
+                        size="sm"
+                        [isLoading]="addingMember()"
                         [disabled]="!addMemberSelectedId()"
-                        class="px-3 py-1 text-xs font-medium text-white bg-[#155347] rounded-md hover:bg-[#0e3d33] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        (onClick)="confirmAddMember()"
                       >
-                        {{ 'TEAM_DETAIL.ADD' | translate }}
-                      </button>
+                        {{ addingMember() ? ('TEAM_DETAIL.ADDING' | translate) : ('TEAM_DETAIL.ADD' | translate) }}
+                      </app-button>
                       <button
                         (click)="closeAddMemberForm()"
                         class="p-1 text-gray-400 hover:text-gray-600 transition-colors"
@@ -646,6 +647,10 @@
       [loading]="shareLoading()"
       [copied]="shareCopied()"
       [invites]="documentInvites()"
+      [emailLoading]="emailLoading()"
+      [emailMessage]="emailMessage()"
+      [emailShouldUseLink]="emailShouldUseLink()"
+      [emailRole]="emailRole()"
       (close)="closeDocumentShareModal()"
       (roleChange)="shareRole.set($event)"
       (expirationDaysChange)="shareExpirationDays.set($event)"
@@ -654,6 +659,8 @@
       (revokeInvite)="revokeDocumentInvite($event)"
       (clearInvites)="clearDocumentInvitesList()"
       (viewInvite)="viewInviteLink($event)"
+      (emailInvite)="sendDocumentEmailInvite($event)"
+      (emailRoleChange)="emailRole.set($event)"
     />
   }
 
@@ -754,6 +761,9 @@
         [loading]="shareLoading()"
         [copied]="shareCopied()"
         [invites]="teamInvites()"
+        [emailLoading]="emailLoading()"
+        [emailMessage]="emailMessage()"
+        [emailShouldUseLink]="emailShouldUseLink()"
         (close)="closeTeamShareModal()"
         (expirationDaysChange)="shareExpirationDays.set($event)"
         (generateInvite)="generateTeamInviteLink()"
@@ -761,6 +771,7 @@
         (revokeInvite)="revokeTeamInvite($event)"
         (clearInvites)="clearTeamInvitesList()"
         (viewInvite)="viewInviteLink($event)"
+        (emailInvite)="sendTeamEmailInvite($event)"
       />
   }
   
