@@ -1,70 +1,76 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
+import { TranslateModule } from '@ngx-translate/core';
 import { LandingHeaderComponent, LandingFooterComponent } from '../components';
 
 @Component({
   selector: 'app-about',
   standalone: true,
-  imports: [CommonModule, LandingHeaderComponent, LandingFooterComponent],
+  imports: [CommonModule, TranslateModule, LandingHeaderComponent, LandingFooterComponent],
   template: `
     <div class="min-h-screen bg-white dark:bg-gray-900">
       <app-landing-header></app-landing-header>
 
+      <!-- Mission -->
       <section class="py-20 bg-gradient-to-br from-[#155347]/10 to-white dark:to-gray-900">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div class="text-center mb-16">
             <h1 class="text-4xl lg:text-5xl font-bold text-gray-900 dark:text-gray-100 mb-6">
-              About Fluxnote
+              {{ 'ABOUT.TITLE' | translate }}
             </h1>
-            <p class="text-xl text-gray-600 max-w-3xl mx-auto">
-              We’re a team passionate about technology and collaboration, dedicated to
-              transforming how people create and share knowledge.
+            <p class="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
+              {{ 'ABOUT.SUBTITLE' | translate }}
             </p>
           </div>
 
           <div class="grid lg:grid-cols-2 gap-12 items-center">
             <div>
-              <h2 class="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-6">Our mission</h2>
+              <h2 class="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-6">
+                {{ 'ABOUT.MISSION_TITLE' | translate }}
+              </h2>
               <p class="text-gray-700 dark:text-gray-300 mb-6 text-lg">
-                Democratize access to intelligent collaboration tools, enabling teams of any size to
-                create professional-quality documents with the help of AI.
+                {{ 'ABOUT.MISSION_P1' | translate }}
               </p>
               <p class="text-gray-700 dark:text-gray-300 text-lg">
-                We believe that when people have the right tools, they can focus on what truly matters:
-                their ideas and creativity.
+                {{ 'ABOUT.MISSION_P2' | translate }}
               </p>
             </div>
-            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-4">
-              <img
-                src="assets/ourMission.png"
-                alt="Fluxnote team at work"
-                class="w-full h-64 object-cover rounded-lg"
-              />
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8">
+              <div class="grid grid-cols-2 gap-4">
+                @for (stat of stats; track stat.labelKey) {
+                  <div class="text-center p-4 bg-[#155347]/5 dark:bg-emerald-900/20 rounded-xl">
+                    <div class="text-3xl font-bold text-[#155347] dark:text-emerald-400 mb-1">{{ stat.value }}</div>
+                    <div class="text-sm text-gray-600 dark:text-gray-400">{{ stat.labelKey | translate }}</div>
+                  </div>
+                }
+              </div>
             </div>
           </div>
         </div>
       </section>
 
+      <!-- Values -->
       <section class="py-20 bg-white dark:bg-gray-900">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div class="text-center mb-16">
             <h2 class="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-gray-100 mb-4">
-              Our values
+              {{ 'ABOUT.VALUES_TITLE' | translate }}
             </h2>
             <p class="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
-              These values guide everything we do—from product development to customer support.
+              {{ 'ABOUT.VALUES_SUBTITLE' | translate }}
             </p>
           </div>
 
           <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            @for (value of values; track value.title) {
+            @for (value of values; track value.titleKey) {
               <div class="text-center">
                 <div class="text-4xl mb-4">{{ value.icon }}</div>
                 <h3 class="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-3">
-                  {{ value.title }}
+                  {{ value.titleKey | translate }}
                 </h3>
                 <p class="text-gray-600 dark:text-gray-400">
-                  {{ value.description }}
+                  {{ value.descKey | translate }}
                 </p>
               </div>
             }
@@ -72,35 +78,35 @@ import { LandingHeaderComponent, LandingFooterComponent } from '../components';
         </div>
       </section>
 
+      <!-- Team -->
       <section class="py-20 bg-gray-50 dark:bg-gray-800">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div class="text-center mb-16">
             <h2 class="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-gray-100 mb-4">
-              Meet our team
+              {{ 'ABOUT.TEAM_TITLE' | translate }}
             </h2>
             <p class="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
-              Talented, dedicated people working every day to make Fluxnote better.
+              {{ 'ABOUT.TEAM_SUBTITLE' | translate }}
             </p>
           </div>
 
-          <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div class="flex flex-wrap justify-center gap-8">
             @for (member of teamMembers; track member.name) {
-              <div class="bg-white dark:bg-gray-700 rounded-2xl shadow-lg p-6 text-center hover:shadow-xl transition-shadow">
-                <div class="w-24 h-24 rounded-full overflow-hidden mx-auto mb-4">
-                  <img
-                    [src]="member.image"
-                    [alt]="member.name"
-                    class="w-full h-full object-cover"
-                  />
+              <div class="bg-white dark:bg-gray-700 rounded-2xl shadow-lg p-8 text-center hover:shadow-xl transition-shadow w-64">
+                <div
+                  class="w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-4 text-white text-2xl font-bold"
+                  [style.background-color]="member.color"
+                >
+                  {{ member.initials }}
                 </div>
-                <h3 class="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">
+                <h3 class="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-1">
                   {{ member.name }}
                 </h3>
-                <p class="text-[#155347] font-medium mb-3">
-                  {{ member.role }}
+                <p class="text-[#155347] dark:text-emerald-400 font-medium mb-3 text-sm">
+                  {{ member.roleKey | translate }}
                 </p>
                 <p class="text-gray-600 dark:text-gray-400 text-sm">
-                  {{ member.description }}
+                  {{ member.descKey | translate }}
                 </p>
               </div>
             }
@@ -108,14 +114,15 @@ import { LandingHeaderComponent, LandingFooterComponent } from '../components';
         </div>
       </section>
 
+      <!-- Journey -->
       <section class="py-20 bg-white dark:bg-gray-900">
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div class="text-center mb-16">
             <h2 class="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-gray-100 mb-4">
-              Our journey
+              {{ 'ABOUT.JOURNEY_TITLE' | translate }}
             </h2>
             <p class="text-xl text-gray-600 dark:text-gray-400">
-              From the first idea to today—see how Fluxnote has evolved.
+              {{ 'ABOUT.JOURNEY_SUBTITLE' | translate }}
             </p>
           </div>
 
@@ -123,20 +130,20 @@ import { LandingHeaderComponent, LandingFooterComponent } from '../components';
             <div class="absolute left-8 top-0 bottom-0 w-0.5 bg-[#155347]/40"></div>
 
             <div class="space-y-12">
-              @for (milestone of milestones; track milestone.year) {
+              @for (milestone of milestones; track milestone.dateKey) {
                 <div class="relative flex items-start">
-                  <div class="absolute left-6 w-4 h-4 bg-[#155347] rounded-full border-4 border-white shadow-lg"></div>
+                  <div class="absolute left-6 w-4 h-4 bg-[#155347] rounded-full border-4 border-white dark:border-gray-900 shadow-lg"></div>
                   <div class="ml-16 bg-gray-50 dark:bg-gray-800 rounded-2xl p-6">
                     <div class="flex items-center mb-3">
-                      <span class="text-sm font-semibold text-[#155347] bg-[#155347]/15 px-3 py-1 rounded-full">
-                        {{ milestone.year }}
+                      <span class="text-sm font-semibold text-[#155347] dark:text-emerald-400 bg-[#155347]/10 dark:bg-emerald-900/30 px-3 py-1 rounded-full">
+                        {{ milestone.dateKey | translate }}
                       </span>
                     </div>
                     <h3 class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2">
-                      {{ milestone.title }}
+                      {{ milestone.titleKey | translate }}
                     </h3>
                     <p class="text-gray-700 dark:text-gray-300">
-                      {{ milestone.description }}
+                      {{ milestone.descKey | translate }}
                     </p>
                   </div>
                 </div>
@@ -146,21 +153,27 @@ import { LandingHeaderComponent, LandingFooterComponent } from '../components';
         </div>
       </section>
 
+      <!-- CTA -->
       <section class="py-20 bg-[#155347] text-white">
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 class="text-3xl lg:text-4xl font-bold mb-6">
-            Join our mission
+            {{ 'ABOUT.CTA_TITLE' | translate }}
           </h2>
           <p class="text-xl mb-8 opacity-90">
-            Want to be part of the digital collaboration revolution?
-            We’re always looking for exceptional talent.
+            {{ 'ABOUT.CTA_SUBTITLE' | translate }}
           </p>
           <div class="flex flex-col sm:flex-row gap-4 justify-center">
-            <button class="border-2 bg-white text-[#155347] px-8 py-3 rounded-xl font-semibold hover:bg-[#155347] hover:text-white hover:border-2 border-white transition-colors cursor-pointer">
-              View opportunities
+            <button
+              (click)="goToRegister()"
+              class="bg-white text-[#155347] px-8 py-3 rounded-xl font-semibold hover:opacity-90 transition-opacity cursor-pointer"
+            >
+              {{ 'ABOUT.CTA_GET_STARTED' | translate }}
             </button>
-            <button class="border-2 border-white text-white px-8 py-3 rounded-xl font-semibold hover:bg-white hover:text-[#155347] transition-colors cursor-pointer">
-              Contact us
+            <button
+              (click)="goToContact()"
+              class="border-2 border-white text-white px-8 py-3 rounded-xl font-semibold hover:bg-white hover:text-[#155347] transition-colors cursor-pointer"
+            >
+              {{ 'ABOUT.CTA_CONTACT' | translate }}
             </button>
           </div>
         </div>
@@ -171,71 +184,57 @@ import { LandingHeaderComponent, LandingFooterComponent } from '../components';
   `
 })
 export class AboutPageComponent {
+  stats = [
+    { value: '3',    labelKey: 'ABOUT.STAT_MEMBERS' },
+    { value: '4',    labelKey: 'ABOUT.STAT_FEATURES' },
+    { value: '2',    labelKey: 'ABOUT.STAT_LANGS' },
+    { value: '2026', labelKey: 'ABOUT.STAT_YEAR' }
+  ];
+
   teamMembers = [
     {
       name: 'Miguel Silva',
-      role: 'CEO & Founder',
-      description: 'Software engineer with expertise in AI and distributed systems.',
-      image: 'assets/miguelsilva.png'
+      initials: 'MS',
+      color: '#155347',
+      roleKey: 'ABOUT.MIGUEL_ROLE',
+      descKey: 'ABOUT.MIGUEL_DESC'
     },
     {
-      name: 'Ana Rodrigues',
-      role: 'Intern',
-      description: 'Product specialist with 10 years of experience in technology.',
-      image: 'assets/anaRodriges.jpg'
+      name: 'Rúben Alves',
+      initials: 'RA',
+      color: '#0f766e',
+      roleKey: 'ABOUT.RUBEN_ROLE',
+      descKey: 'ABOUT.RUBEN_DESC'
     },
     {
-      name: 'Sofia Mendes',
-      role: 'Intern',
-      description: 'UX/UI designer passionate about creating intuitive and accessible experiences.',
-      image: 'assets/sofiaMendes.jpg'
-    },
-    {
-      name: 'Joao Ferreira',
-      role: 'Intern',
-      description: 'Full-stack developer focused on performance and scalability.',
-      image: 'assets/joaoFerreira.jpg'
+      name: 'Ricardo Oliveira',
+      initials: 'RO',
+      color: '#047857',
+      roleKey: 'ABOUT.RICARDO_ROLE',
+      descKey: 'ABOUT.RICARDO_DESC'
     }
   ];
 
   values = [
-    {
-      icon: '🚀',
-      title: 'Innovation',
-      description: 'We’re always exploring new technologies to improve our users’ experience.'
-    },
-    {
-      icon: '🤝',
-      title: 'Collaboration',
-      description: 'We believe the best ideas happen when people work together.'
-    },
-    {
-      icon: '🔒',
-      title: 'Transparency',
-      description: 'We’re open about how we operate and how we protect your data.'
-    },
-    {
-      icon: '🎯',
-      title: 'User focus',
-      description: 'Every decision is made with the best experience for you in mind.'
-    }
+    { icon: '🤝', titleKey: 'ABOUT.V1_TITLE', descKey: 'ABOUT.V1_DESC' },
+    { icon: '🚀', titleKey: 'ABOUT.V2_TITLE', descKey: 'ABOUT.V2_DESC' },
+    { icon: '🔒', titleKey: 'ABOUT.V3_TITLE', descKey: 'ABOUT.V3_DESC' },
+    { icon: '🧠', titleKey: 'ABOUT.V4_TITLE', descKey: 'ABOUT.V4_DESC' }
   ];
 
   milestones = [
-    {
-      year: '2023',
-      title: 'Fluxnote founded',
-      description: 'Development began with a focus on collaboration and AI.'
-    },
-    {
-      year: '2024',
-      title: 'Beta launch',
-      description: 'First version released to selected users.'
-    },
-    {
-      year: '2025',
-      title: 'Public launch',
-      description: 'Platform opened to the public with full features.'
-    }
+    { dateKey: 'ABOUT.M1_DATE', titleKey: 'ABOUT.M1_TITLE', descKey: 'ABOUT.M1_DESC' },
+    { dateKey: 'ABOUT.M2_DATE', titleKey: 'ABOUT.M2_TITLE', descKey: 'ABOUT.M2_DESC' },
+    { dateKey: 'ABOUT.M3_DATE', titleKey: 'ABOUT.M3_TITLE', descKey: 'ABOUT.M3_DESC' }
   ];
+
+  constructor(private router: Router) {}
+
+  goToRegister(): void {
+    this.router.navigate(['/register']);
+  }
+
+  goToContact(): void {
+    this.router.navigate(['/contact']);
+  }
 }

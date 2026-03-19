@@ -1,12 +1,13 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { TranslateModule } from '@ngx-translate/core';
 import { LandingHeaderComponent, LandingFooterComponent } from '../components';
 
 @Component({
   selector: 'app-technologies',
   standalone: true,
-  imports: [CommonModule, LandingHeaderComponent, LandingFooterComponent],
+  imports: [CommonModule, TranslateModule, LandingHeaderComponent, LandingFooterComponent],
   template: `
     <div class="min-h-screen bg-white dark:bg-gray-900">
       <app-landing-header></app-landing-header>
@@ -15,21 +16,20 @@ import { LandingHeaderComponent, LandingFooterComponent } from '../components';
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div class="text-center mb-16">
             <h1 class="text-4xl lg:text-5xl font-bold text-gray-900 dark:text-gray-100 mb-6">
-              Technologies we use
+              {{ 'TECHNOLOGIES.TITLE' | translate }}
             </h1>
             <p class="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
-              Fluxnote is built with modern technologies to ensure performance, scalability,
-              and an exceptional user experience.
+              {{ 'TECHNOLOGIES.SUBTITLE' | translate }}
             </p>
           </div>
 
           <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            @for (category of techCategories; track category.title) {
+            @for (category of techCategories; track category.titleKey) {
               <div class="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg hover:shadow-xl transition-shadow">
                 <div class="flex items-center mb-6">
                   <span class="text-4xl mr-4">{{ category.icon }}</span>
                   <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100">
-                    {{ category.title }}
+                    {{ category.titleKey | translate }}
                   </h2>
                 </div>
 
@@ -40,7 +40,7 @@ import { LandingHeaderComponent, LandingFooterComponent } from '../components';
                         {{ tech.name }}
                       </h3>
                       <p class="text-gray-600 dark:text-gray-400 text-sm">
-                        {{ tech.description }}
+                        {{ tech.descKey | translate }}
                       </p>
                     </div>
                   }
@@ -51,7 +51,7 @@ import { LandingHeaderComponent, LandingFooterComponent } from '../components';
 
           <div class="mt-16 bg-gray-50 dark:bg-gray-800 rounded-2xl p-8">
             <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6 text-center">
-              Technical architecture
+              {{ 'TECHNOLOGIES.ARCH_TITLE' | translate }}
             </h2>
             <div class="grid md:grid-cols-3 gap-8 text-center">
               <div>
@@ -59,10 +59,10 @@ import { LandingHeaderComponent, LandingFooterComponent } from '../components';
                   <span class="text-2xl">🌐</span>
                 </div>
                 <h3 class="font-semibold text-gray-900 dark:text-gray-100 mb-2">
-                  Modern frontend
+                  {{ 'TECHNOLOGIES.ARCH_FRONTEND_TITLE' | translate }}
                 </h3>
                 <p class="text-gray-600 dark:text-gray-400 text-sm">
-                  A responsive interface built with React and TailwindCSS for a smooth experience
+                  {{ 'TECHNOLOGIES.ARCH_FRONTEND_DESC' | translate }}
                 </p>
               </div>
               <div>
@@ -70,30 +70,30 @@ import { LandingHeaderComponent, LandingFooterComponent } from '../components';
                   <span class="text-2xl">⚡</span>
                 </div>
                 <h3 class="font-semibold text-gray-900 dark:text-gray-100 mb-2">
-                  Scalable backend
+                  {{ 'TECHNOLOGIES.ARCH_BACKEND_TITLE' | translate }}
                 </h3>
                 <p class="text-gray-600 dark:text-gray-400 text-sm">
-                  A robust API with Node.js and Express, backed by PostgreSQL for secure data
+                  {{ 'TECHNOLOGIES.ARCH_BACKEND_DESC' | translate }}
                 </p>
               </div>
               <div>
                 <div class="bg-[#155347]/15 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                  <span class="text-2xl">🚀</span>
+                  <span class="text-2xl">🔄</span>
                 </div>
                 <h3 class="font-semibold text-gray-900 dark:text-gray-100 mb-2">
-                  Automated deployment
+                  {{ 'TECHNOLOGIES.ARCH_REALTIME_TITLE' | translate }}
                 </h3>
                 <p class="text-gray-600 dark:text-gray-400 text-sm">
-                  Containerized infrastructure with Docker and Kubernetes for high availability
+                  {{ 'TECHNOLOGIES.ARCH_REALTIME_DESC' | translate }}
                 </p>
               </div>
             </div>
             <div class="text-center mt-8">
               <button
                 (click)="goBack()"
-                class="bg-[#155347] text-white px-8 py-4 rounded-xl text-lg font-semibold hover:bg-[#155347] transition-colors shadow-lg cursor-pointer"
+                class="bg-[#155347] text-white px-8 py-4 rounded-xl text-lg font-semibold hover:opacity-90 transition-opacity shadow-lg cursor-pointer"
               >
-                Back
+                {{ 'TECHNOLOGIES.BACK' | translate }}
               </button>
             </div>
           </div>
@@ -107,52 +107,55 @@ import { LandingHeaderComponent, LandingFooterComponent } from '../components';
 export class TechnologiesPageComponent {
   techCategories = [
     {
-      title: 'Frontend',
+      titleKey: 'TECHNOLOGIES.FRONTEND_TITLE',
       icon: '🎨',
       technologies: [
-        { name: 'React', description: 'JavaScript library for building user interfaces' },
-        { name: 'TipTap', description: 'Extensible rich-text editor for web applications' },
-        { name: 'TailwindCSS', description: 'Utility-first CSS framework for fast, responsive design' }
+        { name: 'Angular 19',             descKey: 'TECHNOLOGIES.FRONTEND_T1_DESC' },
+        { name: 'TailwindCSS',            descKey: 'TECHNOLOGIES.FRONTEND_T2_DESC' },
+        { name: 'Lucide Icons',           descKey: 'TECHNOLOGIES.FRONTEND_T3_DESC' },
+        { name: 'ngx-translate',          descKey: 'TECHNOLOGIES.FRONTEND_T4_DESC' }
       ]
     },
     {
-      title: 'Backend',
+      titleKey: 'TECHNOLOGIES.BACKEND_TITLE',
       icon: '⚙️',
       technologies: [
-        { name: 'Node.js', description: 'JavaScript runtime for server-side development' },
-        { name: 'Express', description: 'Minimal, flexible web framework for Node.js' }
+        { name: 'ASP.NET Core 8.0',       descKey: 'TECHNOLOGIES.BACKEND_T1_DESC' },
+        { name: 'Entity Framework Core',  descKey: 'TECHNOLOGIES.BACKEND_T2_DESC' },
+        { name: 'SignalR',                descKey: 'TECHNOLOGIES.BACKEND_T3_DESC' }
       ]
     },
     {
-      title: 'Sync',
-      icon: '🔄',
+      titleKey: 'TECHNOLOGIES.AUTH_TITLE',
+      icon: '🔒',
       technologies: [
-        { name: 'Yjs', description: 'Framework for real-time collaboration and data syncing' },
-        { name: 'WebSockets', description: 'Protocol for real-time bidirectional communication' }
+        { name: 'JWT Bearer',             descKey: 'TECHNOLOGIES.AUTH_T1_DESC' },
+        { name: 'Refresh Tokens',         descKey: 'TECHNOLOGIES.AUTH_T2_DESC' },
+        { name: 'OAuth 2.0',              descKey: 'TECHNOLOGIES.AUTH_T3_DESC' }
       ]
     },
     {
-      title: 'Database',
+      titleKey: 'TECHNOLOGIES.DATABASE_TITLE',
       icon: '🗄️',
       technologies: [
-        { name: 'PostgreSQL', description: 'Advanced relational database management system' },
-        { name: 'Firebase', description: 'Platform for authentication and push notifications' }
+        { name: 'SQL Server',             descKey: 'TECHNOLOGIES.DATABASE_T1_DESC' },
+        { name: 'EF Core Migrations',     descKey: 'TECHNOLOGIES.DATABASE_T2_DESC' }
       ]
     },
     {
-      title: 'AI Agents',
+      titleKey: 'TECHNOLOGIES.AI_TITLE',
       icon: '🤖',
       technologies: [
-        { name: 'OpenAI API', description: 'AI API for natural language processing' }
+        { name: 'OpenAI API',             descKey: 'TECHNOLOGIES.AI_T1_DESC' }
       ]
     },
     {
-      title: 'Infrastructure',
+      titleKey: 'TECHNOLOGIES.INFRA_TITLE',
       icon: '☁️',
       technologies: [
-        { name: 'Docker', description: 'Containerization platform for consistent deployments' },
-        { name: 'Kubernetes', description: 'Container orchestration system for scalability' },
-        { name: 'GitHub Actions', description: 'CI/CD platform for workflow automation' }
+        { name: 'Docker',                 descKey: 'TECHNOLOGIES.INFRA_T1_DESC' },
+        { name: 'Ubuntu 22 LTS',          descKey: 'TECHNOLOGIES.INFRA_T2_DESC' },
+        { name: 'GitHub Actions',         descKey: 'TECHNOLOGIES.INFRA_T3_DESC' }
       ]
     }
   ];

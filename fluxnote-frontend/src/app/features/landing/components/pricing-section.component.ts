@@ -18,7 +18,7 @@ import { TranslateModule } from '@ngx-translate/core';
           </p>
         </div>
 
-        <div class="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+        <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
           @for (plan of plans; track plan.nameKey) {
             <div
               [class]="'bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg relative flex flex-col ' + (plan.popular ? 'ring-2 ring-[#155347] dark:ring-emerald-500 scale-105' : '')"
@@ -76,6 +76,17 @@ export class PricingSectionComponent {
       popular: false
     },
     {
+      nameKey: 'LANDING.PRICING.STUDENT.NAME',
+      priceKey: 'LANDING.PRICING.STUDENT.PRICE',
+      featureKeys: [
+        'LANDING.PRICING.STUDENT.F1',
+        'LANDING.PRICING.STUDENT.F2',
+        'LANDING.PRICING.STUDENT.F3',
+        'LANDING.PRICING.STUDENT.F4'
+      ],
+      popular: false
+    },
+    {
       nameKey: 'LANDING.PRICING.PRO.NAME',
       priceKey: 'LANDING.PRICING.PRO.PRICE',
       featureKeys: [
@@ -83,8 +94,7 @@ export class PricingSectionComponent {
         'LANDING.PRICING.PRO.F2',
         'LANDING.PRICING.PRO.F3',
         'LANDING.PRICING.PRO.F4',
-        'LANDING.PRICING.PRO.F5',
-        'LANDING.PRICING.PRO.F6'
+        'LANDING.PRICING.PRO.F5'
       ],
       popular: true
     },
@@ -96,8 +106,7 @@ export class PricingSectionComponent {
         'LANDING.PRICING.TEAM.F2',
         'LANDING.PRICING.TEAM.F3',
         'LANDING.PRICING.TEAM.F4',
-        'LANDING.PRICING.TEAM.F5',
-        'LANDING.PRICING.TEAM.F6'
+        'LANDING.PRICING.TEAM.F5'
       ],
       popular: false
     }

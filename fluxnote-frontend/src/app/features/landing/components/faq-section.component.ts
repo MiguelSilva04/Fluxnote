@@ -79,10 +79,7 @@ export class FaqSectionComponent {
     { questionKey: 'LANDING.FAQ.Q4', answerKey: 'LANDING.FAQ.A4' },
     { questionKey: 'LANDING.FAQ.Q5', answerKey: 'LANDING.FAQ.A5' },
     { questionKey: 'LANDING.FAQ.Q6', answerKey: 'LANDING.FAQ.A6' },
-    { questionKey: 'LANDING.FAQ.Q7', answerKey: 'LANDING.FAQ.A7' },
-    { questionKey: 'LANDING.FAQ.Q8', answerKey: 'LANDING.FAQ.A8' },
-    { questionKey: 'LANDING.FAQ.Q9', answerKey: 'LANDING.FAQ.A9' },
-    { questionKey: 'LANDING.FAQ.Q10', answerKey: 'LANDING.FAQ.A10' }
+    { questionKey: 'LANDING.FAQ.Q7', answerKey: 'LANDING.FAQ.A7' }
   ];
 
   constructor(private router: Router) {}

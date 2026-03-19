@@ -5,7 +5,6 @@ import {
   LandingFooterComponent,
   HeroSectionComponent,
   FeaturesSectionComponent,
-  TestimonialsSectionComponent,
   PricingSectionComponent,
   FaqSectionComponent
 } from '../components';
@@ -19,7 +18,6 @@ import {
     LandingFooterComponent,
     HeroSectionComponent,
     FeaturesSectionComponent,
-    TestimonialsSectionComponent,
     PricingSectionComponent,
     FaqSectionComponent
   ],
@@ -28,7 +26,6 @@ import {
       <app-landing-header></app-landing-header>
       <app-hero-section></app-hero-section>
       <app-features-section></app-features-section>
-      <app-testimonials-section></app-testimonials-section>
       <app-pricing-section></app-pricing-section>
       <app-faq-section></app-faq-section>
       <app-landing-footer></app-landing-footer>

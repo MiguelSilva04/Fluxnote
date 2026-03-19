@@ -36,12 +36,6 @@ import { ThemeService } from '../../../core/services/theme.service';
               {{ 'LANDING.HEADER.FEATURES' | translate }}
             </button>
             <button
-              (click)="scrollTo('testemunhos')"
-              class="text-gray-700 dark:text-gray-300 hover:text-[#155347] dark:hover:text-emerald-400 transition-colors cursor-pointer"
-            >
-              {{ 'LANDING.HEADER.TESTIMONIALS' | translate }}
-            </button>
-            <button
               (click)="scrollTo('precos')"
               class="text-gray-700 dark:text-gray-300 hover:text-[#155347] dark:hover:text-emerald-400 transition-colors cursor-pointer"
             >
@@ -162,12 +156,6 @@ import { ThemeService } from '../../../core/services/theme.service';
                 {{ 'LANDING.HEADER.FEATURES' | translate }}
               </button>
               <button
-                (click)="scrollTo('testemunhos'); closeMenu()"
-                class="text-gray-700 dark:text-gray-300 hover:text-[#155347] dark:hover:text-emerald-400 transition-colors text-left cursor-pointer"
-              >
-                {{ 'LANDING.HEADER.TESTIMONIALS' | translate }}
-              </button>
-              <button
                 (click)="scrollTo('precos'); closeMenu()"
                 class="text-gray-700 dark:text-gray-300 hover:text-[#155347] dark:hover:text-emerald-400 transition-colors text-left cursor-pointer"
               >
@@ -236,14 +224,22 @@ export class LandingHeaderComponent {
   }
 
   scrollTo(sectionId: string): void {
-    const element = document.getElementById(sectionId);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
+    if (this.router.url === '/') {
+      const element = document.getElementById(sectionId);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
+    } else {
+      this.router.navigate(['/'], { fragment: sectionId });
     }
   }
 
   scrollToTop(): void {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (this.router.url === '/') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+      this.router.navigate(['/']);
+    }
   }
 
   goToLogin(): void {

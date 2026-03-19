@@ -17,7 +17,7 @@ import { LandingHeaderComponent, LandingFooterComponent } from '../components';
               Privacy Policy
             </h1>
             <p class="text-xl text-gray-600 dark:text-gray-400">
-              Last updated: January 15, 2025
+              Last updated: March 2026
             </p>
           </div>
 
@@ -150,13 +150,10 @@ import { LandingHeaderComponent, LandingFooterComponent } from '../components';
               <section>
                 <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">6. Contact</h2>
                 <div class="bg-gray-50 dark:bg-gray-800 rounded-xl p-6">
-                  <p class="text-gray-700 dark:text-gray-300 mb-4">
-                    For privacy questions or to exercise your rights, contact us:
+                  <p class="text-gray-700 dark:text-gray-300">
+                    Fluxnote is currently an academic project developed at Escola Superior de Tecnologia de Setúbal.
+                    A dedicated privacy contact channel is not yet available.
                   </p>
-                  <div class="space-y-2 text-gray-700 dark:text-gray-300">
-                    <p><strong>Email:</strong> privacy&#64;fluxnote.com</p>
-                    <p><strong>Address:</strong> Innovation Street, 123, 1000-001 Lisbon, Portugal</p>
-                  </div>
                 </div>
               </section>
             </div>

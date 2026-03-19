@@ -83,6 +83,11 @@ del.diffmod {
   color: #fca5a5;
 }
 
+/* Smooth scrolling for anchor navigation */
+html {
+  scroll-behavior: smooth;
+}
+
 /* Base styles */
 body {
   font-family: 'Inter', system-ui, sans-serif;
