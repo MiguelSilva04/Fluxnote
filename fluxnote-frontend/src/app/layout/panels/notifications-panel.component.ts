@@ -45,10 +45,10 @@ import { Router } from '@angular/router';
               [class]="'px-6 py-4 border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all cursor-pointer ' + (!notification.isRead ? 'bg-blue-50/40 dark:bg-blue-900/10' : '') + (deletingIds().has(notification.id) ? ' opacity-50 pointer-events-none' : '')"
             >
               <div class="flex gap-3">
-                <div [class]="'p-2 rounded-xl shrink-0 mt-0.5 ' + getIconBg(notification.type, notification.isRead)">
+                <div [class]="'flex items-center justify-center h-9 w-9 rounded-xl shrink-0 mt-0.5 ' + getIconBg(notification.type, notification.isRead)">
                   <lucide-icon
                     [name]="getIcon(notification.type)"
-                    [class]="'h-5 w-5 ' + getIconColor(notification.type, notification.isRead)"
+                    [class]="'h-4.5 w-4.5 ' + getIconColor(notification.type, notification.isRead)"
                   ></lucide-icon>
                 </div>
                 <div class="flex-1 min-w-0">
