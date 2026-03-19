@@ -121,6 +121,7 @@ export class TeamDetailComponent {
   addMemberDocId = signal<number | null>(null);
   addMemberSelectedId = signal<number | null>(null);
   addMemberSelectedRole = signal<number>(0);
+  addingMember = signal(false);
 
   /** Track which folders are expanded in the Document Permissions section */
   expandedPermFolders = signal<Set<number | 'root'>>(new Set());
@@ -573,12 +574,15 @@ export class TeamDetailComponent {
       role = 1; // Editor
     }
 
+    this.addingMember.set(true);
+
     this.docPermissionService.addPermission({
       documentId: docId,
       teamMemberId: memberId,
       role: role
     }).subscribe({
       next: (newPermission) => {
+        this.addingMember.set(false);
         this.toastService.success(this.translateService.instant('TOASTS.USER_ADDED_TO_DOC'));
         // Find the member name for local state update
         if (team) {
@@ -607,6 +611,7 @@ export class TeamDetailComponent {
         this.closeAddMemberForm();
       },
       error: (err) => {
+        this.addingMember.set(false);
         console.error('Error adding document permission:', err);
         this.toastService.error(this.translateService.instant('TOASTS.USER_ADD_TO_DOC_FAILED'));
       }
