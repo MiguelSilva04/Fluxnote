@@ -541,6 +541,8 @@
     "AT_LEAST_NUMBER": "Pelo menos um número",
     "ONE_SPECIAL": "Um caráter especial",
     "PASSWORDS_MATCH": "Passwords coincidem",
+    "PASSWORD_CHANGED_SUCCESS": "Password alterada com sucesso.",
+    "PASSWORD_CHANGED_FAILED": "Falha ao alterar a password.",
     "CONFIRM_PASSWORD_CHANGE": "Confirmar Alteração de Password",
     "CONFIRM_PASSWORD_DESC": "Tem a certeza que quer alterar a sua password? Terá de usar a nova password no próximo login.",
     "CHANGING": "A alterar...",

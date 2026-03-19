@@ -541,6 +541,8 @@
     "AT_LEAST_NUMBER": "At least one number",
     "ONE_SPECIAL": "One special char",
     "PASSWORDS_MATCH": "Passwords match",
+    "PASSWORD_CHANGED_SUCCESS": "Password changed successfully.",
+    "PASSWORD_CHANGED_FAILED": "Failed to change password.",
     "CONFIRM_PASSWORD_CHANGE": "Confirm Password Change",
     "CONFIRM_PASSWORD_DESC": "Are you sure you want to change your password? You will need to use the new password on your next login.",
     "CHANGING": "Changing...",

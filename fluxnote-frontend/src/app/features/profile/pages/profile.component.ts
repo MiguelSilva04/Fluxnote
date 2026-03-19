@@ -1313,14 +1313,14 @@ export class ProfileComponent {
     });
 
     if (result.success) {
-      this.successMessage.set('Password changed successfully.');
+      this.successMessage.set(this.translateService.instant('PROFILE.PASSWORD_CHANGED_SUCCESS'));
       this.showPasswordConfirmModal.set(false);
       this.closePasswordModal();
       this.autoHideMessages();
     } else {
       this.showPasswordConfirmModal.set(false);
       this.passwordError.set(
-        result.errors?.join(', ') || result.message || 'Failed to change password.',
+        result.errors?.join(', ') || result.message || this.translateService.instant('PROFILE.PASSWORD_CHANGED_FAILED'),
       );
     }
 
