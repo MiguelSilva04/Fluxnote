@@ -255,28 +255,50 @@ import { diffWords } from 'diff';
               (collaborationReady)="onCollaborationReady()"
             />
 
-            <!-- Improve Text Tooltip (appears on text selection) -->
+            <!-- Improve Text Toolbar (appears on text selection) -->
             @if (showImproveTooltip() && canEdit()) {
-              <div
-                class="fixed z-50 flex items-center gap-1 bg-gray-900 text-white rounded-lg shadow-xl px-2 py-1.5 animate-in fade-in"
-                [style.top.px]="improveTooltipPosition().top"
-                [style.left.px]="improveTooltipPosition().left"
-              >
-                <button
-                  (mousedown)="requestImproveText($event)"
-                  class="flex items-center gap-1.5 px-2 py-1 rounded-md hover:bg-white/20 transition-colors text-xs font-medium"
+              @if (isMobile()) {
+                <!-- Mobile: barra fixa no fundo do ecrã, evita sobreposição com a barra nativa do iOS/Android -->
+                <div class="fixed bottom-0 left-0 right-0 z-50 bg-gray-900 text-white flex items-center justify-around px-4 py-3 shadow-2xl border-t border-gray-700 animate-in slide-in-from-bottom duration-150">
+                  <button
+                    (touchend)="requestImproveText($event)"
+                    class="flex items-center gap-2 px-4 py-2 rounded-lg active:bg-white/20 transition-colors text-sm font-medium"
+                  >
+                    <lucide-icon name="sparkles" class="h-4 w-4 text-purple-300"></lucide-icon>
+                    {{ 'DOCUMENT_EDITOR.IMPROVE_WITH_AI' | translate }}
+                  </button>
+                  <div class="w-px h-6 bg-gray-600"></div>
+                  <button
+                    (touchend)="addCommentSelection($event)"
+                    class="flex items-center gap-2 px-4 py-2 rounded-lg active:bg-white/20 transition-colors text-sm font-medium"
+                  >
+                    <lucide-icon name="message-square" class="h-4 w-4 text-blue-300"></lucide-icon>
+                    {{ 'DOCUMENT_EDITOR.ADD_COMMENT_BTN' | translate }}
+                  </button>
+                </div>
+              } @else {
+                <!-- Desktop: tooltip flutuante inline perto da seleção -->
+                <div
+                  class="fixed z-50 flex items-center gap-1 bg-gray-900 text-white rounded-lg shadow-xl px-2 py-1.5 animate-in fade-in"
+                  [style.top.px]="improveTooltipPosition().top"
+                  [style.left.px]="improveTooltipPosition().left"
                 >
-                  <lucide-icon name="sparkles" class="h-3.5 w-3.5 text-purple-300"></lucide-icon>
-                  {{ 'DOCUMENT_EDITOR.IMPROVE_WITH_AI' | translate }}
-                </button>
-                <button
-                  (mousedown)="addCommentSelection($event)"
-                  class="flex items-center gap-1.5 px-2 py-1 rounded-md hover:bg-white/20 transition-colors text-xs font-medium"
-                >
-                  <lucide-icon name="message-square" class="h-3.5 w-3.5 text-blue-300"></lucide-icon>
-                  {{ 'DOCUMENT_EDITOR.ADD_COMMENT_BTN' | translate }}
-                </button>
-              </div>
+                  <button
+                    (mousedown)="requestImproveText($event)"
+                    class="flex items-center gap-1.5 px-2 py-1 rounded-md hover:bg-white/20 transition-colors text-xs font-medium"
+                  >
+                    <lucide-icon name="sparkles" class="h-3.5 w-3.5 text-purple-300"></lucide-icon>
+                    {{ 'DOCUMENT_EDITOR.IMPROVE_WITH_AI' | translate }}
+                  </button>
+                  <button
+                    (mousedown)="addCommentSelection($event)"
+                    class="flex items-center gap-1.5 px-2 py-1 rounded-md hover:bg-white/20 transition-colors text-xs font-medium"
+                  >
+                    <lucide-icon name="message-square" class="h-3.5 w-3.5 text-blue-300"></lucide-icon>
+                    {{ 'DOCUMENT_EDITOR.ADD_COMMENT_BTN' | translate }}
+                  </button>
+                </div>
+              }
             }
 
 
@@ -1504,6 +1526,11 @@ export class DocumentEditorComponent implements OnInit {
   private selectedTextForImprove = '';
   private selectionBounds = { top: 0, left: 0, width: 0, height: 0 };
   private selectionRange: any = null;
+  readonly isMobile = signal(
+    typeof window !== 'undefined' &&
+    (new URLSearchParams(window.location.search).has('mobile') ||
+     window.matchMedia('(pointer: coarse) and (hover: none)').matches)
+  );
 
   // AI Generate Content
   showGeneratePanelModal = signal(false);
@@ -2337,7 +2364,7 @@ export class DocumentEditorComponent implements OnInit {
     }
   }
 
-  requestImproveText(event: MouseEvent): void {
+  requestImproveText(event: Event): void {
     event.preventDefault();
     event.stopPropagation();
 
@@ -2527,7 +2554,7 @@ export class DocumentEditorComponent implements OnInit {
 
 
   //---------------- comentarios------------------
-  addCommentSelection(event: MouseEvent): void {
+  addCommentSelection(event: Event): void {
     event.preventDefault();
     event.stopPropagation();
 
