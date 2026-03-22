@@ -530,25 +530,51 @@ import { diffWords } from 'diff';
                 </button>
               </div>
 
-              <!-- <div class="p-4 border-b border-gray-200">
+              <div class="p-4 border-b border-gray-200">
                 <textarea
                   [placeholder]="'DOCUMENT_EDITOR.ADD_COMMENT' | translate"
-                  [(ngModel)]="newComment"
+                  [(ngModel)]="panelTextBoxComment"
                   class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#155347] text-sm resize-none dark:bg-gray-700 dark:text-gray-100"
                   rows="3"
+                  #inlineCommentInput
+                  [(ngModel)]="inlineCommentText"
+                  (input)="updateInlineMentionSuggestions()"
+                  (click)="updateInlineMentionSuggestions()"
+                  (keyup)="updateInlineMentionSuggestions()"
+                  (keydown)="onInlineCommentKeydown($event)"
+                  [placeholder]="'DOCUMENT_EDITOR.ADD_COMMENT' | translate"
+                  rows="3"
+                  class="w-full px-2 py-1 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-[#155347] text-sm resize-none dark:bg-gray-700 dark:text-gray-100"
                 ></textarea>
+              
+                @if (showInlineMentionList()) {
+                  <div class="max-h-32 overflow-y-auto border border-gray-200 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 shadow-sm">
+                    @for (suggestion of inlineMentionSuggestions(); track suggestion.id; let i = $index) {
+                      <button
+                        type="button"
+                        class="w-full text-left px-2 py-1.5 text-xs hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
+                        [ngClass]="{ 'bg-gray-100 dark:bg-gray-600': i === activeInlineMentionIndex() }"
+                        (mousedown)="onInlineMentionMouseDown($event, i)"
+                      >
+                        <span class="font-medium text-gray-800 dark:text-gray-100">{{ suggestion.name }}</span>
+                        <span class="text-gray-400 ml-1">@{{ suggestion.tag }}</span>
+                      </button>
+                    }
+                  </div>
+                }
                 <div class="mt-2 flex justify-end">
                   <app-button
                     size="sm"
                     customClass="bg-[#155347] hover:bg-[#0d3d31]"
                     [leftIcon]="true"
-                    (onClick)="addComment()"
+                    (onClick)="addCommentFromPanel()"
+                    [disabled]="commentAdding() || !panelTextBoxComment.trim()"
                   >
                     <lucide-icon leftIcon name="send" class="h-3 w-3"></lucide-icon>
-                    Post
+                    {{ 'DOCUMENT_EDITOR.ADD_COMMENT_BTN' | translate }}
                   </app-button>
                 </div>
-              </div> -->
+              </div>
 
               <div class="flex-1 overflow-y-auto p-4 space-y-4">
                 @if (comments.length === 0) {
@@ -1447,7 +1473,7 @@ export class DocumentEditorComponent implements OnInit {
   isRestoreModalOpen = signal(false);
   isRestoring = signal(false);
   versionToRestore = signal<number | null>(null);
-  newComment = '';
+  panelTextBoxComment = '';
   selectedVersions = signal<number[]>([]);
   showCompareOverlay = signal(false);
   compareLoading = signal(false);
@@ -2628,6 +2654,43 @@ export class DocumentEditorComponent implements OnInit {
     this.showInlineCommentBox.set(false);
     this.inlineCommentText = '';
     this.hideInlineMentionSuggestions();
+  }
+
+  addCommentFromPanel(): void {
+    if (!this.panelTextBoxComment.trim()) return;
+
+    this.commentAdding.set(true);
+    const commentContent = this.panelTextBoxComment.trim();
+    const mentionedUserIds = this.getMentionedEditorUserIds(commentContent);
+
+    const newComment: CreateCommentDto = {
+      userId: this.user()?.id,
+      documentId: this.documentId!,
+      createdByColor: this.user()?.color,
+      content: commentContent,
+      mentionedUserIds,
+    };
+    //console.log('Creating comment with range:', newComment);
+    
+    
+    this.documentService.createComment(newComment, this.documentId!).pipe(
+      switchMap((comment) => {
+        this.panelTextBoxComment = '';
+        this.collaborationService.sendComment(this.documentId!, comment);
+        return this.documentService.getComments(this.documentId!);
+      })
+    ).subscribe({
+      next: (comments) => {
+        this.comments = comments;
+        this.commentAdding.set(false);
+        this.toastService.success(this.translateService.instant('DOCUMENT_EDITOR.COMMENT_ADDED'));
+      },
+      error: (err) => {
+        this.commentAdding.set(false);
+        this.toastService.error(this.translateService.instant('DOCUMENT_EDITOR.COMMENT_ERROR'));
+        console.error('Error creating comment:', err);
+      }
+    });
   }
 
  /*  onInlineCommentInput(): void {
