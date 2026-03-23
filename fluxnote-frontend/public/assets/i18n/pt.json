@@ -33,7 +33,8 @@
     "UNIT_YEAR": "ano",
     "UNIT_YEARS": "anos",
     "TIME_AGO_SUFFIX": "atrás",
-    "YESTERDAY": "ontem"
+    "YESTERDAY": "ontem",
+    "AND": "e"
   },
   "LANDING": {
     "HEADER": {
@@ -245,6 +246,19 @@
       "INVALID_LINK": "Link Inválido ou Expirado",
       "INVALID_LINK_DESC": "Este link de redefinição de palavra-passe é inválido ou expirou. Solicite um novo.",
       "REQUEST_NEW": "Solicitar Novo Link"
+    },
+    "EXTERNAL_CALLBACK": {
+      "PROCESSING": "A processar autenticação...",
+      "WAIT_MESSAGE": "Aguarde enquanto terminamos a sua autenticação.",
+      "FAIL_TITLE": "Falha na autenticação"
+    },
+    "EXTERNAL_ERROR": {
+      "ACCOUNT_ALREADY_LINKED": "Conta já associada",
+      "EXTERNAL_LOGIN_UNAVAILABLE": "Login externo indisponível",
+      "PROVIDER_ALREADY_LINKED_MSG": "Esta conta externa já está associada a outro utilizador.",
+      "EMAIL_NOT_PROVIDED_MSG": "Esta conta externa não forneceu um email.",
+      "GENERIC_ERROR_MSG": "Ocorreu um erro durante o processo de autenticação externa.",
+      "GO_BACK_LOGIN": "Voltar ao login"
     }
   },
   "SIDEBAR": {
@@ -570,6 +584,9 @@
     "DISCONNECT_GOOGLE_SAFE": "Desligar o Google desta conta? O seu perfil e documentos continuarão disponíveis.",
     "SAVE_CONFIRM_TITLE": "Confirmar Alterações",
     "SAVE_CONFIRM_DESC": "Tem a certeza que quer guardar estas alterações no seu perfil?",
+    "CHOOSE_IMAGE": "Escolher Imagem",
+    "IMAGE_URL_LABEL": "URL da Imagem",
+    "INVALID_IMAGE_URL": "URL de imagem inválido",
     "VALIDATION": {
       "FULL_NAME_REQUIRED": "O nome completo é obrigatório.",
       "MIN_2_CHARS": "Deve ter pelo menos 2 caracteres.",
@@ -905,7 +922,30 @@
     "INVITE_REVOKED": "Convite revogado",
     "INVITE_REVOKE_FAILED": "Erro ao revogar convite",
     "INVITES_CLEARED": "Convites utilizados removidos",
-    "INVITES_CLEAR_FAILED": "Falha ao remover alguns convites"
+    "INVITES_CLEAR_FAILED": "Falha ao remover alguns convites",
+    "EXTERNAL_LOGIN_FAILED": "Falha no login externo.",
+    "EXTERNAL_NO_TOKEN": "Nenhum token recebido do fornecedor externo.",
+    "PROFILE_UPDATED": "Perfil atualizado com sucesso.",
+    "PROFILE_UPDATE_FAILED": "Falha ao atualizar o perfil.",
+    "PROFILE_PICTURE_UPDATED": "Foto de perfil atualizada com sucesso.",
+    "PROFILE_PICTURE_UPDATE_FAILED": "Falha ao atualizar a foto de perfil.",
+    "SERVER_ERROR": "Erro do servidor. Verifique a sua ligação à internet ou tente novamente mais tarde.",
+    "UNABLE_TO_CONNECT": "Não foi possível ligar ao servidor.",
+    "TOO_MANY_LOGIN_ATTEMPTS": "Demasiadas tentativas de login. Tente novamente em {{time}}.",
+    "RATE_LIMIT_EXCEEDED": "Limite de pedidos excedido. Tente após {{time}}.",
+    "LOGIN_FAILED_GENERIC": "Falha no login. Por favor tente novamente.",
+    "INTERNAL_ERROR": "Erro interno.",
+    "TOO_MANY_REGISTER_ATTEMPTS": "Demasiadas tentativas de registo. Tente novamente em {{time}}.",
+    "REGISTER_FAILED_GENERIC": "Falha ao criar conta. Por favor tente novamente.",
+    "PASSWORD_RESET_FAILED": "Falha ao redefinir a palavra-passe.",
+    "NOT_AUTHENTICATED": "Não autenticado.",
+    "PLEASE_LOGIN_AGAIN": "Por favor inicie sessão novamente.",
+    "SERVER_ERROR_CONNECTION": "Erro do servidor. Verifique a sua ligação à internet.",
+    "SESSION_EXPIRED": "Sessão expirada.",
+    "PROFILE_UPDATE_FAILED_GENERIC": "Falha ao atualizar o perfil.",
+    "PASSWORD_CHANGED": "Palavra-passe alterada com sucesso.",
+    "PASSWORD_CHANGE_FAILED": "Falha ao alterar a palavra-passe.",
+    "USERNAME_CHECK_FAILED": "Falha ao verificar disponibilidade do nome de utilizador."
   },
   "SHARE_MODAL": {
     "SHARE_DOCUMENT": "Partilhar Documento",

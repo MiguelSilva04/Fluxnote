@@ -33,7 +33,8 @@
     "UNIT_YEAR": "year",
     "UNIT_YEARS": "years",
     "TIME_AGO_SUFFIX": "ago",
-    "YESTERDAY": "yesterday"
+    "YESTERDAY": "yesterday",
+    "AND": "and"
   },
   "LANDING": {
     "HEADER": {
@@ -245,6 +246,19 @@
       "INVALID_LINK": "Invalid or Expired Link",
       "INVALID_LINK_DESC": "This password reset link is invalid or has expired. Please request a new one.",
       "REQUEST_NEW": "Request New Link"
+    },
+    "EXTERNAL_CALLBACK": {
+      "PROCESSING": "Processing authentication...",
+      "WAIT_MESSAGE": "Wait while we finish your authentication.",
+      "FAIL_TITLE": "Authentication failed"
+    },
+    "EXTERNAL_ERROR": {
+      "ACCOUNT_ALREADY_LINKED": "Account already linked",
+      "EXTERNAL_LOGIN_UNAVAILABLE": "External Login unavailable",
+      "PROVIDER_ALREADY_LINKED_MSG": "This external account is already linked to another user.",
+      "EMAIL_NOT_PROVIDED_MSG": "This external account did not provide an email.",
+      "GENERIC_ERROR_MSG": "An error occurred during the external authentication process.",
+      "GO_BACK_LOGIN": "Go back to login"
     }
   },
   "SIDEBAR": {
@@ -570,6 +584,9 @@
     "DISCONNECT_GOOGLE_SAFE": "Disconnect Google from this account? Your profile and documents will remain available.",
     "SAVE_CONFIRM_TITLE": "Confirm Changes",
     "SAVE_CONFIRM_DESC": "Are you sure you want to save these changes to your profile?",
+    "CHOOSE_IMAGE": "Choose Image",
+    "IMAGE_URL_LABEL": "Image URL",
+    "INVALID_IMAGE_URL": "Invalid image URL",
     "VALIDATION": {
       "FULL_NAME_REQUIRED": "Full name is required.",
       "MIN_2_CHARS": "Must be at least 2 characters.",
@@ -905,7 +922,30 @@
     "INVITE_REVOKED": "Invite revoked",
     "INVITE_REVOKE_FAILED": "Error revoking invite",
     "INVITES_CLEARED": "Used invites cleared",
-    "INVITES_CLEAR_FAILED": "Failed to clear some invites"
+    "INVITES_CLEAR_FAILED": "Failed to clear some invites",
+    "EXTERNAL_LOGIN_FAILED": "External login failed.",
+    "EXTERNAL_NO_TOKEN": "No token received from external provider.",
+    "PROFILE_UPDATED": "Profile updated successfully.",
+    "PROFILE_UPDATE_FAILED": "Failed to update profile.",
+    "PROFILE_PICTURE_UPDATED": "Profile picture updated successfully.",
+    "PROFILE_PICTURE_UPDATE_FAILED": "Failed to update profile picture.",
+    "SERVER_ERROR": "Server error. Check your internet connection or try again later.",
+    "UNABLE_TO_CONNECT": "Unable to connect to the server.",
+    "TOO_MANY_LOGIN_ATTEMPTS": "Too many login attempts. Please try again in {{time}}.",
+    "RATE_LIMIT_EXCEEDED": "Rate limit exceeded. Retry after {{time}}.",
+    "LOGIN_FAILED_GENERIC": "Login failed. Please try again.",
+    "INTERNAL_ERROR": "Internal error.",
+    "TOO_MANY_REGISTER_ATTEMPTS": "Too many registration attempts. Please try again in {{time}}.",
+    "REGISTER_FAILED_GENERIC": "Failed to create account. Please try again.",
+    "PASSWORD_RESET_FAILED": "Password reset failed.",
+    "NOT_AUTHENTICATED": "Not authenticated.",
+    "PLEASE_LOGIN_AGAIN": "Please log in again.",
+    "SERVER_ERROR_CONNECTION": "Server error. Check your internet connection.",
+    "SESSION_EXPIRED": "Session expired.",
+    "PROFILE_UPDATE_FAILED_GENERIC": "Failed to update profile.",
+    "PASSWORD_CHANGED": "Password changed successfully.",
+    "PASSWORD_CHANGE_FAILED": "Failed to change password.",
+    "USERNAME_CHECK_FAILED": "Failed to check username availability."
   },
   "SHARE_MODAL": {
     "SHARE_DOCUMENT": "Share Document",

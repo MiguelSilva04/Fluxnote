@@ -446,7 +446,7 @@ import { firstValueFrom } from 'rxjs';
               <!-- File Upload Mode -->
               @if (uploadMode() === 'file') {
                 <div>
-                  <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Choose Image</label>
+                  <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{{ 'PROFILE.CHOOSE_IMAGE' | translate }}</label>
                   <div
                     [class]="
                       'border-2 border-dashed rounded-lg p-6 text-center transition-colors cursor-pointer ' +
@@ -502,7 +502,7 @@ import { firstValueFrom } from 'rxjs';
               <!-- URL Mode -->
               @if (uploadMode() === 'url') {
                 <div>
-                  <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Image URL</label>
+                  <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{{ 'PROFILE.IMAGE_URL_LABEL' | translate }}</label>
                   <input
                     type="url"
                     [(ngModel)]="avatarUrl"
@@ -522,7 +522,7 @@ import { firstValueFrom } from 'rxjs';
                       (load)="avatarUrlError.set(false)"
                     />
                     @if (avatarUrlError()) {
-                      <p class="text-xs text-red-500 mt-2">Invalid image URL</p>
+                      <p class="text-xs text-red-500 mt-2">{{ 'PROFILE.INVALID_IMAGE_URL' | translate }}</p>
                     }
                   </div>
                 }
@@ -1121,13 +1121,13 @@ export class ProfileComponent {
     const result = await this.authService.updateProfile(request);
 
     if (result.success) {
-      this.successMessage.set(result.message || 'Profile updated successfully.');
+      this.successMessage.set(result.message || this.translateService.instant('TOASTS.PROFILE_UPDATED'));
       // Update original data to reflect saved state
       this.originalData = { ...current };
       this.avatarPreview.set(null);
     } else {
       this.errorMessage.set(
-        result.errors?.join(', ') || result.message || 'Failed to update profile.',
+        result.errors?.join(', ') || result.message || this.translateService.instant('TOASTS.PROFILE_UPDATE_FAILED'),
       );
     }
 
@@ -1254,12 +1254,12 @@ export class ProfileComponent {
       }));
       this.originalData.profilePictureUrl = profilePictureUrl;
       this.avatarPreview.set(null);
-      this.successMessage.set('Profile picture updated successfully.');
+      this.successMessage.set(this.translateService.instant('TOASTS.PROFILE_PICTURE_UPDATED'));
       this.closeAvatarModal();
       this.autoHideMessages();
     } else {
       this.errorMessage.set(
-        result.errors?.join(', ') || result.message || 'Failed to update profile picture.',
+        result.errors?.join(', ') || result.message || this.translateService.instant('TOASTS.PROFILE_PICTURE_UPDATE_FAILED'),
       );
       this.autoHideMessages();
     }

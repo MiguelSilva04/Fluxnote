@@ -2,6 +2,7 @@ import { Injectable, signal, computed, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
+import { TranslateService } from '@ngx-translate/core';
 import { User } from '../models';
 import { LanguageService } from './language.service';
 
@@ -239,6 +240,7 @@ export class AuthService {
   constructor(private router: Router, private http: HttpClient) { }
 
   private languageService = inject(LanguageService);
+  private translateService = inject(TranslateService);
 
   /**
    * inicia autenticação externa e redireciona o browser para o backend.
@@ -306,7 +308,7 @@ export class AuthService {
 
     const accessToken = params.get('access_token');
     if (!accessToken) {
-      return { success: false, error: 'No token received from external provider.' };
+      return { success: false, error: this.translateService.instant('TOASTS.EXTERNAL_NO_TOKEN') };
     }
 
     this._accessToken.set(accessToken);
@@ -327,13 +329,18 @@ export class AuthService {
     const minutes = Math.floor(totalSeconds / 60);
     const seconds = totalSeconds % 60;
 
+    const t = (key: string) => this.translateService.instant(`COMMON.${key}`);
+    const secLabel = seconds !== 1 ? t('UNIT_SECONDS') : t('UNIT_SECOND');
+    const minLabel = minutes !== 1 ? t('UNIT_MINUTES') : t('UNIT_MINUTE');
+    const andWord = t('AND');
+
     if (minutes === 0) {
-      return `${seconds} second${seconds !== 1 ? 's' : ''}`;
+      return `${seconds} ${secLabel}`;
     }
     if (seconds === 0) {
-      return `${minutes} minute${minutes !== 1 ? 's' : ''}`;
+      return `${minutes} ${minLabel}`;
     }
-    return `${minutes} minute${minutes !== 1 ? 's' : ''} and ${seconds} second${seconds !== 1 ? 's' : ''}`;
+    return `${minutes} ${minLabel} ${andWord} ${seconds} ${secLabel}`;
   }
 
   /**
@@ -523,8 +530,8 @@ export class AuthService {
         // Servidor não está acessível (offline, CORS, etc.)
         return {
           success: false,
-          message: 'Server error. Check your internet connection or try again later.',
-          errors: ['Unable to connect to the server.']
+          message: this.translateService.instant('TOASTS.SERVER_ERROR'),
+          errors: [this.translateService.instant('TOASTS.UNABLE_TO_CONNECT')]
         };
       }
 
@@ -535,8 +542,8 @@ export class AuthService {
         const timeMessage = this.formatRetryTime(totalSeconds);
         return {
           success: false,
-          message: `Too many login attempts. Please try again in ${timeMessage}.`,
-          errors: [`Rate limit exceeded. Retry after ${timeMessage}.`]
+          message: this.translateService.instant('TOASTS.TOO_MANY_LOGIN_ATTEMPTS', { time: timeMessage }),
+          errors: [this.translateService.instant('TOASTS.RATE_LIMIT_EXCEEDED', { time: timeMessage })]
         };
       }
 
@@ -544,8 +551,8 @@ export class AuthService {
       const errorBody = error.error || {};
       return {
         success: false,
-        message: errorBody.message || 'Login failed. Please try again.',
-        errors: errorBody.errors || [errorBody.message || 'Internal error.']
+        message: errorBody.message || this.translateService.instant('TOASTS.LOGIN_FAILED_GENERIC'),
+        errors: errorBody.errors || [errorBody.message || this.translateService.instant('TOASTS.INTERNAL_ERROR')]
       };
     } finally {
       this._isLoading.set(false);
@@ -593,9 +600,9 @@ export class AuthService {
       if (error.status === 0) {
         // Servidor não está acessível (offline, CORS, etc.)
         return {
-          message: 'Server error. Check your internet connection or try again later.',
+          message: this.translateService.instant('TOASTS.SERVER_ERROR'),
           status: 'error',
-          errors: ['Unable to connect to the server.']
+          errors: [this.translateService.instant('TOASTS.UNABLE_TO_CONNECT')]
         };
       }
 
@@ -605,18 +612,18 @@ export class AuthService {
         const totalSeconds = retryAfter ? parseInt(retryAfter, 10) : 3600; // default 1 hora
         const timeMessage = this.formatRetryTime(totalSeconds);
         return {
-          message: `Too many registration attempts. Please try again in ${timeMessage}.`,
+          message: this.translateService.instant('TOASTS.TOO_MANY_REGISTER_ATTEMPTS', { time: timeMessage }),
           status: 'error',
-          errors: [`Rate limit exceeded. Retry after ${timeMessage}.`]
+          errors: [this.translateService.instant('TOASTS.RATE_LIMIT_EXCEEDED', { time: timeMessage })]
         };
       }
 
       // O backend retorna { message, errors } no corpo da resposta
       const errorBody = error.error || {};
       return {
-        message: errorBody.message || 'Failed to create account. Please try again.',
+        message: errorBody.message || this.translateService.instant('TOASTS.REGISTER_FAILED_GENERIC'),
         status: 'error',
-        errors: errorBody.errors || [errorBody.message || 'Internal error.']
+        errors: errorBody.errors || [errorBody.message || this.translateService.instant('TOASTS.INTERNAL_ERROR')]
       };
     } finally {
       this._isLoading.set(false);
@@ -819,7 +826,7 @@ export class AuthService {
       const body = err?.error;
       return {
         success: false,
-        message: body?.message ?? 'Password reset failed.',
+        message: body?.message ?? this.translateService.instant('TOASTS.PASSWORD_RESET_FAILED'),
         errors: body?.errors ?? [],
       };
     } finally {
@@ -839,7 +846,7 @@ export class AuthService {
     try {
       const token = this.getAccessToken();
       if (!token) {
-        return { success: false, message: 'Not authenticated.', errors: ['Please log in again.'] };
+        return { success: false, message: this.translateService.instant('TOASTS.NOT_AUTHENTICATED'), errors: [this.translateService.instant('TOASTS.PLEASE_LOGIN_AGAIN')] };
       }
 
       const res = await firstValueFrom(
@@ -866,29 +873,29 @@ export class AuthService {
       };
       this._currentUser.set(updatedUser);
 
-      return { success: true, message: 'Profile updated successfully.' };
+      return { success: true, message: this.translateService.instant('TOASTS.PROFILE_UPDATED') };
     } catch (error: any) {
       if (error.status === 0) {
         return {
           success: false,
-          message: 'Server error. Check your internet connection.',
-          errors: ['Unable to connect to the server.']
+          message: this.translateService.instant('TOASTS.SERVER_ERROR_CONNECTION'),
+          errors: [this.translateService.instant('TOASTS.UNABLE_TO_CONNECT')]
         };
       }
 
       if (error.status === 401) {
         return {
           success: false,
-          message: 'Session expired.',
-          errors: ['Please log in again.']
+          message: this.translateService.instant('TOASTS.SESSION_EXPIRED'),
+          errors: [this.translateService.instant('TOASTS.PLEASE_LOGIN_AGAIN')]
         };
       }
 
       const errorBody = error.error || {};
       return {
         success: false,
-        message: errorBody.message || 'Failed to update profile.',
-        errors: errorBody.errors || [errorBody.message || 'Internal error.']
+        message: errorBody.message || this.translateService.instant('TOASTS.PROFILE_UPDATE_FAILED_GENERIC'),
+        errors: errorBody.errors || [errorBody.message || this.translateService.instant('TOASTS.INTERNAL_ERROR')]
       };
     } finally {
       this._isLoading.set(false);
@@ -907,7 +914,7 @@ export class AuthService {
     try {
       const token = this.getAccessToken();
       if (!token) {
-        return { success: false, message: 'Not authenticated.', errors: ['Please log in again.'] };
+        return { success: false, message: this.translateService.instant('TOASTS.NOT_AUTHENTICATED'), errors: [this.translateService.instant('TOASTS.PLEASE_LOGIN_AGAIN')] };
       }
 
       await firstValueFrom(
@@ -916,29 +923,29 @@ export class AuthService {
         })
       );
 
-      return { success: true, message: 'Password changed successfully.' };
+      return { success: true, message: this.translateService.instant('TOASTS.PASSWORD_CHANGED') };
     } catch (error: any) {
       if (error.status === 0) {
         return {
           success: false,
-          message: 'Server error. Check your internet connection.',
-          errors: ['Unable to connect to the server.']
+          message: this.translateService.instant('TOASTS.SERVER_ERROR_CONNECTION'),
+          errors: [this.translateService.instant('TOASTS.UNABLE_TO_CONNECT')]
         };
       }
 
       if (error.status === 401) {
         return {
           success: false,
-          message: 'Session expired.',
-          errors: ['Please log in again.']
+          message: this.translateService.instant('TOASTS.SESSION_EXPIRED'),
+          errors: [this.translateService.instant('TOASTS.PLEASE_LOGIN_AGAIN')]
         };
       }
 
       const errorBody = error.error || {};
       return {
         success: false,
-        message: errorBody.message || 'Failed to change password.',
-        errors: errorBody.errors || [errorBody.message || 'Internal error.']
+        message: errorBody.message || this.translateService.instant('TOASTS.PASSWORD_CHANGE_FAILED'),
+        errors: errorBody.errors || [errorBody.message || this.translateService.instant('TOASTS.INTERNAL_ERROR')]
       };
     } finally {
       this._isLoading.set(false);
@@ -956,7 +963,7 @@ export class AuthService {
     try {
       const token = this.getAccessToken();
       if (!token) {
-        return { available: false, message: 'Not authenticated.' };
+        return { available: false, message: this.translateService.instant('TOASTS.NOT_AUTHENTICATED') };
       }
 
       const res = await firstValueFrom(
@@ -971,7 +978,7 @@ export class AuthService {
       const errorBody = error.error || {};
       return {
         available: false,
-        message: errorBody.message || 'Failed to check username availability.'
+        message: errorBody.message || this.translateService.instant('TOASTS.USERNAME_CHECK_FAILED')
       };
     }
   }
