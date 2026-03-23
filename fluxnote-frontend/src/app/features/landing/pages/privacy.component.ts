@@ -1,11 +1,12 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { TranslateModule } from '@ngx-translate/core';
 import { LandingHeaderComponent, LandingFooterComponent } from '../components';
 
 @Component({
   selector: 'app-privacy',
   standalone: true,
-  imports: [CommonModule, LandingHeaderComponent, LandingFooterComponent],
+  imports: [CommonModule, TranslateModule, LandingHeaderComponent, LandingFooterComponent],
   template: `
     <div class="min-h-screen bg-white dark:bg-gray-900">
       <app-landing-header></app-landing-header>
@@ -14,145 +15,142 @@ import { LandingHeaderComponent, LandingFooterComponent } from '../components';
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div class="text-center mb-16">
             <h1 class="text-4xl lg:text-5xl font-bold text-gray-900 dark:text-gray-100 mb-6">
-              Privacy Policy
+              {{ 'LANDING.PRIVACY.TITLE' | translate }}
             </h1>
             <p class="text-xl text-gray-600 dark:text-gray-400">
-              Last updated: March 2026
+              {{ 'LANDING.PRIVACY.UPDATED' | translate }}
             </p>
           </div>
 
           <div class="prose prose-lg max-w-none">
             <div class="bg-[#155347]/10 border border-[#155347]/30 rounded-2xl p-8 mb-8">
-              <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">Policy summary</h2>
+              <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">{{ 'LANDING.PRIVACY.SUMMARY_TITLE' | translate }}</h2>
               <p class="text-gray-700 dark:text-gray-300">
-                At Fluxnote, your privacy is fundamental. We collect only the data necessary to
-                provide our service, we never sell your information to third parties, and we give you
-                full control over your data.
+                {{ 'LANDING.PRIVACY.SUMMARY_TEXT' | translate }}
               </p>
             </div>
 
             <div class="space-y-8">
               <section>
-                <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">1. Information we collect</h2>
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">{{ 'LANDING.PRIVACY.S1_TITLE' | translate }}</h2>
                 <div class="bg-gray-50 dark:bg-gray-800 rounded-xl p-6">
-                  <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">Account information</h3>
+                  <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">{{ 'LANDING.PRIVACY.S1_ACCOUNT_TITLE' | translate }}</h3>
                   <ul class="list-disc list-inside text-gray-700 dark:text-gray-300 space-y-2">
-                    <li>Full name and email address</li>
-                    <li>Password (encrypted)</li>
-                    <li>Optional profile information</li>
+                    <li>{{ 'LANDING.PRIVACY.S1_ACCOUNT_1' | translate }}</li>
+                    <li>{{ 'LANDING.PRIVACY.S1_ACCOUNT_2' | translate }}</li>
+                    <li>{{ 'LANDING.PRIVACY.S1_ACCOUNT_3' | translate }}</li>
                   </ul>
                 </div>
 
                 <div class="bg-gray-50 dark:bg-gray-800 rounded-xl p-6 mt-4">
-                  <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">Content and documents</h3>
+                  <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">{{ 'LANDING.PRIVACY.S1_CONTENT_TITLE' | translate }}</h3>
                   <ul class="list-disc list-inside text-gray-700 dark:text-gray-300 space-y-2">
-                    <li>Documents created and edited on the platform</li>
-                    <li>Comments and suggestions</li>
-                    <li>Document version history</li>
+                    <li>{{ 'LANDING.PRIVACY.S1_CONTENT_1' | translate }}</li>
+                    <li>{{ 'LANDING.PRIVACY.S1_CONTENT_2' | translate }}</li>
+                    <li>{{ 'LANDING.PRIVACY.S1_CONTENT_3' | translate }}</li>
                   </ul>
                 </div>
 
                 <div class="bg-gray-50 dark:bg-gray-800 rounded-xl p-6 mt-4">
-                  <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">Usage data</h3>
+                  <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">{{ 'LANDING.PRIVACY.S1_USAGE_TITLE' | translate }}</h3>
                   <ul class="list-disc list-inside text-gray-700 dark:text-gray-300 space-y-2">
-                    <li>Information about how you use the service</li>
-                    <li>Performance and diagnostic data</li>
-                    <li>IP address and device information</li>
+                    <li>{{ 'LANDING.PRIVACY.S1_USAGE_1' | translate }}</li>
+                    <li>{{ 'LANDING.PRIVACY.S1_USAGE_2' | translate }}</li>
+                    <li>{{ 'LANDING.PRIVACY.S1_USAGE_3' | translate }}</li>
                   </ul>
                 </div>
               </section>
 
               <section>
-                <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">2. How we use your information</h2>
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">{{ 'LANDING.PRIVACY.S2_TITLE' | translate }}</h2>
                 <div class="grid md:grid-cols-2 gap-6">
                   <div class="bg-[#155347]/10 rounded-xl p-6">
-                    <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">Providing the service</h3>
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">{{ 'LANDING.PRIVACY.S2_SERVICE_TITLE' | translate }}</h3>
                     <ul class="list-disc list-inside text-gray-700 dark:text-gray-300 space-y-2">
-                      <li>Create and maintain your account</li>
-                      <li>Process and store documents</li>
-                      <li>Enable real-time collaboration</li>
+                      <li>{{ 'LANDING.PRIVACY.S2_SERVICE_1' | translate }}</li>
+                      <li>{{ 'LANDING.PRIVACY.S2_SERVICE_2' | translate }}</li>
+                      <li>{{ 'LANDING.PRIVACY.S2_SERVICE_3' | translate }}</li>
                     </ul>
                   </div>
 
                   <div class="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-6">
-                    <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">Improving the product</h3>
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">{{ 'LANDING.PRIVACY.S2_IMPROVE_TITLE' | translate }}</h3>
                     <ul class="list-disc list-inside text-gray-700 dark:text-gray-300 space-y-2">
-                      <li>Analyze usage patterns</li>
-                      <li>Develop new features</li>
-                      <li>Improve AI performance</li>
+                      <li>{{ 'LANDING.PRIVACY.S2_IMPROVE_1' | translate }}</li>
+                      <li>{{ 'LANDING.PRIVACY.S2_IMPROVE_2' | translate }}</li>
+                      <li>{{ 'LANDING.PRIVACY.S2_IMPROVE_3' | translate }}</li>
                     </ul>
                   </div>
                 </div>
               </section>
 
               <section>
-                <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">3. Sharing information</h2>
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">{{ 'LANDING.PRIVACY.S3_TITLE' | translate }}</h2>
                 <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-6">
-                  <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">We never sell your data</h3>
+                  <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">{{ 'LANDING.PRIVACY.S3_NEVER_TITLE' | translate }}</h3>
                   <p class="text-gray-700 dark:text-gray-300 mb-4">
-                    Fluxnote never sells, rents, or trades your personal information to third parties.
+                    {{ 'LANDING.PRIVACY.S3_NEVER_TEXT' | translate }}
                   </p>
                   <p class="text-gray-700 dark:text-gray-300">
-                    We only share information in very specific circumstances:
+                    {{ 'LANDING.PRIVACY.S3_SHARE_INTRO' | translate }}
                   </p>
                   <ul class="list-disc list-inside text-gray-700 dark:text-gray-300 mt-3 space-y-1">
-                    <li>With your explicit consent</li>
-                    <li>To comply with legal obligations</li>
-                    <li>With essential service providers (under confidentiality agreements)</li>
+                    <li>{{ 'LANDING.PRIVACY.S3_SHARE_1' | translate }}</li>
+                    <li>{{ 'LANDING.PRIVACY.S3_SHARE_2' | translate }}</li>
+                    <li>{{ 'LANDING.PRIVACY.S3_SHARE_3' | translate }}</li>
                   </ul>
                 </div>
               </section>
 
               <section>
-                <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">4. Data security</h2>
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">{{ 'LANDING.PRIVACY.S4_TITLE' | translate }}</h2>
                 <div class="grid md:grid-cols-3 gap-6">
                   <div class="bg-gray-50 dark:bg-gray-800 rounded-xl p-6 text-center">
                     <div class="text-3xl mb-3">🔒</div>
-                    <h3 class="font-semibold text-gray-900 dark:text-gray-100 mb-2">Encryption</h3>
-                    <p class="text-gray-700 dark:text-gray-300 text-sm">All data is encrypted in transit and at rest</p>
+                    <h3 class="font-semibold text-gray-900 dark:text-gray-100 mb-2">{{ 'LANDING.PRIVACY.S4_ENCRYPTION_TITLE' | translate }}</h3>
+                    <p class="text-gray-700 dark:text-gray-300 text-sm">{{ 'LANDING.PRIVACY.S4_ENCRYPTION_DESC' | translate }}</p>
                   </div>
 
                   <div class="bg-gray-50 dark:bg-gray-800 rounded-xl p-6 text-center">
                     <div class="text-3xl mb-3">🛡️</div>
-                    <h3 class="font-semibold text-gray-900 dark:text-gray-100 mb-2">Controlled access</h3>
-                    <p class="text-gray-700 dark:text-gray-300 text-sm">Access limited to authorized personnel only</p>
+                    <h3 class="font-semibold text-gray-900 dark:text-gray-100 mb-2">{{ 'LANDING.PRIVACY.S4_ACCESS_TITLE' | translate }}</h3>
+                    <p class="text-gray-700 dark:text-gray-300 text-sm">{{ 'LANDING.PRIVACY.S4_ACCESS_DESC' | translate }}</p>
                   </div>
 
                   <div class="bg-gray-50 dark:bg-gray-800 rounded-xl p-6 text-center">
                     <div class="text-3xl mb-3">🔍</div>
-                    <h3 class="font-semibold text-gray-900 dark:text-gray-100 mb-2">Monitoring</h3>
-                    <p class="text-gray-700 dark:text-gray-300 text-sm">Continuous security monitoring</p>
+                    <h3 class="font-semibold text-gray-900 dark:text-gray-100 mb-2">{{ 'LANDING.PRIVACY.S4_MONITORING_TITLE' | translate }}</h3>
+                    <p class="text-gray-700 dark:text-gray-300 text-sm">{{ 'LANDING.PRIVACY.S4_MONITORING_DESC' | translate }}</p>
                   </div>
                 </div>
               </section>
 
               <section>
-                <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">5. Your rights</h2>
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">{{ 'LANDING.PRIVACY.S5_TITLE' | translate }}</h2>
                 <div class="bg-[#155347]/10 rounded-xl p-6">
                   <p class="text-gray-700 dark:text-gray-300 mb-4">
-                    In accordance with GDPR and other data protection laws, you have the following rights:
+                    {{ 'LANDING.PRIVACY.S5_INTRO' | translate }}
                   </p>
                   <div class="grid md:grid-cols-2 gap-4">
                     <ul class="list-disc list-inside text-gray-700 dark:text-gray-300 space-y-2">
-                      <li>Access to your personal data</li>
-                      <li>Correction of inaccurate information</li>
-                      <li>Deletion of your data</li>
+                      <li>{{ 'LANDING.PRIVACY.S5_RIGHT_1' | translate }}</li>
+                      <li>{{ 'LANDING.PRIVACY.S5_RIGHT_2' | translate }}</li>
+                      <li>{{ 'LANDING.PRIVACY.S5_RIGHT_3' | translate }}</li>
                     </ul>
                     <ul class="list-disc list-inside text-gray-700 dark:text-gray-300 space-y-2">
-                      <li>Data portability</li>
-                      <li>Restriction of processing</li>
-                      <li>Objection to processing</li>
+                      <li>{{ 'LANDING.PRIVACY.S5_RIGHT_4' | translate }}</li>
+                      <li>{{ 'LANDING.PRIVACY.S5_RIGHT_5' | translate }}</li>
+                      <li>{{ 'LANDING.PRIVACY.S5_RIGHT_6' | translate }}</li>
                     </ul>
                   </div>
                 </div>
               </section>
 
               <section>
-                <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">6. Contact</h2>
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">{{ 'LANDING.PRIVACY.S6_TITLE' | translate }}</h2>
                 <div class="bg-gray-50 dark:bg-gray-800 rounded-xl p-6">
                   <p class="text-gray-700 dark:text-gray-300">
-                    Fluxnote is currently an academic project developed at Escola Superior de Tecnologia de Setúbal.
-                    A dedicated privacy contact channel is not yet available.
+                    {{ 'LANDING.PRIVACY.S6_TEXT' | translate }}
                   </p>
                 </div>
               </section>

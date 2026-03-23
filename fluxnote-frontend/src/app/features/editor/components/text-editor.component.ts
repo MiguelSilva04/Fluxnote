@@ -156,6 +156,7 @@ export class TextEditorComponent implements OnInit, AfterViewInit, OnDestroy {
   private snapshotInterval?: ReturnType<typeof setInterval>;
   private awarenessInterval?: ReturnType<typeof setInterval>;
   private colorIndex = 0;
+  private mobileSelectionListener: (() => void) | null = null;
   // Mapa connectionId → elemento DOM do cursor no editor
   private collaboratorCursors = new Map<string, HTMLElement>();
   // Scroll: re-render cursors when the local user scrolls (fixed-position cursors go stale)
@@ -197,6 +198,9 @@ export class TextEditorComponent implements OnInit, AfterViewInit, OnDestroy {
   ngOnDestroy(): void {
     document.removeEventListener('click', this.handleClickOutside.bind(this));
     document.removeEventListener('scroll', this.onScroll, true);
+    if (this.mobileSelectionListener) {
+      document.removeEventListener('selectionchange', this.mobileSelectionListener);
+    }
     if (this.scrollRafId !== null) cancelAnimationFrame(this.scrollRafId);
 
     // Limpar intervalos
@@ -402,6 +406,12 @@ export class TextEditorComponent implements OnInit, AfterViewInit, OnDestroy {
     this.quill.root.addEventListener('keyup', () => {
       this.updateActiveFormats();
     });
+
+    // Em mobile, prevenir o menu contextual nativo do SO para que o tooltip
+    // personalizado da plataforma não seja sobreposto pelo popup do Android/iOS
+    if ('ontouchstart' in window) {
+      this.quill.root.addEventListener('contextmenu', (e: Event) => e.preventDefault());
+    }
 
     // Emitir eventos de seleção para o componente pai (tooltip de Improve)
     this.setupSelectionChangeEmitter();
@@ -880,6 +890,20 @@ export class TextEditorComponent implements OnInit, AfterViewInit, OnDestroy {
 
     // Reagir a mudanças de cursor/seleção
     this.quill.on('selection-change', (range: any) => evaluate(range));
+
+    // Fallback mobile: quando o utilizador arrasta os handles nativos do iOS/Android,
+    // o Quill pode não disparar 'selection-change' — escutar o evento nativo do documento
+    if ('ontouchstart' in window) {
+      this.mobileSelectionListener = () => {
+        const sel = window.getSelection();
+        if (!sel || sel.rangeCount === 0) { evaluate(null); return; }
+        const nativeRange = sel.getRangeAt(0);
+        if (!this.quill.root.contains(nativeRange.commonAncestorContainer)) { evaluate(null); return; }
+        // Pequeno delay para garantir que o Quill já atualizou o seu estado interno
+        setTimeout(() => evaluate(this.quill.getSelection()), 80);
+      };
+      document.addEventListener('selectionchange', this.mobileSelectionListener);
+    }
 
     // Reagir a mudanças de conteúdo (ex: apagar até linha ficar vazia, Enter para nova linha)
     this.quill.on('text-change', () => {

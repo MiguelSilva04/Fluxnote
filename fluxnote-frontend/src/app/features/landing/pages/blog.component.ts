@@ -1,11 +1,12 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { TranslateModule } from '@ngx-translate/core';
 import { LandingHeaderComponent, LandingFooterComponent } from '../components';
 
 @Component({
   selector: 'app-blog',
   standalone: true,
-  imports: [CommonModule, LandingHeaderComponent, LandingFooterComponent],
+  imports: [CommonModule, TranslateModule, LandingHeaderComponent, LandingFooterComponent],
   template: `
     <div class="min-h-screen bg-white dark:bg-gray-900">
       <app-landing-header></app-landing-header>
@@ -13,13 +14,12 @@ import { LandingHeaderComponent, LandingFooterComponent } from '../components';
       <section class="py-20 bg-gradient-to-br from-[#155347]/10 to-white dark:to-gray-900">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div class="text-center mb-12">
-            <span class="inline-block bg-[#155347] text-white text-sm font-semibold px-4 py-1.5 rounded-full mb-6">Coming soon</span>
+            <span class="inline-block bg-[#155347] text-white text-sm font-semibold px-4 py-1.5 rounded-full mb-6">{{ 'LANDING.BLOG.COMING_SOON_BADGE' | translate }}</span>
             <h1 class="text-4xl lg:text-5xl font-bold text-gray-900 dark:text-gray-100 mb-6">
-              Fluxnote Blog
+              {{ 'LANDING.BLOG.TITLE' | translate }}
             </h1>
             <p class="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
-              Insights, tips, and updates on collaboration, artificial intelligence,
-              and productivity in modern work.
+              {{ 'LANDING.BLOG.DESCRIPTION' | translate }}
             </p>
           </div>
 
@@ -30,10 +30,10 @@ import { LandingHeaderComponent, LandingFooterComponent } from '../components';
               </svg>
             </div>
             <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-3">
-              The blog is coming soon
+              {{ 'LANDING.BLOG.CARD_TITLE' | translate }}
             </h2>
             <p class="text-gray-600 dark:text-gray-400">
-              We're working on articles about collaboration, productivity, and the story behind Fluxnote. Stay tuned!
+              {{ 'LANDING.BLOG.CARD_DESC' | translate }}
             </p>
           </div>
         </div>

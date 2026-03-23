@@ -1,11 +1,12 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { TranslateModule } from '@ngx-translate/core';
 import { LandingHeaderComponent, LandingFooterComponent } from '../components';
 
 @Component({
   selector: 'app-terms',
   standalone: true,
-  imports: [CommonModule, LandingHeaderComponent, LandingFooterComponent],
+  imports: [CommonModule, TranslateModule, LandingHeaderComponent, LandingFooterComponent],
   template: `
     <div class="min-h-screen bg-white dark:bg-gray-900">
       <app-landing-header></app-landing-header>
@@ -14,181 +15,172 @@ import { LandingHeaderComponent, LandingFooterComponent } from '../components';
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div class="text-center mb-16">
             <h1 class="text-4xl lg:text-5xl font-bold text-gray-900 dark:text-gray-100 mb-6">
-              Terms & Conditions
+              {{ 'LANDING.TERMS.TITLE' | translate }}
             </h1>
             <p class="text-xl text-gray-600 dark:text-gray-400">
-              Last updated: March 2026
+              {{ 'LANDING.TERMS.UPDATED' | translate }}
             </p>
           </div>
 
           <div class="prose prose-lg max-w-none">
             <div class="bg-[#155347]/10 border border-[#155347]/30 rounded-2xl p-8 mb-8">
-              <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">Welcome to Fluxnote</h2>
+              <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">{{ 'LANDING.TERMS.WELCOME_TITLE' | translate }}</h2>
               <p class="text-gray-700 dark:text-gray-300">
-                These terms and conditions govern your use of the Fluxnote service.
-                By using our service, you agree to these terms in full.
+                {{ 'LANDING.TERMS.WELCOME_TEXT' | translate }}
               </p>
             </div>
 
             <div class="space-y-8">
               <section>
-                <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">1. Definitions</h2>
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">{{ 'LANDING.TERMS.S1_TITLE' | translate }}</h2>
                 <div class="bg-gray-50 dark:bg-gray-800 rounded-xl p-6">
                   <dl class="space-y-4">
                     <div>
-                      <dt class="font-semibold text-gray-900 dark:text-gray-100">"Service"</dt>
-                      <dd class="text-gray-700 dark:text-gray-300">Refers to the Fluxnote platform and all of its features</dd>
+                      <dt class="font-semibold text-gray-900 dark:text-gray-100">{{ 'LANDING.TERMS.S1_SERVICE_TERM' | translate }}</dt>
+                      <dd class="text-gray-700 dark:text-gray-300">{{ 'LANDING.TERMS.S1_SERVICE_DEF' | translate }}</dd>
                     </div>
                     <div>
-                      <dt class="font-semibold text-gray-900 dark:text-gray-100">"User"</dt>
-                      <dd class="text-gray-700 dark:text-gray-300">Any person who accesses or uses the Service</dd>
+                      <dt class="font-semibold text-gray-900 dark:text-gray-100">{{ 'LANDING.TERMS.S1_USER_TERM' | translate }}</dt>
+                      <dd class="text-gray-700 dark:text-gray-300">{{ 'LANDING.TERMS.S1_USER_DEF' | translate }}</dd>
                     </div>
                     <div>
-                      <dt class="font-semibold text-gray-900 dark:text-gray-100">"Content"</dt>
-                      <dd class="text-gray-700 dark:text-gray-300">Documents, text, images, and other materials created within the Service</dd>
+                      <dt class="font-semibold text-gray-900 dark:text-gray-100">{{ 'LANDING.TERMS.S1_CONTENT_TERM' | translate }}</dt>
+                      <dd class="text-gray-700 dark:text-gray-300">{{ 'LANDING.TERMS.S1_CONTENT_DEF' | translate }}</dd>
                     </div>
                   </dl>
                 </div>
               </section>
 
               <section>
-                <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">2. Use of the Service</h2>
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">{{ 'LANDING.TERMS.S2_TITLE' | translate }}</h2>
                 <div class="space-y-4">
                   <div class="bg-[#155347]/10 rounded-xl p-6">
-                    <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">Permitted uses</h3>
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">{{ 'LANDING.TERMS.S2_PERMITTED_TITLE' | translate }}</h3>
                     <ul class="list-disc list-inside text-gray-700 dark:text-gray-300 space-y-2">
-                      <li>Create and edit documents for legitimate purposes</li>
-                      <li>Collaborate with other users</li>
-                      <li>Use AI features to improve content</li>
-                      <li>Share documents with appropriate permissions</li>
+                      <li>{{ 'LANDING.TERMS.S2_PERMITTED_1' | translate }}</li>
+                      <li>{{ 'LANDING.TERMS.S2_PERMITTED_2' | translate }}</li>
+                      <li>{{ 'LANDING.TERMS.S2_PERMITTED_3' | translate }}</li>
+                      <li>{{ 'LANDING.TERMS.S2_PERMITTED_4' | translate }}</li>
                     </ul>
                   </div>
 
                   <div class="bg-red-50 dark:bg-red-900/20 rounded-xl p-6">
-                    <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">Prohibited uses</h3>
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">{{ 'LANDING.TERMS.S2_PROHIBITED_TITLE' | translate }}</h3>
                     <ul class="list-disc list-inside text-gray-700 dark:text-gray-300 space-y-2">
-                      <li>Create illegal, defamatory, or harmful content</li>
-                      <li>Violate intellectual property rights</li>
-                      <li>Attempt to access other users’ accounts</li>
-                      <li>Interfere with the operation of the Service</li>
-                      <li>Use the Service for spam or malicious activities</li>
+                      <li>{{ 'LANDING.TERMS.S2_PROHIBITED_1' | translate }}</li>
+                      <li>{{ 'LANDING.TERMS.S2_PROHIBITED_2' | translate }}</li>
+                      <li>{{ 'LANDING.TERMS.S2_PROHIBITED_3' | translate }}</li>
+                      <li>{{ 'LANDING.TERMS.S2_PROHIBITED_4' | translate }}</li>
+                      <li>{{ 'LANDING.TERMS.S2_PROHIBITED_5' | translate }}</li>
                     </ul>
                   </div>
                 </div>
               </section>
 
               <section>
-                <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">3. User accounts</h2>
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">{{ 'LANDING.TERMS.S3_TITLE' | translate }}</h2>
                 <div class="bg-gray-50 dark:bg-gray-800 rounded-xl p-6">
-                  <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">User responsibilities</h3>
+                  <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">{{ 'LANDING.TERMS.S3_RESPONSIBILITIES_TITLE' | translate }}</h3>
                   <ul class="list-disc list-inside text-gray-700 dark:text-gray-300 space-y-2">
-                    <li>Keep your login credentials confidential</li>
-                    <li>Provide accurate and up-to-date information</li>
-                    <li>Notify us immediately of unauthorized use</li>
-                    <li>Be responsible for all activity on your account</li>
+                    <li>{{ 'LANDING.TERMS.S3_RESP_1' | translate }}</li>
+                    <li>{{ 'LANDING.TERMS.S3_RESP_2' | translate }}</li>
+                    <li>{{ 'LANDING.TERMS.S3_RESP_3' | translate }}</li>
+                    <li>{{ 'LANDING.TERMS.S3_RESP_4' | translate }}</li>
                   </ul>
                 </div>
               </section>
 
               <section>
-                <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">4. Intellectual property</h2>
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">{{ 'LANDING.TERMS.S4_TITLE' | translate }}</h2>
                 <div class="grid md:grid-cols-2 gap-6">
                   <div class="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-6">
-                    <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">Your content</h3>
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">{{ 'LANDING.TERMS.S4_YOUR_CONTENT_TITLE' | translate }}</h3>
                     <p class="text-gray-700 dark:text-gray-300 mb-3">
-                      You retain all rights to the content you create in Fluxnote.
+                      {{ 'LANDING.TERMS.S4_YOUR_CONTENT_1' | translate }}
                     </p>
                     <p class="text-gray-700 dark:text-gray-300">
-                      You grant us only a limited license to process and store your content
-                      in order to provide the Service.
+                      {{ 'LANDING.TERMS.S4_YOUR_CONTENT_2' | translate }}
                     </p>
                   </div>
 
                   <div class="bg-[#155347]/10 rounded-xl p-6">
-                    <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">Our property</h3>
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">{{ 'LANDING.TERMS.S4_OUR_PROPERTY_TITLE' | translate }}</h3>
                     <p class="text-gray-700 dark:text-gray-300 mb-3">
-                      Fluxnote, including its software, design, and features,
-                      is owned by us and our licensors.
+                      {{ 'LANDING.TERMS.S4_OUR_PROPERTY_1' | translate }}
                     </p>
                     <p class="text-gray-700 dark:text-gray-300">
-                      You may not copy, modify, or distribute our software.
+                      {{ 'LANDING.TERMS.S4_OUR_PROPERTY_2' | translate }}
                     </p>
                   </div>
                 </div>
               </section>
 
               <section>
-                <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">5. Plans and payments</h2>
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">{{ 'LANDING.TERMS.S5_TITLE' | translate }}</h2>
                 <div class="bg-gray-50 dark:bg-gray-800 rounded-xl p-6">
-                  <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">Subscriptions</h3>
+                  <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">{{ 'LANDING.TERMS.S5_SUBSCRIPTIONS_TITLE' | translate }}</h3>
                   <ul class="list-disc list-inside text-gray-700 dark:text-gray-300 space-y-2">
-                    <li>Paid plans are billed monthly or annually</li>
-                    <li>Prices may change with 30 days’ notice</li>
-                    <li>You can cancel your subscription at any time</li>
-                    <li>We do not offer refunds for partial periods</li>
+                    <li>{{ 'LANDING.TERMS.S5_SUB_1' | translate }}</li>
+                    <li>{{ 'LANDING.TERMS.S5_SUB_2' | translate }}</li>
+                    <li>{{ 'LANDING.TERMS.S5_SUB_3' | translate }}</li>
+                    <li>{{ 'LANDING.TERMS.S5_SUB_4' | translate }}</li>
                   </ul>
                 </div>
               </section>
 
               <section>
-                <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">6. Limitation of liability</h2>
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">{{ 'LANDING.TERMS.S6_TITLE' | translate }}</h2>
                 <div class="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-xl p-6">
                   <p class="text-gray-700 dark:text-gray-300 mb-4">
-                    The Service is provided "as is". We do not guarantee it will always be
-                    available, secure, or error-free.
+                    {{ 'LANDING.TERMS.S6_TEXT_1' | translate }}
                   </p>
                   <p class="text-gray-700 dark:text-gray-300">
-                    Our liability is limited to the amount paid for the Service
-                    in the 12 months prior to the incident.
+                    {{ 'LANDING.TERMS.S6_TEXT_2' | translate }}
                   </p>
                 </div>
               </section>
 
               <section>
-                <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">7. Termination</h2>
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">{{ 'LANDING.TERMS.S7_TITLE' | translate }}</h2>
                 <div class="bg-gray-50 dark:bg-gray-800 rounded-xl p-6">
-                  <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">Termination by you</h3>
+                  <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">{{ 'LANDING.TERMS.S7_BY_YOU_TITLE' | translate }}</h3>
                   <p class="text-gray-700 dark:text-gray-300 mb-4">
-                    You may terminate your account at any time through your account settings
-                    or by contacting us.
+                    {{ 'LANDING.TERMS.S7_BY_YOU_TEXT' | translate }}
                   </p>
 
-                  <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">Termination by us</h3>
+                  <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">{{ 'LANDING.TERMS.S7_BY_US_TITLE' | translate }}</h3>
                   <p class="text-gray-700 dark:text-gray-300">
-                    We may suspend or terminate your account if you violate these terms
-                    or for other legitimate reasons, with prior notice when possible.
+                    {{ 'LANDING.TERMS.S7_BY_US_TEXT' | translate }}
                   </p>
                 </div>
               </section>
 
               <section>
-                <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">8. Changes to these terms</h2>
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">{{ 'LANDING.TERMS.S8_TITLE' | translate }}</h2>
                 <div class="bg-[#155347]/10 rounded-xl p-6">
                   <p class="text-gray-700 dark:text-gray-300 mb-4">
-                    We may update these terms from time to time. We will notify you of
-                    significant changes by email or through the Service.
+                    {{ 'LANDING.TERMS.S8_TEXT_1' | translate }}
                   </p>
                   <p class="text-gray-700 dark:text-gray-300">
-                    Continued use after changes constitutes acceptance of the new terms.
-                  </p>
-                </div>
-              </section>
-
-              <section>
-                <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">9. Governing law</h2>
-                <div class="bg-gray-50 dark:bg-gray-800 rounded-xl p-6">
-                  <p class="text-gray-700 dark:text-gray-300">
-                    These terms are governed by Portuguese law.
+                    {{ 'LANDING.TERMS.S8_TEXT_2' | translate }}
                   </p>
                 </div>
               </section>
 
               <section>
-                <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">10. Contact</h2>
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">{{ 'LANDING.TERMS.S9_TITLE' | translate }}</h2>
                 <div class="bg-gray-50 dark:bg-gray-800 rounded-xl p-6">
                   <p class="text-gray-700 dark:text-gray-300">
-                    Fluxnote is currently an academic project developed at Escola Superior de Tecnologia de Setúbal.
-                    A dedicated legal contact channel is not yet available.
+                    {{ 'LANDING.TERMS.S9_TEXT' | translate }}
+                  </p>
+                </div>
+              </section>
+
+              <section>
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">{{ 'LANDING.TERMS.S10_TITLE' | translate }}</h2>
+                <div class="bg-gray-50 dark:bg-gray-800 rounded-xl p-6">
+                  <p class="text-gray-700 dark:text-gray-300">
+                    {{ 'LANDING.TERMS.S10_TEXT' | translate }}
                   </p>
                 </div>
               </section>

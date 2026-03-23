@@ -105,7 +105,7 @@ import { TranslateModule } from '@ngx-translate/core';
             <h3 class="text-lg font-semibold mb-4">{{ 'LANDING.FOOTER.NEWSLETTER' | translate }}</h3>
             <div class="bg-gray-800 border border-gray-700 rounded-xl p-4 mb-6">
               <div class="flex items-center gap-2 mb-2">
-                <span class="bg-[#155347] text-white text-xs font-semibold px-2 py-0.5 rounded-full">Coming soon</span>
+                <span class="bg-[#155347] text-white text-xs font-semibold px-2 py-0.5 rounded-full">{{ 'LANDING.FOOTER.COMING_SOON' | translate }}</span>
               </div>
               <p class="text-gray-400 text-sm">
                 {{ 'LANDING.FOOTER.NEWSLETTER_DESC' | translate }}

@@ -255,28 +255,50 @@ import { diffWords } from 'diff';
               (collaborationReady)="onCollaborationReady()"
             />
 
-            <!-- Improve Text Tooltip (appears on text selection) -->
+            <!-- Improve Text Toolbar (appears on text selection) -->
             @if (showImproveTooltip() && canEdit()) {
-              <div
-                class="fixed z-50 flex items-center gap-1 bg-gray-900 text-white rounded-lg shadow-xl px-2 py-1.5 animate-in fade-in"
-                [style.top.px]="improveTooltipPosition().top"
-                [style.left.px]="improveTooltipPosition().left"
-              >
-                <button
-                  (mousedown)="requestImproveText($event)"
-                  class="flex items-center gap-1.5 px-2 py-1 rounded-md hover:bg-white/20 transition-colors text-xs font-medium"
+              @if (isMobile()) {
+                <!-- Mobile: barra fixa no fundo do ecrã, evita sobreposição com a barra nativa do iOS/Android -->
+                <div class="fixed bottom-0 left-0 right-0 z-50 bg-gray-900 text-white flex items-center justify-around px-4 py-3 shadow-2xl border-t border-gray-700 animate-in slide-in-from-bottom duration-150">
+                  <button
+                    (touchend)="requestImproveText($event)"
+                    class="flex items-center gap-2 px-4 py-2 rounded-lg active:bg-white/20 transition-colors text-sm font-medium"
+                  >
+                    <lucide-icon name="sparkles" class="h-4 w-4 text-purple-300"></lucide-icon>
+                    {{ 'DOCUMENT_EDITOR.IMPROVE_WITH_AI' | translate }}
+                  </button>
+                  <div class="w-px h-6 bg-gray-600"></div>
+                  <button
+                    (touchend)="addCommentSelection($event)"
+                    class="flex items-center gap-2 px-4 py-2 rounded-lg active:bg-white/20 transition-colors text-sm font-medium"
+                  >
+                    <lucide-icon name="message-square" class="h-4 w-4 text-blue-300"></lucide-icon>
+                    {{ 'DOCUMENT_EDITOR.ADD_COMMENT_BTN' | translate }}
+                  </button>
+                </div>
+              } @else {
+                <!-- Desktop: tooltip flutuante inline perto da seleção -->
+                <div
+                  class="fixed z-50 flex items-center gap-1 bg-gray-900 text-white rounded-lg shadow-xl px-2 py-1.5 animate-in fade-in"
+                  [style.top.px]="improveTooltipPosition().top"
+                  [style.left.px]="improveTooltipPosition().left"
                 >
-                  <lucide-icon name="sparkles" class="h-3.5 w-3.5 text-purple-300"></lucide-icon>
-                  {{ 'DOCUMENT_EDITOR.IMPROVE_WITH_AI' | translate }}
-                </button>
-                <button
-                  (mousedown)="addCommentSelection($event)"
-                  class="flex items-center gap-1.5 px-2 py-1 rounded-md hover:bg-white/20 transition-colors text-xs font-medium"
-                >
-                  <lucide-icon name="message-square" class="h-3.5 w-3.5 text-blue-300"></lucide-icon>
-                  {{ 'DOCUMENT_EDITOR.ADD_COMMENT_BTN' | translate }}
-                </button>
-              </div>
+                  <button
+                    (mousedown)="requestImproveText($event)"
+                    class="flex items-center gap-1.5 px-2 py-1 rounded-md hover:bg-white/20 transition-colors text-xs font-medium"
+                  >
+                    <lucide-icon name="sparkles" class="h-3.5 w-3.5 text-purple-300"></lucide-icon>
+                    {{ 'DOCUMENT_EDITOR.IMPROVE_WITH_AI' | translate }}
+                  </button>
+                  <button
+                    (mousedown)="addCommentSelection($event)"
+                    class="flex items-center gap-1.5 px-2 py-1 rounded-md hover:bg-white/20 transition-colors text-xs font-medium"
+                  >
+                    <lucide-icon name="message-square" class="h-3.5 w-3.5 text-blue-300"></lucide-icon>
+                    {{ 'DOCUMENT_EDITOR.ADD_COMMENT_BTN' | translate }}
+                  </button>
+                </div>
+              }
             }
 
 
@@ -530,25 +552,51 @@ import { diffWords } from 'diff';
                 </button>
               </div>
 
-              <!-- <div class="p-4 border-b border-gray-200">
+              <div class="p-4 border-b border-gray-200">
                 <textarea
                   [placeholder]="'DOCUMENT_EDITOR.ADD_COMMENT' | translate"
-                  [(ngModel)]="newComment"
+                  [(ngModel)]="panelTextBoxComment"
                   class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#155347] text-sm resize-none dark:bg-gray-700 dark:text-gray-100"
                   rows="3"
+                  #inlineCommentInput
+                  [(ngModel)]="inlineCommentText"
+                  (input)="updateInlineMentionSuggestions()"
+                  (click)="updateInlineMentionSuggestions()"
+                  (keyup)="updateInlineMentionSuggestions()"
+                  (keydown)="onInlineCommentKeydown($event)"
+                  [placeholder]="'DOCUMENT_EDITOR.ADD_COMMENT' | translate"
+                  rows="3"
+                  class="w-full px-2 py-1 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-[#155347] text-sm resize-none dark:bg-gray-700 dark:text-gray-100"
                 ></textarea>
+              
+                @if (showInlineMentionList()) {
+                  <div class="max-h-32 overflow-y-auto border border-gray-200 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 shadow-sm">
+                    @for (suggestion of inlineMentionSuggestions(); track suggestion.id; let i = $index) {
+                      <button
+                        type="button"
+                        class="w-full text-left px-2 py-1.5 text-xs hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
+                        [ngClass]="{ 'bg-gray-100 dark:bg-gray-600': i === activeInlineMentionIndex() }"
+                        (mousedown)="onInlineMentionMouseDown($event, i)"
+                      >
+                        <span class="font-medium text-gray-800 dark:text-gray-100">{{ suggestion.name }}</span>
+                        <span class="text-gray-400 ml-1">@{{ suggestion.tag }}</span>
+                      </button>
+                    }
+                  </div>
+                }
                 <div class="mt-2 flex justify-end">
                   <app-button
                     size="sm"
                     customClass="bg-[#155347] hover:bg-[#0d3d31]"
                     [leftIcon]="true"
-                    (onClick)="addComment()"
+                    (onClick)="addCommentFromPanel()"
+                    [disabled]="commentAdding() || !panelTextBoxComment.trim()"
                   >
                     <lucide-icon leftIcon name="send" class="h-3 w-3"></lucide-icon>
-                    Post
+                    {{ 'DOCUMENT_EDITOR.ADD_COMMENT_BTN' | translate }}
                   </app-button>
                 </div>
-              </div> -->
+              </div>
 
               <div class="flex-1 overflow-y-auto p-4 space-y-4">
                 @if (comments.length === 0) {
@@ -1447,7 +1495,7 @@ export class DocumentEditorComponent implements OnInit {
   isRestoreModalOpen = signal(false);
   isRestoring = signal(false);
   versionToRestore = signal<number | null>(null);
-  newComment = '';
+  panelTextBoxComment = '';
   selectedVersions = signal<number[]>([]);
   showCompareOverlay = signal(false);
   compareLoading = signal(false);
@@ -1478,6 +1526,11 @@ export class DocumentEditorComponent implements OnInit {
   private selectedTextForImprove = '';
   private selectionBounds = { top: 0, left: 0, width: 0, height: 0 };
   private selectionRange: any = null;
+  readonly isMobile = signal(
+    typeof window !== 'undefined' &&
+    (new URLSearchParams(window.location.search).has('mobile') ||
+     window.matchMedia('(pointer: coarse) and (hover: none)').matches)
+  );
 
   // AI Generate Content
   showGeneratePanelModal = signal(false);
@@ -2311,7 +2364,7 @@ export class DocumentEditorComponent implements OnInit {
     }
   }
 
-  requestImproveText(event: MouseEvent): void {
+  requestImproveText(event: Event): void {
     event.preventDefault();
     event.stopPropagation();
 
@@ -2501,7 +2554,7 @@ export class DocumentEditorComponent implements OnInit {
 
 
   //---------------- comentarios------------------
-  addCommentSelection(event: MouseEvent): void {
+  addCommentSelection(event: Event): void {
     event.preventDefault();
     event.stopPropagation();
 
@@ -2628,6 +2681,43 @@ export class DocumentEditorComponent implements OnInit {
     this.showInlineCommentBox.set(false);
     this.inlineCommentText = '';
     this.hideInlineMentionSuggestions();
+  }
+
+  addCommentFromPanel(): void {
+    if (!this.panelTextBoxComment.trim()) return;
+
+    this.commentAdding.set(true);
+    const commentContent = this.panelTextBoxComment.trim();
+    const mentionedUserIds = this.getMentionedEditorUserIds(commentContent);
+
+    const newComment: CreateCommentDto = {
+      userId: this.user()?.id,
+      documentId: this.documentId!,
+      createdByColor: this.user()?.color,
+      content: commentContent,
+      mentionedUserIds,
+    };
+    //console.log('Creating comment with range:', newComment);
+    
+    
+    this.documentService.createComment(newComment, this.documentId!).pipe(
+      switchMap((comment) => {
+        this.panelTextBoxComment = '';
+        this.collaborationService.sendComment(this.documentId!, comment);
+        return this.documentService.getComments(this.documentId!);
+      })
+    ).subscribe({
+      next: (comments) => {
+        this.comments = comments;
+        this.commentAdding.set(false);
+        this.toastService.success(this.translateService.instant('DOCUMENT_EDITOR.COMMENT_ADDED'));
+      },
+      error: (err) => {
+        this.commentAdding.set(false);
+        this.toastService.error(this.translateService.instant('DOCUMENT_EDITOR.COMMENT_ERROR'));
+        console.error('Error creating comment:', err);
+      }
+    });
   }
 
  /*  onInlineCommentInput(): void {
