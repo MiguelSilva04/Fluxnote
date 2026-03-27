@@ -1734,6 +1734,7 @@ public class AuthController : ControllerBase
         });
     }
 
+    [HttpGet("ping")]
     [HttpPost("ping")]
     public IActionResult Ping() => Ok("pong");
 
