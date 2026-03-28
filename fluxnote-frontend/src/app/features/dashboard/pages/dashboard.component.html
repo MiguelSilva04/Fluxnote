@@ -133,7 +133,9 @@
                   </div>
                 }
               </div>
-              <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100 mb-2">{{ doc.title }}</h3>
+              <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100 mb-2">
+                {{ (doc.title.length > 40 ? (doc.title | slice:0:40) + '...' : doc.title) }}
+              </h3>
               <div class="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400 flex-wrap">
                 <div class="flex items-center gap-1">
                   <lucide-icon name="clock" class="h-4 w-4"></lucide-icon>
@@ -226,7 +228,7 @@
                               </div>
                             }
                           </div>
-                          <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100 mb-2">{{ doc.title }}</h3>
+                          <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100 mb-2">{{ doc.title.length > 40 ? (doc.title | slice:0:40) + '...' : doc.title }}</h3>
                           <div class="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
                             <div class="flex items-center gap-1">
                               <lucide-icon name="clock" class="h-4 w-4"></lucide-icon>
@@ -303,7 +305,7 @@
                         </div>
                       }
                     </div>
-                    <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100 mb-2">{{ doc.title }}</h3>
+                    <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100 mb-2">{{ doc.title.length > 40 ? (doc.title | slice:0:40) + '...' : doc.title }}</h3>
                     <div class="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
                       <div class="flex items-center gap-1">
                         <lucide-icon name="clock" class="h-4 w-4"></lucide-icon>
