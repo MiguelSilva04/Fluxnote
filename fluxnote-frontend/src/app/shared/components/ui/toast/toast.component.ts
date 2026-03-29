@@ -66,7 +66,7 @@ export class ToastComponent {
   getToastClasses(type: ToastType): string {
     const baseClasses = 'border';
     const typeClasses = {
-      success: 'bg-green-50 border-green-200 dark:bg-green-950 dark:border-green-700',
+      success: 'bg-green-50 border-green-200 dark:bg-green-900 dark:border-green-700',
       error: 'bg-red-50 border-red-200 dark:bg-red-950 dark:border-red-700',
       info: 'bg-blue-50 border-blue-200 dark:bg-blue-950 dark:border-blue-700',
       warning: 'bg-yellow-50 border-yellow-200 dark:bg-yellow-950 dark:border-yellow-700'
