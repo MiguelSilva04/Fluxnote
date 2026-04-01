@@ -1,1 +1,1 @@
-search_result['239']=["topic_0000000000000074_props--.html","ExternalAuthErrorResponse Properties",""];
+search_result['239']=["topic_0000000000000064.html","TeamsController.PostTeam Method","Cria uma nova equipa."];

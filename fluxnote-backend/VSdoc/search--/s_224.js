@@ -1,1 +1,1 @@
-search_result['224']=["topic_0000000000000070_methods--.html","ChangePasswordRequest Methods",""];
+search_result['224']=["topic_000000000000005F.html","TeamsController Constructor","Construtor com injeção de dependências."];

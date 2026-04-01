@@ -1,1 +1,1 @@
-search_result['1027']=["topic_00000000000001F9.html","RefreshToken Class","Representa um token de atualização (refresh token) para autenticação JWT.\r\nPermite renovar o access token sem necessidade de nova autenticação com credenciais."];
+search_result['1027']=["topic_000000000000017E_props--.html","DocumentPermissionSummaryDto Properties",""];

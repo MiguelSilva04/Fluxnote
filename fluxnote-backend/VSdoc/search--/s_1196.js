@@ -1,1 +1,1 @@
-search_result['1196']=["topic_0000000000000266.html","TeamAutorizationService.GetTeamMemberAsync Method","Obtém o registo de associação de um utilizador a uma equipa."];
+search_result['1196']=["topic_00000000000001B2_overloads--.html","documentComments.Down Method","Builds the operations that will migrate the database \u0027down\u0027."];

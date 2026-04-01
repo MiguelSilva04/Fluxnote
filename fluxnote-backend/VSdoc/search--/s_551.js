@@ -1,1 +1,1 @@
-search_result['551']=["topic_00000000000000F7.html","DocumentDetailDto.CreatedById Property","ID do utilizador criador."];
+search_result['551']=["topic_00000000000000D4.html","CreateDocumentCommentDto.UserId Property","ID do utilizador que criou o comentário. Pode ser obtido do contexto de autenticação."];

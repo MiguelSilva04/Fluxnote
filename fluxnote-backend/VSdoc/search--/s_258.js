@@ -1,1 +1,1 @@
-search_result['258']=["topic_000000000000007C_vars--.html","TeamMemberDto Fields",""];
+search_result['258']=["topic_000000000000006D.html","FluxnoteServerContext.Team Property","DbSet para equipas colaborativas."];

@@ -5,7 +5,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta name="GENERATOR" content="VSdocman - documentation generator; https://www.helixoft.com" />
 	<link rel="icon" href="favicon.ico">
-	<title>DocumentsController.ImproveText Method</title>
+	<title>DocumentsController.GenerateSummary Method</title>
 
 	<link rel="stylesheet" type="text/css" href="msdn2019/toc.css" />
 	<script src="msdn2019/toc.js"></script>
@@ -75,7 +75,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
   </div>
 
 <div id="mainBody">
-		<h1 class="title">DocumentsController.ImproveText Method</h1>
+		<h1 class="title">DocumentsController.GenerateSummary Method</h1>
         
 		<div class="metadata">
         Namespace:
@@ -90,8 +90,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 
        
        
-        <summary-info>Sugere melhorias para o texto selecionado usando IA (Google Gemini).
-Utiliza o contexto do documento e ficheiros de contexto para maior precisão.</summary-info>
+        <summary-info>Gera um resumo do documento usando IA (Google Gemini).</summary-info>
 
 
 
@@ -141,7 +140,7 @@ Utiliza o contexto do documento e ficheiros de contexto para maior precisão.</s
 				</div>
 				
 				<div class="codeSnippetCode codeVB">
-					<pre xml:space="preserve" class="brush: vb">&lt;HttpPost(&quot;{id}/improve&quot;)&gt; _&nbsp;<br />Public Function ImproveText( _&nbsp;<br />   ByVal <i>id</i> As <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.int32">Integer</a>, _&nbsp;<br />   &lt;FromBody()&gt; _&nbsp;<br />   ByVal <i>request</i> As <a target="_top" href="topic_0000000000000118.html" onclick="this.target='';return true;">ImproveTextRequest</a> _&nbsp;<br />) As <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1">Task</a>(Of <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.actionresult">ActionResult</a>)</pre>			
+					<pre xml:space="preserve" class="brush: vb">&lt;HttpPost(&quot;{id}/summary&quot;)&gt; _&nbsp;<br />Public Function GenerateSummary( _&nbsp;<br />   ByVal <i>id</i> As <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.int32">Integer</a> _&nbsp;<br />) As <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1">Task</a>(Of <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.actionresult">ActionResult</a>)</pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -180,7 +179,7 @@ Utiliza o contexto do documento e ficheiros de contexto para maior precisão.</s
 				</div>
 				
 				<div class="codeSnippetCode codeCsharp">
-					<pre xml:space="preserve" class="brush: csharp">[HttpPost(&quot;{id}/improve&quot;)]&nbsp;<br />public <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.actionresult">ActionResult</a>&gt; ImproveText(&nbsp;<br />   <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.int32">int</a> <i>id</i>,&nbsp;<br />   [FromBody()]&nbsp;<br />   <a target="_top" href="topic_0000000000000118.html" onclick="this.target='';return true;">ImproveTextRequest</a> <i>request</i>&nbsp;<br />)</pre>			
+					<pre xml:space="preserve" class="brush: csharp">[HttpPost(&quot;{id}/summary&quot;)]&nbsp;<br />public <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.actionresult">ActionResult</a>&gt; GenerateSummary(&nbsp;<br />   <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.int32">int</a> <i>id</i>&nbsp;<br />)</pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -220,7 +219,7 @@ Utiliza o contexto do documento e ficheiros de contexto para maior precisão.</s
 				</div>
 				
 				<div class="codeSnippetCode codeCpp">
-					<pre xml:space="preserve" class="brush: cpp">[HttpPost(&quot;{id}/improve&quot;)]&nbsp;<br />public: &nbsp;<br /><a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.actionresult">ActionResult</a>^&gt;^ ImproveText(&nbsp;<br />   <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.int32">int</a> <i>id</i>,&nbsp;<br />   [FromBody()]&nbsp;<br />   <a target="_top" href="topic_0000000000000118.html" onclick="this.target='';return true;">ImproveTextRequest</a>^ <i>request</i>&nbsp;<br />) </pre>			
+					<pre xml:space="preserve" class="brush: cpp">[HttpPost(&quot;{id}/summary&quot;)]&nbsp;<br />public: &nbsp;<br /><a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.actionresult">ActionResult</a>^&gt;^ GenerateSummary(&nbsp;<br />   <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.int32">int</a> <i>id</i>&nbsp;<br />) </pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -284,19 +283,6 @@ Utiliza o contexto do documento e ficheiros de contexto para maior precisão.</s
 <p>
 	ID do documento. 
 </p>
-<dl paramName="request" class="parameterList">
-	<dt>
-		<span class="parameter">
-			request
-		</span>
-	</dt>
-	<dd>
-		<a target="_top" href="topic_0000000000000118.html" onclick="this.target='';return true;">ImproveTextRequest</a> 
-	</dd>
-</dl>
-<p>
-	Texto selecionado pelo utilizador. 
-</p>
 
 <p />
 
@@ -304,7 +290,7 @@ Utiliza o contexto do documento e ficheiros de contexto para maior precisão.</s
 		Return Value</h4>
 	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.actionresult">ActionResult</a>&gt; 
 		<p>
-		<ul><li></li><li></li><li></li><li></li><li></li><li></li><li></li></ul> 
+		<ul><li></li><li></li><li></li><li></li><li></li><li></li></ul> 
 	</p>
 	
 
@@ -394,7 +380,7 @@ Utiliza o contexto do documento e ficheiros de contexto para maior precisão.</s
 
 	<div id="seeAlsoSection" class="section">	
 		<div>
-			<a href="topic_0000000000000026.html">DocumentsController Class</a><br />
+			<a href="topic_0000000000000027.html">DocumentsController Class</a><br />
 
 
 

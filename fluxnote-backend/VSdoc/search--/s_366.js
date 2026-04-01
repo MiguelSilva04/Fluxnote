@@ -1,1 +1,1 @@
-search_result['366']=["topic_00000000000000AC.html","CreateDocumentInviteRequest Class","DTO de pedido para criação de convite de acesso a um documento."];
+search_result['366']=["topic_000000000000008E.html","LoginRequest.Email Property","Endereço de email do utilizador."];

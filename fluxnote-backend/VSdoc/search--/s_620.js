@@ -1,1 +1,1 @@
-search_result['620']=["topic_0000000000000119.html","ImproveTextRequest.SelectedText Property","Texto selecionado pelo utilizador no editor."];
+search_result['620']=["topic_00000000000000E9_methods--.html","DocumentContextDto Methods",""];

@@ -1,0 +1,1 @@
+search_result['1712']=["topic_00000000000002A5.html","IAIService.GenerateContentAsync Method","Gera conteúdo novo com base num prompt do utilizador, tendo em conta o documento e ficheiros de contexto."];

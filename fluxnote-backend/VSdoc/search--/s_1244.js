@@ -1,1 +1,1 @@
-search_result['1244']=["topic_000000000000027D.html","SmtpEmailSender Class","Implementação de IEmailSender para produção usando SMTP.\r\nEnvia emails reais através de um servidor SMTP configurado."];
+search_result['1244']=["topic_00000000000001C2_overloads--.html","AddReferenceTokenToNotification.Down Method","Builds the operations that will migrate the database \u0027down\u0027."];

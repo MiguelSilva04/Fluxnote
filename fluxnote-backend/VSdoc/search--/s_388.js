@@ -1,1 +1,1 @@
-search_result['388']=["topic_00000000000000B3.html","DocumentInviteDto.DocumentId Property","DocumentId é o identificador do documento para o qual o convite foi criado."];
+search_result['388']=["topic_0000000000000095.html","RegisterRequest.FullName Property","Nome completo do utilizador para exibição."];

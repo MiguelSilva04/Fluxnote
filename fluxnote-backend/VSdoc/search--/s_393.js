@@ -1,1 +1,1 @@
-search_result['393']=["topic_00000000000000B8.html","DocumentInviteDto.Role Property","Role a ser atribuído ao utilizador convidado ao aceitar o convite.\r\n0 = Viewer, 1 = Editor. Este campo é necessário para que o frontend\r\nsaiba qual permissão atribuir ao utilizador quando ele aceitar ..."];
+search_result['393']=["topic_0000000000000095_vars--.html","RefreshToken Fields",""];

@@ -1,1 +1,1 @@
-search_result['150']=["topic_000000000000004E_methods--.html","TeamMembersController Methods",""];
+search_result['150']=["topic_0000000000000047.html","FoldersController.RemoveDocumentFromFolder Method","Remove um documento de uma pasta (fica solto). Apenas Owner ou TeamAdmin."];

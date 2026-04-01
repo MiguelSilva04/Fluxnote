@@ -1,1 +1,1 @@
-search_result['582']=["topic_000000000000010C.html","UpdateDocumentPermissionRequest Class","DTO de pedido para atualização de uma permissão de documento."];
+search_result['582']=["topic_00000000000000DD_events--.html","ConsoleEmailSender Events",""];

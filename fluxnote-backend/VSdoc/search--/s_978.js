@@ -1,1 +1,1 @@
-search_result['978']=["topic_00000000000001D5.html","DocumentInvite.UsedByUserId Property","Tracking de uso (null = não utilizado)"];
+search_result['978']=["topic_000000000000016C.html","TeamDto.DeletionScheduled Property","Data agendada para eliminação automática (se aplicável)."];

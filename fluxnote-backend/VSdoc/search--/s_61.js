@@ -1,1 +1,1 @@
-search_result['61']=["topic_0000000000000025.html","DocumentPermissionsController.DeletePermission Method","Remove uma permissão de documento (retira acesso ao membro).\r\nRequer Owner ou TeamAdmin. Não pode remover Owner/TeamAdmin."];
+search_result['61']=["topic_0000000000000021_props--.html","DocumentPermissionsController Properties",""];

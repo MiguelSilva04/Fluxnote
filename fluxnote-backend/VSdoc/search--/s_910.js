@@ -1,1 +1,1 @@
-search_result['910']=["topic_00000000000001A0.html","Document.TeamId Property","Identificador da equipa proprietária (FK para Team)."];
+search_result['910']=["topic_0000000000000152_methods--.html","AcceptTeamInviteResponseDto Methods",""];

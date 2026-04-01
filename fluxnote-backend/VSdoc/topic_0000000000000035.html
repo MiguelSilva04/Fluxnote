@@ -5,7 +5,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta name="GENERATOR" content="VSdocman - documentation generator; https://www.helixoft.com" />
 	<link rel="icon" href="favicon.ico">
-	<title>DocumentsController.GetContextFiles Method</title>
+	<title>DocumentsController.UploadContext Method</title>
 
 	<link rel="stylesheet" type="text/css" href="msdn2019/toc.css" />
 	<script src="msdn2019/toc.js"></script>
@@ -75,7 +75,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
   </div>
 
 <div id="mainBody">
-		<h1 class="title">DocumentsController.GetContextFiles Method</h1>
+		<h1 class="title">DocumentsController.UploadContext Method</h1>
         
 		<div class="metadata">
         Namespace:
@@ -90,8 +90,9 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 
        
        
-        <summary-info>Lista os ficheiros de contexto associados ao documento.
-Apenas Editors e Owners podem listar (Viewers não têm acesso ao painel de IA).</summary-info>
+        <summary-info>Faz upload de um ficheiro de contexto para o documento.
+O texto é extraído e guardado na BD para uso futuro pela IA.
+Apenas Editors e Owners podem adicionar contexto.</summary-info>
 
 
 
@@ -141,7 +142,7 @@ Apenas Editors e Owners podem listar (Viewers não têm acesso ao painel de IA).
 				</div>
 				
 				<div class="codeSnippetCode codeVB">
-					<pre xml:space="preserve" class="brush: vb">&lt;HttpGet(&quot;{id}/context&quot;)&gt; _&nbsp;<br />Public Function GetContextFiles( _&nbsp;<br />   ByVal <i>id</i> As <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.int32">Integer</a> _&nbsp;<br />) As <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1">Task</a>(Of <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.actionresult-1">ActionResult</a>(Of <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>(Of <a target="_top" href="topic_00000000000000DC.html" onclick="this.target='';return true;">DocumentContextDto</a>)))</pre>			
+					<pre xml:space="preserve" class="brush: vb">&lt;HttpPost(&quot;{id}/context&quot;)&gt; _&nbsp;<br />&lt;Consumes(&quot;multipart/form-data&quot;)&gt; _&nbsp;<br />Public Function UploadContext( _&nbsp;<br />   ByVal <i>id</i> As <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.int32">Integer</a>, _&nbsp;<br />   ByVal <i>file</i> As <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.http.iformfile">IFormFile</a> _&nbsp;<br />) As <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1">Task</a>(Of <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.actionresult-1">ActionResult</a>(Of <a target="_top" href="topic_00000000000000E9.html" onclick="this.target='';return true;">DocumentContextDto</a>))</pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -180,7 +181,7 @@ Apenas Editors e Owners podem listar (Viewers não têm acesso ao painel de IA).
 				</div>
 				
 				<div class="codeSnippetCode codeCsharp">
-					<pre xml:space="preserve" class="brush: csharp">[HttpGet(&quot;{id}/context&quot;)]&nbsp;<br />public <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.actionresult-1">ActionResult</a>&lt;<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a target="_top" href="topic_00000000000000DC.html" onclick="this.target='';return true;">DocumentContextDto</a>&gt;&gt;&gt; GetContextFiles(&nbsp;<br />   <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.int32">int</a> <i>id</i>&nbsp;<br />)</pre>			
+					<pre xml:space="preserve" class="brush: csharp">[HttpPost(&quot;{id}/context&quot;)]&nbsp;<br />[Consumes(&quot;multipart/form-data&quot;)]&nbsp;<br />public <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.actionresult-1">ActionResult</a>&lt;<a target="_top" href="topic_00000000000000E9.html" onclick="this.target='';return true;">DocumentContextDto</a>&gt;&gt; UploadContext(&nbsp;<br />   <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.int32">int</a> <i>id</i>,&nbsp;<br />   <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.http.iformfile">IFormFile</a> <i>file</i>&nbsp;<br />)</pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -220,7 +221,7 @@ Apenas Editors e Owners podem listar (Viewers não têm acesso ao painel de IA).
 				</div>
 				
 				<div class="codeSnippetCode codeCpp">
-					<pre xml:space="preserve" class="brush: cpp">[HttpGet(&quot;{id}/context&quot;)]&nbsp;<br />public: &nbsp;<br /><a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.actionresult-1">ActionResult</a>&lt;<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a target="_top" href="topic_00000000000000DC.html" onclick="this.target='';return true;">DocumentContextDto</a>&gt;^&gt;^&gt;^ GetContextFiles(&nbsp;<br />   <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.int32">int</a> <i>id</i>&nbsp;<br />) </pre>			
+					<pre xml:space="preserve" class="brush: cpp">[HttpPost(&quot;{id}/context&quot;)]&nbsp;<br />[Consumes(&quot;multipart/form-data&quot;)]&nbsp;<br />public: &nbsp;<br /><a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.actionresult-1">ActionResult</a>&lt;<a target="_top" href="topic_00000000000000E9.html" onclick="this.target='';return true;">DocumentContextDto</a>&gt;^&gt;^ UploadContext(&nbsp;<br />   <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.int32">int</a> <i>id</i>,&nbsp;<br />   <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.http.iformfile">IFormFile</a>^ <i>file</i>&nbsp;<br />) </pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -284,12 +285,25 @@ Apenas Editors e Owners podem listar (Viewers não têm acesso ao painel de IA).
 <p>
 	ID do documento. 
 </p>
+<dl paramName="file" class="parameterList">
+	<dt>
+		<span class="parameter">
+			file
+		</span>
+	</dt>
+	<dd>
+		<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.http.iformfile">IFormFile</a> 
+	</dd>
+</dl>
+<p>
+	Ficheiro a carregar (PDF ou TXT, máx. 10MB). 
+</p>
 
 <p />
 
 	<h4 class="subHeading">
 		Return Value</h4>
-	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.actionresult-1">ActionResult</a>&lt;<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a target="_top" href="topic_00000000000000DC.html" onclick="this.target='';return true;">DocumentContextDto</a>&gt;&gt;&gt; 
+	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.actionresult-1">ActionResult</a>&lt;<a target="_top" href="topic_00000000000000E9.html" onclick="this.target='';return true;">DocumentContextDto</a>&gt;&gt; 
 	
 
 
@@ -378,7 +392,7 @@ Apenas Editors e Owners podem listar (Viewers não têm acesso ao painel de IA).
 
 	<div id="seeAlsoSection" class="section">	
 		<div>
-			<a href="topic_0000000000000026.html">DocumentsController Class</a><br />
+			<a href="topic_0000000000000027.html">DocumentsController Class</a><br />
 
 
 

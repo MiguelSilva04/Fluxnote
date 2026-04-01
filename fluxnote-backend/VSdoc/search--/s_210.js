@@ -1,1 +1,1 @@
-search_result['210']=["topic_000000000000006A.html","FluxnoteServerContext.DocumentComments Property","DbSet para comentários em documentos"];
+search_result['210']=["topic_000000000000005B.html","TeamMembersController.PostTeamMember Method","Cria um novo TeamMember.\r\nUsado principalmente para criar o Owner inicial da equipa."];

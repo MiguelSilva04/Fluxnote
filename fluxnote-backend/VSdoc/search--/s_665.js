@@ -1,1 +1,1 @@
-search_result['665']=["topic_000000000000012D.html","AcceptTeamInviteResponseDto.TeamId Property","Identificador da equipa para o qual o convite foi aceito."];
+search_result['665']=["topic_00000000000000FB.html","DocumentDto.IsDeleted Property","Indica se o documento está na lixeira."];

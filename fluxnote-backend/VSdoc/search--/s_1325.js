@@ -1,0 +1,1 @@
+search_result['1325']=["topic_00000000000001EC.html","DocumentComment.CreatedBy Property","Referência de navegação para o utilizador que criou o comentário. Permite aceder a informações adicionais do utilizador, como nome, email, etc. Dependendo de como o backend lida com os utilizadores, i..."];

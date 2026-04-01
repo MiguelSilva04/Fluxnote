@@ -1,1 +1,1 @@
-search_result['830']=["topic_0000000000000182.html","DocumentContext Class","A base class inherited by each EF Core migration."];
+search_result['830']=["topic_0000000000000132_vars--.html","TeamInviteDto Fields",""];

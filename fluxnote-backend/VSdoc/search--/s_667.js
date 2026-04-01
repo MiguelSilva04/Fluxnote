@@ -1,1 +1,1 @@
-search_result['667']=["topic_000000000000012F.html","CreateTeamInviteRequest Class","DTO de pedido para criação de convite de entrada numa equipa."];
+search_result['667']=["topic_00000000000000FD.html","DocumentDto.FolderName Property","Nome da pasta (null se solto)."];

@@ -1,0 +1,1 @@
+search_result['1721']=["topic_00000000000002A9.html","TextExtractionService Class","Implementação de ITextExtractionService.\r\nPDF: extração via PdfPig (MIT, pure C#, sem dependências nativas).\r\nTXT: leitura direta como UTF-8."];

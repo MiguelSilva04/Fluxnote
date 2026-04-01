@@ -1,1 +1,1 @@
-search_result['934']=["topic_00000000000001B3.html","DocumentComment.UserId Property","ID do utilizador que criou o comentário. Pode ser usado para exibir o nome do autor, associar uma cor ou para controle de permissões (ex: permitir que apenas o autor edite ou exclua o comentário)."];
+search_result['934']=["topic_000000000000015E.html","TeamInviteDto.ExpiresAt Property","Data e hora em que o convite foi criado. Este campo é útil\r\npara exibir informações sobre quando o convite foi gerado e para fins de auditoria."];

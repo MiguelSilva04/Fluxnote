@@ -1,0 +1,1 @@
+search_result['1737']=["topic_00000000000002AF.html","TokenService.CreateAccessToken Method","Cria um access token JWT para um utilizador autenticado."];

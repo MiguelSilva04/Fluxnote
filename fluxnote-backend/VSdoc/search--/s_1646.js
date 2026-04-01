@@ -1,0 +1,1 @@
+search_result['1646']=["topic_000000000000028B.html","User.LastUsernameChangeReset Property","Data do último reset do contador de alterações de username.\r\nUsado para determinar quando resetar o contador mensal."];

@@ -1,1 +1,1 @@
-search_result['1009']=["topic_00000000000001EC.html","DocumentVersion.ContentHtml Property","Conteúdo HTML do documento no momento da versão (UTF-8 bytes).\r\nExtraído de Document.Content para exibição em modo leitura."];
+search_result['1009']=["topic_0000000000000179.html","TeamDocumentDto.Title Property","Título do documento."];

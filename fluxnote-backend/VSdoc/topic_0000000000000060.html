@@ -5,7 +5,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta name="GENERATOR" content="VSdocman - documentation generator; https://www.helixoft.com" />
 	<link rel="icon" href="favicon.ico">
-	<title>FluxnoteServerContext Class</title>
+	<title>TeamsController.GetTeams Method</title>
 
 	<link rel="stylesheet" type="text/css" href="msdn2019/toc.css" />
 	<script src="msdn2019/toc.js"></script>
@@ -75,11 +75,11 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
   </div>
 
 <div id="mainBody">
-		<h1 class="title">FluxnoteServerContext Class</h1>
+		<h1 class="title">TeamsController.GetTeams Method</h1>
         
 		<div class="metadata">
         Namespace:
-<a href="topic_000000000000005F.html">Fluxnote.Backend.Data</a>
+<a href="topic_0000000000000000.html">Fluxnote.Backend.Controllers</a>
 
 
 
@@ -90,8 +90,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 
        
        
-        <summary-info>Contexto principal do Entity Framework Core para a aplicação Fluxnote.
-Estende IdentityDbContext para integração com ASP.NET Core Identity.</summary-info>
+        <summary-info>Lista todas as equipas onde o utilizador é membro.</summary-info>
 
 
 
@@ -141,7 +140,7 @@ Estende IdentityDbContext para integração com ASP.NET Core Identity.</summary-
 				</div>
 				
 				<div class="codeSnippetCode codeVB">
-					<pre xml:space="preserve" class="brush: vb">Public Class FluxnoteServerContext&nbsp;<br />    Inherits <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.identity.entityframeworkcore.identitydbcontext-1">IdentityDbContext</a>(Of <a target="_top" href="topic_000000000000022E.html" onclick="this.target='';return true;">User</a>)</pre>			
+					<pre xml:space="preserve" class="brush: vb">&lt;HttpGet()&gt; _&nbsp;<br />Public Function GetTeams() As <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1">Task</a>(Of <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.actionresult-1">ActionResult</a>(Of <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>(Of <a target="_top" href="topic_0000000000000165.html" onclick="this.target='';return true;">TeamDto</a>)))</pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -180,7 +179,7 @@ Estende IdentityDbContext para integração com ASP.NET Core Identity.</summary-
 				</div>
 				
 				<div class="codeSnippetCode codeCsharp">
-					<pre xml:space="preserve" class="brush: csharp">public class FluxnoteServerContext : <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.identity.entityframeworkcore.identitydbcontext-1">IdentityDbContext</a>&lt;<a target="_top" href="topic_000000000000022E.html" onclick="this.target='';return true;">User</a>&gt;</pre>			
+					<pre xml:space="preserve" class="brush: csharp">[HttpGet()]&nbsp;<br />public <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.actionresult-1">ActionResult</a>&lt;<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a target="_top" href="topic_0000000000000165.html" onclick="this.target='';return true;">TeamDto</a>&gt;&gt;&gt; GetTeams()</pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -220,7 +219,7 @@ Estende IdentityDbContext para integração com ASP.NET Core Identity.</summary-
 				</div>
 				
 				<div class="codeSnippetCode codeCpp">
-					<pre xml:space="preserve" class="brush: cpp">public ref class FluxnoteServerContext : public <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft::aspnetcore::identity::entityframeworkcore::identitydbcontext-1">IdentityDbContext</a>&lt;<a target="_top" href="topic_000000000000022E.html" onclick="this.target='';return true;">User</a>^&gt;^</pre>			
+					<pre xml:space="preserve" class="brush: cpp">[HttpGet()]&nbsp;<br />public: &nbsp;<br /><a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.actionresult-1">ActionResult</a>&lt;<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a target="_top" href="topic_0000000000000165.html" onclick="this.target='';return true;">TeamDto</a>&gt;^&gt;^&gt;^ GetTeams() </pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -271,6 +270,14 @@ Estende IdentityDbContext para integração com ASP.NET Core Identity.</summary-
 
 
 
+	<h4 class="subHeading">
+		Return Value</h4>
+	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.actionresult-1">ActionResult</a>&lt;<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a target="_top" href="topic_0000000000000165.html" onclick="this.target='';return true;">TeamDto</a>&gt;&gt;&gt; 
+		<p>
+		<ul><li></li><li></li></ul> 
+	</p>
+	
+
 
 
 
@@ -286,468 +293,6 @@ Estende IdentityDbContext para integração com ASP.NET Core Identity.</summary-
 
 	</div>
 </div>
-
-
-
-<div class="section_container">
-	<div class="section_heading">
-		<span><a href="javascript:void(0)" title="Collapse" onclick="toggleSection(this);">Constructors</a></span>
-		<div>&nbsp;</div>
-	</div>
-
-	<div id="ConstructorsSection" class="section">	
-  <table class="memberListTable">
-    <tr>
-      <th></th>
-      <th>
-        Name
-      </th>
-      <th>
-        Description
-      </th>
-    </tr>
-
-
-	
-			<tr class="
-	
-	
-	">
-	  <td>
-    <img alt="Public constructor" title="Public constructor" src="msdn2019/pubmethod.png"></img>
-
-	
-	    
-	  </td>
-	  <td>
-	    <a href="topic_0000000000000061.html">FluxnoteServerContext(DbContextOptions&lt;FluxnoteServerContext&gt;)</a>
-
-	  </td>
-	  <td>
-	
-	Construtor com injeção de opções de configuração.
-	
-		</td>
-	</tr>
-	
-
-
-  </table>
-
-  <a href="#mainBody">
-    Top
-  </a>
-
-	</div>					
-</div>
-
-<div class="section_container">
-	<div class="section_heading">
-		<span><a href="javascript:void(0)" title="Collapse" onclick="toggleSection(this);">Properties</a></span>
-		<div>&nbsp;</div>
-	</div>
-
-	<div id="PropertiesSection" class="section">	
-  <table class="memberListTable">
-    <tr>
-      <th></th>
-      <th>
-        Name
-      </th>
-      <th>
-        Description
-      </th>
-    </tr>
-
-
-	
-		<tr class="
-
-
-">
-	<td>
-<img alt="Public property" title="Public property" src="msdn2019/pubproperty.png"></img>
-
-
-    
-	</td>
-	<td>
-	<a href="topic_000000000000006C.html">CommentMentions</a>
-
-	</td>
-	<td>
-
-Representa a coleção de Comment Mention na base de dados.
-
-	</td>
-</tr>
-	
-
-
-	
-		<tr class="
-
-
-">
-	<td>
-<img alt="Public property" title="Public property" src="msdn2019/pubproperty.png"></img>
-
-
-    
-	</td>
-	<td>
-	<a href="topic_0000000000000065.html">Document</a>
-
-	</td>
-	<td>
-
-DbSet para documentos colaborativos.
-
-	</td>
-</tr>
-	
-
-
-	
-		<tr class="
-
-
-">
-	<td>
-<img alt="Public property" title="Public property" src="msdn2019/pubproperty.png"></img>
-
-
-    
-	</td>
-	<td>
-	<a href="topic_000000000000006A.html">DocumentComments</a>
-
-	</td>
-	<td>
-
-DbSet para comentários em documentos
-
-	</td>
-</tr>
-	
-
-
-	
-		<tr class="
-
-
-">
-	<td>
-<img alt="Public property" title="Public property" src="msdn2019/pubproperty.png"></img>
-
-
-    
-	</td>
-	<td>
-	<a href="topic_0000000000000069.html">DocumentContext</a>
-
-	</td>
-	<td>
-
-DbSet para ficheiros de contexto de documentos (uso pela IA).
-
-	</td>
-</tr>
-	
-
-
-	
-		<tr class="
-
-
-">
-	<td>
-<img alt="Public property" title="Public property" src="msdn2019/pubproperty.png"></img>
-
-
-    
-	</td>
-	<td>
-	<a href="topic_0000000000000067.html">DocumentInvite</a>
-
-	</td>
-	<td>
-
-DbSet para convites de documentos (permite gerir convites pendentes e aceites).
-
-	</td>
-</tr>
-	
-
-
-	
-		<tr class="
-
-
-">
-	<td>
-<img alt="Public property" title="Public property" src="msdn2019/pubproperty.png"></img>
-
-
-    
-	</td>
-	<td>
-	<a href="topic_0000000000000066.html">DocumentPermission</a>
-
-	</td>
-	<td>
-
-Representa o set de Permissões de Documento.
-
-	</td>
-</tr>
-	
-
-
-	
-		<tr class="
-
-
-">
-	<td>
-<img alt="Public property" title="Public property" src="msdn2019/pubproperty.png"></img>
-
-
-    
-	</td>
-	<td>
-	<a href="topic_000000000000006B.html">DocumentVersion</a>
-
-	</td>
-	<td>
-
-DbSet para versões de documentos (criadas ao fechar sessão de edição).
-
-	</td>
-</tr>
-	
-
-
-	
-		<tr class="
-
-
-">
-	<td>
-<img alt="Public property" title="Public property" src="msdn2019/pubproperty.png"></img>
-
-
-    
-	</td>
-	<td>
-	<a href="topic_0000000000000068.html">Folder</a>
-
-	</td>
-	<td>
-
-
-
-	</td>
-</tr>
-	
-
-
-	
-		<tr class="
-
-
-">
-	<td>
-<img alt="Public property" title="Public property" src="msdn2019/pubproperty.png"></img>
-
-
-    
-	</td>
-	<td>
-	<a href="topic_000000000000006D.html">RefreshTokens</a>
-
-	</td>
-	<td>
-
-DbSet para refresh tokens de autenticação.
-
-	</td>
-</tr>
-	
-
-
-	
-		<tr class="
-
-
-">
-	<td>
-<img alt="Public property" title="Public property" src="msdn2019/pubproperty.png"></img>
-
-
-    
-	</td>
-	<td>
-	<a href="topic_0000000000000062.html">Team</a>
-
-	</td>
-	<td>
-
-DbSet para equipas colaborativas.
-
-	</td>
-</tr>
-	
-
-
-	
-		<tr class="
-
-
-">
-	<td>
-<img alt="Public property" title="Public property" src="msdn2019/pubproperty.png"></img>
-
-
-    
-	</td>
-	<td>
-	<a href="topic_0000000000000064.html">TeamInvite</a>
-
-	</td>
-	<td>
-
-DbSet para convites de equipas (permite gerir convites pendentes e aceites).
-
-	</td>
-</tr>
-	
-
-
-	
-		<tr class="
-
-
-">
-	<td>
-<img alt="Public property" title="Public property" src="msdn2019/pubproperty.png"></img>
-
-
-    
-	</td>
-	<td>
-	<a href="topic_0000000000000063.html">TeamMember</a>
-
-	</td>
-	<td>
-
-DbSet para membros de equipas.
-
-	</td>
-</tr>
-	
-
-
-  </table>
-
-  <a href="#mainBody">
-    Top
-  </a>
-
-	</div>					
-</div>
-
-
-
-
-
-
-<div class="section_container">
-	<div class="section_heading">
-		<span><a href="javascript:void(0)" title="Collapse" onclick="toggleSection(this);">Methods</a></span>
-		<div>&nbsp;</div>
-	</div>
-
-	<div id="MethodsSection" class="section">	
-  <table class="memberListTable">
-    <tr>
-      <th></th>
-      <th>
-        Name
-      </th>
-      <th>
-        Description
-      </th>
-    </tr>
-
-
-
-
-	<tr class="
-
-
-">
-	<td>
-   <img alt="Protected method" title="Protected method" src="msdn2019/protmethod.png"></img>
-
-    
-	  
-
-
-    
-	</td>
-	<td>
-	<a href="topic_000000000000006E.html">OnModelCreating(ModelBuilder)</a>
-
-	</td>
-	<td>
-
-Configuração do modelo de dados via Fluent API.
-Define relacionamentos, índices e configurações específicas do provider.
-
-	</td>
-</tr>
-
-
-
-
-
-
-  </table>
-
-  <a href="#mainBody">
-    Top
-  </a>
-
-	</div>					
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
-
-<!-- Classes -->
-
-<!-- Classes End -->
-
-<!-- Standard Modules -->
-
-<!-- Standard Modules End -->
-
-  
-
-
-
 
 
 
@@ -760,65 +305,14 @@ Define relacionamentos, índices e configurações específicas do provider.
 	</div>
 
 	<div id="remarksSection" class="section">	
-			<strong>Herança:</strong>&nbsp;<br />
-IdentityDbContext&lt;User&gt; fornece automaticamente as tabelas do Identity:
-<ul><li>AspNetUsers (mapeado para User)</li><li>AspNetRoles, AspNetUserRoles, AspNetUserClaims, etc.</li></ul>
-
-<strong>DbSets Adicionais:</strong>
-<table width="100%" cellspacing="2" cellpadding="5"><tr><th align="left">DbSet</th><th align="left">Descrição</th></tr><tr valign="top"><td>Team</td><td>Equipas colaborativas</td></tr><tr valign="top"><td>TeamMember</td><td>Membros de equipas com papéis</td></tr><tr valign="top"><td>Document</td><td>Documentos colaborativos</td></tr><tr valign="top"><td>RefreshTokens</td><td>Tokens de atualização para sessões</td></tr></table>
-
-<strong>Relacionamentos Configurados:</strong>
-<ul><li>RefreshToken → User: Cascade delete</li><li>Document → Team: Cascade delete</li><li>Document → User (CreatedBy): Restrict delete</li></ul>
-
-<strong>Connection String (appsettings.json):</strong>
-			<div class="codeSnippetCodeCollection">
-				<div class="codeSnippetToolbar">
-					<a title="Copy to clipboard." href="javascript:void(0)" onclick="CopyCode(this);">Copy</a>
-				</div>
-				
-				<div class="codeSnippetCode">
-					<pre xml:space="preserve">&quot;FluxnoteServerContext&quot;: &quot;Server=(localdb)\\mssqllocaldb;Database=FluxnoteDB&quot;					</pre>			
-				</div>
-			</div>
+			<strong>Dados Incluídos:</strong>
+<ul><li>Informação básica da equipa (nome, datas, estado)</li><li>Lista de membros com papéis</li><li>Lista de documentos não eliminados</li><li>CurrentUserRole: papel do utilizador nessa equipa</li></ul>
 	</div>					
 </div>
 
 
 
 
-<div class="section_container">
-	<div class="section_heading">
-		<span><a href="javascript:void(0)" title="Collapse" onclick="toggleSection(this);">Inheritance Hierarchy</a></span>
-		<div>&nbsp;</div>
-	</div>
-
-<div id="inheritanceHierarchySection" class="section">
-
-<div style="padding-left:0em;"><a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.object">object</a>
-</div>
-
-<div style="padding-left:1em;"><a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.entityframeworkcore.dbcontext">Microsoft.EntityFrameworkCore.DbContext</a>
-</div>
-
-<div style="padding-left:2em;"><a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.identity.entityframeworkcore.identityusercontext-5">Microsoft.AspNetCore.Identity.EntityFrameworkCore.IdentityUserContext&lt;TUser, TKey, TUserClaim, TUserLogin, TUserToken&gt;</a>
-</div>
-
-<div style="padding-left:3em;"><a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.identity.entityframeworkcore.identitydbcontext-8">Microsoft.AspNetCore.Identity.EntityFrameworkCore.IdentityDbContext&lt;TUser, TRole, TKey, TUserClaim, TUserRole, TUserLogin, TRoleClaim, TUserToken&gt;</a>
-</div>
-
-<div style="padding-left:4em;"><a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.identity.entityframeworkcore.identitydbcontext-3">Microsoft.AspNetCore.Identity.EntityFrameworkCore.IdentityDbContext&lt;TUser, TRole, TKey&gt;</a>
-</div>
-
-<div style="padding-left:5em;"><a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.identity.entityframeworkcore.identitydbcontext-1">Microsoft.AspNetCore.Identity.EntityFrameworkCore.IdentityDbContext&lt;TUser&gt;</a>
-</div>
-
-
-
-<div style="padding-left:6em;">Fluxnote.Backend.Data.FluxnoteServerContext</div>
-
-				
-</div>
-</div>
 
 
 
@@ -873,7 +367,6 @@ IdentityDbContext&lt;User&gt; fornece automaticamente as tabelas do Identity:
 	</div>					
 </div>
 
-
 <div class="section_container">
 	<div class="section_heading">
 		<span><a href="javascript:void(0)" title="Collapse" onclick="toggleSection(this);">See Also</a></span>
@@ -882,10 +375,14 @@ IdentityDbContext&lt;User&gt; fornece automaticamente as tabelas do Identity:
 
 	<div id="seeAlsoSection" class="section">	
 		<div>
-	<a href="topic_000000000000005F.html">Fluxnote.Backend.Data Namespace</a><br />
+			<a href="topic_000000000000005E.html">TeamsController Class</a><br />
 
 
-	
+
+<a href="topic_0000000000000000.html">Fluxnote.Backend.Controllers Namespace</a><br />
+
+
+			
 
 		</div>
 	</div>					

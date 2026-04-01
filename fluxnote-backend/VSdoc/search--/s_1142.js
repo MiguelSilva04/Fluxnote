@@ -1,1 +1,1 @@
-search_result['1142']=["topic_000000000000024E.html","GeminiOptions Class","Configuração para o serviço de IA (Google Gemini).\r\nModel definido em appsettings.json, ApiKey lida da variável de ambiente GEMINI_API_KEY."];
+search_result['1142']=["topic_00000000000001A0_methods--.html","AddFolders Methods",""];

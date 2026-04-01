@@ -1,1 +1,1 @@
-search_result['609']=["topic_0000000000000116_events--.html","GenerateContentRequest Events",""];
+search_result['609']=["topic_00000000000000E6.html","DocumentCommentDto.Resolved Property","Indica se o comentário foi resolvido ou não. Isto pode ser usado para marcar visualmente os comentários que já foram tratados ou respondidos, ajudando os utilizadores a focar nos comentários que ainda..."];

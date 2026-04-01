@@ -5,7 +5,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta name="GENERATOR" content="VSdocman - documentation generator; https://www.helixoft.com" />
 	<link rel="icon" href="favicon.ico">
-	<title>ChangePasswordRequest.NewPassword Property</title>
+	<title>FluxnoteServerContext.DocumentInvite Property</title>
 
 	<link rel="stylesheet" type="text/css" href="msdn2019/toc.css" />
 	<script src="msdn2019/toc.js"></script>
@@ -75,11 +75,11 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
   </div>
 
 <div id="mainBody">
-		<h1 class="title">ChangePasswordRequest.NewPassword Property</h1>
+		<h1 class="title">FluxnoteServerContext.DocumentInvite Property</h1>
         
 		<div class="metadata">
         Namespace:
-<a href="topic_000000000000006F.html">Fluxnote.Backend.Dtos.Auth</a>
+<a href="topic_000000000000006A.html">Fluxnote.Backend.Data</a>
 
 
 
@@ -90,7 +90,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 
        
        
-        <summary-info>Nova password pretendida.</summary-info>
+        <summary-info>DbSet para convites de documentos (permite gerir convites pendentes e aceites).</summary-info>
 
 
 
@@ -140,7 +140,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 				</div>
 				
 				<div class="codeSnippetCode codeVB">
-					<pre xml:space="preserve" class="brush: vb">&lt;Required(ErrorMessage = &quot;New password is required.&quot;)&gt; _&nbsp;<br />&lt;StringLength(100, MinimumLength = 8, ErrorMessage = &quot;Password must be at least 8 characters long.&quot;)&gt; _&nbsp;<br />Public Property NewPassword() As <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.string">String</a></pre>			
+					<pre xml:space="preserve" class="brush: vb">Public Property DocumentInvite() As <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.entityframeworkcore.dbset-1">DbSet</a>(Of <a target="_top" href="topic_00000000000001FE.html" onclick="this.target='';return true;">DocumentInvite</a>)</pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -179,7 +179,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 				</div>
 				
 				<div class="codeSnippetCode codeCsharp">
-					<pre xml:space="preserve" class="brush: csharp">[Required(ErrorMessage = &quot;New password is required.&quot;)]&nbsp;<br />[StringLength(100, MinimumLength = 8, ErrorMessage = &quot;Password must be at least 8 characters long.&quot;)]&nbsp;<br />public <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.string">string</a> NewPassword {get; set;}</pre>			
+					<pre xml:space="preserve" class="brush: csharp">public <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.entityframeworkcore.dbset-1">DbSet</a>&lt;<a target="_top" href="topic_00000000000001FE.html" onclick="this.target='';return true;">DocumentInvite</a>&gt; DocumentInvite {get; set;}</pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -219,7 +219,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 				</div>
 				
 				<div class="codeSnippetCode codeCpp">
-					<pre xml:space="preserve" class="brush: cpp">[Required(ErrorMessage = &quot;New password is required.&quot;)]&nbsp;<br />[StringLength(100, MinimumLength = 8, ErrorMessage = &quot;Password must be at least 8 characters long.&quot;)]&nbsp;<br />public: &nbsp;<br />property <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.string">String</a>^ NewPassword {&nbsp;<br /> <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.string">String</a>^ get( );&nbsp;<br /> void set(&nbsp;<br />   <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.string">String</a>^ value&nbsp;<br /> );&nbsp;<br />}</pre>			
+					<pre xml:space="preserve" class="brush: cpp">public: &nbsp;<br />property <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.entityframeworkcore.dbset-1">DbSet</a>&lt;<a target="_top" href="topic_00000000000001FE.html" onclick="this.target='';return true;">DocumentInvite</a>&gt;^ DocumentInvite {&nbsp;<br /> <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.entityframeworkcore.dbset-1">DbSet</a>&lt;<a target="_top" href="topic_00000000000001FE.html" onclick="this.target='';return true;">DocumentInvite</a>&gt;^ get( );&nbsp;<br /> void set(&nbsp;<br />   <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.entityframeworkcore.dbset-1">DbSet</a>&lt;<a target="_top" href="topic_00000000000001FE.html" onclick="this.target='';return true;">DocumentInvite</a>&gt;^ value&nbsp;<br /> );&nbsp;<br />}</pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -258,7 +258,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 				</div>
 				
 				<div class="codeSnippetCode codeJScript">
-					<pre xml:space="preserve" class="brush: js">public &nbsp;<br />   Required(ErrorMessage = &quot;New password is required.&quot;)&nbsp;<br />   StringLength(100, MinimumLength = 8, ErrorMessage = &quot;Password must be at least 8 characters long.&quot;)&nbsp;<br />function get NewPassword() : <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.string">String</a>;&nbsp;<br />public &nbsp;<br />   Required(ErrorMessage = &quot;New password is required.&quot;)&nbsp;<br />   StringLength(100, MinimumLength = 8, ErrorMessage = &quot;Password must be at least 8 characters long.&quot;)&nbsp;<br />function set NewPassword(value : <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.string">String</a>);</pre>			
+					<pre xml:space="preserve" class="brush: js">JScript does not support generic types and methods.</pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -272,7 +272,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 
 	<h4 class="subHeading">
 		Property Value</h4>
-	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.string">string</a> 
+	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.entityframeworkcore.dbset-1">DbSet</a>&lt;<a target="_top" href="topic_00000000000001FE.html" onclick="this.target='';return true;">DocumentInvite</a>&gt; 
 	
 
 
@@ -295,16 +295,6 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 
 
 
-<div class="section_container">
-	<div class="section_heading">
-		<span><a href="javascript:void(0)" title="Collapse" onclick="toggleSection(this);">Remarks</a></span>
-		<div>&nbsp;</div>
-	</div>
-
-	<div id="remarksSection" class="section">	
-			Requisitos do Identity: 8+ caracteres, maiúscula, minúscula, dígito, especial.
-	</div>					
-</div>
 
 
 
@@ -371,11 +361,11 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 
 	<div id="seeAlsoSection" class="section">	
 		<div>
-			<a href="topic_0000000000000070.html">ChangePasswordRequest Class</a><br />
+			<a href="topic_000000000000006B.html">FluxnoteServerContext Class</a><br />
 
 
 
-<a href="topic_000000000000006F.html">Fluxnote.Backend.Dtos.Auth Namespace</a><br />
+<a href="topic_000000000000006A.html">Fluxnote.Backend.Data Namespace</a><br />
 
 
 			

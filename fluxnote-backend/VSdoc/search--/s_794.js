@@ -1,1 +1,1 @@
-search_result['794']=["topic_0000000000000176.html","initial Class","A base class inherited by each EF Core migration."];
+search_result['794']=["topic_0000000000000127.html","UpdateDocumentRequest Class","DTO para pedido de atualização de documento.\r\nUsado no endpoint PUT /api/documents/{id}."];

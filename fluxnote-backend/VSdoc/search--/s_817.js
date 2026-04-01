@@ -1,1 +1,1 @@
-search_result['817']=["topic_000000000000017D_overloads--.html","AddFolders.BuildTargetModel Method","Implemented to build the TargetModel."];
+search_result['817']=["topic_000000000000012F.html","FolderDto.TeamId Property","ID da equipa à qual a pasta pertence."];

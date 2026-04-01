@@ -1,0 +1,1 @@
+search_result['1752']=["topic_00000000000002B9.html","ConsoleEmailSender Class","Implementação de IEmailSender para ambiente de desenvolvimento.\r\nSimula o envio de emails escrevendo para a consola e armazenando em memória."];

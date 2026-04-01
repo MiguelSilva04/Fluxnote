@@ -1,1 +1,1 @@
-search_result['505']=["topic_00000000000000E6_attached_props--.html","EmailOptions Attached Properties",""];
+search_result['505']=["topic_00000000000000BF.html","DocumentInviteDto.Token Property","Token único para o link do convite."];

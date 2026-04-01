@@ -5,7 +5,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta name="GENERATOR" content="VSdocman - documentation generator; https://www.helixoft.com" />
 	<link rel="icon" href="favicon.ico">
-	<title>DocumentCommentDto Class</title>
+	<title>CreateDocumentCommentDto Class</title>
 
 	<link rel="stylesheet" type="text/css" href="msdn2019/toc.css" />
 	<script src="msdn2019/toc.js"></script>
@@ -75,11 +75,11 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
   </div>
 
 <div id="mainBody">
-		<h1 class="title">DocumentCommentDto Class</h1>
+		<h1 class="title">CreateDocumentCommentDto Class</h1>
         
 		<div class="metadata">
         Namespace:
-<a href="topic_00000000000000BD.html">Fluxnote.Backend.Dtos.Documents</a>
+<a href="topic_00000000000000CA.html">Fluxnote.Backend.Dtos.Documents</a>
 
 
 
@@ -90,7 +90,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 
        
        
-        <summary-info>DTO para representar um comentário num documento. Inclui informações sobre o comentário, como conteúdo, autor, data de criação, posição no texto e se o comentário está resolvido ou não. Também inclui uma lista de respostas (replies), caso existam.</summary-info>
+        <summary-info>DTO para criar um comentário num documento. Pode ser um comentário raiz ou uma resposta a outro comentário.</summary-info>
 
 
 
@@ -140,7 +140,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 				</div>
 				
 				<div class="codeSnippetCode codeVB">
-					<pre xml:space="preserve" class="brush: vb">Public Class DocumentCommentDto</pre>			
+					<pre xml:space="preserve" class="brush: vb">Public Class CreateDocumentCommentDto</pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -179,7 +179,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 				</div>
 				
 				<div class="codeSnippetCode codeCsharp">
-					<pre xml:space="preserve" class="brush: csharp">public class DocumentCommentDto</pre>			
+					<pre xml:space="preserve" class="brush: csharp">public class CreateDocumentCommentDto</pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -219,7 +219,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 				</div>
 				
 				<div class="codeSnippetCode codeCpp">
-					<pre xml:space="preserve" class="brush: cpp">public ref class DocumentCommentDto </pre>			
+					<pre xml:space="preserve" class="brush: cpp">public ref class CreateDocumentCommentDto </pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -258,7 +258,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 				</div>
 				
 				<div class="codeSnippetCode codeJScript">
-					<pre xml:space="preserve" class="brush: js">public class DocumentCommentDto</pre>			
+					<pre xml:space="preserve" class="brush: js">public class CreateDocumentCommentDto</pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -320,7 +320,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
     
 	</td>
 	<td>
-	<a href="topic_00000000000000D6.html">Content</a>
+	<a href="topic_00000000000000D0.html">Content</a>
 
 	</td>
 	<td>
@@ -345,31 +345,7 @@ dependendo de como o frontend lida com os comentários.
     
 	</td>
 	<td>
-	<a href="topic_00000000000000D5.html">CreatedAt</a>
-
-	</td>
-	<td>
-
-Data e hora em que o comentário foi criado.
-
-	</td>
-</tr>
-	
-
-
-	
-		<tr class="
-
-
-">
-	<td>
-<img alt="Public property" title="Public property" src="msdn2019/pubproperty.png"></img>
-
-
-    
-	</td>
-	<td>
-	<a href="topic_00000000000000D4.html">CreatedByColor</a>
+	<a href="topic_00000000000000D1.html">CreatedByColor</a>
 
 	</td>
 	<td>
@@ -393,36 +369,12 @@ Cor associada ao utilizador que criou o comentário. Isto pode ser usado para de
     
 	</td>
 	<td>
-	<a href="topic_00000000000000D3.html">CreatedByName</a>
+	<a href="topic_00000000000000CF.html">DocumentId</a>
 
 	</td>
 	<td>
 
-Nome do utilizador que criou o comentário. Pode ser obtido a partir do UserId, dependendo de como o backend lida com os utilizadores. Útil para exibir o nome do autor no frontend.
-
-	</td>
-</tr>
-	
-
-
-	
-		<tr class="
-
-
-">
-	<td>
-<img alt="Public property" title="Public property" src="msdn2019/pubproperty.png"></img>
-
-
-    
-	</td>
-	<td>
-	<a href="topic_00000000000000D0.html">DocumentId</a>
-
-	</td>
-	<td>
-
-ID do documento ao qual o comentário pertence.
+ID do documento ao qual o comentário pertence. Necessário para associar o comentário ao documento correto.
 
 	</td>
 </tr>
@@ -441,36 +393,12 @@ ID do documento ao qual o comentário pertence.
     
 	</td>
 	<td>
-	<a href="topic_00000000000000CF.html">Id</a>
+	<a href="topic_00000000000000D6.html">MentionedUserIds</a>
 
 	</td>
 	<td>
 
-ID do comentário. Útil para identificar o comentário, especialmente para operações de resposta, edição ou exclusão.
-
-	</td>
-</tr>
-	
-
-
-	
-		<tr class="
-
-
-">
-	<td>
-<img alt="Public property" title="Public property" src="msdn2019/pubproperty.png"></img>
-
-
-    
-	</td>
-	<td>
-	<a href="topic_00000000000000DB.html">Mentions</a>
-
-	</td>
-	<td>
-
-Lista de menções de utilizadores associadas ao comentário.
+Lista de IDs de utilizadores mencionados no comentário
 
 	</td>
 </tr>
@@ -489,7 +417,7 @@ Lista de menções de utilizadores associadas ao comentário.
     
 	</td>
 	<td>
-	<a href="topic_00000000000000D2.html">ParentCommentId</a>
+	<a href="topic_00000000000000D5.html">ParentCommentId</a>
 
 	</td>
 	<td>
@@ -513,36 +441,12 @@ ID do comentário pai, caso este seja uma resposta a outro comentário. Se for u
     
 	</td>
 	<td>
-	<a href="topic_00000000000000D7.html">RangeIndex</a>
+	<a href="topic_00000000000000D2.html">RangeIndex</a>
 
 	</td>
 	<td>
 
-Posição no editor Quill onde o comentário foi feito. Isto pode ser usado para destacar a parte do texto que está a ser comentada. Se for um comentário de seleção, isto indica o índice inicial da seleção. Se for um comentário de posição (sem seleção), isto indica a posição do cursor onde o comentário foi feito.
-
-	</td>
-</tr>
-	
-
-
-	
-		<tr class="
-
-
-">
-	<td>
-<img alt="Public property" title="Public property" src="msdn2019/pubproperty.png"></img>
-
-
-    
-	</td>
-	<td>
-	<a href="topic_00000000000000D8.html">RangeLength</a>
-
-	</td>
-	<td>
-
-Comprimento do texto selecionado no editor Quill. Se for um comentário de seleção, isto indica quantos caracteres estão a ser comentados. Se for um comentário de posição (sem seleção), este campo pode ser nulo ou zero.
+Posição no editor Quill.
 
 	</td>
 </tr>
@@ -561,36 +465,13 @@ Comprimento do texto selecionado no editor Quill. Se for um comentário de sele�
     
 	</td>
 	<td>
-	<a href="topic_00000000000000DA.html">Replies</a>
+	<a href="topic_00000000000000D3.html">RangeLength</a>
 
 	</td>
 	<td>
 
-Lista de respostas (replies) a este comentário. Cada resposta é também um DocumentCommentDto, permitindo uma estrutura hierárquica de comentários e respostas. Se não houver respostas, essa lista pode estar vazia.
-
-	</td>
-</tr>
-	
-
-
-	
-		<tr class="
-
-
-">
-	<td>
-<img alt="Public property" title="Public property" src="msdn2019/pubproperty.png"></img>
-
-
-    
-	</td>
-	<td>
-	<a href="topic_00000000000000D9.html">Resolved</a>
-
-	</td>
-	<td>
-
-Indica se o comentário foi resolvido ou não. Isto pode ser usado para marcar visualmente os comentários que já foram tratados ou respondidos, ajudando os utilizadores a focar nos comentários que ainda precisam de atenção.
+Comprimento do texto selecionado no editor Quill. Se for um comentário de seleção, isto indica quantos caracteres estão a ser comentados.
+Se for um comentário de posição (sem seleção), este campo pode ser nulo ou zero.
 
 	</td>
 </tr>
@@ -609,12 +490,12 @@ Indica se o comentário foi resolvido ou não. Isto pode ser usado para marcar v
     
 	</td>
 	<td>
-	<a href="topic_00000000000000D1.html">UserId</a>
+	<a href="topic_00000000000000D4.html">UserId</a>
 
 	</td>
 	<td>
 
-ID do utilizador que criou o comentário. Pode ser usado para exibir o nome do autor, associar uma cor ou para controle de permissões (ex: permitir que apenas o autor edite ou exclua o comentário).
+ID do utilizador que criou o comentário. Pode ser obtido do contexto de autenticação.
 
 	</td>
 </tr>
@@ -957,7 +838,7 @@ Returns a string that represents the current object.
 
 
 
-<div style="padding-left:1em;">Fluxnote.Backend.Dtos.Documents.DocumentCommentDto</div>
+<div style="padding-left:1em;">Fluxnote.Backend.Dtos.Documents.CreateDocumentCommentDto</div>
 
 				
 </div>
@@ -1025,7 +906,7 @@ Returns a string that represents the current object.
 
 	<div id="seeAlsoSection" class="section">	
 		<div>
-	<a href="topic_00000000000000BD.html">Fluxnote.Backend.Dtos.Documents Namespace</a><br />
+	<a href="topic_00000000000000CA.html">Fluxnote.Backend.Dtos.Documents Namespace</a><br />
 
 
 	

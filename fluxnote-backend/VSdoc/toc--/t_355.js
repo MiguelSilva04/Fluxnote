@@ -1,1 +1,1 @@
-c['355']=[['356',"AcceptTeamInviteResponseDto Class","topic_000000000000012C.html",1],['360',"CreateTeamInviteRequest Class","topic_000000000000012F.html",1],['364',"TeamInviteDto Class","topic_0000000000000132.html",1]];
+c['355']=[['356',"Name Property","topic_0000000000000134.html",0],['357',"TeamId Property","topic_0000000000000135.html",0]];

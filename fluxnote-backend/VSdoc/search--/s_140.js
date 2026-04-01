@@ -1,1 +1,1 @@
-search_result['140']=["topic_0000000000000047_vars--.html","TeamInvitesController Fields",""];
+search_result['140']=["topic_0000000000000042.html","FoldersController.GetFolders Method","Lista as pastas de uma equipa."];

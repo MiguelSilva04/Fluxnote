@@ -1,0 +1,1 @@
+search_result['1323']=["topic_00000000000001EA.html","DocumentComment.Resolved Property","Indica se o comentário foi resolvido ou não. Isto pode ser usado para marcar visualmente os comentários que já foram tratados ou respondidos, ajudando os utilizadores a focar nos comentários que ainda..."];

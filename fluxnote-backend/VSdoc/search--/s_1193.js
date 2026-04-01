@@ -1,1 +1,1 @@
-search_result['1193']=["topic_0000000000000263.html","TeamAutorizationService Constructor","Inicializa uma nova instância de TeamAutorizationService."];
+search_result['1193']=["topic_00000000000001B1.html","documentComments.Up Method","Builds the operations that will migrate the database \u0027up\u0027."];

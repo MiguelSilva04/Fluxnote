@@ -1,1 +1,1 @@
-search_result['352']=["topic_00000000000000A6_events--.html","AcceptDocumentInviteResponseDto Events",""];
+search_result['352']=["topic_000000000000008A.html","ForgotPasswordRequest Class","DTO para pedido de recuperação de password."];

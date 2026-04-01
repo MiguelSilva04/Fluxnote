@@ -1,1 +1,1 @@
-search_result['387']=["topic_00000000000000B2.html","DocumentInviteDto.Token Property","Token único para o link do convite."];
+search_result['387']=["topic_0000000000000094.html","RegisterRequest.Password Property","Password para a conta."];

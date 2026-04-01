@@ -5,7 +5,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta name="GENERATOR" content="VSdocman - documentation generator; https://www.helixoft.com" />
 	<link rel="icon" href="favicon.ico">
-	<title>DocumentHub Class</title>
+	<title>TeamDto.UpdatedAt Property</title>
 
 	<link rel="stylesheet" type="text/css" href="msdn2019/toc.css" />
 	<script src="msdn2019/toc.js"></script>
@@ -75,11 +75,11 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
   </div>
 
 <div id="mainBody">
-		<h1 class="title">DocumentHub Class</h1>
+		<h1 class="title">TeamDto.UpdatedAt Property</h1>
         
 		<div class="metadata">
         Namespace:
-<a href="topic_0000000000000169.html">Fluxnote.Backend.Hubs</a>
+<a href="topic_0000000000000162.html">Fluxnote.Backend.Dtos.Teams</a>
 
 
 
@@ -90,16 +90,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 
        
        
-        <summary-info>Hub SignalR para colaboração em tempo real nos documentos.
-Cada documento tem o seu próprio grupo: &quot;doc-{documentId}&quot;.
-
-Fluxo:
-  1. Cliente chama JoinDocument(documentId)
-  2. Hub valida permissão e adiciona ao grupo
-  3. Edições locais → SendUpdate(documentId, update[])
-  4. Hub faz relay para todos os outros no grupo via ReceiveUpdate
-  5. Periodicamente o cliente chama SaveSnapshot para persistir
-  6. Na desconexão, se houve edições, cria uma DocumentVersion</summary-info>
+        <summary-info>Data da última modificação (UTC).</summary-info>
 
 
 
@@ -149,7 +140,7 @@ Fluxo:
 				</div>
 				
 				<div class="codeSnippetCode codeVB">
-					<pre xml:space="preserve" class="brush: vb">&lt;Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)&gt; _&nbsp;<br />Public Class DocumentHub&nbsp;<br />    Inherits <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.signalr.hub">Hub</a></pre>			
+					<pre xml:space="preserve" class="brush: vb">Public Property UpdatedAt() As <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.datetime">Date</a></pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -188,7 +179,7 @@ Fluxo:
 				</div>
 				
 				<div class="codeSnippetCode codeCsharp">
-					<pre xml:space="preserve" class="brush: csharp">[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]&nbsp;<br />public class DocumentHub : <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.signalr.hub">Hub</a></pre>			
+					<pre xml:space="preserve" class="brush: csharp">public <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.datetime">DateTime</a> UpdatedAt {get; set;}</pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -228,7 +219,7 @@ Fluxo:
 				</div>
 				
 				<div class="codeSnippetCode codeCpp">
-					<pre xml:space="preserve" class="brush: cpp">[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]&nbsp;<br />public ref class DocumentHub : public <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft::aspnetcore::signalr::hub">Hub</a>^</pre>			
+					<pre xml:space="preserve" class="brush: cpp">public: &nbsp;<br />property <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.datetime">DateTime</a> UpdatedAt {&nbsp;<br /> <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.datetime">DateTime</a> get( );&nbsp;<br /> void set(&nbsp;<br />   <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.datetime">DateTime</a> value&nbsp;<br /> );&nbsp;<br />}</pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -267,7 +258,7 @@ Fluxo:
 				</div>
 				
 				<div class="codeSnippetCode codeJScript">
-					<pre xml:space="preserve" class="brush: js">public &nbsp;<br />   Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)&nbsp;<br />class DocumentHub&nbsp;<br />   extends <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.signalr.hub">Hub</a></pre>			
+					<pre xml:space="preserve" class="brush: js">public function get UpdatedAt() : <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.datetime">DateTime</a>;&nbsp;<br />public function set UpdatedAt(value : <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.datetime">DateTime</a>);</pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -279,6 +270,11 @@ Fluxo:
 
 
 
+	<h4 class="subHeading">
+		Property Value</h4>
+	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.datetime">DateTime</a> 
+	
+
 
 
 
@@ -297,601 +293,12 @@ Fluxo:
 
 
 
-<div class="section_container">
-	<div class="section_heading">
-		<span><a href="javascript:void(0)" title="Collapse" onclick="toggleSection(this);">Constructors</a></span>
-		<div>&nbsp;</div>
-	</div>
 
-	<div id="ConstructorsSection" class="section">	
-  <table class="memberListTable">
-    <tr>
-      <th></th>
-      <th>
-        Name
-      </th>
-      <th>
-        Description
-      </th>
-    </tr>
 
 
-	
-			<tr class="
-	
-	
-	">
-	  <td>
-    <img alt="Public constructor" title="Public constructor" src="msdn2019/pubmethod.png"></img>
 
-	
-	    
-	  </td>
-	  <td>
-	    <a href="topic_000000000000016B.html">DocumentHub(FluxnoteServerContext, ILogger&lt;DocumentHub&gt;)</a>
 
-	  </td>
-	  <td>
-	
-	
-	
-		</td>
-	</tr>
-	
 
-
-  </table>
-
-  <a href="#mainBody">
-    Top
-  </a>
-
-	</div>					
-</div>
-
-<div class="section_container">
-	<div class="section_heading">
-		<span><a href="javascript:void(0)" title="Collapse" onclick="toggleSection(this);">Properties</a></span>
-		<div>&nbsp;</div>
-	</div>
-
-	<div id="PropertiesSection" class="section">	
-  <table class="memberListTable">
-    <tr>
-      <th></th>
-      <th>
-        Name
-      </th>
-      <th>
-        Description
-      </th>
-    </tr>
-
-
-	
-		<tr class="
-inheritedMember 
-
-
-">
-	<td>
-<img alt="Public property" title="Public property" src="msdn2019/pubproperty.png"></img>
-
-
-    
-	</td>
-	<td>
-	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.signalr.hub.clients">Clients</a>
-
-	</td>
-	<td>
-
-Gets or sets an object that can be used to invoke methods on the clients connected to this hub.
-(inherited from <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.signalr.hub">Hub</a>).
-
-	</td>
-</tr>
-	
-
-
-	
-		<tr class="
-inheritedMember 
-
-
-">
-	<td>
-<img alt="Public property" title="Public property" src="msdn2019/pubproperty.png"></img>
-
-
-    
-	</td>
-	<td>
-	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.signalr.hub.context">Context</a>
-
-	</td>
-	<td>
-
-Gets or sets the hub caller context.
-(inherited from <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.signalr.hub">Hub</a>).
-
-	</td>
-</tr>
-	
-
-
-	
-		<tr class="
-inheritedMember 
-
-
-">
-	<td>
-<img alt="Public property" title="Public property" src="msdn2019/pubproperty.png"></img>
-
-
-    
-	</td>
-	<td>
-	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.signalr.hub.groups">Groups</a>
-
-	</td>
-	<td>
-
-Gets or sets the group manager.
-(inherited from <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.signalr.hub">Hub</a>).
-
-	</td>
-</tr>
-	
-
-
-  </table>
-
-  <a href="#mainBody">
-    Top
-  </a>
-
-	</div>					
-</div>
-
-
-
-
-
-
-<div class="section_container">
-	<div class="section_heading">
-		<span><a href="javascript:void(0)" title="Collapse" onclick="toggleSection(this);">Methods</a></span>
-		<div>&nbsp;</div>
-	</div>
-
-	<div id="MethodsSection" class="section">	
-  <table class="memberListTable">
-    <tr>
-      <th></th>
-      <th>
-        Name
-      </th>
-      <th>
-        Description
-      </th>
-    </tr>
-
-
-
-			<tr class="
-inheritedMember 
-
-
-">
-	<td>
-<img alt="Public method" title="Public method" src="msdn2019/pubmethod.png"></img>
-
-
-    
-	</td>
-	<td>
-	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.signalr.hub.dispose">Dispose()</a>
-
-	</td>
-	<td>
-
-
-(inherited from <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.signalr.hub">Hub</a>).
-
-	</td>
-</tr>
-			<tr class="
-inheritedMember 
-
-
-">
-	<td>
-   <img alt="Protected method" title="Protected method" src="msdn2019/protmethod.png"></img>
-
-    
-	  
-
-
-    
-	</td>
-	<td>
-	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.signalr.hub.dispose">Dispose(bool)</a>
-
-	</td>
-	<td>
-
-Releases all resources currently used by this <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.signalr.hub">Hub</a> instance.
-(inherited from <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.signalr.hub">Hub</a>).
-
-	</td>
-</tr>
-	
-
-
-
-
-
-
-
-
-	<tr class="
-
-
-">
-	<td>
-<img alt="Public method" title="Public method" src="msdn2019/pubmethod.png"></img>
-
-
-    
-	</td>
-	<td>
-	<a href="topic_000000000000016C.html">JoinDocument(int)</a>
-
-	</td>
-	<td>
-
-
-
-	</td>
-</tr>
-
-
-
-
-
-
-
-
-	<tr class="
-
-
-">
-	<td>
-<img alt="Public method" title="Public method" src="msdn2019/pubmethod.png"></img>
-
-
-    
-	</td>
-	<td>
-	<a href="topic_000000000000016D.html">LeaveDocument(int, string)</a>
-
-	</td>
-	<td>
-
-
-
-	</td>
-</tr>
-
-
-
-
-
-
-
-
-	<tr class="
-inheritedMember 
-
-
-">
-	<td>
-<img alt="Public method" title="Public method" src="msdn2019/pubmethod.png"></img>
-
-
-    
-	</td>
-	<td>
-	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.signalr.hub.onconnectedasync">OnConnectedAsync()</a>
-
-	</td>
-	<td>
-
-Called when a new connection is established with the hub.
-(inherited from <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.signalr.hub">Hub</a>).
-
-	</td>
-</tr>
-
-
-
-
-
-
-
-			<tr class="
-
-
-">
-	<td>
-<img alt="Public method" title="Public method" src="msdn2019/pubmethod.png"></img>
-
-
-    
-	</td>
-	<td>
-	<a href="topic_0000000000000174.html">OnDisconnectedAsync(Exception)</a>
-
-	</td>
-	<td>
-
-Called when a connection with the hub is terminated.
-
-	</td>
-</tr>
-	
-
-
-
-
-
-
-
-
-	<tr class="
-
-
-">
-	<td>
-<img alt="Public method" title="Public method" src="msdn2019/pubmethod.png"></img>
-
-
-    
-	</td>
-	<td>
-	<a href="topic_0000000000000173.html">SaveSnapshot(int, byte[], string)</a>
-
-	</td>
-	<td>
-
-
-
-	</td>
-</tr>
-
-
-
-
-
-
-
-
-	<tr class="
-
-
-">
-	<td>
-<img alt="Public method" title="Public method" src="msdn2019/pubmethod.png"></img>
-
-
-    
-	</td>
-	<td>
-	<a href="topic_000000000000016F.html">SendAwareness(int, string)</a>
-
-	</td>
-	<td>
-
-
-
-	</td>
-</tr>
-
-
-
-
-
-
-
-
-	<tr class="
-
-
-">
-	<td>
-<img alt="Public method" title="Public method" src="msdn2019/pubmethod.png"></img>
-
-
-    
-	</td>
-	<td>
-	<a href="topic_0000000000000170.html">SendComment(int, string)</a>
-
-	</td>
-	<td>
-
-Notifica outros utilizadores no documento que um comentário foi criado.
-O payload é o JSON do comentário completo (DocumentCommentDto).
-
-	</td>
-</tr>
-
-
-
-
-
-
-
-
-	<tr class="
-
-
-">
-	<td>
-<img alt="Public method" title="Public method" src="msdn2019/pubmethod.png"></img>
-
-
-    
-	</td>
-	<td>
-	<a href="topic_0000000000000172.html">SendCommentDeleted(int, int)</a>
-
-	</td>
-	<td>
-
-Notifica outros utilizadores que um comentário foi eliminado.
-
-	</td>
-</tr>
-
-
-
-
-
-
-
-
-	<tr class="
-
-
-">
-	<td>
-<img alt="Public method" title="Public method" src="msdn2019/pubmethod.png"></img>
-
-
-    
-	</td>
-	<td>
-	<a href="topic_0000000000000171.html">SendCommentResolved(int, int, bool)</a>
-
-	</td>
-	<td>
-
-Notifica outros utilizadores que um comentário foi resolvido/unreresolvido.
-
-	</td>
-</tr>
-
-
-
-
-
-
-
-
-	<tr class="
-
-
-">
-	<td>
-<img alt="Public method" title="Public method" src="msdn2019/pubmethod.png"></img>
-
-
-    
-	</td>
-	<td>
-	<a href="topic_000000000000016E.html">SendUpdate(int, byte[])</a>
-
-	</td>
-	<td>
-
-
-
-	</td>
-</tr>
-
-
-
-
-
-
-  </table>
-
-  <a href="#mainBody">
-    Top
-  </a>
-
-	</div>					
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
-
-<!-- Classes -->
-
-<!-- Classes End -->
-
-<!-- Standard Modules -->
-
-<!-- Standard Modules End -->
-
-  
-
-
-
-
-
-
-
-
-
-
-
-
-<div class="section_container">
-	<div class="section_heading">
-		<span><a href="javascript:void(0)" title="Collapse" onclick="toggleSection(this);">Inheritance Hierarchy</a></span>
-		<div>&nbsp;</div>
-	</div>
-
-<div id="inheritanceHierarchySection" class="section">
-
-<div style="padding-left:0em;"><a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.object">object</a>
-</div>
-
-<div style="padding-left:1em;"><a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.signalr.hub">Microsoft.AspNetCore.SignalR.Hub</a>
-</div>
-
-
-
-<div style="padding-left:2em;">Fluxnote.Backend.Hubs.DocumentHub</div>
-
-				
-</div>
-</div>
 
 
 
@@ -946,7 +353,6 @@ Notifica outros utilizadores que um comentário foi resolvido/unreresolvido.
 	</div>					
 </div>
 
-
 <div class="section_container">
 	<div class="section_heading">
 		<span><a href="javascript:void(0)" title="Collapse" onclick="toggleSection(this);">See Also</a></span>
@@ -955,10 +361,14 @@ Notifica outros utilizadores que um comentário foi resolvido/unreresolvido.
 
 	<div id="seeAlsoSection" class="section">	
 		<div>
-	<a href="topic_0000000000000169.html">Fluxnote.Backend.Hubs Namespace</a><br />
+			<a href="topic_0000000000000165.html">TeamDto Class</a><br />
 
 
-	
+
+<a href="topic_0000000000000162.html">Fluxnote.Backend.Dtos.Teams Namespace</a><br />
+
+
+			
 
 		</div>
 	</div>					

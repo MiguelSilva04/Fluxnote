@@ -1,0 +1,1 @@
+search_result['1375']=["topic_000000000000020A.html","DocumentPermission Class","Entidade que representa uma permissão explícita de acesso de um membro a um documento."];

@@ -1,1 +1,1 @@
-search_result['568']=["topic_0000000000000103.html","DocumentPermissionDto.DocumentId Property","ID do documento ao qual a permissão pertence."];
+search_result['568']=["topic_00000000000000DB.html","DocumentCommentDto Class","DTO para representar um comentário num documento. Inclui informações sobre o comentário, como conteúdo, autor, data de criação, posição no texto e se o comentário está resolvido ou não. Também inclui ..."];

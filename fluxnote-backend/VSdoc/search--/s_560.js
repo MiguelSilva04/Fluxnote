@@ -1,1 +1,1 @@
-search_result['560']=["topic_0000000000000100.html","DocumentDetailDto.IsTeamAdmin Property","Indica se o utilizador autenticado é um Team Admin da equipa deste documento.\r\nO Owner e o TeamAdmin podem resolver comentários."];
+search_result['560']=["topic_00000000000000D7_attached_props--.html","CreateDocumentRequest Attached Properties",""];

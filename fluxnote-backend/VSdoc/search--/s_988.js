@@ -1,1 +1,1 @@
-search_result['988']=["topic_00000000000001DA.html","DocumentPermission.DocumentId Property","ID do documento ao qual a permissão pertence."];
+search_result['988']=["topic_0000000000000171_vars--.html","TeamMemberDto Fields",""];

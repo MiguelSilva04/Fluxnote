@@ -1,1 +1,1 @@
-search_result['358']=["topic_00000000000000A7_events--.html","Team Events",""];
+search_result['358']=["topic_000000000000008B.html","ForgotPasswordRequest.Email Property","Email do utilizador que pretende recuperar a password."];

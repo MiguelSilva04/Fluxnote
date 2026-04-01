@@ -1,1 +1,1 @@
-search_result['596']=["topic_0000000000000110.html","DocumentVersionDto.DocumentId Property",""];
+search_result['596']=["topic_00000000000000E3.html","DocumentCommentDto.Content Property","Conteúdo do comentário. Pode ser texto simples ou conter formatação (ex: Markdown ou HTML)\r\ndependendo de como o frontend lida com os comentários."];

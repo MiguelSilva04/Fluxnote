@@ -1,0 +1,1 @@
+search_result['1686']=["topic_000000000000029A.html","GeminiAIService Class","Implementação do serviço de IA usando Google Gemini API (free tier)."];

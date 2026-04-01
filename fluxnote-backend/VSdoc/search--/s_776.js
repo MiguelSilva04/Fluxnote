@@ -1,1 +1,1 @@
-search_result['776']=["topic_000000000000016A.html","DocumentHub Class","Hub SignalR para colaboração em tempo real nos documentos.\r\nCada documento tem o seu próprio grupo: \"doc-{documentId}\".\r\n\r\nFluxo:\r\n  1. Cliente chama JoinDocument(documentId)\r\n  2. Hub valida permissã..."];
+search_result['776']=["topic_0000000000000123_attached_props--.html","GenerateContentRequest Attached Properties",""];

@@ -1,1 +1,1 @@
-search_result['637']=["topic_0000000000000120.html","FolderDto.Id Property","Identificador único da pasta."];
+search_result['637']=["topic_00000000000000F0_methods--.html","SmtpEmailSender Methods",""];

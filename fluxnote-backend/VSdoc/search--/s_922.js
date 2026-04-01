@@ -1,1 +1,1 @@
-search_result['922']=["topic_00000000000001AC.html","Document.CreatedBy Property","Referência de navegação para o utilizador criador."];
+search_result['922']=["topic_0000000000000157.html","CreateTeamInviteRequest.ExpirationDays Property","Dias até o convite expirar. Após esse período, o convite não poderá mais ser aceito.\r\nPor padrão, o convite expira em 7 dias. O valor deve ser um inteiro positivo."];

@@ -1,0 +1,1 @@
+search_result['1334']=["topic_00000000000001F0.html","DocumentComment.ParentComment Property","Referência de navegação para o comentário pai, caso este seja uma resposta a outro comentário."];

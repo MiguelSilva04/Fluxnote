@@ -1,1 +1,1 @@
-search_result['1175']=["topic_000000000000025B.html","Fluxnote.Backend.Services.Auth Namespace",""];
+search_result['1175']=["topic_00000000000001AC.html","AddDocumentVersions Class","A base class inherited by each EF Core migration."];

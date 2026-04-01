@@ -1,1 +1,1 @@
-search_result['1281']=["topic_000000000000028E.html","IStorageService.GetImageAsync Method","Devolve o stream de uma imagem previamente carregada, ou null se não existir.\r\nUsado pelo UploadsController para servir imagens sem depender de acesso anónimo ao blob."];
+search_result['1281']=["topic_00000000000001CF_vars--.html","Document Fields",""];

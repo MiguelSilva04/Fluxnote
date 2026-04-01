@@ -1,1 +1,1 @@
-search_result['673']=["topic_0000000000000130.html","CreateTeamInviteRequest.TeamId Property","ID da equipa para o qual o convite será criado."];
+search_result['673']=["topic_00000000000000FF_props--.html","DocumentDetailDto Properties",""];

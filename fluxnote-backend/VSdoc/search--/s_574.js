@@ -1,1 +1,1 @@
-search_result['574']=["topic_0000000000000108_attached_props--.html","CreateDocumentPermissionRequest Attached Properties",""];
+search_result['574']=["topic_00000000000000DC.html","DocumentCommentDto.Id Property","ID do comentário. Útil para identificar o comentário, especialmente para operações de resposta, edição ou exclusão."];

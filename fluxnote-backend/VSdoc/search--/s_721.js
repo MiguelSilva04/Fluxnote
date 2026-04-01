@@ -1,1 +1,1 @@
-search_result['721']=["topic_000000000000014C.html","TeamMemberDto.Id Property","Identificador único do membro."];
+search_result['721']=["topic_0000000000000115.html","CreateDocumentPermissionRequest Class","DTO de pedido para criação de uma permissão de documento."];

@@ -1,1 +1,1 @@
-search_result['343']=["topic_000000000000009F.html","UserProfile.Location Property","Localização geográfica."];
+search_result['343']=["topic_0000000000000086.html","ExternalUserInfo.Provider Property",""];

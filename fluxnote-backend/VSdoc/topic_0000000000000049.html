@@ -5,7 +5,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta name="GENERATOR" content="VSdocman - documentation generator; https://www.helixoft.com" />
 	<link rel="icon" href="favicon.ico">
-	<title>TeamInvitesController.CreateInvite Method</title>
+	<title>NotificationsController Constructor</title>
 
 	<link rel="stylesheet" type="text/css" href="msdn2019/toc.css" />
 	<script src="msdn2019/toc.js"></script>
@@ -75,7 +75,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
   </div>
 
 <div id="mainBody">
-		<h1 class="title">TeamInvitesController.CreateInvite Method</h1>
+		<h1 class="title">NotificationsController Constructor</h1>
         
 		<div class="metadata">
         Namespace:
@@ -90,8 +90,6 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 
        
        
-        <summary-info>Cria um convite por link para um documento.
-Apenas Owner ou TeamAdmin podem criar convites.</summary-info>
 
 
 
@@ -141,7 +139,7 @@ Apenas Owner ou TeamAdmin podem criar convites.</summary-info>
 				</div>
 				
 				<div class="codeSnippetCode codeVB">
-					<pre xml:space="preserve" class="brush: vb">&lt;HttpPost()&gt; _&nbsp;<br />Public Function CreateInvite( _&nbsp;<br />   &lt;FromBody()&gt; _&nbsp;<br />   ByVal <i>request</i> As <a target="_top" href="topic_000000000000012F.html" onclick="this.target='';return true;">CreateTeamInviteRequest</a> _&nbsp;<br />) As <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1">Task</a>(Of <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.actionresult-1">ActionResult</a>(Of <a target="_top" href="topic_0000000000000132.html" onclick="this.target='';return true;">TeamInviteDto</a>))</pre>			
+					<pre xml:space="preserve" class="brush: vb">Public Sub New( _&nbsp;<br />   ByVal <i>context</i> As <a target="_top" href="topic_000000000000006B.html" onclick="this.target='';return true;">FluxnoteServerContext</a>, _&nbsp;<br />   ByVal <i>notificationService</i> As <a target="_top" href="topic_00000000000002D6.html" onclick="this.target='';return true;">INotificationService</a> _&nbsp;<br />)</pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -180,7 +178,7 @@ Apenas Owner ou TeamAdmin podem criar convites.</summary-info>
 				</div>
 				
 				<div class="codeSnippetCode codeCsharp">
-					<pre xml:space="preserve" class="brush: csharp">[HttpPost()]&nbsp;<br />public <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.actionresult-1">ActionResult</a>&lt;<a target="_top" href="topic_0000000000000132.html" onclick="this.target='';return true;">TeamInviteDto</a>&gt;&gt; CreateInvite(&nbsp;<br />   [FromBody()]&nbsp;<br />   <a target="_top" href="topic_000000000000012F.html" onclick="this.target='';return true;">CreateTeamInviteRequest</a> <i>request</i>&nbsp;<br />)</pre>			
+					<pre xml:space="preserve" class="brush: csharp">public NotificationsController(&nbsp;<br />   <a target="_top" href="topic_000000000000006B.html" onclick="this.target='';return true;">FluxnoteServerContext</a> <i>context</i>,&nbsp;<br />   <a target="_top" href="topic_00000000000002D6.html" onclick="this.target='';return true;">INotificationService</a> <i>notificationService</i>&nbsp;<br />)</pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -220,7 +218,7 @@ Apenas Owner ou TeamAdmin podem criar convites.</summary-info>
 				</div>
 				
 				<div class="codeSnippetCode codeCpp">
-					<pre xml:space="preserve" class="brush: cpp">[HttpPost()]&nbsp;<br />public: &nbsp;<br /><a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.actionresult-1">ActionResult</a>&lt;<a target="_top" href="topic_0000000000000132.html" onclick="this.target='';return true;">TeamInviteDto</a>&gt;^&gt;^ CreateInvite(&nbsp;<br />   [FromBody()]&nbsp;<br />   <a target="_top" href="topic_000000000000012F.html" onclick="this.target='';return true;">CreateTeamInviteRequest</a>^ <i>request</i>&nbsp;<br />) </pre>			
+					<pre xml:space="preserve" class="brush: cpp">public: &nbsp;<br />NotificationsController(&nbsp;<br />   <a target="_top" href="topic_000000000000006B.html" onclick="this.target='';return true;">FluxnoteServerContext</a>^ <i>context</i>,&nbsp;<br />   <a target="_top" href="topic_00000000000002D6.html" onclick="this.target='';return true;">INotificationService</a>^ <i>notificationService</i>&nbsp;<br />) </pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -259,7 +257,7 @@ Apenas Owner ou TeamAdmin podem criar convites.</summary-info>
 				</div>
 				
 				<div class="codeSnippetCode codeJScript">
-					<pre xml:space="preserve" class="brush: js">JScript does not support generic types and methods.</pre>			
+					<pre xml:space="preserve" class="brush: js">public function NotificationsController(&nbsp;<br />    <i>context</i> : <a target="_top" href="topic_000000000000006B.html" onclick="this.target='';return true;">FluxnoteServerContext</a>,&nbsp;<br />    <i>notificationService</i> : <a target="_top" href="topic_00000000000002D6.html" onclick="this.target='';return true;">INotificationService</a>&nbsp;<br />);</pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -271,14 +269,27 @@ Apenas Owner ou TeamAdmin podem criar convites.</summary-info>
 
 
 <h4 class="subHeading">
-	Parameters</h4><dl paramName="request" class="parameterList">
+	Parameters</h4><dl paramName="context" class="parameterList">
 	<dt>
 		<span class="parameter">
-			request
+			context
 		</span>
 	</dt>
 	<dd>
-		<a target="_top" href="topic_000000000000012F.html" onclick="this.target='';return true;">CreateTeamInviteRequest</a> 
+		<a target="_top" href="topic_000000000000006B.html" onclick="this.target='';return true;">FluxnoteServerContext</a> 
+	</dd>
+</dl>
+<p>
+	 
+</p>
+<dl paramName="notificationService" class="parameterList">
+	<dt>
+		<span class="parameter">
+			notificationService
+		</span>
+	</dt>
+	<dd>
+		<a target="_top" href="topic_00000000000002D6.html" onclick="this.target='';return true;">INotificationService</a> 
 	</dd>
 </dl>
 <p>
@@ -287,10 +298,6 @@ Apenas Owner ou TeamAdmin podem criar convites.</summary-info>
 
 <p />
 
-	<h4 class="subHeading">
-		Return Value</h4>
-	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.actionresult-1">ActionResult</a>&lt;<a target="_top" href="topic_0000000000000132.html" onclick="this.target='';return true;">TeamInviteDto</a>&gt;&gt; 
-	
 
 
 
@@ -378,7 +385,7 @@ Apenas Owner ou TeamAdmin podem criar convites.</summary-info>
 
 	<div id="seeAlsoSection" class="section">	
 		<div>
-			<a href="topic_0000000000000047.html">TeamInvitesController Class</a><br />
+			<a href="topic_0000000000000048.html">NotificationsController Class</a><br />
 
 
 

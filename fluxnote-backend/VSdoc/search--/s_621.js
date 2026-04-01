@@ -1,1 +1,1 @@
-search_result['621']=["topic_000000000000011A.html","UpdateDocumentRequest Class","DTO para pedido de atualização de documento.\r\nUsado no endpoint PUT /api/documents/{id}."];
+search_result['621']=["topic_00000000000000E9_props--.html","DocumentContextDto Properties",""];

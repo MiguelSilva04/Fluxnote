@@ -1,1 +1,1 @@
-search_result['141']=["topic_0000000000000048.html","TeamInvitesController Constructor",""];
+search_result['141']=["topic_0000000000000043.html","FoldersController.CreateFolder Method","Cria uma nova pasta numa equipa. Apenas Owner ou TeamAdmin."];

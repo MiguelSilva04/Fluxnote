@@ -1,1 +1,1 @@
-search_result['395']=["topic_00000000000000BA.html","DocumentInviteDto.IsRevoked Property","Indica se o convite foi revogado.\r\nUm convite revogado não pode ser aceito, mesmo que ainda não tenha expirado."];
+search_result['395']=["topic_0000000000000097.html","ResetPasswordRequest Class","DTO para redefinição de password com token."];

@@ -1,1 +1,1 @@
-search_result['295']=["topic_0000000000000088_vars--.html","Document Fields",""];
+search_result['295']=["topic_0000000000000079.html","FluxnoteServerContext.NotificationPreferences Property","DbSet para preferências de notificação dos utilizadores."];

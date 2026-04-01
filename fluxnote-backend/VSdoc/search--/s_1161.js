@@ -1,1 +1,1 @@
-search_result['1161']=["topic_0000000000000255_events--.html","ITextExtractionService Events",""];
+search_result['1161']=["topic_00000000000001A7.html","AddYDocSnapshot.BuildTargetModel Method","Implemented to build the TargetModel."];

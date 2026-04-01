@@ -1,1 +1,1 @@
-c['737']=[['738',"Up(MigrationBuilder) Method","topic_000000000000017F.html",0]];
+c['737']=[['738',"Properties","topic_00000000000002C4_props--.html",1]];

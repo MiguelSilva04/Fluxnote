@@ -5,7 +5,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta name="GENERATOR" content="VSdocman - documentation generator; https://www.helixoft.com" />
 	<link rel="icon" href="favicon.ico">
-	<title>ConsoleEmailSender Class</title>
+	<title>TeamInvite.Id Property</title>
 
 	<link rel="stylesheet" type="text/css" href="msdn2019/toc.css" />
 	<script src="msdn2019/toc.js"></script>
@@ -75,11 +75,11 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
   </div>
 
 <div id="mainBody">
-		<h1 class="title">ConsoleEmailSender Class</h1>
+		<h1 class="title">TeamInvite.Id Property</h1>
         
 		<div class="metadata">
         Namespace:
-<a href="topic_0000000000000267.html">Fluxnote.Backend.Services.Email</a>
+<a href="topic_00000000000001C8.html">Fluxnote.Backend.Models</a>
 
 
 
@@ -90,8 +90,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 
        
        
-        <summary-info>Implementação de IEmailSender para ambiente de desenvolvimento.
-Simula o envio de emails escrevendo para a consola e armazenando em memória.</summary-info>
+        <summary-info>Identificador único do convite (chave primária).</summary-info>
 
 
 
@@ -141,7 +140,7 @@ Simula o envio de emails escrevendo para a consola e armazenando em memória.</s
 				</div>
 				
 				<div class="codeSnippetCode codeVB">
-					<pre xml:space="preserve" class="brush: vb">Public Class ConsoleEmailSender&nbsp;<br />    Implements <a target="_top" href="topic_000000000000027A.html" onclick="this.target='';return true;">IEmailSender</a></pre>			
+					<pre xml:space="preserve" class="brush: vb">Public Property Id() As <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.int32">Integer</a></pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -180,7 +179,7 @@ Simula o envio de emails escrevendo para a consola e armazenando em memória.</s
 				</div>
 				
 				<div class="codeSnippetCode codeCsharp">
-					<pre xml:space="preserve" class="brush: csharp">public class ConsoleEmailSender : <a target="_top" href="topic_000000000000027A.html" onclick="this.target='';return true;">IEmailSender</a></pre>			
+					<pre xml:space="preserve" class="brush: csharp">public <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.int32">int</a> Id {get; set;}</pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -220,7 +219,7 @@ Simula o envio de emails escrevendo para a consola e armazenando em memória.</s
 				</div>
 				
 				<div class="codeSnippetCode codeCpp">
-					<pre xml:space="preserve" class="brush: cpp">public ref class ConsoleEmailSender  : public <a target="_top" href="topic_000000000000027A.html" onclick="this.target='';return true;">IEmailSender</a>^</pre>			
+					<pre xml:space="preserve" class="brush: cpp">public: &nbsp;<br />property <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.int32">int</a> Id {&nbsp;<br /> <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.int32">int</a> get( );&nbsp;<br /> void set(&nbsp;<br />   <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.int32">int</a> value&nbsp;<br /> );&nbsp;<br />}</pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -259,7 +258,7 @@ Simula o envio de emails escrevendo para a consola e armazenando em memória.</s
 				</div>
 				
 				<div class="codeSnippetCode codeJScript">
-					<pre xml:space="preserve" class="brush: js">public class ConsoleEmailSender&nbsp;<br />   implements <a target="_top" href="topic_000000000000027A.html" onclick="this.target='';return true;">IEmailSender</a></pre>			
+					<pre xml:space="preserve" class="brush: js">public function get Id() : <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.int32">int</a>;&nbsp;<br />public function set Id(value : <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.int32">int</a>);</pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -271,6 +270,11 @@ Simula o envio de emails escrevendo para a consola e armazenando em memória.</s
 
 
 
+	<h4 class="subHeading">
+		Property Value</h4>
+	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.int32">int</a> 
+	
+
 
 
 
@@ -289,485 +293,12 @@ Simula o envio de emails escrevendo para a consola e armazenando em memória.</s
 
 
 
-<div class="section_container">
-	<div class="section_heading">
-		<span><a href="javascript:void(0)" title="Collapse" onclick="toggleSection(this);">Constructors</a></span>
-		<div>&nbsp;</div>
-	</div>
 
-	<div id="ConstructorsSection" class="section">	
-  <table class="memberListTable">
-    <tr>
-      <th></th>
-      <th>
-        Name
-      </th>
-      <th>
-        Description
-      </th>
-    </tr>
 
 
-	
-			<tr class="
-	
-	
-	">
-	  <td>
-    <img alt="Public constructor" title="Public constructor" src="msdn2019/pubmethod.png"></img>
 
-	
-	    
-	  </td>
-	  <td>
-	    <a href="topic_0000000000000269.html">ConsoleEmailSender(ILogger&lt;ConsoleEmailSender&gt;, IDevEmailStore)</a>
 
-	  </td>
-	  <td>
-	
-	Construtor com injeção de dependências.
-	
-		</td>
-	</tr>
-	
 
-
-  </table>
-
-  <a href="#mainBody">
-    Top
-  </a>
-
-	</div>					
-</div>
-
-
-
-
-
-
-
-<div class="section_container">
-	<div class="section_heading">
-		<span><a href="javascript:void(0)" title="Collapse" onclick="toggleSection(this);">Methods</a></span>
-		<div>&nbsp;</div>
-	</div>
-
-	<div id="MethodsSection" class="section">	
-  <table class="memberListTable">
-    <tr>
-      <th></th>
-      <th>
-        Name
-      </th>
-      <th>
-        Description
-      </th>
-    </tr>
-
-
-
-			<tr class="
-inheritedMember 
-
-
-">
-	<td>
-<img alt="Public method" title="Public method" src="msdn2019/pubmethod.png"></img>
-
-	<img alt="Static" title="Static" src="msdn2019/static.png"></img>
-
-    
-	</td>
-	<td>
-	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.object.equals">Equals(object?, object?)</a>
-
-	</td>
-	<td>
-
-Determines whether the specified object instances are considered equal.
-(inherited from <a target="_top" href=".html" onclick="this.target='';return true;">object</a>).
-
-	</td>
-</tr>
-			<tr class="
-inheritedMember 
-
-
-">
-	<td>
-<img alt="Public method" title="Public method" src="msdn2019/pubmethod.png"></img>
-
-
-    
-	</td>
-	<td>
-	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.object.equals">Equals(object?)</a>
-
-	</td>
-	<td>
-
-Determines whether the specified object is equal to the current object.
-(inherited from <a target="_top" href=".html" onclick="this.target='';return true;">object</a>).
-
-	</td>
-</tr>
-	
-
-
-
-
-
-
-
-
-	<tr class="
-inheritedMember 
-
-
-">
-	<td>
-   <img alt="Protected method" title="Protected method" src="msdn2019/protmethod.png"></img>
-
-    
-	  
-
-
-    
-	</td>
-	<td>
-	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.object.finalize">~Object()</a>
-
-	</td>
-	<td>
-
-Allows an object to try to free resources and perform other cleanup operations before it is reclaimed by garbage collection.
-(inherited from <a target="_top" href=".html" onclick="this.target='';return true;">object</a>).
-
-	</td>
-</tr>
-
-
-
-
-
-
-
-
-	<tr class="
-inheritedMember 
-
-
-">
-	<td>
-<img alt="Public method" title="Public method" src="msdn2019/pubmethod.png"></img>
-
-
-    
-	</td>
-	<td>
-	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.object.gethashcode">GetHashCode()</a>
-
-	</td>
-	<td>
-
-Serves as the default hash function.
-(inherited from <a target="_top" href=".html" onclick="this.target='';return true;">object</a>).
-
-	</td>
-</tr>
-
-
-
-
-
-
-
-
-	<tr class="
-inheritedMember 
-
-
-">
-	<td>
-<img alt="Public method" title="Public method" src="msdn2019/pubmethod.png"></img>
-
-
-    
-	</td>
-	<td>
-	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.object.gettype">GetType()</a>
-
-	</td>
-	<td>
-
-Gets the <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.type">Type</a> of the current instance.
-(inherited from <a target="_top" href=".html" onclick="this.target='';return true;">object</a>).
-
-	</td>
-</tr>
-
-
-
-
-
-
-
-
-	<tr class="
-inheritedMember 
-
-
-">
-	<td>
-   <img alt="Protected method" title="Protected method" src="msdn2019/protmethod.png"></img>
-
-    
-	  
-
-
-    
-	</td>
-	<td>
-	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.object.memberwiseclone">MemberwiseClone()</a>
-
-	</td>
-	<td>
-
-Creates a shallow copy of the current <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.object">object</a>.
-(inherited from <a target="_top" href=".html" onclick="this.target='';return true;">object</a>).
-
-	</td>
-</tr>
-
-
-
-
-
-
-
-
-	<tr class="
-inheritedMember 
-
-
-">
-	<td>
-<img alt="Public method" title="Public method" src="msdn2019/pubmethod.png"></img>
-
-	<img alt="Static" title="Static" src="msdn2019/static.png"></img>
-
-    
-	</td>
-	<td>
-	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.object.referenceequals">ReferenceEquals(object?, object?)</a>
-
-	</td>
-	<td>
-
-Determines whether the specified <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.object">object</a> instances are the same instance.
-(inherited from <a target="_top" href=".html" onclick="this.target='';return true;">object</a>).
-
-	</td>
-</tr>
-
-
-
-
-
-
-
-
-	<tr class="
-
-
-">
-	<td>
-<img alt="Public method" title="Public method" src="msdn2019/pubmethod.png"></img>
-
-
-    
-	</td>
-	<td>
-	<a href="topic_000000000000026A.html">SendEmailConfirmationAsync(string, string, string)</a>
-
-	</td>
-	<td>
-
-Simula o envio de um email de confirmação.
-
-	</td>
-</tr>
-
-
-
-
-
-
-
-
-	<tr class="
-
-
-">
-	<td>
-<img alt="Public method" title="Public method" src="msdn2019/pubmethod.png"></img>
-
-
-    
-	</td>
-	<td>
-	<a href="topic_000000000000026B.html">SendPasswordResetAsync(string, string, string)</a>
-
-	</td>
-	<td>
-
-Simula o envio de um email de recuperação de password.
-
-	</td>
-</tr>
-
-
-
-
-
-
-
-
-	<tr class="
-inheritedMember 
-
-
-">
-	<td>
-<img alt="Public method" title="Public method" src="msdn2019/pubmethod.png"></img>
-
-
-    
-	</td>
-	<td>
-	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.object.tostring">ToString()</a>
-
-	</td>
-	<td>
-
-Returns a string that represents the current object.
-(inherited from <a target="_top" href=".html" onclick="this.target='';return true;">object</a>).
-
-	</td>
-</tr>
-
-
-
-
-
-
-  </table>
-
-  <a href="#mainBody">
-    Top
-  </a>
-
-	</div>					
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
-
-<!-- Classes -->
-
-<!-- Classes End -->
-
-<!-- Standard Modules -->
-
-<!-- Standard Modules End -->
-
-  
-
-
-
-
-
-
-
-
-<div class="section_container">
-	<div class="section_heading">
-		<span><a href="javascript:void(0)" title="Collapse" onclick="toggleSection(this);">Remarks</a></span>
-		<div>&nbsp;</div>
-	</div>
-
-	<div id="remarksSection" class="section">	
-			<strong>⚠️ APENAS PARA DESENVOLVIMENTO</strong>&nbsp;<br />
-Esta implementação NÃO envia emails reais.
-
-<strong>Funcionalidades:</strong>
-<ul><li>Escreve o email e link para a consola</li><li>Armazena o link no DevEmailStore para acesso via API</li><li>Regista no logger para debugging</li></ul>
-
-<strong>Recuperar Link de Confirmação:</strong>
-			<div class="codeSnippetCodeCollection">
-				<div class="codeSnippetToolbar">
-					<a title="Copy to clipboard." href="javascript:void(0)" onclick="CopyCode(this);">Copy</a>
-				</div>
-				
-				<div class="codeSnippetCode">
-					<pre xml:space="preserve">GET /api/auth/dev/last-confirmation-link?email={email}					</pre>			
-				</div>
-			</div>
-
-<strong>Registo em Program.cs:</strong>
-			<div class="codeSnippetCodeCollection">
-				<div class="codeSnippetToolbar">
-					<a title="Copy to clipboard." href="javascript:void(0)" onclick="CopyCode(this);">Copy</a>
-				</div>
-				
-				<div class="codeSnippetCode">
-					<pre xml:space="preserve">services.AddScoped&lt;IEmailSender, ConsoleEmailSender&gt;();					</pre>			
-				</div>
-			</div>
-	</div>					
-</div>
-
-
-
-
-<div class="section_container">
-	<div class="section_heading">
-		<span><a href="javascript:void(0)" title="Collapse" onclick="toggleSection(this);">Inheritance Hierarchy</a></span>
-		<div>&nbsp;</div>
-	</div>
-
-<div id="inheritanceHierarchySection" class="section">
-
-<div style="padding-left:0em;"><a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.object">object</a>
-</div>
-
-
-
-<div style="padding-left:1em;">Fluxnote.Backend.Services.Email.ConsoleEmailSender</div>
-
-				
-</div>
-</div>
 
 
 
@@ -822,7 +353,6 @@ Esta implementação NÃO envia emails reais.
 	</div>					
 </div>
 
-
 <div class="section_container">
 	<div class="section_heading">
 		<span><a href="javascript:void(0)" title="Collapse" onclick="toggleSection(this);">See Also</a></span>
@@ -831,10 +361,14 @@ Esta implementação NÃO envia emails reais.
 
 	<div id="seeAlsoSection" class="section">	
 		<div>
-	<a href="topic_0000000000000267.html">Fluxnote.Backend.Services.Email Namespace</a><br />
+			<a href="topic_0000000000000267.html">TeamInvite Class</a><br />
 
 
-	
+
+<a href="topic_00000000000001C8.html">Fluxnote.Backend.Models Namespace</a><br />
+
+
+			
 
 		</div>
 	</div>					

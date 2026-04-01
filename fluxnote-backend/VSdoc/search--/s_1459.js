@@ -1,0 +1,1 @@
+search_result['1459']=["topic_000000000000023B.html","NotificationPreference Class","Preferências de notificação de um utilizador.\r\nControla quais canais (email, in-app) estão ativos."];

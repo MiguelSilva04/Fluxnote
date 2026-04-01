@@ -1,0 +1,1 @@
+search_result['1336']=["topic_00000000000001F2.html","DocumentContext Class","Representa um ficheiro de contexto associado a um documento para uso pela IA.\r\nO texto extraído é armazenado na BD para ser usado futuramente em prompts de geração de conteúdo."];

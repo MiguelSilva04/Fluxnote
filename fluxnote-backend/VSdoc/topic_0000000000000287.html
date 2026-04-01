@@ -5,7 +5,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta name="GENERATOR" content="VSdocman - documentation generator; https://www.helixoft.com" />
 	<link rel="icon" href="favicon.ico">
-	<title>BlobStorageService Constructor</title>
+	<title>User.AccountStatus Property</title>
 
 	<link rel="stylesheet" type="text/css" href="msdn2019/toc.css" />
 	<script src="msdn2019/toc.js"></script>
@@ -75,11 +75,11 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
   </div>
 
 <div id="mainBody">
-		<h1 class="title">BlobStorageService Constructor</h1>
+		<h1 class="title">User.AccountStatus Property</h1>
         
 		<div class="metadata">
         Namespace:
-<a href="topic_0000000000000281.html">Fluxnote.Backend.Services.Storage</a>
+<a href="topic_00000000000001C8.html">Fluxnote.Backend.Models</a>
 
 
 
@@ -90,6 +90,8 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 
        
        
+        <summary-info>Estado atual da conta do utilizador.
+Determina se o utilizador pode aceder ao sistema.</summary-info>
 
 
 
@@ -139,7 +141,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 				</div>
 				
 				<div class="codeSnippetCode codeVB">
-					<pre xml:space="preserve" class="brush: vb">Public Sub New( _&nbsp;<br />   ByVal <i>options</i> As <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.extensions.options.ioptions-1">IOptions</a>(Of <a target="_top" href="topic_0000000000000282.html" onclick="this.target='';return true;">BlobStorageOptions</a>) _&nbsp;<br />)</pre>			
+					<pre xml:space="preserve" class="brush: vb">Public Property AccountStatus() As <a target="_top" href="topic_0000000000000292.html" onclick="this.target='';return true;">AccountStatus</a></pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -178,7 +180,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 				</div>
 				
 				<div class="codeSnippetCode codeCsharp">
-					<pre xml:space="preserve" class="brush: csharp">public BlobStorageService(&nbsp;<br />   <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.extensions.options.ioptions-1">IOptions</a>&lt;<a target="_top" href="topic_0000000000000282.html" onclick="this.target='';return true;">BlobStorageOptions</a>&gt; <i>options</i>&nbsp;<br />)</pre>			
+					<pre xml:space="preserve" class="brush: csharp">public <a target="_top" href="topic_0000000000000292.html" onclick="this.target='';return true;">AccountStatus</a> AccountStatus {get; set;}</pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -218,7 +220,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 				</div>
 				
 				<div class="codeSnippetCode codeCpp">
-					<pre xml:space="preserve" class="brush: cpp">public: &nbsp;<br />BlobStorageService(&nbsp;<br />   <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.extensions.options.ioptions-1">IOptions</a>&lt;<a target="_top" href="topic_0000000000000282.html" onclick="this.target='';return true;">BlobStorageOptions</a>^&gt;^ <i>options</i>&nbsp;<br />) </pre>			
+					<pre xml:space="preserve" class="brush: cpp">public: &nbsp;<br />property <a target="_top" href="topic_0000000000000292.html" onclick="this.target='';return true;">AccountStatus</a> AccountStatus {&nbsp;<br /> <a target="_top" href="topic_0000000000000292.html" onclick="this.target='';return true;">AccountStatus</a> get( );&nbsp;<br /> void set(&nbsp;<br />   <a target="_top" href="topic_0000000000000292.html" onclick="this.target='';return true;">AccountStatus</a> value&nbsp;<br /> );&nbsp;<br />}</pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -257,7 +259,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 				</div>
 				
 				<div class="codeSnippetCode codeJScript">
-					<pre xml:space="preserve" class="brush: js">JScript does not support generic types and methods.</pre>			
+					<pre xml:space="preserve" class="brush: js">public function get AccountStatus() : <a target="_top" href="topic_0000000000000292.html" onclick="this.target='';return true;">AccountStatus</a>;&nbsp;<br />public function set AccountStatus(value : <a target="_top" href="topic_0000000000000292.html" onclick="this.target='';return true;">AccountStatus</a>);</pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -268,23 +270,11 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 	</div>
 
 
-<h4 class="subHeading">
-	Parameters</h4><dl paramName="options" class="parameterList">
-	<dt>
-		<span class="parameter">
-			options
-		</span>
-	</dt>
-	<dd>
-		<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.extensions.options.ioptions-1">IOptions</a>&lt;<a target="_top" href="topic_0000000000000282.html" onclick="this.target='';return true;">BlobStorageOptions</a>&gt; 
-	</dd>
-</dl>
-<p>
-	 
-</p>
 
-<p />
-
+	<h4 class="subHeading">
+		Property Value</h4>
+	<a target="_top" href="topic_0000000000000292.html" onclick="this.target='';return true;">AccountStatus</a> 
+	
 
 
 
@@ -372,14 +362,16 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 
 	<div id="seeAlsoSection" class="section">	
 		<div>
-			<a href="topic_0000000000000286.html">BlobStorageService Class</a><br />
+			<a href="topic_000000000000027F.html">User Class</a><br />
 
 
 
-<a href="topic_0000000000000281.html">Fluxnote.Backend.Services.Storage Namespace</a><br />
+<a href="topic_00000000000001C8.html">Fluxnote.Backend.Models Namespace</a><br />
 
 
 			
+<a href="topic_0000000000000292.html">AccountStatus</a>
+<br />
 
 		</div>
 	</div>					

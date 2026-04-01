@@ -1,1 +1,1 @@
-search_result['1235']=["topic_0000000000000279.html","EmailOptions.UseStartTls Property","Indica se deve usar STARTTLS para encriptação."];
+search_result['1235']=["topic_00000000000001C0.html","AddReferenceTokenToNotification Class","A base class inherited by each EF Core migration."];

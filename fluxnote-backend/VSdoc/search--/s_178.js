@@ -1,1 +1,1 @@
-search_result['178']=["topic_0000000000000059.html","TeamsController.PostTeam Method","Cria uma nova equipa."];
+search_result['178']=["topic_0000000000000051_methods--.html","TeamInvitesController Methods",""];

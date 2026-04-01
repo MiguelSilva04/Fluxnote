@@ -1,1 +1,1 @@
-search_result['949']=["topic_00000000000001C0_events--.html","DocumentContext Events",""];
+search_result['949']=["topic_0000000000000163.html","CreateTeamRequest Class","DTO para criação de uma nova equipa."];

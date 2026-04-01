@@ -5,7 +5,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta name="GENERATOR" content="VSdocman - documentation generator; https://www.helixoft.com" />
 	<link rel="icon" href="favicon.ico">
-	<title>DocumentContext Properties</title>
+	<title>AddReferenceTokenToNotification Properties</title>
 
 	<link rel="stylesheet" type="text/css" href="msdn2019/toc.css" />
 	<script src="msdn2019/toc.js"></script>
@@ -76,11 +76,11 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
   </div>
 
 <div id="mainBody">
-	  <h1 class="title">DocumentContext Properties</h1>
+	  <h1 class="title">AddReferenceTokenToNotification Properties</h1>
         <p />
         <p>
           The following tables list the members exposed by the  
-              <a href="topic_00000000000001C0.html">DocumentContext</a>
+              <a href="topic_00000000000001C0.html">AddReferenceTokenToNotification</a>
              type.
         </p>
 
@@ -105,6 +105,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 
 	
 		<tr class="
+inheritedMember 
 
 
 ">
@@ -115,13 +116,13 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
     
 	</td>
 	<td>
-	<a href="topic_00000000000001C4.html">ContentType</a>
+	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.entityframeworkcore.migrations.migration.activeprovider">ActiveProvider</a>
 
 	</td>
 	<td>
 
-MIME type do ficheiro (ex: &quot;application/pdf&quot;, &quot;text/plain&quot;).
-Utilizado para determinar o método de extração de texto.
+The name of the current database provider.
+(inherited from <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.entityframeworkcore.migrations.migration">Migration</a>).
 
 	</td>
 </tr>
@@ -130,6 +131,7 @@ Utilizado para determinar o método de extração de texto.
 
 	
 		<tr class="
+inheritedMember 
 
 
 ">
@@ -140,12 +142,13 @@ Utilizado para determinar o método de extração de texto.
     
 	</td>
 	<td>
-	<a href="topic_00000000000001CA.html">Document</a>
+	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.entityframeworkcore.migrations.migration.downoperations">DownOperations</a>
 
 	</td>
 	<td>
 
-
+The <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.entityframeworkcore.migrations.operations.migrationoperation">MigrationOperation</a>s that will migrate the database 'down'.
+(inherited from <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.entityframeworkcore.migrations.migration">Migration</a>).
 
 	</td>
 </tr>
@@ -154,6 +157,7 @@ Utilizado para determinar o método de extração de texto.
 
 	
 		<tr class="
+inheritedMember 
 
 
 ">
@@ -164,12 +168,13 @@ Utilizado para determinar o método de extração de texto.
     
 	</td>
 	<td>
-	<a href="topic_00000000000001C2.html">DocumentId</a>
+	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.entityframeworkcore.migrations.migration.targetmodel">TargetModel</a>
 
 	</td>
 	<td>
 
-ID do documento ao qual este contexto pertence (FK para Document).
+The <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.entityframeworkcore.metadata.imodel">IModel</a> that the database will map to after the migration has been applied.
+(inherited from <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.entityframeworkcore.migrations.migration">Migration</a>).
 
 	</td>
 </tr>
@@ -178,6 +183,7 @@ ID do documento ao qual este contexto pertence (FK para Document).
 
 	
 		<tr class="
+inheritedMember 
 
 
 ">
@@ -188,184 +194,13 @@ ID do documento ao qual este contexto pertence (FK para Document).
     
 	</td>
 	<td>
-	<a href="topic_00000000000001C6.html">ExtractedText</a>
+	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.entityframeworkcore.migrations.migration.upoperations">UpOperations</a>
 
 	</td>
 	<td>
 
-Texto extraído do ficheiro, pronto para ser incluído em prompts de IA.
-Null se a extração falhou ou o ficheiro estava vazio.
-Não é exposto ao frontend.
-
-	</td>
-</tr>
-	
-
-
-	
-		<tr class="
-
-
-">
-	<td>
-<img alt="Public property" title="Public property" src="msdn2019/pubproperty.png"></img>
-
-
-    
-	</td>
-	<td>
-	<a href="topic_00000000000001C3.html">FileName</a>
-
-	</td>
-	<td>
-
-Nome original do ficheiro carregado (ex: &quot;notas.pdf&quot;).
-
-	</td>
-</tr>
-	
-
-
-	
-		<tr class="
-
-
-">
-	<td>
-<img alt="Public property" title="Public property" src="msdn2019/pubproperty.png"></img>
-
-
-    
-	</td>
-	<td>
-	<a href="topic_00000000000001C7.html">FileSizeBytes</a>
-
-	</td>
-	<td>
-
-Tamanho do ficheiro em bytes.
-
-	</td>
-</tr>
-	
-
-
-	
-		<tr class="
-
-
-">
-	<td>
-<img alt="Public property" title="Public property" src="msdn2019/pubproperty.png"></img>
-
-
-    
-	</td>
-	<td>
-	<a href="topic_00000000000001C1.html">Id</a>
-
-	</td>
-	<td>
-
-Identificador único do contexto.
-
-	</td>
-</tr>
-	
-
-
-	
-		<tr class="
-
-
-">
-	<td>
-<img alt="Public property" title="Public property" src="msdn2019/pubproperty.png"></img>
-
-
-    
-	</td>
-	<td>
-	<a href="topic_00000000000001C5.html">StoredPath</a>
-
-	</td>
-	<td>
-
-Caminho ou referência ao ficheiro armazenado, devolvido pelo IStorageService.
-Em dev: &quot;local://context/{uniqueName}&quot;. Em produção: &quot;blob://context/{blobName}&quot;.
-Usado para eliminar o ficheiro do storage quando o contexto for removido.
-
-	</td>
-</tr>
-	
-
-
-	
-		<tr class="
-
-
-">
-	<td>
-<img alt="Public property" title="Public property" src="msdn2019/pubproperty.png"></img>
-
-
-    
-	</td>
-	<td>
-	<a href="topic_00000000000001C8.html">UploadedAt</a>
-
-	</td>
-	<td>
-
-Data e hora do upload (UTC).
-
-	</td>
-</tr>
-	
-
-
-	
-		<tr class="
-
-
-">
-	<td>
-<img alt="Public property" title="Public property" src="msdn2019/pubproperty.png"></img>
-
-
-    
-	</td>
-	<td>
-	<a href="topic_00000000000001CB.html">UploadedBy</a>
-
-	</td>
-	<td>
-
-
-
-	</td>
-</tr>
-	
-
-
-	
-		<tr class="
-
-
-">
-	<td>
-<img alt="Public property" title="Public property" src="msdn2019/pubproperty.png"></img>
-
-
-    
-	</td>
-	<td>
-	<a href="topic_00000000000001C9.html">UploadedById</a>
-
-	</td>
-	<td>
-
-ID do utilizador que fez o upload (FK para User).
+The <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.entityframeworkcore.migrations.operations.migrationoperation">MigrationOperation</a>s that will migrate the database 'up'.
+(inherited from <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.entityframeworkcore.migrations.migration">Migration</a>).
 
 	</td>
 </tr>
@@ -390,8 +225,8 @@ ID do utilizador que fez o upload (FK para User).
 
 	<div id="seeAlsoSection" class="section">	
 		<div>
-			<a href="topic_00000000000001C0.html">DocumentContext Class</a><br />
-	<a href="topic_0000000000000196.html">Fluxnote.Backend.Models Namespace</a><br />
+			<a href="topic_00000000000001C0.html">AddReferenceTokenToNotification Class</a><br />
+	<a href="topic_000000000000019B.html">fluxnotebackend.Migrations Namespace</a><br />
 
 
 			

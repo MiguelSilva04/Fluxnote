@@ -1,1 +1,1 @@
-search_result['332']=["topic_0000000000000099.html","UserProfile Class","DTO de resposta com o perfil completo do utilizador.\r\nUsado na resposta dos endpoints GET/PUT /api/auth/users/me."];
+search_result['332']=["topic_0000000000000084_attached_props--.html","ExternalUserInfo Attached Properties",""];

@@ -1,1 +1,1 @@
-search_result['613']=["topic_0000000000000117.html","GenerateContentRequest.Prompt Property","Prompt do utilizador — instrução sobre o conteúdo a gerar."];
+search_result['613']=["topic_00000000000000E6_props--.html","EmailOptions Properties",""];

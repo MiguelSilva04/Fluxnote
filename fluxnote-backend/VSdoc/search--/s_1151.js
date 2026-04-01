@@ -1,1 +1,1 @@
-search_result['1151']=["topic_0000000000000251_attached_props--.html","IAIService Attached Properties",""];
+search_result['1151']=["topic_00000000000001A4.html","AddYDocSnapshot Class","A base class inherited by each EF Core migration."];

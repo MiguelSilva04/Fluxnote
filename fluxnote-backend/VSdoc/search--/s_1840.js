@@ -1,0 +1,1 @@
+search_result['1840']=["topic_00000000000002E9.html","NotificationRequest.EmailHtmlBodyPt Property","Corpo HTML do email em português. Se null, usa o inglês."];

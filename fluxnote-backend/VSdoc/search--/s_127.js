@@ -1,1 +1,1 @@
-search_result['127']=["topic_0000000000000044.html","FoldersController.DeleteFolder Method","Elimina uma pasta. Documentos ficam soltos (FolderId = null). Apenas Owner ou TeamAdmin."];
+search_result['127']=["topic_000000000000003F.html","DocumentsController.RestoreVersion Method","Restaura o conteúdo do documento para uma versão anterior.\r\nApenas o Owner da equipa pode executar esta operação.\r\nCria uma nova entrada de versão com o conteúdo restaurado e notifica os clientes via ..."];

@@ -1,0 +1,1 @@
+search_result['1475']=["topic_0000000000000241.html","NotificationPreference.Language Property","Idioma preferido do utilizador, utilizado para notificações,\r\nno frontend para exibição de conteúdo traduzido e pelo ChangePasswordRequest para\r\no email de notificação."];

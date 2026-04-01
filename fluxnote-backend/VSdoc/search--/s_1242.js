@@ -1,1 +1,1 @@
-search_result['1242']=["topic_000000000000027B.html","IEmailSender.SendEmailConfirmationAsync Method","Envia um email de confirmação de conta para um utilizador."];
+search_result['1242']=["topic_00000000000001C1_overloads--.html","AddReferenceTokenToNotification.Up Method","Builds the operations that will migrate the database \u0027up\u0027."];

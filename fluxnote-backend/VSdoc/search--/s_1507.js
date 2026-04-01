@@ -1,0 +1,1 @@
+search_result['1507']=["topic_0000000000000250.html","RefreshToken.SessionStartedAt Property","Momento de início da sessão (UTC)."];

@@ -1,1 +1,1 @@
-search_result['1195']=["topic_0000000000000265.html","TeamAutorizationService.IsTeamOwnerOrAdminAsync Method","Verifica se o utilizador é Owner ou TeamAdmin da equipa."];
+search_result['1195']=["topic_00000000000001B2.html","documentComments.Down Method","Builds the operations that will migrate the database \u0027down\u0027."];

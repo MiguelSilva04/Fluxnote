@@ -1,1 +1,1 @@
-search_result['440']=["topic_00000000000000CE.html","DocumentCommentDto Class","DTO para representar um comentário num documento. Inclui informações sobre o comentário, como conteúdo, autor, data de criação, posição no texto e se o comentário está resolvido ou não. Também inclui ..."];
+search_result['440']=["topic_00000000000000A7_props--.html","Team Properties",""];

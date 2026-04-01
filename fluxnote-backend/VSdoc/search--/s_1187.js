@@ -1,1 +1,1 @@
-search_result['1187']=["topic_0000000000000262.html","TeamAutorizationService Class","Serviço de autorização para validar papéis de utilizador no contexto de equipa."];
+search_result['1187']=["topic_00000000000001B0.html","documentComments Class","A base class inherited by each EF Core migration."];

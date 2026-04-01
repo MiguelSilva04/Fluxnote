@@ -1,1 +1,1 @@
-var breadcrumbs=[['-1',"",""],['2',"fluxnote-backend Reference","topic_000000000000029B.html"],['4',"\u003cdefault\u003e Namespace","topic_000000000000029D.html"],['9',"Program Class","topic_000000000000029A.html"]];
+var breadcrumbs=[['-1',"",""],['2',"fluxnote-backend Reference","topic_000000000000030A.html"],['692',"Fluxnote.Backend.Services.AI Namespace","topic_0000000000000299.html"],['693',"GeminiAIService Class","topic_000000000000029A.html"]];

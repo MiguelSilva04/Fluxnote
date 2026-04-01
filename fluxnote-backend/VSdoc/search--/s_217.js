@@ -1,1 +1,1 @@
-search_result['217']=["topic_000000000000006D_props--.html","UpdateDocumentRequest Properties",""];
+search_result['217']=["topic_000000000000005D.html","TeamMembersController.DeleteTeamMember Method","Remove um membro de uma equipa.\r\nOwner pode remover qualquer membro exceto si próprio.\r\nTeamAdmin pode remover apenas Members."];

@@ -1,1 +1,1 @@
-search_result['126']=["topic_0000000000000043.html","FoldersController.UpdateFolder Method","Renomeia uma pasta. Apenas Owner ou TeamAdmin."];
+search_result['126']=["topic_000000000000003E.html","DocumentsController.GetVersionDetail Method","Obtém o detalhe de uma versão específica, incluindo conteúdo HTML para visualização.\r\nAcessível a Owner, TeamAdmin e Editores do documento."];

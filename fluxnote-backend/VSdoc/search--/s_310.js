@@ -1,1 +1,1 @@
-search_result['310']=["topic_000000000000008F_methods--.html","SetPasswordRequest Methods",""];
+search_result['310']=["topic_000000000000007E.html","ChangePasswordRequest.CurrentPassword Property","Password atual do utilizador para verificação de segurança."];

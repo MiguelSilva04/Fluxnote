@@ -1,1 +1,1 @@
-search_result['373']=["topic_00000000000000AE.html","CreateDocumentInviteRequest.Role Property","Role a ser atribuído ao utilizador convidado ao aceitar o convite.\r\n0 = Viewer, 1 = Editor."];
+search_result['373']=["topic_0000000000000090.html","LoginRequest.RememberMe Property","Indica se a sessão deve ter duração prolongada (30 dias vs 7 dias)."];

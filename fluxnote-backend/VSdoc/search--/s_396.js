@@ -1,1 +1,1 @@
-search_result['396']=["topic_00000000000000BB.html","DocumentInviteDto.IsUsed Property","Indica se o convite já foi utilizado. Um convite é considerado utilizado\r\nse já tiver sido aceito por um utilizador."];
+search_result['396']=["topic_0000000000000097_attached_props--.html","ResetPasswordRequest Attached Properties",""];

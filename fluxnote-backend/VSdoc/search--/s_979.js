@@ -1,1 +1,1 @@
-search_result['979']=["topic_00000000000001D6.html","DocumentInvite.Document Property","Navigation properties"];
+search_result['979']=["topic_000000000000016D.html","TeamDto.CurrentUserRole Property","Papel do utilizador autenticado nesta equipa."];

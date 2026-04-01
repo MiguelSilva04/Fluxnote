@@ -1,1 +1,1 @@
-search_result['1174']=["topic_000000000000025A.html","TextExtractionService.ExtractTextAsync Method","Extrai texto plano de um stream de ficheiro."];
+search_result['1174']=["topic_00000000000001AB_overloads--.html","DocumentContext.BuildTargetModel Method","Implemented to build the TargetModel."];

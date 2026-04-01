@@ -1,1 +1,1 @@
-c['723']=[['724',"Methods","topic_000000000000017A_methods--.html",1]];
+c['723']=[['724',"TeamAutorizationService Class","topic_00000000000002B3.html",1]];

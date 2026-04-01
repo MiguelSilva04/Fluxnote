@@ -1,1 +1,1 @@
-search_result['1294']=["topic_0000000000000296.html","LocalStorageService.DeleteContextFileAsync Method","Elimina um ficheiro de contexto previamente armazenado."];
+search_result['1294']=["topic_00000000000001D8_props--.html","DocumentPermission Properties",""];

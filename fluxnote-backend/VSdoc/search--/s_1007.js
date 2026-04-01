@@ -1,1 +1,1 @@
-search_result['1007']=["topic_00000000000001EA.html","DocumentVersion.Summary Property","Resumo automático da versão (ex: \"Session by João Silva\")."];
+search_result['1007']=["topic_0000000000000178.html","TeamDocumentDto.Id Property","Identificador único do documento."];

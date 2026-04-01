@@ -1,1 +1,1 @@
-search_result['930']=["topic_00000000000001B0_props--.html","DocumentComment Properties",""];
+search_result['930']=["topic_000000000000015A.html","TeamInviteDto.Token Property","Token único para o link do convite."];

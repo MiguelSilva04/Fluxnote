@@ -1,1 +1,1 @@
-search_result['265']=["topic_000000000000007E.html","ForgotPasswordRequest.Email Property","Email do utilizador que pretende recuperar a password."];
+search_result['265']=["topic_000000000000006F.html","FluxnoteServerContext.TeamInvite Property","DbSet para convites de equipas (permite gerir convites pendentes e aceites)."];

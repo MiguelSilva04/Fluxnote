@@ -1,1 +1,1 @@
-search_result['282']=["topic_0000000000000085.html","RegisterRequest Class","DTO para pedido de registo de novo utilizador.\r\nUsado no endpoint POST /api/auth/register."];
+search_result['282']=["topic_0000000000000074_events--.html","ExternalAuthErrorResponse Events",""];

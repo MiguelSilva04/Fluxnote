@@ -5,7 +5,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta name="GENERATOR" content="VSdocman - documentation generator; https://www.helixoft.com" />
 	<link rel="icon" href="favicon.ico">
-	<title>DocumentsController.GetDocuments Method</title>
+	<title>DocumentsController Constructor</title>
 
 	<link rel="stylesheet" type="text/css" href="msdn2019/toc.css" />
 	<script src="msdn2019/toc.js"></script>
@@ -75,7 +75,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
   </div>
 
 <div id="mainBody">
-		<h1 class="title">DocumentsController.GetDocuments Method</h1>
+		<h1 class="title">DocumentsController Constructor</h1>
         
 		<div class="metadata">
         Namespace:
@@ -90,7 +90,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 
        
        
-        <summary-info>Lista os documentos acessíveis pelo utilizador autenticado.</summary-info>
+        <summary-info>Construtor com injeção de dependências.</summary-info>
 
 
 
@@ -140,7 +140,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 				</div>
 				
 				<div class="codeSnippetCode codeVB">
-					<pre xml:space="preserve" class="brush: vb">&lt;HttpGet()&gt; _&nbsp;<br />Public Function GetDocuments( _&nbsp;<br />   &lt;FromQuery()&gt; _&nbsp;<br />   ByVal <i>teamId</i> As <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.nullable-1">Nullable</a>(Of <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.int32">Integer</a>), _&nbsp;<br />   &lt;FromQuery()&gt; _&nbsp;<br />   ByVal <i>search</i> As <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.string">String</a> _&nbsp;<br />) As <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1">Task</a>(Of <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.actionresult-1">ActionResult</a>(Of <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>(Of <a target="_top" href="topic_00000000000000E5.html" onclick="this.target='';return true;">DocumentDto</a>)))</pre>			
+					<pre xml:space="preserve" class="brush: vb">Public Sub New( _&nbsp;<br />   ByVal <i>context</i> As <a target="_top" href="topic_000000000000006B.html" onclick="this.target='';return true;">FluxnoteServerContext</a>, _&nbsp;<br />   ByVal <i>userManager</i> As <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.identity.usermanager-1">UserManager</a>(Of <a target="_top" href="topic_000000000000027F.html" onclick="this.target='';return true;">User</a>), _&nbsp;<br />   ByVal <i>aiService</i> As <a target="_top" href="topic_00000000000002A2.html" onclick="this.target='';return true;">IAIService</a>, _&nbsp;<br />   ByVal <i>storageService</i> As <a target="_top" href="topic_00000000000002FB.html" onclick="this.target='';return true;">IStorageService</a>, _&nbsp;<br />   ByVal <i>textExtractionService</i> As <a target="_top" href="topic_00000000000002A6.html" onclick="this.target='';return true;">ITextExtractionService</a>, _&nbsp;<br />   ByVal <i>hubContext</i> As <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.signalr.ihubcontext-1">IHubContext</a>(Of <a target="_top" href="topic_0000000000000190.html" onclick="this.target='';return true;">DocumentHub</a>), _&nbsp;<br />   ByVal <i>notificationService</i> As <a target="_top" href="topic_00000000000002D6.html" onclick="this.target='';return true;">INotificationService</a> _&nbsp;<br />)</pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -179,7 +179,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 				</div>
 				
 				<div class="codeSnippetCode codeCsharp">
-					<pre xml:space="preserve" class="brush: csharp">[HttpGet()]&nbsp;<br />public <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.actionresult-1">ActionResult</a>&lt;<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a target="_top" href="topic_00000000000000E5.html" onclick="this.target='';return true;">DocumentDto</a>&gt;&gt;&gt; GetDocuments(&nbsp;<br />   [FromQuery()]&nbsp;<br />   <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.nullable-1">Nullable</a>&lt;<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.int32">int</a>&gt; <i>teamId</i>,&nbsp;<br />   [FromQuery()]&nbsp;<br />   <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.string">string</a> <i>search</i>&nbsp;<br />)</pre>			
+					<pre xml:space="preserve" class="brush: csharp">public DocumentsController(&nbsp;<br />   <a target="_top" href="topic_000000000000006B.html" onclick="this.target='';return true;">FluxnoteServerContext</a> <i>context</i>,&nbsp;<br />   <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.identity.usermanager-1">UserManager</a>&lt;<a target="_top" href="topic_000000000000027F.html" onclick="this.target='';return true;">User</a>&gt; <i>userManager</i>,&nbsp;<br />   <a target="_top" href="topic_00000000000002A2.html" onclick="this.target='';return true;">IAIService</a> <i>aiService</i>,&nbsp;<br />   <a target="_top" href="topic_00000000000002FB.html" onclick="this.target='';return true;">IStorageService</a> <i>storageService</i>,&nbsp;<br />   <a target="_top" href="topic_00000000000002A6.html" onclick="this.target='';return true;">ITextExtractionService</a> <i>textExtractionService</i>,&nbsp;<br />   <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.signalr.ihubcontext-1">IHubContext</a>&lt;<a target="_top" href="topic_0000000000000190.html" onclick="this.target='';return true;">DocumentHub</a>&gt; <i>hubContext</i>,&nbsp;<br />   <a target="_top" href="topic_00000000000002D6.html" onclick="this.target='';return true;">INotificationService</a> <i>notificationService</i>&nbsp;<br />)</pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -219,7 +219,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 				</div>
 				
 				<div class="codeSnippetCode codeCpp">
-					<pre xml:space="preserve" class="brush: cpp">[HttpGet()]&nbsp;<br />public: &nbsp;<br /><a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.actionresult-1">ActionResult</a>&lt;<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a target="_top" href="topic_00000000000000E5.html" onclick="this.target='';return true;">DocumentDto</a>&gt;^&gt;^&gt;^ GetDocuments(&nbsp;<br />   [FromQuery()]&nbsp;<br />   <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.nullable-1">Nullable</a>&lt;<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.int32">int</a>&gt; <i>teamId</i>,&nbsp;<br />   [FromQuery()]&nbsp;<br />   <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.string">String</a>^ <i>search</i>&nbsp;<br />) </pre>			
+					<pre xml:space="preserve" class="brush: cpp">public: &nbsp;<br />DocumentsController(&nbsp;<br />   <a target="_top" href="topic_000000000000006B.html" onclick="this.target='';return true;">FluxnoteServerContext</a>^ <i>context</i>,&nbsp;<br />   <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.identity.usermanager-1">UserManager</a>&lt;<a target="_top" href="topic_000000000000027F.html" onclick="this.target='';return true;">User</a>&gt;^ <i>userManager</i>,&nbsp;<br />   <a target="_top" href="topic_00000000000002A2.html" onclick="this.target='';return true;">IAIService</a>^ <i>aiService</i>,&nbsp;<br />   <a target="_top" href="topic_00000000000002FB.html" onclick="this.target='';return true;">IStorageService</a>^ <i>storageService</i>,&nbsp;<br />   <a target="_top" href="topic_00000000000002A6.html" onclick="this.target='';return true;">ITextExtractionService</a>^ <i>textExtractionService</i>,&nbsp;<br />   <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.signalr.ihubcontext-1">IHubContext</a>&lt;<a target="_top" href="topic_0000000000000190.html" onclick="this.target='';return true;">DocumentHub</a>&gt;^ <i>hubContext</i>,&nbsp;<br />   <a target="_top" href="topic_00000000000002D6.html" onclick="this.target='';return true;">INotificationService</a>^ <i>notificationService</i>&nbsp;<br />) </pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -270,42 +270,100 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 
 
 <h4 class="subHeading">
-	Parameters</h4><dl paramName="teamId" class="parameterList">
+	Parameters</h4><dl paramName="context" class="parameterList">
 	<dt>
 		<span class="parameter">
-			teamId
+			context
 		</span>
 	</dt>
 	<dd>
-		<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.nullable-1">Nullable</a>&lt;<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.int32">int</a>&gt; 
+		<a target="_top" href="topic_000000000000006B.html" onclick="this.target='';return true;">FluxnoteServerContext</a> 
 	</dd>
 </dl>
 <p>
-	Filtrar por ID de equipa (opcional). 
+	Contexto da base de dados. 
 </p>
-<dl paramName="search" class="parameterList">
+<dl paramName="userManager" class="parameterList">
 	<dt>
 		<span class="parameter">
-			search
+			userManager
 		</span>
 	</dt>
 	<dd>
-		<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.string">string</a> 
+		<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.identity.usermanager-1">UserManager</a>&lt;<a target="_top" href="topic_000000000000027F.html" onclick="this.target='';return true;">User</a>&gt; 
 	</dd>
 </dl>
 <p>
-	Termo de pesquisa em título e conteúdo (opcional). 
+	Gestor de utilizadores do Identity. 
+</p>
+<dl paramName="aiService" class="parameterList">
+	<dt>
+		<span class="parameter">
+			aiService
+		</span>
+	</dt>
+	<dd>
+		<a target="_top" href="topic_00000000000002A2.html" onclick="this.target='';return true;">IAIService</a> 
+	</dd>
+</dl>
+<p>
+	Serviço de IA generativa. 
+</p>
+<dl paramName="storageService" class="parameterList">
+	<dt>
+		<span class="parameter">
+			storageService
+		</span>
+	</dt>
+	<dd>
+		<a target="_top" href="topic_00000000000002FB.html" onclick="this.target='';return true;">IStorageService</a> 
+	</dd>
+</dl>
+<p>
+	Serviço de armazenamento de ficheiros. 
+</p>
+<dl paramName="textExtractionService" class="parameterList">
+	<dt>
+		<span class="parameter">
+			textExtractionService
+		</span>
+	</dt>
+	<dd>
+		<a target="_top" href="topic_00000000000002A6.html" onclick="this.target='';return true;">ITextExtractionService</a> 
+	</dd>
+</dl>
+<p>
+	Serviço de extração de texto para ficheiros de contexto. 
+</p>
+<dl paramName="hubContext" class="parameterList">
+	<dt>
+		<span class="parameter">
+			hubContext
+		</span>
+	</dt>
+	<dd>
+		<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.signalr.ihubcontext-1">IHubContext</a>&lt;<a target="_top" href="topic_0000000000000190.html" onclick="this.target='';return true;">DocumentHub</a>&gt; 
+	</dd>
+</dl>
+<p>
+	 
+</p>
+<dl paramName="notificationService" class="parameterList">
+	<dt>
+		<span class="parameter">
+			notificationService
+		</span>
+	</dt>
+	<dd>
+		<a target="_top" href="topic_00000000000002D6.html" onclick="this.target='';return true;">INotificationService</a> 
+	</dd>
+</dl>
+<p>
+	 
 </p>
 
 <p />
 
-	<h4 class="subHeading">
-		Return Value</h4>
-	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.actionresult-1">ActionResult</a>&lt;<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a target="_top" href="topic_00000000000000E5.html" onclick="this.target='';return true;">DocumentDto</a>&gt;&gt;&gt; 
-		<p>
-		<ul><li></li><li></li></ul> 
-	</p>
-	
 
 
 
@@ -327,19 +385,6 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 
 
 
-<div class="section_container">
-	<div class="section_heading">
-		<span><a href="javascript:void(0)" title="Collapse" onclick="toggleSection(this);">Remarks</a></span>
-		<div>&nbsp;</div>
-	</div>
-
-	<div id="remarksSection" class="section">	
-			<strong>Filtros:</strong>
-<ul><li><strong>teamId:</strong> Retorna apenas documentos dessa equipa</li><li><strong>search:</strong> Pesquisa case-insensitive em título e PlainText</li></ul>
-<strong>Preview:</strong> Quando há pesquisa, inclui preview com contexto em torno do match.&nbsp;<br />
-<strong>Acesso:</strong> Apenas documentos de equipas onde o utilizador é membro.
-	</div>					
-</div>
 
 
 
@@ -406,7 +451,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 
 	<div id="seeAlsoSection" class="section">	
 		<div>
-			<a href="topic_0000000000000026.html">DocumentsController Class</a><br />
+			<a href="topic_0000000000000027.html">DocumentsController Class</a><br />
 
 
 

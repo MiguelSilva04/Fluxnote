@@ -1,1 +1,1 @@
-search_result['666']=["topic_000000000000012E.html","AcceptTeamInviteResponseDto.TeamName Property","Nome da equipa à qual o documento pertence.\r\nEste campo é incluído para facilitar a exibição de informações sobre a equipa,\r\nsem a necessidade de uma consulta adicional para obter o nome da equipa."];
+search_result['666']=["topic_00000000000000FC.html","DocumentDto.FolderId Property","ID da pasta onde o documento está (null se solto)."];

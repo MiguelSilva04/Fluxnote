@@ -1,1 +1,1 @@
-search_result['704']=["topic_0000000000000140.html","TeamDto.Id Property","Identificador único da equipa."];
+search_result['704']=["topic_000000000000010E.html","DocumentPermissionDto Class","DTO de resposta para uma permissão explícita de documento."];

@@ -1,1 +1,1 @@
-search_result['1060']=["topic_0000000000000210.html","Team.UpdatedAt Property","Data e hora da última modificação da equipa (UTC)."];
+search_result['1060']=["topic_0000000000000188.html","CreateTeamMemberRequest.Role Property","Role do membro na equipa (0=Member, 1=TeamAdmin, 2=Owner)."];

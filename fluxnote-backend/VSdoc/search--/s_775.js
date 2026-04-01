@@ -1,1 +1,1 @@
-search_result['775']=["topic_0000000000000169.html","Fluxnote.Backend.Hubs Namespace",""];
+search_result['775']=["topic_0000000000000123.html","GenerateContentRequest Class","Request para gerar conteúdo novo usando IA."];

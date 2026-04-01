@@ -5,7 +5,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta name="GENERATOR" content="VSdocman - documentation generator; https://www.helixoft.com" />
 	<link rel="icon" href="favicon.ico">
-	<title>ForgotPasswordRequest Class</title>
+	<title>ChangePasswordRequest Class</title>
 
 	<link rel="stylesheet" type="text/css" href="msdn2019/toc.css" />
 	<script src="msdn2019/toc.js"></script>
@@ -75,11 +75,11 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
   </div>
 
 <div id="mainBody">
-		<h1 class="title">ForgotPasswordRequest Class</h1>
+		<h1 class="title">ChangePasswordRequest Class</h1>
         
 		<div class="metadata">
         Namespace:
-<a href="topic_000000000000006F.html">Fluxnote.Backend.Dtos.Auth</a>
+<a href="topic_000000000000007C.html">Fluxnote.Backend.Dtos.Auth</a>
 
 
 
@@ -90,7 +90,8 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 
        
        
-        <summary-info>DTO para pedido de recuperação de password.</summary-info>
+        <summary-info>DTO para pedido de alteração de password.
+Usado no endpoint PUT /api/auth/users/me/password.</summary-info>
 
 
 
@@ -140,7 +141,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 				</div>
 				
 				<div class="codeSnippetCode codeVB">
-					<pre xml:space="preserve" class="brush: vb">Public Class ForgotPasswordRequest</pre>			
+					<pre xml:space="preserve" class="brush: vb">Public Class ChangePasswordRequest</pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -179,7 +180,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 				</div>
 				
 				<div class="codeSnippetCode codeCsharp">
-					<pre xml:space="preserve" class="brush: csharp">public class ForgotPasswordRequest</pre>			
+					<pre xml:space="preserve" class="brush: csharp">public class ChangePasswordRequest</pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -219,7 +220,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 				</div>
 				
 				<div class="codeSnippetCode codeCpp">
-					<pre xml:space="preserve" class="brush: cpp">public ref class ForgotPasswordRequest </pre>			
+					<pre xml:space="preserve" class="brush: cpp">public ref class ChangePasswordRequest </pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -258,7 +259,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 				</div>
 				
 				<div class="codeSnippetCode codeJScript">
-					<pre xml:space="preserve" class="brush: js">public class ForgotPasswordRequest</pre>			
+					<pre xml:space="preserve" class="brush: js">public class ChangePasswordRequest</pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -320,12 +321,12 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
     
 	</td>
 	<td>
-	<a href="topic_000000000000007E.html">Email</a>
+	<a href="topic_0000000000000080.html">ConfirmPassword</a>
 
 	</td>
 	<td>
 
-Email do utilizador que pretende recuperar a password.
+Confirmação da nova password (deve ser igual a NewPassword).
 
 	</td>
 </tr>
@@ -344,12 +345,36 @@ Email do utilizador que pretende recuperar a password.
     
 	</td>
 	<td>
-	<a href="topic_000000000000007F.html">Lang</a>
+	<a href="topic_000000000000007E.html">CurrentPassword</a>
 
 	</td>
 	<td>
 
-Idioma preferido para o email (&quot;en&quot; ou &quot;pt&quot;).
+Password atual do utilizador para verificação de segurança.
+
+	</td>
+</tr>
+	
+
+
+	
+		<tr class="
+
+
+">
+	<td>
+<img alt="Public property" title="Public property" src="msdn2019/pubproperty.png"></img>
+
+
+    
+	</td>
+	<td>
+	<a href="topic_000000000000007F.html">NewPassword</a>
+
+	</td>
+	<td>
+
+Nova password pretendida.
 
 	</td>
 </tr>
@@ -675,6 +700,19 @@ Returns a string that represents the current object.
 
 
 
+<div class="section_container">
+	<div class="section_heading">
+		<span><a href="javascript:void(0)" title="Collapse" onclick="toggleSection(this);">Remarks</a></span>
+		<div>&nbsp;</div>
+	</div>
+
+	<div id="remarksSection" class="section">	
+			<strong>Validações:</strong>
+<ul><li>CurrentPassword: Obrigatório</li><li>NewPassword: Obrigatório, 6-100 caracteres</li><li>ConfirmPassword: Obrigatório, deve coincidir com NewPassword</li></ul>
+<strong>Nota:</strong> Requisitos adicionais de password (maiúscula, minúscula, dígito, especial)
+são aplicados pelo ASP.NET Core Identity.
+	</div>					
+</div>
 
 
 
@@ -692,7 +730,7 @@ Returns a string that represents the current object.
 
 
 
-<div style="padding-left:1em;">Fluxnote.Backend.Dtos.Auth.ForgotPasswordRequest</div>
+<div style="padding-left:1em;">Fluxnote.Backend.Dtos.Auth.ChangePasswordRequest</div>
 
 				
 </div>
@@ -760,7 +798,7 @@ Returns a string that represents the current object.
 
 	<div id="seeAlsoSection" class="section">	
 		<div>
-	<a href="topic_000000000000006F.html">Fluxnote.Backend.Dtos.Auth Namespace</a><br />
+	<a href="topic_000000000000007C.html">Fluxnote.Backend.Dtos.Auth Namespace</a><br />
 
 
 	

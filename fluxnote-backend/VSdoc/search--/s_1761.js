@@ -1,0 +1,1 @@
+search_result['1761']=["topic_00000000000002BD.html","ConsoleEmailSender.SendNotificationEmailAsync Method","Simula o envio de um email de notificação genérico."];

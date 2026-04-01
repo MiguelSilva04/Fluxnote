@@ -1,1 +1,1 @@
-search_result['467']=["topic_00000000000000DA.html","DocumentCommentDto.Replies Property","Lista de respostas (replies) a este comentário. Cada resposta é também um DocumentCommentDto, permitindo uma estrutura hierárquica de comentários e respostas. Se não houver respostas, essa lista pode ..."];
+search_result['467']=["topic_00000000000000B2.html","Fluxnote.Backend.Dtos.DocumentInvites Namespace",""];

@@ -1,1 +1,1 @@
-search_result['1296']=["topic_0000000000000298.html","RegisterRequestValidator Class","Validador FluentValidation para pedidos de registo de utilizador."];
+search_result['1296']=["topic_00000000000001D9.html","Document.IsDeleted Property","Indica se o documento está na lixeira (soft delete)."];

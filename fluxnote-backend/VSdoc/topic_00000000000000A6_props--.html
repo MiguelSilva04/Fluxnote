@@ -5,7 +5,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta name="GENERATOR" content="VSdocman - documentation generator; https://www.helixoft.com" />
 	<link rel="icon" href="favicon.ico">
-	<title>AcceptDocumentInviteResponseDto Properties</title>
+	<title>UserProfile Properties</title>
 
 	<link rel="stylesheet" type="text/css" href="msdn2019/toc.css" />
 	<script src="msdn2019/toc.js"></script>
@@ -76,11 +76,11 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
   </div>
 
 <div id="mainBody">
-	  <h1 class="title">AcceptDocumentInviteResponseDto Properties</h1>
+	  <h1 class="title">UserProfile Properties</h1>
         <p />
         <p>
           The following tables list the members exposed by the  
-              <a href="topic_00000000000000A6.html">AcceptDocumentInviteResponseDto</a>
+              <a href="topic_00000000000000A6.html">UserProfile</a>
              type.
         </p>
 
@@ -115,38 +115,12 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
     
 	</td>
 	<td>
-	<a href="topic_00000000000000A8.html">DocumentId</a>
+	<a href="topic_00000000000000AE.html">Bio</a>
 
 	</td>
 	<td>
 
-Identificador do documento para o qual o convite foi aceito.
-
-	</td>
-</tr>
-	
-
-
-	
-		<tr class="
-
-
-">
-	<td>
-<img alt="Public property" title="Public property" src="msdn2019/pubproperty.png"></img>
-
-
-    
-	</td>
-	<td>
-	<a href="topic_00000000000000AB.html">DocumentRole</a>
-
-	</td>
-	<td>
-
-Role a ser atribuído ao utilizador convidado ao aceitar o convite.
-0 = Viewer, 1 = Editor. Este campo é necessário para que o
-frontend saiba qual permissão atribuir ao utilizador quando ele aceitar o convite.
+Biografia ou descrição pessoal.
 
 	</td>
 </tr>
@@ -165,38 +139,12 @@ frontend saiba qual permissão atribuir ao utilizador quando ele aceitar o convi
     
 	</td>
 	<td>
-	<a href="topic_00000000000000A9.html">DocumentTitle</a>
+	<a href="topic_00000000000000B0.html">CreatedAt</a>
 
 	</td>
 	<td>
 
-Titulo do documento para o qual o convite foi aceito. Este campo é incluído para facilitar a exibição de informações sobre o documento, sem a necessidade de uma consulta adicional para obter o título do documento.
-Ele é preenchido no momento da criação do DTO com base na relação entre o convite e o documento correspondente.
-
-	</td>
-</tr>
-	
-
-
-	
-		<tr class="
-
-
-">
-	<td>
-<img alt="Public property" title="Public property" src="msdn2019/pubproperty.png"></img>
-
-
-    
-	</td>
-	<td>
-	<a href="topic_00000000000000A7.html">TeamId</a>
-
-	</td>
-	<td>
-
-Identificador do documento para o qual o convite foi aceito.
-Este campo é necessário para que o frontend saiba qual documento abrir após o utilizador aceitar o convite.
+Data de criação da conta (UTC).
 
 	</td>
 </tr>
@@ -215,14 +163,204 @@ Este campo é necessário para que o frontend saiba qual documento abrir após o
     
 	</td>
 	<td>
-	<a href="topic_00000000000000AA.html">TeamName</a>
+	<a href="topic_00000000000000A8.html">Email</a>
 
 	</td>
 	<td>
 
-Nome da equipa à qual o documento pertence.
-Este campo é incluído para facilitar a exibição de informações sobre a equipa,
-sem a necessidade de uma consulta adicional para obter o nome da equipa.
+Endereço de email do utilizador (também usado como login).
+
+	</td>
+</tr>
+	
+
+
+	
+		<tr class="
+
+
+">
+	<td>
+<img alt="Public property" title="Public property" src="msdn2019/pubproperty.png"></img>
+
+
+    
+	</td>
+	<td>
+	<a href="topic_00000000000000A9.html">FullName</a>
+
+	</td>
+	<td>
+
+Nome completo para exibição.
+
+	</td>
+</tr>
+	
+
+
+	
+		<tr class="
+
+
+">
+	<td>
+<img alt="Public property" title="Public property" src="msdn2019/pubproperty.png"></img>
+
+
+    
+	</td>
+	<td>
+	<a href="topic_00000000000000A7.html">Id</a>
+
+	</td>
+	<td>
+
+Identificador único do utilizador (GUID).
+
+	</td>
+</tr>
+	
+
+
+	
+		<tr class="
+
+
+">
+	<td>
+<img alt="Public property" title="Public property" src="msdn2019/pubproperty.png"></img>
+
+
+    
+	</td>
+	<td>
+	<a href="topic_00000000000000AC.html">Location</a>
+
+	</td>
+	<td>
+
+Localização geográfica.
+
+	</td>
+</tr>
+	
+
+
+	
+		<tr class="
+
+
+">
+	<td>
+<img alt="Public property" title="Public property" src="msdn2019/pubproperty.png"></img>
+
+
+    
+	</td>
+	<td>
+	<a href="topic_00000000000000AD.html">PhoneNumber</a>
+
+	</td>
+	<td>
+
+Número de telefone.
+
+	</td>
+</tr>
+	
+
+
+	
+		<tr class="
+
+
+">
+	<td>
+<img alt="Public property" title="Public property" src="msdn2019/pubproperty.png"></img>
+
+
+    
+	</td>
+	<td>
+	<a href="topic_00000000000000AB.html">ProfilePictureUrl</a>
+
+	</td>
+	<td>
+
+URL ou data URI da foto de perfil.
+
+	</td>
+</tr>
+	
+
+
+	
+		<tr class="
+
+
+">
+	<td>
+<img alt="Public property" title="Public property" src="msdn2019/pubproperty.png"></img>
+
+
+    
+	</td>
+	<td>
+	<a href="topic_00000000000000AF.html">Timezone</a>
+
+	</td>
+	<td>
+
+Fuso horário preferido (formato IANA).
+
+	</td>
+</tr>
+	
+
+
+	
+		<tr class="
+
+
+">
+	<td>
+<img alt="Public property" title="Public property" src="msdn2019/pubproperty.png"></img>
+
+
+    
+	</td>
+	<td>
+	<a href="topic_00000000000000AA.html">UserName</a>
+
+	</td>
+	<td>
+
+Username único do utilizador.
+
+	</td>
+</tr>
+	
+
+
+	
+		<tr class="
+
+
+">
+	<td>
+<img alt="Public property" title="Public property" src="msdn2019/pubproperty.png"></img>
+
+
+    
+	</td>
+	<td>
+	<a href="topic_00000000000000B1.html">UsernameChangesRemaining</a>
+
+	</td>
+	<td>
+
+Número de alterações de username restantes este mês (máx. 3).
 
 	</td>
 </tr>
@@ -247,8 +385,8 @@ sem a necessidade de uma consulta adicional para obter o nome da equipa.
 
 	<div id="seeAlsoSection" class="section">	
 		<div>
-			<a href="topic_00000000000000A6.html">AcceptDocumentInviteResponseDto Class</a><br />
-	<a href="topic_00000000000000A5.html">Fluxnote.Backend.Dtos.DocumentInvites Namespace</a><br />
+			<a href="topic_00000000000000A6.html">UserProfile Class</a><br />
+	<a href="topic_000000000000007C.html">Fluxnote.Backend.Dtos.Auth Namespace</a><br />
 
 
 			

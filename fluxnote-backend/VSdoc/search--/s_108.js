@@ -1,1 +1,1 @@
-search_result['108']=["topic_000000000000003B.html","DocumentsController.DeleteComment Method","Elimina um comentário e todas as suas respostas. Apenas o autor do comentário\r\nou um administrador da equipa pode eliminar."];
+search_result['108']=["topic_0000000000000036.html","DocumentsController.GetContextFiles Method","Lista os ficheiros de contexto associados ao documento.\r\nApenas Editors e Owners podem listar (Viewers não têm acesso ao painel de IA)."];

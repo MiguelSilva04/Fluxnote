@@ -1,1 +1,1 @@
-search_result['350']=["topic_00000000000000A6.html","AcceptDocumentInviteResponseDto Class","DTO de resposta devolvido após aceitação de convite de documento."];
+search_result['350']=["topic_0000000000000088_vars--.html","Document Fields",""];

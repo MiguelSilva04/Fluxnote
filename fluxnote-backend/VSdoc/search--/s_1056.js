@@ -1,1 +1,1 @@
-search_result['1056']=["topic_000000000000020C.html","Team.Id Property","Identificador único da equipa (chave primária)."];
+search_result['1056']=["topic_0000000000000186_props--.html","CreateTeamMemberRequest Properties",""];

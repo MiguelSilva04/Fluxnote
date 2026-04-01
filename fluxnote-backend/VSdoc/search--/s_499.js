@@ -1,1 +1,1 @@
-search_result['499']=["topic_00000000000000E5_attached_props--.html","DocumentDto Attached Properties",""];
+search_result['499']=["topic_00000000000000BE.html","DocumentInviteDto.Id Property","Identificador único do convite.\r\nEste é o ID do convite na base de dados e é usado para referência interna."];

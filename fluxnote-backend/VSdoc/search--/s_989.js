@@ -1,1 +1,1 @@
-search_result['989']=["topic_00000000000001DB.html","DocumentPermission.TeamMemberId Property","ID do membro da equipa a quem a permissão foi atribuída."];
+search_result['989']=["topic_0000000000000172.html","TeamMemberDto.Id Property","Identificador único do membro."];

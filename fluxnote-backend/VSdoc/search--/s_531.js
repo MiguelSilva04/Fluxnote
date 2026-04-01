@@ -1,1 +1,1 @@
-search_result['531']=["topic_00000000000000F2.html","DocumentDetailDto Class","DTO completo para detalhes de documento (com conteúdo).\r\nUsado na resposta dos endpoints GET/PUT /api/documents/{id}."];
+search_result['531']=["topic_00000000000000CB_props--.html","CommentMentionDto Properties",""];

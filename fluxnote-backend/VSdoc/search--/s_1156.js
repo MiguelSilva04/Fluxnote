@@ -1,1 +1,1 @@
-search_result['1156']=["topic_0000000000000252.html","IAIService.GenerateSummaryAsync Method","Gera um resumo a partir do texto fornecido."];
+search_result['1156']=["topic_00000000000001A4_vars--.html","AddYDocSnapshot Fields",""];

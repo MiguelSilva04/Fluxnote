@@ -5,7 +5,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta name="GENERATOR" content="VSdocman - documentation generator; https://www.helixoft.com" />
 	<link rel="icon" href="favicon.ico">
-	<title>TeamInvite Properties</title>
+	<title>DocumentVersion Properties</title>
 
 	<link rel="stylesheet" type="text/css" href="msdn2019/toc.css" />
 	<script src="msdn2019/toc.js"></script>
@@ -76,11 +76,11 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
   </div>
 
 <div id="mainBody">
-	  <h1 class="title">TeamInvite Properties</h1>
+	  <h1 class="title">DocumentVersion Properties</h1>
         <p />
         <p>
           The following tables list the members exposed by the  
-              <a href="topic_0000000000000216.html">TeamInvite</a>
+              <a href="topic_0000000000000216.html">DocumentVersion</a>
              type.
         </p>
 
@@ -115,31 +115,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
     
 	</td>
 	<td>
-	<a href="topic_000000000000021C.html">CreatedAt</a>
-
-	</td>
-	<td>
-
-Metadata
-
-	</td>
-</tr>
-	
-
-
-	
-		<tr class="
-
-
-">
-	<td>
-<img alt="Public property" title="Public property" src="msdn2019/pubproperty.png"></img>
-
-
-    
-	</td>
-	<td>
-	<a href="topic_0000000000000221.html">CreatedBy</a>
+	<a href="topic_0000000000000220.html">Author</a>
 
 	</td>
 	<td>
@@ -163,7 +139,104 @@ Metadata
     
 	</td>
 	<td>
-	<a href="topic_000000000000021A.html">CreatedByTeamMemberId</a>
+	<a href="topic_0000000000000219.html">AuthorId</a>
+
+	</td>
+	<td>
+
+ID do utilizador que originou esta versão (quem saiu da sessão).
+
+	</td>
+</tr>
+	
+
+
+	
+		<tr class="
+
+
+">
+	<td>
+<img alt="Public property" title="Public property" src="msdn2019/pubproperty.png"></img>
+
+
+    
+	</td>
+	<td>
+	<a href="topic_000000000000021A.html">AuthorName</a>
+
+	</td>
+	<td>
+
+Nome do autor (desnormalizado para exibição histórica).
+
+	</td>
+</tr>
+	
+
+
+	
+		<tr class="
+
+
+">
+	<td>
+<img alt="Public property" title="Public property" src="msdn2019/pubproperty.png"></img>
+
+
+    
+	</td>
+	<td>
+	<a href="topic_000000000000021E.html">ContentHtml</a>
+
+	</td>
+	<td>
+
+Conteúdo HTML do documento no momento da versão (UTF-8 bytes).
+Extraído de Document.Content para exibição em modo leitura.
+
+	</td>
+</tr>
+	
+
+
+	
+		<tr class="
+
+
+">
+	<td>
+<img alt="Public property" title="Public property" src="msdn2019/pubproperty.png"></img>
+
+
+    
+	</td>
+	<td>
+	<a href="topic_000000000000021B.html">CreatedAt</a>
+
+	</td>
+	<td>
+
+Data e hora de criação desta versão (UTC).
+
+	</td>
+</tr>
+	
+
+
+	
+		<tr class="
+
+
+">
+	<td>
+<img alt="Public property" title="Public property" src="msdn2019/pubproperty.png"></img>
+
+
+    
+	</td>
+	<td>
+	<a href="topic_000000000000021F.html">Document</a>
 
 	</td>
 	<td>
@@ -187,12 +260,12 @@ Metadata
     
 	</td>
 	<td>
-	<a href="topic_000000000000021D.html">ExpiresAt</a>
+	<a href="topic_0000000000000218.html">DocumentId</a>
 
 	</td>
 	<td>
 
-
+ID do documento ao qual pertence esta versão.
 
 	</td>
 </tr>
@@ -216,7 +289,7 @@ Metadata
 	</td>
 	<td>
 
-Identificador único do convite (chave primária).
+Identificador único da versão.
 
 	</td>
 </tr>
@@ -235,36 +308,12 @@ Identificador único do convite (chave primária).
     
 	</td>
 	<td>
-	<a href="topic_000000000000021E.html">IsRevoked</a>
+	<a href="topic_000000000000021C.html">Summary</a>
 
 	</td>
 	<td>
 
-
-
-	</td>
-</tr>
-	
-
-
-	
-		<tr class="
-
-
-">
-	<td>
-<img alt="Public property" title="Public property" src="msdn2019/pubproperty.png"></img>
-
-
-    
-	</td>
-	<td>
-	<a href="topic_000000000000021B.html">Role</a>
-
-	</td>
-	<td>
-
-Role a atribuir ao convidado ao aceitar o convite
+Resumo automático da versão (ex: &quot;Session by João Silva&quot;).
 
 	</td>
 </tr>
@@ -283,84 +332,13 @@ Role a atribuir ao convidado ao aceitar o convite
     
 	</td>
 	<td>
-	<a href="topic_0000000000000220.html">Team</a>
+	<a href="topic_000000000000021D.html">YDocSnapshot</a>
 
 	</td>
 	<td>
 
-Navigation properties
-
-	</td>
-</tr>
-	
-
-
-	
-		<tr class="
-
-
-">
-	<td>
-<img alt="Public property" title="Public property" src="msdn2019/pubproperty.png"></img>
-
-
-    
-	</td>
-	<td>
-	<a href="topic_0000000000000219.html">TeamId</a>
-
-	</td>
-	<td>
-
-Foreign Keys
-
-	</td>
-</tr>
-	
-
-
-	
-		<tr class="
-
-
-">
-	<td>
-<img alt="Public property" title="Public property" src="msdn2019/pubproperty.png"></img>
-
-
-    
-	</td>
-	<td>
-	<a href="topic_0000000000000218.html">Token</a>
-
-	</td>
-	<td>
-
-Token único para o link do convite
-
-	</td>
-</tr>
-	
-
-
-	
-		<tr class="
-
-
-">
-	<td>
-<img alt="Public property" title="Public property" src="msdn2019/pubproperty.png"></img>
-
-
-    
-	</td>
-	<td>
-	<a href="topic_000000000000021F.html">UsedByUserId</a>
-
-	</td>
-	<td>
-
-Tracking de uso (null = não utilizado)
+Snapshot binário do Y.Doc no momento da versão.
+Serializado via Y.encodeStateAsUpdate() no frontend.
 
 	</td>
 </tr>
@@ -385,8 +363,8 @@ Tracking de uso (null = não utilizado)
 
 	<div id="seeAlsoSection" class="section">	
 		<div>
-			<a href="topic_0000000000000216.html">TeamInvite Class</a><br />
-	<a href="topic_0000000000000196.html">Fluxnote.Backend.Models Namespace</a><br />
+			<a href="topic_0000000000000216.html">DocumentVersion Class</a><br />
+	<a href="topic_00000000000001C8.html">Fluxnote.Backend.Models Namespace</a><br />
 
 
 			

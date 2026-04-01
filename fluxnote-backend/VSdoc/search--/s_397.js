@@ -1,1 +1,1 @@
-search_result['397']=["topic_00000000000000BC.html","DocumentInviteDto.InviteUrl Property","Url do convite que pode ser partilhada com o utilizador convidado.\r\nEste é o link que o utilizador deve aceder para aceitar o convite."];
+search_result['397']=["topic_0000000000000097_events--.html","ResetPasswordRequest Events",""];

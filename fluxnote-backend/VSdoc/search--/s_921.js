@@ -1,1 +1,1 @@
-search_result['921']=["topic_00000000000001AB.html","Document.Folder Property","Referência de navegação para a pasta (opcional)."];
+search_result['921']=["topic_0000000000000156.html","CreateTeamInviteRequest.TeamId Property","ID da equipa para o qual o convite será criado."];

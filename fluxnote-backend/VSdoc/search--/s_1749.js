@@ -1,0 +1,1 @@
+search_result['1749']=["topic_00000000000002B6.html","TeamAutorizationService.IsTeamOwnerOrAdminAsync Method","Verifica se o utilizador é Owner ou TeamAdmin da equipa."];

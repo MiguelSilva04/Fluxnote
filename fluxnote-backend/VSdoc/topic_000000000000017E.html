@@ -5,7 +5,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta name="GENERATOR" content="VSdocman - documentation generator; https://www.helixoft.com" />
 	<link rel="icon" href="favicon.ico">
-	<title>AddYDocSnapshot Class</title>
+	<title>DocumentPermissionSummaryDto Class</title>
 
 	<link rel="stylesheet" type="text/css" href="msdn2019/toc.css" />
 	<script src="msdn2019/toc.js"></script>
@@ -75,11 +75,11 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
   </div>
 
 <div id="mainBody">
-		<h1 class="title">AddYDocSnapshot Class</h1>
+		<h1 class="title">DocumentPermissionSummaryDto Class</h1>
         
 		<div class="metadata">
         Namespace:
-<a href="topic_0000000000000175.html">fluxnotebackend.Migrations</a>
+<a href="topic_0000000000000162.html">Fluxnote.Backend.Dtos.Teams</a>
 
 
 
@@ -90,7 +90,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 
        
        
-        <summary-info>A base class inherited by each EF Core migration.</summary-info>
+        <summary-info>DTO resumido de permissão de documento em contexto de equipa.</summary-info>
 
 
 
@@ -140,7 +140,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 				</div>
 				
 				<div class="codeSnippetCode codeVB">
-					<pre xml:space="preserve" class="brush: vb">&lt;DbContext(typeof(FluxnoteServerContext))&gt; _&nbsp;<br />&lt;Migration(&quot;20260228171638_AddYDocSnapshot&quot;)&gt; _&nbsp;<br />Public Class AddYDocSnapshot&nbsp;<br />    Inherits <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.entityframeworkcore.migrations.migration">Migration</a></pre>			
+					<pre xml:space="preserve" class="brush: vb">Public Class DocumentPermissionSummaryDto</pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -179,7 +179,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 				</div>
 				
 				<div class="codeSnippetCode codeCsharp">
-					<pre xml:space="preserve" class="brush: csharp">[DbContext(typeof(FluxnoteServerContext))]&nbsp;<br />[Migration(&quot;20260228171638_AddYDocSnapshot&quot;)]&nbsp;<br />public class AddYDocSnapshot : <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.entityframeworkcore.migrations.migration">Migration</a></pre>			
+					<pre xml:space="preserve" class="brush: csharp">public class DocumentPermissionSummaryDto</pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -219,7 +219,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 				</div>
 				
 				<div class="codeSnippetCode codeCpp">
-					<pre xml:space="preserve" class="brush: cpp">[DbContext(typeof(FluxnoteServerContext))]&nbsp;<br />[Migration(&quot;20260228171638_AddYDocSnapshot&quot;)]&nbsp;<br />public ref class AddYDocSnapshot : public <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft::entityframeworkcore::migrations::migration">Migration</a>^</pre>			
+					<pre xml:space="preserve" class="brush: cpp">public ref class DocumentPermissionSummaryDto </pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -258,7 +258,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 				</div>
 				
 				<div class="codeSnippetCode codeJScript">
-					<pre xml:space="preserve" class="brush: js">public &nbsp;<br />   DbContext(typeof(FluxnoteServerContext))&nbsp;<br />   Migration(&quot;20260228171638_AddYDocSnapshot&quot;)&nbsp;<br />class AddYDocSnapshot&nbsp;<br />   extends <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.entityframeworkcore.migrations.migration">Migration</a></pre>			
+					<pre xml:space="preserve" class="brush: js">public class DocumentPermissionSummaryDto</pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -310,7 +310,6 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 
 	
 		<tr class="
-inheritedMember 
 
 
 ">
@@ -321,13 +320,12 @@ inheritedMember
     
 	</td>
 	<td>
-	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.entityframeworkcore.migrations.migration.activeprovider">ActiveProvider</a>
+	<a href="topic_0000000000000183.html">DocumentRole</a>
 
 	</td>
 	<td>
 
-The name of the current database provider.
-(inherited from <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.entityframeworkcore.migrations.migration">Migration</a>).
+Role no documento (0=Viewer, 1=Editor).
 
 	</td>
 </tr>
@@ -336,7 +334,6 @@ The name of the current database provider.
 
 	
 		<tr class="
-inheritedMember 
 
 
 ">
@@ -347,13 +344,12 @@ inheritedMember
     
 	</td>
 	<td>
-	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.entityframeworkcore.migrations.migration.downoperations">DownOperations</a>
+	<a href="topic_000000000000017F.html">Id</a>
 
 	</td>
 	<td>
 
-The <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.entityframeworkcore.migrations.operations.migrationoperation">MigrationOperation</a>s that will migrate the database 'down'.
-(inherited from <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.entityframeworkcore.migrations.migration">Migration</a>).
+Identificador único da permissão.
 
 	</td>
 </tr>
@@ -362,7 +358,6 @@ The <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft
 
 	
 		<tr class="
-inheritedMember 
 
 
 ">
@@ -373,13 +368,12 @@ inheritedMember
     
 	</td>
 	<td>
-	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.entityframeworkcore.migrations.migration.targetmodel">TargetModel</a>
+	<a href="topic_0000000000000181.html">MemberName</a>
 
 	</td>
 	<td>
 
-The <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.entityframeworkcore.metadata.imodel">IModel</a> that the database will map to after the migration has been applied.
-(inherited from <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.entityframeworkcore.migrations.migration">Migration</a>).
+Nome do membro da equipa.
 
 	</td>
 </tr>
@@ -388,7 +382,6 @@ The <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft
 
 	
 		<tr class="
-inheritedMember 
 
 
 ">
@@ -399,13 +392,36 @@ inheritedMember
     
 	</td>
 	<td>
-	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.entityframeworkcore.migrations.migration.upoperations">UpOperations</a>
+	<a href="topic_0000000000000182.html">MemberRole</a>
 
 	</td>
 	<td>
 
-The <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.entityframeworkcore.migrations.operations.migrationoperation">MigrationOperation</a>s that will migrate the database 'up'.
-(inherited from <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.entityframeworkcore.migrations.migration">Migration</a>).
+Role do membro na equipa (0=Member, 1=TeamAdmin, 2=Owner).
+
+	</td>
+</tr>
+	
+
+
+	
+		<tr class="
+
+
+">
+	<td>
+<img alt="Public property" title="Public property" src="msdn2019/pubproperty.png"></img>
+
+
+    
+	</td>
+	<td>
+	<a href="topic_0000000000000180.html">TeamMemberId</a>
+
+	</td>
+	<td>
+
+ID do membro da equipa associado à permissão.
 
 	</td>
 </tr>
@@ -447,162 +463,242 @@ The <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft
 
 
 			<tr class="
-
-
-">
-	<td>
-   <img alt="Protected method" title="Protected method" src="msdn2019/protmethod.png"></img>
-
-    
-	  
-
-
-    
-	</td>
-	<td>
-	<a href="topic_0000000000000181.html">BuildTargetModel(ModelBuilder)</a>
-
-	</td>
-	<td>
-
-Implemented to build the <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.entityframeworkcore.migrations.migration.targetmodel">TargetModel</a>.
-
-	</td>
-</tr>
-	
-
-
-
-
-
-
-
-			<tr class="
-
-
-">
-	<td>
-   <img alt="Protected method" title="Protected method" src="msdn2019/protmethod.png"></img>
-
-    
-	  
-
-
-    
-	</td>
-	<td>
-	<a href="topic_0000000000000180.html">Down(MigrationBuilder)</a>
-
-	</td>
-	<td>
-
-Builds the operations that will migrate the database 'down'.
-
-	</td>
-</tr>
-	
-
-
-
-
-
-
-
-			<tr class="
-
-
-">
-	<td>
-   <img alt="Protected method" title="Protected method" src="msdn2019/protmethod.png"></img>
-
-    
-	  
-
-
-    
-	</td>
-	<td>
-	<a href="topic_000000000000017F.html">Up(MigrationBuilder)</a>
-
-	</td>
-	<td>
-
-Builds the operations that will migrate the database 'up'.
-
-	</td>
-</tr>
-	
-
-
-
-
-
-
-  </table>
-
-  <a href="#mainBody">
-    Top
-  </a>
-
-	</div>					
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div class="section_container">
-	<div class="section_heading">
-		<span><a href="javascript:void(0)" title="Collapse" onclick="toggleSection(this);">Extension Methods</a></span>
-		<div>&nbsp;</div>
-	</div>
-
-	<div id="ExtensionMethodsSection" class="section">	
-  <table class="memberListTable">
-    <tr>
-      <th></th>
-      <th>
-        Name
-      </th>
-      <th>
-        Description
-      </th>
-    </tr>
-
-
-	
-		<tr class="
 inheritedMember 
 
 
 ">
 	<td>
-	<img alt="Public extension method" title="Public extension method" src="msdn2019/pubextensionmethod.png"></img>
+<img alt="Public method" title="Public method" src="msdn2019/pubmethod.png"></img>
+
+	<img alt="Static" title="Static" src="msdn2019/static.png"></img>
+
     
 	</td>
 	<td>
-	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.entityframeworkcore.migrations.internal.migrationextensions.getid">GetId(Migration)</a>
+	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.object.equals">Equals(object?, object?)</a>
 
 	</td>
 	<td>
 
-This is an internal API that supports the Entity Framework Core infrastructure and not subject to
-                the same compatibility standards as public APIs. It may be changed or removed without notice in
-                any release. You should only use it directly in your code with extreme caution and knowing that
-                doing so can result in application failures when updating to a new Entity Framework Core release.
-(Defined by <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.entityframeworkcore.migrations.internal.migrationextensions">MigrationExtensions</a>).
+Determines whether the specified object instances are considered equal.
+(inherited from <a target="_top" href=".html" onclick="this.target='';return true;">object</a>).
+
+	</td>
+</tr>
+			<tr class="
+inheritedMember 
+
+
+">
+	<td>
+<img alt="Public method" title="Public method" src="msdn2019/pubmethod.png"></img>
+
+
+    
+	</td>
+	<td>
+	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.object.equals">Equals(object?)</a>
+
+	</td>
+	<td>
+
+Determines whether the specified object is equal to the current object.
+(inherited from <a target="_top" href=".html" onclick="this.target='';return true;">object</a>).
 
 	</td>
 </tr>
 	
+
+
+
+
+
+
+
+
+	<tr class="
+inheritedMember 
+
+
+">
+	<td>
+   <img alt="Protected method" title="Protected method" src="msdn2019/protmethod.png"></img>
+
+    
+	  
+
+
+    
+	</td>
+	<td>
+	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.object.finalize">~Object()</a>
+
+	</td>
+	<td>
+
+Allows an object to try to free resources and perform other cleanup operations before it is reclaimed by garbage collection.
+(inherited from <a target="_top" href=".html" onclick="this.target='';return true;">object</a>).
+
+	</td>
+</tr>
+
+
+
+
+
+
+
+
+	<tr class="
+inheritedMember 
+
+
+">
+	<td>
+<img alt="Public method" title="Public method" src="msdn2019/pubmethod.png"></img>
+
+
+    
+	</td>
+	<td>
+	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.object.gethashcode">GetHashCode()</a>
+
+	</td>
+	<td>
+
+Serves as the default hash function.
+(inherited from <a target="_top" href=".html" onclick="this.target='';return true;">object</a>).
+
+	</td>
+</tr>
+
+
+
+
+
+
+
+
+	<tr class="
+inheritedMember 
+
+
+">
+	<td>
+<img alt="Public method" title="Public method" src="msdn2019/pubmethod.png"></img>
+
+
+    
+	</td>
+	<td>
+	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.object.gettype">GetType()</a>
+
+	</td>
+	<td>
+
+Gets the <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.type">Type</a> of the current instance.
+(inherited from <a target="_top" href=".html" onclick="this.target='';return true;">object</a>).
+
+	</td>
+</tr>
+
+
+
+
+
+
+
+
+	<tr class="
+inheritedMember 
+
+
+">
+	<td>
+   <img alt="Protected method" title="Protected method" src="msdn2019/protmethod.png"></img>
+
+    
+	  
+
+
+    
+	</td>
+	<td>
+	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.object.memberwiseclone">MemberwiseClone()</a>
+
+	</td>
+	<td>
+
+Creates a shallow copy of the current <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.object">object</a>.
+(inherited from <a target="_top" href=".html" onclick="this.target='';return true;">object</a>).
+
+	</td>
+</tr>
+
+
+
+
+
+
+
+
+	<tr class="
+inheritedMember 
+
+
+">
+	<td>
+<img alt="Public method" title="Public method" src="msdn2019/pubmethod.png"></img>
+
+	<img alt="Static" title="Static" src="msdn2019/static.png"></img>
+
+    
+	</td>
+	<td>
+	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.object.referenceequals">ReferenceEquals(object?, object?)</a>
+
+	</td>
+	<td>
+
+Determines whether the specified <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.object">object</a> instances are the same instance.
+(inherited from <a target="_top" href=".html" onclick="this.target='';return true;">object</a>).
+
+	</td>
+</tr>
+
+
+
+
+
+
+
+
+	<tr class="
+inheritedMember 
+
+
+">
+	<td>
+<img alt="Public method" title="Public method" src="msdn2019/pubmethod.png"></img>
+
+
+    
+	</td>
+	<td>
+	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.object.tostring">ToString()</a>
+
+	</td>
+	<td>
+
+Returns a string that represents the current object.
+(inherited from <a target="_top" href=".html" onclick="this.target='';return true;">object</a>).
+
+	</td>
+</tr>
+
+
+
+
 
 
   </table>
@@ -613,6 +709,23 @@ This is an internal API that supports the Entity Framework Core infrastructure a
 
 	</div>					
 </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
   
@@ -634,16 +747,6 @@ This is an internal API that supports the Entity Framework Core infrastructure a
 
 
 
-<div class="section_container">
-	<div class="section_heading">
-		<span><a href="javascript:void(0)" title="Collapse" onclick="toggleSection(this);">Remarks</a></span>
-		<div>&nbsp;</div>
-	</div>
-
-	<div id="remarksSection" class="section">	
-			See <a target="_top" href="https://aka.ms/efcore-docs-migrations">Database migrations</a> for more information and examples.
-	</div>					
-</div>
 
 
 
@@ -659,12 +762,9 @@ This is an internal API that supports the Entity Framework Core infrastructure a
 <div style="padding-left:0em;"><a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.object">object</a>
 </div>
 
-<div style="padding-left:1em;"><a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.entityframeworkcore.migrations.migration">Microsoft.EntityFrameworkCore.Migrations.Migration</a>
-</div>
 
 
-
-<div style="padding-left:2em;">fluxnotebackend.Migrations.AddYDocSnapshot</div>
+<div style="padding-left:1em;">Fluxnote.Backend.Dtos.Teams.DocumentPermissionSummaryDto</div>
 
 				
 </div>
@@ -732,7 +832,7 @@ This is an internal API that supports the Entity Framework Core infrastructure a
 
 	<div id="seeAlsoSection" class="section">	
 		<div>
-	<a href="topic_0000000000000175.html">fluxnotebackend.Migrations Namespace</a><br />
+	<a href="topic_0000000000000162.html">Fluxnote.Backend.Dtos.Teams Namespace</a><br />
 
 
 	

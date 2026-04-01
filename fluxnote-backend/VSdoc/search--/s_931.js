@@ -1,1 +1,1 @@
-search_result['931']=["topic_00000000000001B0_vars--.html","DocumentComment Fields",""];
+search_result['931']=["topic_000000000000015B.html","TeamInviteDto.TeamId Property","TeamId é o identificador da equipa para o qual o convite foi criado."];

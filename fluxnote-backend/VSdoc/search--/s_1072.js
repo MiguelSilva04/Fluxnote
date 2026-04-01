@@ -1,1 +1,1 @@
-search_result['1072']=["topic_0000000000000217.html","TeamInvite.Id Property","Identificador único do convite (chave primária)."];
+search_result['1072']=["topic_000000000000018C.html","UpdateTeamRequest Class","DTO para atualização de uma equipa existente."];

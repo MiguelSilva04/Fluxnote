@@ -1,0 +1,1 @@
+search_result['1768']=["topic_00000000000002BF.html","IDevEmailStore.Save Method","Guarda um link de confirmação para um email."];

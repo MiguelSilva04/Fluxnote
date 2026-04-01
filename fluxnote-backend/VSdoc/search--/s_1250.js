@@ -1,1 +1,1 @@
-search_result['1250']=["topic_000000000000027E.html","SmtpEmailSender Constructor","Construtor com injeção de opções."];
+search_result['1250']=["topic_00000000000001C4_methods--.html","AddBilingualFieldsToNotification Methods",""];

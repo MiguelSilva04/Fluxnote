@@ -1,1 +1,1 @@
-search_result['51']=["topic_0000000000000020.html","DocumentPermissionsController Class","Controlador responsável pela gestão de permissões de documentos por membro."];
+search_result['51']=["topic_0000000000000020.html","DocumentInvitesController.InviteByEmail Method","Convida um utilizador para um documento por email.\r\nSe o utilizador existir e tiver notificações ativas, envia notificação in-app e/ou email.\r\nSe não tiver nenhum canal ativo, retorna aviso para usar ..."];

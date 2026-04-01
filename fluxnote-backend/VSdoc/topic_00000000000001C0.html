@@ -5,7 +5,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta name="GENERATOR" content="VSdocman - documentation generator; https://www.helixoft.com" />
 	<link rel="icon" href="favicon.ico">
-	<title>DocumentContext Class</title>
+	<title>AddReferenceTokenToNotification Class</title>
 
 	<link rel="stylesheet" type="text/css" href="msdn2019/toc.css" />
 	<script src="msdn2019/toc.js"></script>
@@ -75,11 +75,11 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
   </div>
 
 <div id="mainBody">
-		<h1 class="title">DocumentContext Class</h1>
+		<h1 class="title">AddReferenceTokenToNotification Class</h1>
         
 		<div class="metadata">
         Namespace:
-<a href="topic_0000000000000196.html">Fluxnote.Backend.Models</a>
+<a href="topic_000000000000019B.html">fluxnotebackend.Migrations</a>
 
 
 
@@ -90,8 +90,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 
        
        
-        <summary-info>Representa um ficheiro de contexto associado a um documento para uso pela IA.
-O texto extraído é armazenado na BD para ser usado futuramente em prompts de geração de conteúdo.</summary-info>
+        <summary-info>A base class inherited by each EF Core migration.</summary-info>
 
 
 
@@ -141,7 +140,7 @@ O texto extraído é armazenado na BD para ser usado futuramente em prompts de g
 				</div>
 				
 				<div class="codeSnippetCode codeVB">
-					<pre xml:space="preserve" class="brush: vb">Public Class DocumentContext</pre>			
+					<pre xml:space="preserve" class="brush: vb">&lt;DbContext(typeof(FluxnoteServerContext))&gt; _&nbsp;<br />&lt;Migration(&quot;20260316234955_AddReferenceTokenToNotification&quot;)&gt; _&nbsp;<br />Public Class AddReferenceTokenToNotification&nbsp;<br />    Inherits <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.entityframeworkcore.migrations.migration">Migration</a></pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -180,7 +179,7 @@ O texto extraído é armazenado na BD para ser usado futuramente em prompts de g
 				</div>
 				
 				<div class="codeSnippetCode codeCsharp">
-					<pre xml:space="preserve" class="brush: csharp">public class DocumentContext</pre>			
+					<pre xml:space="preserve" class="brush: csharp">[DbContext(typeof(FluxnoteServerContext))]&nbsp;<br />[Migration(&quot;20260316234955_AddReferenceTokenToNotification&quot;)]&nbsp;<br />public class AddReferenceTokenToNotification : <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.entityframeworkcore.migrations.migration">Migration</a></pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -220,7 +219,7 @@ O texto extraído é armazenado na BD para ser usado futuramente em prompts de g
 				</div>
 				
 				<div class="codeSnippetCode codeCpp">
-					<pre xml:space="preserve" class="brush: cpp">public ref class DocumentContext </pre>			
+					<pre xml:space="preserve" class="brush: cpp">[DbContext(typeof(FluxnoteServerContext))]&nbsp;<br />[Migration(&quot;20260316234955_AddReferenceTokenToNotification&quot;)]&nbsp;<br />public ref class AddReferenceTokenToNotification : public <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft::entityframeworkcore::migrations::migration">Migration</a>^</pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -259,7 +258,7 @@ O texto extraído é armazenado na BD para ser usado futuramente em prompts de g
 				</div>
 				
 				<div class="codeSnippetCode codeJScript">
-					<pre xml:space="preserve" class="brush: js">public class DocumentContext</pre>			
+					<pre xml:space="preserve" class="brush: js">public &nbsp;<br />   DbContext(typeof(FluxnoteServerContext))&nbsp;<br />   Migration(&quot;20260316234955_AddReferenceTokenToNotification&quot;)&nbsp;<br />class AddReferenceTokenToNotification&nbsp;<br />   extends <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.entityframeworkcore.migrations.migration">Migration</a></pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -311,6 +310,7 @@ O texto extraído é armazenado na BD para ser usado futuramente em prompts de g
 
 	
 		<tr class="
+inheritedMember 
 
 
 ">
@@ -321,13 +321,13 @@ O texto extraído é armazenado na BD para ser usado futuramente em prompts de g
     
 	</td>
 	<td>
-	<a href="topic_00000000000001C4.html">ContentType</a>
+	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.entityframeworkcore.migrations.migration.activeprovider">ActiveProvider</a>
 
 	</td>
 	<td>
 
-MIME type do ficheiro (ex: &quot;application/pdf&quot;, &quot;text/plain&quot;).
-Utilizado para determinar o método de extração de texto.
+The name of the current database provider.
+(inherited from <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.entityframeworkcore.migrations.migration">Migration</a>).
 
 	</td>
 </tr>
@@ -336,6 +336,7 @@ Utilizado para determinar o método de extração de texto.
 
 	
 		<tr class="
+inheritedMember 
 
 
 ">
@@ -346,12 +347,13 @@ Utilizado para determinar o método de extração de texto.
     
 	</td>
 	<td>
-	<a href="topic_00000000000001CA.html">Document</a>
+	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.entityframeworkcore.migrations.migration.downoperations">DownOperations</a>
 
 	</td>
 	<td>
 
-
+The <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.entityframeworkcore.migrations.operations.migrationoperation">MigrationOperation</a>s that will migrate the database 'down'.
+(inherited from <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.entityframeworkcore.migrations.migration">Migration</a>).
 
 	</td>
 </tr>
@@ -360,6 +362,7 @@ Utilizado para determinar o método de extração de texto.
 
 	
 		<tr class="
+inheritedMember 
 
 
 ">
@@ -370,12 +373,13 @@ Utilizado para determinar o método de extração de texto.
     
 	</td>
 	<td>
-	<a href="topic_00000000000001C2.html">DocumentId</a>
+	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.entityframeworkcore.migrations.migration.targetmodel">TargetModel</a>
 
 	</td>
 	<td>
 
-ID do documento ao qual este contexto pertence (FK para Document).
+The <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.entityframeworkcore.metadata.imodel">IModel</a> that the database will map to after the migration has been applied.
+(inherited from <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.entityframeworkcore.migrations.migration">Migration</a>).
 
 	</td>
 </tr>
@@ -384,6 +388,7 @@ ID do documento ao qual este contexto pertence (FK para Document).
 
 	
 		<tr class="
+inheritedMember 
 
 
 ">
@@ -394,184 +399,13 @@ ID do documento ao qual este contexto pertence (FK para Document).
     
 	</td>
 	<td>
-	<a href="topic_00000000000001C6.html">ExtractedText</a>
+	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.entityframeworkcore.migrations.migration.upoperations">UpOperations</a>
 
 	</td>
 	<td>
 
-Texto extraído do ficheiro, pronto para ser incluído em prompts de IA.
-Null se a extração falhou ou o ficheiro estava vazio.
-Não é exposto ao frontend.
-
-	</td>
-</tr>
-	
-
-
-	
-		<tr class="
-
-
-">
-	<td>
-<img alt="Public property" title="Public property" src="msdn2019/pubproperty.png"></img>
-
-
-    
-	</td>
-	<td>
-	<a href="topic_00000000000001C3.html">FileName</a>
-
-	</td>
-	<td>
-
-Nome original do ficheiro carregado (ex: &quot;notas.pdf&quot;).
-
-	</td>
-</tr>
-	
-
-
-	
-		<tr class="
-
-
-">
-	<td>
-<img alt="Public property" title="Public property" src="msdn2019/pubproperty.png"></img>
-
-
-    
-	</td>
-	<td>
-	<a href="topic_00000000000001C7.html">FileSizeBytes</a>
-
-	</td>
-	<td>
-
-Tamanho do ficheiro em bytes.
-
-	</td>
-</tr>
-	
-
-
-	
-		<tr class="
-
-
-">
-	<td>
-<img alt="Public property" title="Public property" src="msdn2019/pubproperty.png"></img>
-
-
-    
-	</td>
-	<td>
-	<a href="topic_00000000000001C1.html">Id</a>
-
-	</td>
-	<td>
-
-Identificador único do contexto.
-
-	</td>
-</tr>
-	
-
-
-	
-		<tr class="
-
-
-">
-	<td>
-<img alt="Public property" title="Public property" src="msdn2019/pubproperty.png"></img>
-
-
-    
-	</td>
-	<td>
-	<a href="topic_00000000000001C5.html">StoredPath</a>
-
-	</td>
-	<td>
-
-Caminho ou referência ao ficheiro armazenado, devolvido pelo IStorageService.
-Em dev: &quot;local://context/{uniqueName}&quot;. Em produção: &quot;blob://context/{blobName}&quot;.
-Usado para eliminar o ficheiro do storage quando o contexto for removido.
-
-	</td>
-</tr>
-	
-
-
-	
-		<tr class="
-
-
-">
-	<td>
-<img alt="Public property" title="Public property" src="msdn2019/pubproperty.png"></img>
-
-
-    
-	</td>
-	<td>
-	<a href="topic_00000000000001C8.html">UploadedAt</a>
-
-	</td>
-	<td>
-
-Data e hora do upload (UTC).
-
-	</td>
-</tr>
-	
-
-
-	
-		<tr class="
-
-
-">
-	<td>
-<img alt="Public property" title="Public property" src="msdn2019/pubproperty.png"></img>
-
-
-    
-	</td>
-	<td>
-	<a href="topic_00000000000001CB.html">UploadedBy</a>
-
-	</td>
-	<td>
-
-
-
-	</td>
-</tr>
-	
-
-
-	
-		<tr class="
-
-
-">
-	<td>
-<img alt="Public property" title="Public property" src="msdn2019/pubproperty.png"></img>
-
-
-    
-	</td>
-	<td>
-	<a href="topic_00000000000001C9.html">UploadedById</a>
-
-	</td>
-	<td>
-
-ID do utilizador que fez o upload (FK para User).
+The <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.entityframeworkcore.migrations.operations.migrationoperation">MigrationOperation</a>s that will migrate the database 'up'.
+(inherited from <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.entityframeworkcore.migrations.migration">Migration</a>).
 
 	</td>
 </tr>
@@ -613,47 +447,25 @@ ID do utilizador que fez o upload (FK para User).
 
 
 			<tr class="
-inheritedMember 
 
 
 ">
 	<td>
-<img alt="Public method" title="Public method" src="msdn2019/pubmethod.png"></img>
-
-	<img alt="Static" title="Static" src="msdn2019/static.png"></img>
+   <img alt="Protected method" title="Protected method" src="msdn2019/protmethod.png"></img>
 
     
-	</td>
-	<td>
-	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.object.equals">Equals(object?, object?)</a>
-
-	</td>
-	<td>
-
-Determines whether the specified object instances are considered equal.
-(inherited from <a target="_top" href=".html" onclick="this.target='';return true;">object</a>).
-
-	</td>
-</tr>
-			<tr class="
-inheritedMember 
-
-
-">
-	<td>
-<img alt="Public method" title="Public method" src="msdn2019/pubmethod.png"></img>
+	  
 
 
     
 	</td>
 	<td>
-	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.object.equals">Equals(object?)</a>
+	<a href="topic_00000000000001C3.html">BuildTargetModel(ModelBuilder)</a>
 
 	</td>
 	<td>
 
-Determines whether the specified object is equal to the current object.
-(inherited from <a target="_top" href=".html" onclick="this.target='';return true;">object</a>).
+Implemented to build the <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.entityframeworkcore.migrations.migration.targetmodel">TargetModel</a>.
 
 	</td>
 </tr>
@@ -665,9 +477,7 @@ Determines whether the specified object is equal to the current object.
 
 
 
-
-	<tr class="
-inheritedMember 
+			<tr class="
 
 
 ">
@@ -681,16 +491,16 @@ inheritedMember
     
 	</td>
 	<td>
-	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.object.finalize">~Object()</a>
+	<a href="topic_00000000000001C2.html">Down(MigrationBuilder)</a>
 
 	</td>
 	<td>
 
-Allows an object to try to free resources and perform other cleanup operations before it is reclaimed by garbage collection.
-(inherited from <a target="_top" href=".html" onclick="this.target='';return true;">object</a>).
+Builds the operations that will migrate the database 'down'.
 
 	</td>
 </tr>
+	
 
 
 
@@ -698,69 +508,7 @@ Allows an object to try to free resources and perform other cleanup operations b
 
 
 
-
-	<tr class="
-inheritedMember 
-
-
-">
-	<td>
-<img alt="Public method" title="Public method" src="msdn2019/pubmethod.png"></img>
-
-
-    
-	</td>
-	<td>
-	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.object.gethashcode">GetHashCode()</a>
-
-	</td>
-	<td>
-
-Serves as the default hash function.
-(inherited from <a target="_top" href=".html" onclick="this.target='';return true;">object</a>).
-
-	</td>
-</tr>
-
-
-
-
-
-
-
-
-	<tr class="
-inheritedMember 
-
-
-">
-	<td>
-<img alt="Public method" title="Public method" src="msdn2019/pubmethod.png"></img>
-
-
-    
-	</td>
-	<td>
-	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.object.gettype">GetType()</a>
-
-	</td>
-	<td>
-
-Gets the <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.type">Type</a> of the current instance.
-(inherited from <a target="_top" href=".html" onclick="this.target='';return true;">object</a>).
-
-	</td>
-</tr>
-
-
-
-
-
-
-
-
-	<tr class="
-inheritedMember 
+			<tr class="
 
 
 ">
@@ -774,77 +522,16 @@ inheritedMember
     
 	</td>
 	<td>
-	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.object.memberwiseclone">MemberwiseClone()</a>
+	<a href="topic_00000000000001C1.html">Up(MigrationBuilder)</a>
 
 	</td>
 	<td>
 
-Creates a shallow copy of the current <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.object">object</a>.
-(inherited from <a target="_top" href=".html" onclick="this.target='';return true;">object</a>).
+Builds the operations that will migrate the database 'up'.
 
 	</td>
 </tr>
-
-
-
-
-
-
-
-
-	<tr class="
-inheritedMember 
-
-
-">
-	<td>
-<img alt="Public method" title="Public method" src="msdn2019/pubmethod.png"></img>
-
-	<img alt="Static" title="Static" src="msdn2019/static.png"></img>
-
-    
-	</td>
-	<td>
-	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.object.referenceequals">ReferenceEquals(object?, object?)</a>
-
-	</td>
-	<td>
-
-Determines whether the specified <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.object">object</a> instances are the same instance.
-(inherited from <a target="_top" href=".html" onclick="this.target='';return true;">object</a>).
-
-	</td>
-</tr>
-
-
-
-
-
-
-
-
-	<tr class="
-inheritedMember 
-
-
-">
-	<td>
-<img alt="Public method" title="Public method" src="msdn2019/pubmethod.png"></img>
-
-
-    
-	</td>
-	<td>
-	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.object.tostring">ToString()</a>
-
-	</td>
-	<td>
-
-Returns a string that represents the current object.
-(inherited from <a target="_top" href=".html" onclick="this.target='';return true;">object</a>).
-
-	</td>
-</tr>
+	
 
 
 
@@ -872,10 +559,60 @@ Returns a string that represents the current object.
 
 
 
+<div class="section_container">
+	<div class="section_heading">
+		<span><a href="javascript:void(0)" title="Collapse" onclick="toggleSection(this);">Extension Methods</a></span>
+		<div>&nbsp;</div>
+	</div>
+
+	<div id="ExtensionMethodsSection" class="section">	
+  <table class="memberListTable">
+    <tr>
+      <th></th>
+      <th>
+        Name
+      </th>
+      <th>
+        Description
+      </th>
+    </tr>
 
 
+	
+		<tr class="
+inheritedMember 
 
 
+">
+	<td>
+	<img alt="Public extension method" title="Public extension method" src="msdn2019/pubextensionmethod.png"></img>
+    
+	</td>
+	<td>
+	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.entityframeworkcore.migrations.internal.migrationextensions.getid">GetId(Migration)</a>
+
+	</td>
+	<td>
+
+This is an internal API that supports the Entity Framework Core infrastructure and not subject to
+                the same compatibility standards as public APIs. It may be changed or removed without notice in
+                any release. You should only use it directly in your code with extreme caution and knowing that
+                doing so can result in application failures when updating to a new Entity Framework Core release.
+(Defined by <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.entityframeworkcore.migrations.internal.migrationextensions">MigrationExtensions</a>).
+
+	</td>
+</tr>
+	
+
+
+  </table>
+
+  <a href="#mainBody">
+    Top
+  </a>
+
+	</div>					
+</div>
 
 
   
@@ -904,9 +641,7 @@ Returns a string that represents the current object.
 	</div>
 
 	<div id="remarksSection" class="section">	
-			Suporta ficheiros PDF e TXT. A estrutura é extensível para outros formatos.
-O ficheiro em si é guardado via IStorageService (local em dev, Azure Blob em produção).
-O ExtractedText não é exposto ao frontend, é exclusivamente usado server-side pela IA.
+			See <a target="_top" href="https://aka.ms/efcore-docs-migrations">Database migrations</a> for more information and examples.
 	</div>					
 </div>
 
@@ -924,9 +659,12 @@ O ExtractedText não é exposto ao frontend, é exclusivamente usado server-side
 <div style="padding-left:0em;"><a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.object">object</a>
 </div>
 
+<div style="padding-left:1em;"><a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/microsoft.entityframeworkcore.migrations.migration">Microsoft.EntityFrameworkCore.Migrations.Migration</a>
+</div>
 
 
-<div style="padding-left:1em;">Fluxnote.Backend.Models.DocumentContext</div>
+
+<div style="padding-left:2em;">fluxnotebackend.Migrations.AddReferenceTokenToNotification</div>
 
 				
 </div>
@@ -994,7 +732,7 @@ O ExtractedText não é exposto ao frontend, é exclusivamente usado server-side
 
 	<div id="seeAlsoSection" class="section">	
 		<div>
-	<a href="topic_0000000000000196.html">Fluxnote.Backend.Models Namespace</a><br />
+	<a href="topic_000000000000019B.html">fluxnotebackend.Migrations Namespace</a><br />
 
 
 	

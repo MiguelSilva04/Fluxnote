@@ -1,0 +1,1 @@
+search_result['1759']=["topic_00000000000002BB.html","ConsoleEmailSender.SendEmailConfirmationAsync Method","Simula o envio de um email de confirmação."];

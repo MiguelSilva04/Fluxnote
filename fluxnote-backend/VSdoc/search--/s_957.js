@@ -1,1 +1,1 @@
-search_result['957']=["topic_00000000000001C5.html","DocumentContext.StoredPath Property","Caminho ou referência ao ficheiro armazenado, devolvido pelo IStorageService.\r\nEm dev: \"local://context/{uniqueName}\". Em produção: \"blob://context/{blobName}\".\r\nUsado para eliminar o ficheiro do stor..."];
+search_result['957']=["topic_0000000000000165_attached_props--.html","TeamDto Attached Properties",""];

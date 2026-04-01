@@ -1,1 +1,1 @@
-search_result['424']=["topic_00000000000000C8.html","CreateDocumentCommentDto.ParentCommentId Property","ID do comentário pai, caso este seja uma resposta a outro comentário. Se for um comentário raiz, esse campo pode ser nulo."];
+search_result['424']=["topic_00000000000000A0.html","UpdateProfileRequest.ProfilePictureUrl Property","URL ou data URI (base64) da foto de perfil."];

@@ -1,1 +1,1 @@
-search_result['1159']=["topic_0000000000000255.html","ITextExtractionService Interface","Serviço para extração de texto plano de ficheiros carregados como contexto para a IA.\r\nSuporta PDF e TXT;"];
+search_result['1159']=["topic_00000000000001A6.html","AddYDocSnapshot.Down Method","Builds the operations that will migrate the database \u0027down\u0027."];

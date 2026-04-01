@@ -1,1 +1,1 @@
-search_result['312']=["topic_000000000000008F_vars--.html","SetPasswordRequest Fields",""];
+search_result['312']=["topic_0000000000000080.html","ChangePasswordRequest.ConfirmPassword Property","Confirmação da nova password (deve ser igual a NewPassword)."];

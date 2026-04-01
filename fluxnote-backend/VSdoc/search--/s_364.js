@@ -1,1 +1,1 @@
-search_result['364']=["topic_00000000000000AA.html","AcceptDocumentInviteResponseDto.TeamName Property","Nome da equipa à qual o documento pertence.\r\nEste campo é incluído para facilitar a exibição de informações sobre a equipa,\r\nsem a necessidade de uma consulta adicional para obter o nome da equipa."];
+search_result['364']=["topic_000000000000008D_props--.html","LoginRequest Properties",""];

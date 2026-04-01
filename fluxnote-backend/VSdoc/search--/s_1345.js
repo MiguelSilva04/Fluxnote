@@ -1,0 +1,1 @@
+search_result['1345']=["topic_00000000000001F6.html","DocumentContext.ContentType Property","MIME type do ficheiro (ex: \"application/pdf\", \"text/plain\").\r\nUtilizado para determinar o método de extração de texto."];

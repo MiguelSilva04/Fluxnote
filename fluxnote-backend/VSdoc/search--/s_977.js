@@ -1,1 +1,1 @@
-search_result['977']=["topic_00000000000001D4.html","DocumentInvite.IsRevoked Property",""];
+search_result['977']=["topic_000000000000016B.html","TeamDto.IsActive Property","Indica se a equipa está ativa."];

@@ -1,1 +1,1 @@
-search_result['156']=["topic_0000000000000052.html","TeamMembersController.DeleteTeamMember Method","Remove um membro de uma equipa.\r\nOwner pode remover qualquer membro exceto si próprio.\r\nTeamAdmin pode remover apenas Members."];
+search_result['156']=["topic_0000000000000048.html","NotificationsController Class","Controlador para gestão de notificações in-app e preferências de notificação."];

@@ -1,1 +1,1 @@
-search_result['225']=["topic_0000000000000070_props--.html","ChangePasswordRequest Properties",""];
+search_result['225']=["topic_0000000000000060.html","TeamsController.GetTeams Method","Lista todas as equipas onde o utilizador é membro."];

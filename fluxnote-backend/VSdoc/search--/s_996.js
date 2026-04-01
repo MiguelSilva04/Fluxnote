@@ -1,1 +1,1 @@
-search_result['996']=["topic_00000000000001E4.html","DocumentVersion Class","Representa uma versão imutável de um documento, criada quando um utilizador\r\nfecha a sessão de edição (desconexão do hub SignalR)."];
+search_result['996']=["topic_0000000000000176_events--.html","initial Events",""];

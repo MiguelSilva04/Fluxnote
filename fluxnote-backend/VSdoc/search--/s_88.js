@@ -1,1 +1,1 @@
-search_result['88']=["topic_0000000000000031.html","DocumentsController.GetTrash Method","Lista documentos na lixeira do utilizador (apenas documentos criados pelo próprio)."];
+search_result['88']=["topic_000000000000002C.html","DocumentsController.GenerateSummary Method","Gera um resumo do documento usando IA (Google Gemini)."];

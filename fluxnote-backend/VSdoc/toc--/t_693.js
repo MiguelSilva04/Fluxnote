@@ -1,1 +1,1 @@
-c['693']=[['694',"DeleteContextFileAsync Method","topic_000000000000028B.html",0],['695',"GetImageAsync Method","topic_0000000000000289.html",0],['696',"UploadContextFileAsync Method","topic_000000000000028A.html",0],['697',"UploadImageAsync Method","topic_0000000000000288.html",0]];
+c['693']=[['694',"GeminiAIService Constructor","topic_000000000000029B.html",0],['695',"Methods","topic_000000000000029A_methods--.html",1]];

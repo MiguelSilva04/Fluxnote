@@ -1,1 +1,1 @@
-search_result['595']=["topic_000000000000010F.html","DocumentVersionDto.Id Property",""];
+search_result['595']=["topic_00000000000000E2.html","DocumentCommentDto.CreatedAt Property","Data e hora em que o comentário foi criado."];

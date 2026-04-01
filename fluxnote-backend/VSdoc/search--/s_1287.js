@@ -1,1 +1,1 @@
-search_result['1287']=["topic_0000000000000291_methods--.html","LocalStorageService Methods",""];
+search_result['1287']=["topic_00000000000001D5.html","Document.PlainText Property","Texto extraído do conteúdo para pesquisa full-text."];

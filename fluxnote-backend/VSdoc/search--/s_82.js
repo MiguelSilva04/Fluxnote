@@ -1,1 +1,1 @@
-search_result['82']=["topic_0000000000000030.html","DocumentsController.DeleteDocument Method","Move um documento para a lixeira (soft delete). Apenas o Owner da equipa pode apagar."];
+search_result['82']=["topic_0000000000000028_methods--.html","FluxnoteServerContext Methods",""];

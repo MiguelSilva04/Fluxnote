@@ -1,1 +1,1 @@
-search_result['994']=["topic_00000000000001E0.html","DocumentPermission.TeamMember Property","Membro da equipa associado à permissão."];
+search_result['994']=["topic_0000000000000176.html","TeamMemberDto.JoinedAt Property","Data em que o membro entrou na equipa (UTC)."];

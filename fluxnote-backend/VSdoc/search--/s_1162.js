@@ -1,1 +1,1 @@
-search_result['1162']=["topic_0000000000000255_methods--.html","ITextExtractionService Methods",""];
+search_result['1162']=["topic_00000000000001A7_overloads--.html","AddYDocSnapshot.BuildTargetModel Method","Implemented to build the TargetModel."];

@@ -1,0 +1,1 @@
+search_result['1390']=["topic_000000000000020F.html","DocumentPermission.CreatedAt Property","Data de criação da permissão (UTC)."];

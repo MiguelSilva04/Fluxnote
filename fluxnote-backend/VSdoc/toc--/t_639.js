@@ -1,1 +1,1 @@
-c['639']=[['640',"GenerateContentAsync Method","topic_0000000000000254.html",0],['641',"GenerateSummaryAsync Method","topic_0000000000000252.html",0],['642',"ImproveTextAsync Method","topic_0000000000000253.html",0]];
+c['639']=[['640',"Properties","topic_000000000000025C_props--.html",1]];

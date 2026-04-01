@@ -1,1 +1,1 @@
-search_result['187']=["topic_000000000000005D.html","UploadsController.UploadImage Method","Faz upload de uma imagem e retorna a URL pública."];
+search_result['187']=["topic_0000000000000053.html","TeamInvitesController.CreateInvite Method","Cria um convite por link para um documento.\r\nApenas Owner ou TeamAdmin podem criar convites."];

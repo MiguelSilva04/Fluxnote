@@ -1,1 +1,1 @@
-search_result['1139']=["topic_000000000000024B.html","GeminiAIService.GenerateSummaryAsync Method","Gera um resumo a partir do texto fornecido."];
+search_result['1139']=["topic_00000000000001A0.html","AddFolders Class","A base class inherited by each EF Core migration."];

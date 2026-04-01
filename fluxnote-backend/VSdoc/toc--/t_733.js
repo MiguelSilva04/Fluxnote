@@ -1,1 +1,1 @@
-c['733']=[['734',"BuildTargetModel(ModelBuilder) Method","topic_0000000000000181.html",0]];
+c['733']=[['734',"SendEmailConfirmationAsync Method","topic_00000000000002BB.html",0],['735',"SendNotificationEmailAsync Method","topic_00000000000002BD.html",0],['736',"SendPasswordResetAsync Method","topic_00000000000002BC.html",0]];

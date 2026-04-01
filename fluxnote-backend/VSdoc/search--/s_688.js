@@ -1,1 +1,1 @@
-search_result['688']=["topic_000000000000013A.html","TeamInviteDto.IsUsed Property","Indica se o convite já foi utilizado. Um convite é considerado utilizado\r\nse já tiver sido aceito por um utilizador."];
+search_result['688']=["topic_0000000000000108.html","DocumentDetailDto.IsDeleted Property","Indica se está na lixeira."];

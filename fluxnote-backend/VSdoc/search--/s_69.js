@@ -1,1 +1,1 @@
-search_result['69']=["topic_0000000000000028.html","DocumentsController.GetDocuments Method","Lista os documentos acessíveis pelo utilizador autenticado."];
+search_result['69']=["topic_0000000000000026_events--.html","DocumentsController Events",""];

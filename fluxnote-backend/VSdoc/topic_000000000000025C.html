@@ -5,7 +5,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta name="GENERATOR" content="VSdocman - documentation generator; https://www.helixoft.com" />
 	<link rel="icon" href="favicon.ico">
-	<title>TokenService Class</title>
+	<title>Team Class</title>
 
 	<link rel="stylesheet" type="text/css" href="msdn2019/toc.css" />
 	<script src="msdn2019/toc.js"></script>
@@ -75,11 +75,11 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
   </div>
 
 <div id="mainBody">
-		<h1 class="title">TokenService Class</h1>
+		<h1 class="title">Team Class</h1>
         
 		<div class="metadata">
         Namespace:
-<a href="topic_000000000000025B.html">Fluxnote.Backend.Services.Auth</a>
+<a href="topic_00000000000001C8.html">Fluxnote.Backend.Models</a>
 
 
 
@@ -90,7 +90,8 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 
        
        
-        <summary-info>Serviço responsável pela geração e gestão de tokens de autenticação.</summary-info>
+        <summary-info>Representa uma equipa colaborativa no sistema Fluxnote.
+Uma equipa agrupa utilizadores (membros) e documentos partilhados.</summary-info>
 
 
 
@@ -140,7 +141,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 				</div>
 				
 				<div class="codeSnippetCode codeVB">
-					<pre xml:space="preserve" class="brush: vb">Public Class TokenService</pre>			
+					<pre xml:space="preserve" class="brush: vb">Public Class Team</pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -179,7 +180,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 				</div>
 				
 				<div class="codeSnippetCode codeCsharp">
-					<pre xml:space="preserve" class="brush: csharp">public class TokenService</pre>			
+					<pre xml:space="preserve" class="brush: csharp">public class Team</pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -219,7 +220,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 				</div>
 				
 				<div class="codeSnippetCode codeCpp">
-					<pre xml:space="preserve" class="brush: cpp">public ref class TokenService </pre>			
+					<pre xml:space="preserve" class="brush: cpp">public ref class Team </pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -258,7 +259,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 				</div>
 				
 				<div class="codeSnippetCode codeJScript">
-					<pre xml:space="preserve" class="brush: js">public class TokenService</pre>			
+					<pre xml:space="preserve" class="brush: js">public class Team</pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -288,13 +289,14 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 
 
 
+
 <div class="section_container">
 	<div class="section_heading">
-		<span><a href="javascript:void(0)" title="Collapse" onclick="toggleSection(this);">Constructors</a></span>
+		<span><a href="javascript:void(0)" title="Collapse" onclick="toggleSection(this);">Properties</a></span>
 		<div>&nbsp;</div>
 	</div>
 
-	<div id="ConstructorsSection" class="section">	
+	<div id="PropertiesSection" class="section">	
   <table class="memberListTable">
     <tr>
       <th></th>
@@ -308,26 +310,242 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 
 
 	
-			<tr class="
+		<tr class="
+
+
+">
+	<td>
+<img alt="Public property" title="Public property" src="msdn2019/pubproperty.png"></img>
+
+
+    
+	</td>
+	<td>
+	<a href="topic_0000000000000260.html">CreatedAt</a>
+
+	</td>
+	<td>
+
+Data e hora de criação da equipa (UTC).
+
+	</td>
+</tr>
 	
-	
-	">
-	  <td>
-    <img alt="Public constructor" title="Public constructor" src="msdn2019/pubmethod.png"></img>
+
 
 	
-	    
-	  </td>
-	  <td>
-	    <a href="topic_000000000000025D.html">TokenService(IConfiguration)</a>
+		<tr class="
 
-	  </td>
-	  <td>
+
+">
+	<td>
+<img alt="Public property" title="Public property" src="msdn2019/pubproperty.png"></img>
+
+
+    
+	</td>
+	<td>
+	<a href="topic_0000000000000263.html">DeletionScheduled</a>
+
+	</td>
+	<td>
+
+Data agendada para eliminação automática da equipa.
+
+	</td>
+</tr>
 	
-	Construtor com injeção de configuração.
+
+
 	
-		</td>
-	</tr>
+		<tr class="
+
+
+">
+	<td>
+<img alt="Public property" title="Public property" src="msdn2019/pubproperty.png"></img>
+
+
+    
+	</td>
+	<td>
+	<a href="topic_0000000000000265.html">Documents</a>
+
+	</td>
+	<td>
+
+Coleção de documentos pertencentes à equipa.
+
+	</td>
+</tr>
+	
+
+
+	
+		<tr class="
+
+
+">
+	<td>
+<img alt="Public property" title="Public property" src="msdn2019/pubproperty.png"></img>
+
+
+    
+	</td>
+	<td>
+	<a href="topic_0000000000000266.html">Folders</a>
+
+	</td>
+	<td>
+
+Coleção de pastas pertencentes à equipa.
+
+	</td>
+</tr>
+	
+
+
+	
+		<tr class="
+
+
+">
+	<td>
+<img alt="Public property" title="Public property" src="msdn2019/pubproperty.png"></img>
+
+
+    
+	</td>
+	<td>
+	<a href="topic_000000000000025D.html">Id</a>
+
+	</td>
+	<td>
+
+Identificador único da equipa (chave primária).
+
+	</td>
+</tr>
+	
+
+
+	
+		<tr class="
+
+
+">
+	<td>
+<img alt="Public property" title="Public property" src="msdn2019/pubproperty.png"></img>
+
+
+    
+	</td>
+	<td>
+	<a href="topic_0000000000000262.html">IsActive</a>
+
+	</td>
+	<td>
+
+Indica se a equipa está ativa.
+
+	</td>
+</tr>
+	
+
+
+	
+		<tr class="
+
+
+">
+	<td>
+<img alt="Public property" title="Public property" src="msdn2019/pubproperty.png"></img>
+
+
+    
+	</td>
+	<td>
+	<a href="topic_0000000000000264.html">Members</a>
+
+	</td>
+	<td>
+
+Coleção de membros pertencentes à equipa.
+
+	</td>
+</tr>
+	
+
+
+	
+		<tr class="
+
+
+">
+	<td>
+<img alt="Public property" title="Public property" src="msdn2019/pubproperty.png"></img>
+
+
+    
+	</td>
+	<td>
+	<a href="topic_000000000000025E.html">Name</a>
+
+	</td>
+	<td>
+
+Nome da equipa (obrigatório).
+
+	</td>
+</tr>
+	
+
+
+	
+		<tr class="
+
+
+">
+	<td>
+<img alt="Public property" title="Public property" src="msdn2019/pubproperty.png"></img>
+
+
+    
+	</td>
+	<td>
+	<a href="topic_000000000000025F.html">OwnerId</a>
+
+	</td>
+	<td>
+
+Identificador do proprietário da equipa.
+
+	</td>
+</tr>
+	
+
+
+	
+		<tr class="
+
+
+">
+	<td>
+<img alt="Public property" title="Public property" src="msdn2019/pubproperty.png"></img>
+
+
+    
+	</td>
+	<td>
+	<a href="topic_0000000000000261.html">UpdatedAt</a>
+
+	</td>
+	<td>
+
+Data e hora da última modificação da equipa (UTC).
+
+	</td>
+</tr>
 	
 
 
@@ -339,7 +557,6 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 
 	</div>					
 </div>
-
 
 
 
@@ -363,34 +580,6 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
         Description
       </th>
     </tr>
-
-
-
-
-	<tr class="
-
-
-">
-	<td>
-<img alt="Public method" title="Public method" src="msdn2019/pubmethod.png"></img>
-
-
-    
-	</td>
-	<td>
-	<a href="topic_000000000000025E.html">CreateAccessToken(User)</a>
-
-	</td>
-	<td>
-
-Cria um access token JWT para um utilizador autenticado.
-
-	</td>
-</tr>
-
-
-
-
 
 
 
@@ -482,35 +671,6 @@ Allows an object to try to free resources and perform other cleanup operations b
 
 
 	<tr class="
-
-
-">
-	<td>
-<img alt="Public method" title="Public method" src="msdn2019/pubmethod.png"></img>
-
-	<img alt="Static" title="Static" src="msdn2019/static.png"></img>
-
-    
-	</td>
-	<td>
-	<a href="topic_000000000000025F.html">GenerateRefreshTokenPlain()</a>
-
-	</td>
-	<td>
-
-Gera um refresh token aleatório em texto plano.
-
-	</td>
-</tr>
-
-
-
-
-
-
-
-
-	<tr class="
 inheritedMember 
 
 
@@ -559,35 +719,6 @@ inheritedMember
 
 Gets the <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.type">Type</a> of the current instance.
 (inherited from <a target="_top" href=".html" onclick="this.target='';return true;">object</a>).
-
-	</td>
-</tr>
-
-
-
-
-
-
-
-
-	<tr class="
-
-
-">
-	<td>
-<img alt="Public method" title="Public method" src="msdn2019/pubmethod.png"></img>
-
-	<img alt="Static" title="Static" src="msdn2019/static.png"></img>
-
-    
-	</td>
-	<td>
-	<a href="topic_0000000000000260.html">HashRefreshToken(string)</a>
-
-	</td>
-	<td>
-
-Calcula o hash SHA256 de um refresh token para armazenamento seguro.
 
 	</td>
 </tr>
@@ -718,9 +849,6 @@ Returns a string that represents the current object.
 
 
 
-
-
-
   
 
 <!-- Classes -->
@@ -747,31 +875,12 @@ Returns a string that represents the current object.
 	</div>
 
 	<div id="remarksSection" class="section">	
-			<strong>Funcionalidades:</strong>
-<ul><li>Geração de access tokens JWT</li><li>Geração de refresh tokens aleatórios</li><li>Hash de refresh tokens para armazenamento seguro</li></ul>
-
-<strong>Configuração (appsettings.json):</strong>
-			<div class="codeSnippetCodeCollection">
-				<div class="codeSnippetToolbar">
-					<a title="Copy to clipboard." href="javascript:void(0)" onclick="CopyCode(this);">Copy</a>
-				</div>
-				
-				<div class="codeSnippetCode">
-					<pre xml:space="preserve">
- {
-     &quot;Jwt&quot;: {
-         &quot;Key&quot;: &quot;CHAVE_SECRETA_256_BITS&quot;,
-         &quot;Issuer&quot;: &quot;Fluxnote&quot;,
-         &quot;Audience&quot;: &quot;Fluxnote&quot;,
-         &quot;AccessTokenMinutes&quot;: 15
-     }
- }
- 					</pre>			
-				</div>
-			</div>
-
-<strong>Especificações de Segurança:</strong>
-<ul><li><strong>Algoritmo JWT:</strong> HMAC-SHA256 (simétrico)</li><li><strong>Refresh Token:</strong> 64 bytes aleatórios (512 bits de entropia)</li><li><strong>Hash:</strong> SHA256 para armazenamento de refresh tokens</li></ul>
+			Funcionalidades principais:
+<ul><li>Organização de documentos em contexto colaborativo</li><li>Gestão de membros com diferentes níveis de permissão</li><li>Suporte para agendamento de eliminação futura</li></ul>
+Relacionamentos:
+<ul><li>1:N com TeamMember - equipa tem vários membros</li><li>1:N com Document - equipa contém vários documentos (cascade delete)</li></ul>
+Regras de Negócio:
+<ul><li>Cada equipa tem exatamente um proprietário (OwnerId)</li><li>Apenas o proprietário pode criar documentos na equipa</li><li>Eliminação da equipa remove em cascata todos os membros e documentos</li></ul>
 	</div>					
 </div>
 
@@ -791,7 +900,7 @@ Returns a string that represents the current object.
 
 
 
-<div style="padding-left:1em;">Fluxnote.Backend.Services.Auth.TokenService</div>
+<div style="padding-left:1em;">Fluxnote.Backend.Models.Team</div>
 
 				
 </div>
@@ -859,7 +968,7 @@ Returns a string that represents the current object.
 
 	<div id="seeAlsoSection" class="section">	
 		<div>
-	<a href="topic_000000000000025B.html">Fluxnote.Backend.Services.Auth Namespace</a><br />
+	<a href="topic_00000000000001C8.html">Fluxnote.Backend.Models Namespace</a><br />
 
 
 	

@@ -1,1 +1,1 @@
-search_result['58']=["topic_0000000000000022.html","DocumentPermissionsController.GetByDocument Method","Lista as permissões de um documento específico.\r\nRequer ser membro da equipa do documento."];
+search_result['58']=["topic_0000000000000021_attached_props--.html","DocumentPermissionsController Attached Properties",""];

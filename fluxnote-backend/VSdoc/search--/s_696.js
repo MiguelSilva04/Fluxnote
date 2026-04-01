@@ -1,1 +1,1 @@
-search_result['696']=["topic_000000000000013D_vars--.html","CreateTeamRequest Fields",""];
+search_result['696']=["topic_000000000000010B.html","DocumentDetailDto.Role Property","Role efetiva do utilizador neste documento."];

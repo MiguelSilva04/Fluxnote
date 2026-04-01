@@ -1,1 +1,1 @@
-search_result['280']=["topic_0000000000000083.html","LoginRequest.RememberMe Property","Indica se a sessão deve ter duração prolongada (30 dias vs 7 dias)."];
+search_result['280']=["topic_0000000000000074.html","FluxnoteServerContext.DocumentContext Property","DbSet para ficheiros de contexto de documentos (uso pela IA)."];

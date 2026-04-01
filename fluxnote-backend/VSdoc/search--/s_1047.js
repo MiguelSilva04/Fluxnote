@@ -1,1 +1,1 @@
-search_result['1047']=["topic_0000000000000208.html","RefreshToken.isExpired Property","Indica se o token já expirou (propriedade calculada)."];
+search_result['1047']=["topic_0000000000000184_overloads--.html","DocumentContext.Down Method","Builds the operations that will migrate the database \u0027down\u0027."];

@@ -1,0 +1,1 @@
+search_result['1516']=["topic_0000000000000254.html","RefreshToken.CreatedByIp Property","Endereço IP do cliente que criou o token."];

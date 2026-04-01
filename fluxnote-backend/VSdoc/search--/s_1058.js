@@ -1,1 +1,1 @@
-search_result['1058']=["topic_000000000000020E.html","Team.OwnerId Property","Identificador do proprietário da equipa."];
+search_result['1058']=["topic_0000000000000187.html","CreateTeamMemberRequest.Name Property","Nome de exibição do membro na equipa."];

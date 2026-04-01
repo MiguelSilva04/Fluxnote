@@ -1,1 +1,1 @@
-search_result['992']=["topic_00000000000001DE.html","DocumentPermission.UpdatedAt Property","Data da última atualização da permissão (UTC)."];
+search_result['992']=["topic_0000000000000174_overloads--.html","DocumentHub.OnDisconnectedAsync Method","Called when a connection with the hub is terminated."];

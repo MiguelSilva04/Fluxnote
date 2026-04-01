@@ -1,1 +1,1 @@
-search_result['714']=["topic_000000000000014A.html","TeamDto.Folders Property","Lista de pastas da equipa."];
+search_result['714']=["topic_0000000000000113.html","DocumentPermissionDto.MemberRole Property","Role do membro na equipa (0=Member, 1=TeamAdmin, 2=Owner)."];

@@ -1,1 +1,1 @@
-search_result['1097']=["topic_000000000000022E.html","User Class","Representa um utilizador do sistema Fluxnote.\r\nEstende IdentityUser do ASP.NET Core Identity para gestão de autenticação."];
+search_result['1097']=["topic_0000000000000191_overloads--.html","commentDtosAndControllers.BuildTargetModel Method","Implemented to build the TargetModel."];

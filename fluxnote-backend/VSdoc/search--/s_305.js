@@ -1,1 +1,1 @@
-search_result['305']=["topic_000000000000008D.html","ResetPasswordRequest.NewPassword Property","Nova password."];
+search_result['305']=["topic_000000000000007D_attached_props--.html","ChangePasswordRequest Attached Properties",""];

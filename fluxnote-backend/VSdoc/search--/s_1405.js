@@ -1,0 +1,1 @@
+search_result['1405']=["topic_0000000000000219.html","DocumentVersion.AuthorId Property","ID do utilizador que originou esta versão (quem saiu da sessão)."];

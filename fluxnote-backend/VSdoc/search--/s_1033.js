@@ -1,1 +1,1 @@
-search_result['1033']=["topic_00000000000001FA.html","RefreshToken.Id Property","Identificador único do token (chave primária)."];
+search_result['1033']=["topic_0000000000000181.html","DocumentPermissionSummaryDto.MemberName Property","Nome do membro da equipa."];

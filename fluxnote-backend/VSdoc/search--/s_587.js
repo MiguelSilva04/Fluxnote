@@ -1,1 +1,1 @@
-search_result['587']=["topic_000000000000010C_vars--.html","UpdateDocumentPermissionRequest Fields",""];
+search_result['587']=["topic_00000000000000DF.html","DocumentCommentDto.ParentCommentId Property","ID do comentário pai, caso este seja uma resposta a outro comentário. Se for um comentário raiz, esse campo pode ser nulo."];

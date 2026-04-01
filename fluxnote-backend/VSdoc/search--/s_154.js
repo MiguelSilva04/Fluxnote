@@ -1,1 +1,1 @@
-search_result['154']=["topic_0000000000000050.html","TeamMembersController.PostTeamMember Method","Cria um novo TeamMember.\r\nUsado principalmente para criar o Owner inicial da equipa."];
+search_result['154']=["topic_0000000000000047_props--.html","TeamInvitesController Properties",""];

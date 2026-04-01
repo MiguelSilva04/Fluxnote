@@ -1,1 +1,1 @@
-search_result['296']=["topic_0000000000000089.html","RegisterRequest.Lang Property","Idioma preferido do utilizador para emails (\"en\" ou \"pt\")."];
+search_result['296']=["topic_000000000000007A.html","FluxnoteServerContext.RefreshTokens Property","DbSet para refresh tokens de autenticação."];

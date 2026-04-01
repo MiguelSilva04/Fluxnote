@@ -1,0 +1,1 @@
+search_result['1880']=["topic_00000000000002FD.html","IStorageService.GetImageAsync Method","Devolve o stream de uma imagem previamente carregada, ou null se não existir.\r\nUsado pelo UploadsController para servir imagens sem depender de acesso anónimo ao blob."];

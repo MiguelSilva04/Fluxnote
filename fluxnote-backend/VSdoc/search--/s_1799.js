@@ -1,0 +1,1 @@
+search_result['1799']=["topic_00000000000002CF.html","IEmailSender.SendNotificationEmailAsync Method","Envia um email de notificação genérico (convites, menções, alertas de segurança, etc.)."];

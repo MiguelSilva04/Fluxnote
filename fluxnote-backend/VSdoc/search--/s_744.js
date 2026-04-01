@@ -1,1 +1,1 @@
-search_result['744']=["topic_0000000000000159.html","DocumentPermissionSummaryDto.Id Property","Identificador único da permissão."];
+search_result['744']=["topic_0000000000000119_props--.html","UpdateDocumentPermissionRequest Properties",""];

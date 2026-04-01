@@ -1,1 +1,1 @@
-search_result['1064']=["topic_0000000000000214.html","Team.Documents Property","Coleção de documentos pertencentes à equipa."];
+search_result['1064']=["topic_000000000000018A.html","CreateTeamMemberRequest.UserId Property","ID do utilizador a adicionar."];

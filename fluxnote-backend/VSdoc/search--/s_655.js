@@ -1,1 +1,1 @@
-search_result['655']=["topic_0000000000000129_props--.html","UpdateFolderRequest Properties",""];
+search_result['655']=["topic_00000000000000F6.html","DocumentDto.TeamName Property","Nome da equipa (denormalizado para evitar joins)."];

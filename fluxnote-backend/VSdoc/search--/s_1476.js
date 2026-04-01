@@ -1,0 +1,1 @@
+search_result['1476']=["topic_0000000000000242.html","NotificationType Enumeration","Tipos de notificação suportados pelo sistema."];

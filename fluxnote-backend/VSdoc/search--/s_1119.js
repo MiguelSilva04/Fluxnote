@@ -1,1 +1,1 @@
-search_result['1119']=["topic_000000000000023F_methods--.html","AuthProviderExtensions Methods",""];
+search_result['1119']=["topic_000000000000019A.html","DocumentHub.OnDisconnectedAsync Method","Called when a connection with the hub is terminated."];

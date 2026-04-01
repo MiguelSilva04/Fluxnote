@@ -1,0 +1,1 @@
+c['708']=[['709',"GenerateContentAsync Method","topic_00000000000002A5.html",0],['710',"GenerateSummaryAsync Method","topic_00000000000002A3.html",0],['711',"ImproveTextAsync Method","topic_00000000000002A4.html",0]];

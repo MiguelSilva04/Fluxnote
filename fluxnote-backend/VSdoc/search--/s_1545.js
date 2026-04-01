@@ -1,0 +1,1 @@
+search_result['1545']=["topic_0000000000000262.html","Team.IsActive Property","Indica se a equipa está ativa."];

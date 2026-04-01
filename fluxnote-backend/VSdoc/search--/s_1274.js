@@ -1,1 +1,1 @@
-search_result['1274']=["topic_000000000000028C.html","IStorageService Interface",""];
+search_result['1274']=["topic_00000000000001CD.html","CommentMention.UserId Property","ID do utilizador mencionado."];

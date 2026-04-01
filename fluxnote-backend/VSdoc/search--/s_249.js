@@ -1,1 +1,1 @@
-search_result['249']=["topic_0000000000000078.html","ExternalUserInfo.ProviderId Property",""];
+search_result['249']=["topic_0000000000000069.html","UploadsController.GetImage Method","Serve imagens — em dev a partir do sistema de ficheiros local,\r\nem produção via proxy ao Azure Blob Storage (sem necessidade de acesso anónimo ao blob)."];

@@ -1,1 +1,1 @@
-search_result['876']=["topic_0000000000000191.html","commentDtosAndControllers.BuildTargetModel Method","Implemented to build the TargetModel."];
+search_result['876']=["topic_0000000000000147.html","NotificationPreferenceDto Class","DTO de resposta para as preferências de notificação."];

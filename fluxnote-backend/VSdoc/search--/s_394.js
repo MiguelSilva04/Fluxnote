@@ -1,1 +1,1 @@
-search_result['394']=["topic_00000000000000B9.html","DocumentInviteDto.ExpiresAt Property","Data e hora em que o convite foi criado. Este campo é útil\r\npara exibir informações sobre quando o convite foi gerado e para fins de auditoria."];
+search_result['394']=["topic_0000000000000096.html","RegisterRequest.Lang Property","Idioma preferido do utilizador para emails (\"en\" ou \"pt\")."];

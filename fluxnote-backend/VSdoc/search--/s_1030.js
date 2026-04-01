@@ -1,1 +1,1 @@
-search_result['1030']=["topic_00000000000001F9_methods--.html","RefreshToken Methods",""];
+search_result['1030']=["topic_000000000000017F_overloads--.html","AddYDocSnapshot.Up Method","Builds the operations that will migrate the database \u0027up\u0027."];

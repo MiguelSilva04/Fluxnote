@@ -1,1 +1,1 @@
-search_result['257']=["topic_000000000000007C_props--.html","TeamMemberDto Properties",""];
+search_result['257']=["topic_000000000000006C.html","FluxnoteServerContext Constructor","Construtor com injeção de opções de configuração."];

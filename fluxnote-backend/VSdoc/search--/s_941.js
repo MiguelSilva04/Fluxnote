@@ -1,1 +1,1 @@
-search_result['941']=["topic_00000000000001BA.html","DocumentComment.CreatedBy Property","Referência de navegação para o utilizador que criou o comentário. Permite aceder a informações adicionais do utilizador, como nome, email, etc. Dependendo de como o backend lida com os utilizadores, i..."];
+search_result['941']=["topic_0000000000000160.html","TeamInviteDto.IsUsed Property","Indica se o convite já foi utilizado. Um convite é considerado utilizado\r\nse já tiver sido aceito por um utilizador."];

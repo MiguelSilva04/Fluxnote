@@ -1,1 +1,1 @@
-search_result['272']=["topic_0000000000000080_vars--.html","LoginRequest Fields",""];
+search_result['272']=["topic_0000000000000071.html","FluxnoteServerContext.DocumentPermission Property","Representa o set de Permissões de Documento."];

@@ -1,1 +1,1 @@
-c['748']=[['749',"BuildTargetModel Method","topic_0000000000000191_overloads--.html",1],['751',"Down Method","topic_0000000000000190_overloads--.html",1],['753',"Up Method","topic_000000000000018F_overloads--.html",1]];
+c['748']=[['749',"SendEmailConfirmationAsync Method","topic_00000000000002D2.html",0],['750',"SendNotificationEmailAsync Method","topic_00000000000002D4.html",0],['751',"SendPasswordResetAsync Method","topic_00000000000002D3.html",0]];

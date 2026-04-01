@@ -1,1 +1,1 @@
-search_result['109']=["topic_000000000000003C.html","DocumentsController.GetVersions Method","Lista as versões de um documento (mais recente → mais antiga).\r\nAcessível a Owner, TeamAdmin e Editores do documento."];
+search_result['109']=["topic_0000000000000037.html","DocumentsController.DeleteContext Method","Remove um ficheiro de contexto do documento.\r\nApenas Editors podem remover contexto."];

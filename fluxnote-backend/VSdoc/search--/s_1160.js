@@ -1,1 +1,1 @@
-search_result['1160']=["topic_0000000000000255_attached_props--.html","ITextExtractionService Attached Properties",""];
+search_result['1160']=["topic_00000000000001A6_overloads--.html","AddYDocSnapshot.Down Method","Builds the operations that will migrate the database \u0027down\u0027."];

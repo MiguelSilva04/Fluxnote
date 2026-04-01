@@ -1,1 +1,1 @@
-search_result['603']=["topic_0000000000000114_methods--.html","DocumentVersionDetailDto Methods",""];
+search_result['603']=["topic_00000000000000E5.html","DocumentCommentDto.RangeLength Property","Comprimento do texto selecionado no editor Quill. Se for um comentário de seleção, isto indica quantos caracteres estão a ser comentados. Se for um comentário de posição (sem seleção), este campo pode..."];

@@ -1,1 +1,1 @@
-search_result['557']=["topic_00000000000000FD.html","DocumentDetailDto.PlainText Property","Texto plano extraído do HTML (sem tags)."];
+search_result['557']=["topic_00000000000000D5.html","CreateDocumentCommentDto.ParentCommentId Property","ID do comentário pai, caso este seja uma resposta a outro comentário. Se for um comentário raiz, esse campo pode ser nulo."];

@@ -1,1 +1,1 @@
-search_result['392']=["topic_00000000000000B7.html","DocumentInviteDto.CreatedByName Property","Nome do utilizador que criou o convite. Este campo é incluído para facilitar a exibição de\r\ninformações sobre o convite, sem a necessidade de uma consulta adicional para obter o nome do utilizador.\r\nE..."];
+search_result['392']=["topic_0000000000000095_props--.html","RefreshToken Properties",""];

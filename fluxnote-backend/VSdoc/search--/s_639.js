@@ -1,1 +1,1 @@
-search_result['639']=["topic_0000000000000122.html","FolderDto.TeamId Property","ID da equipa à qual a pasta pertence."];
+search_result['639']=["topic_00000000000000F0_vars--.html","SmtpEmailSender Fields",""];

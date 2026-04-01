@@ -1,1 +1,1 @@
-search_result['606']=["topic_0000000000000115.html","DocumentVersionDetailDto.ContentHtml Property","Conteúdo HTML da versão (extraído de Document.Content no momento da criação).\r\nNull se o documento não tinha conteúdo HTML guardado nesse momento."];
+search_result['606']=["topic_00000000000000E5_methods--.html","DocumentDto Methods",""];

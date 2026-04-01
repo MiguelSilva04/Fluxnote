@@ -1,1 +1,1 @@
-search_result['913']=["topic_00000000000001A3.html","Document.PlainText Property","Texto extraído do conteúdo para pesquisa full-text."];
+search_result['913']=["topic_0000000000000153.html","AcceptTeamInviteResponseDto.TeamId Property","Identificador da equipa para o qual o convite foi aceito."];

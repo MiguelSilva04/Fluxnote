@@ -1,1 +1,1 @@
-c['753']=[['754',"Up(MigrationBuilder) Method","topic_000000000000018F.html",0]];
+c['753']=[['754',"SendEmailConfirmationAsync Method","topic_00000000000002CD.html",0],['755',"SendNotificationEmailAsync Method","topic_00000000000002CF.html",0],['756',"SendPasswordResetAsync Method","topic_00000000000002CE.html",0]];

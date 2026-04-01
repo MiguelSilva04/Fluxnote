@@ -1,1 +1,1 @@
-search_result['146']=["topic_000000000000004D.html","TeamInvitesController.RevokeInvite Method","Revoga um convite (torna-o inutilizavel).\r\nApenas Owner ou TeamAdmin podem revogar."];
+search_result['146']=["topic_0000000000000045_methods--.html","UserProfile Methods",""];

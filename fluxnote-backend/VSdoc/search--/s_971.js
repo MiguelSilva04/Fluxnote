@@ -1,1 +1,1 @@
-search_result['971']=["topic_00000000000001CE.html","DocumentInvite.Token Property","Token único para o link do convite"];
+search_result['971']=["topic_000000000000016A.html","TeamDto.UpdatedAt Property","Data da última modificação (UTC)."];

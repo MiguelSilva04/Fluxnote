@@ -1,1 +1,1 @@
-search_result['970']=["topic_00000000000001CD.html","DocumentInvite.Id Property","Identificador único do convite (chave primária)."];
+search_result['970']=["topic_0000000000000169.html","TeamDto.CreatedAt Property","Data de criação da equipa (UTC)."];

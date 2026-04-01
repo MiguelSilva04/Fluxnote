@@ -5,7 +5,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta name="GENERATOR" content="VSdocman - documentation generator; https://www.helixoft.com" />
 	<link rel="icon" href="favicon.ico">
-	<title>DocumentDetailDto Properties</title>
+	<title>DocumentDto Properties</title>
 
 	<link rel="stylesheet" type="text/css" href="msdn2019/toc.css" />
 	<script src="msdn2019/toc.js"></script>
@@ -76,11 +76,11 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
   </div>
 
 <div id="mainBody">
-	  <h1 class="title">DocumentDetailDto Properties</h1>
+	  <h1 class="title">DocumentDto Properties</h1>
         <p />
         <p>
           The following tables list the members exposed by the  
-              <a href="topic_00000000000000F2.html">DocumentDetailDto</a>
+              <a href="topic_00000000000000F2.html">DocumentDto</a>
              type.
         </p>
 
@@ -115,36 +115,12 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
     
 	</td>
 	<td>
-	<a href="topic_00000000000000FC.html">Content</a>
-
-	</td>
-	<td>
-
-Conteúdo HTML completo do documento.
-
-	</td>
-</tr>
-	
-
-
-	
-		<tr class="
-
-
-">
-	<td>
-<img alt="Public property" title="Public property" src="msdn2019/pubproperty.png"></img>
-
-
-    
-	</td>
-	<td>
 	<a href="topic_00000000000000F9.html">CreatedAt</a>
 
 	</td>
 	<td>
 
-Data de criação (UTC).
+Data de criação do documento (UTC).
 
 	</td>
 </tr>
@@ -168,7 +144,7 @@ Data de criação (UTC).
 	</td>
 	<td>
 
-ID do utilizador criador.
+ID do utilizador que criou o documento.
 
 	</td>
 </tr>
@@ -192,7 +168,55 @@ ID do utilizador criador.
 	</td>
 	<td>
 
-Nome do criador.
+Nome do criador (denormalizado).
+
+	</td>
+</tr>
+	
+
+
+	
+		<tr class="
+
+
+">
+	<td>
+<img alt="Public property" title="Public property" src="msdn2019/pubproperty.png"></img>
+
+
+    
+	</td>
+	<td>
+	<a href="topic_00000000000000FC.html">FolderId</a>
+
+	</td>
+	<td>
+
+ID da pasta onde o documento está (null se solto).
+
+	</td>
+</tr>
+	
+
+
+	
+		<tr class="
+
+
+">
+	<td>
+<img alt="Public property" title="Public property" src="msdn2019/pubproperty.png"></img>
+
+
+    
+	</td>
+	<td>
+	<a href="topic_00000000000000FD.html">FolderName</a>
+
+	</td>
+	<td>
+
+Nome da pasta (null se solto).
 
 	</td>
 </tr>
@@ -240,7 +264,7 @@ Identificador único do documento.
 	</td>
 	<td>
 
-Indica se está na lixeira.
+Indica se o documento está na lixeira.
 
 	</td>
 </tr>
@@ -259,86 +283,12 @@ Indica se está na lixeira.
     
 	</td>
 	<td>
-	<a href="topic_00000000000000FF.html">IsOwner</a>
+	<a href="topic_00000000000000FE.html">Preview</a>
 
 	</td>
 	<td>
 
-Indica se o utilizador autenticado é o Owner da equipa deste documento.
-Apenas o Owner pode restaurar versões. O Owner e o TeamAdmin podem resolver comentários.
-
-	</td>
-</tr>
-	
-
-
-	
-		<tr class="
-
-
-">
-	<td>
-<img alt="Public property" title="Public property" src="msdn2019/pubproperty.png"></img>
-
-
-    
-	</td>
-	<td>
-	<a href="topic_0000000000000100.html">IsTeamAdmin</a>
-
-	</td>
-	<td>
-
-Indica se o utilizador autenticado é um Team Admin da equipa deste documento.
-O Owner e o TeamAdmin podem resolver comentários.
-
-	</td>
-</tr>
-	
-
-
-	
-		<tr class="
-
-
-">
-	<td>
-<img alt="Public property" title="Public property" src="msdn2019/pubproperty.png"></img>
-
-
-    
-	</td>
-	<td>
-	<a href="topic_00000000000000FD.html">PlainText</a>
-
-	</td>
-	<td>
-
-Texto plano extraído do HTML (sem tags).
-
-	</td>
-</tr>
-	
-
-
-	
-		<tr class="
-
-
-">
-	<td>
-<img alt="Public property" title="Public property" src="msdn2019/pubproperty.png"></img>
-
-
-    
-	</td>
-	<td>
-	<a href="topic_00000000000000FE.html">Role</a>
-
-	</td>
-	<td>
-
-Role efetiva do utilizador neste documento.
+Preview do texto com contexto em torno do termo pesquisado.
 
 	</td>
 </tr>
@@ -386,7 +336,7 @@ ID da equipa a que o documento pertence.
 	</td>
 	<td>
 
-Nome da equipa.
+Nome da equipa (denormalizado para evitar joins).
 
 	</td>
 </tr>
@@ -459,8 +409,8 @@ Data da última modificação (UTC).
 
 	<div id="seeAlsoSection" class="section">	
 		<div>
-			<a href="topic_00000000000000F2.html">DocumentDetailDto Class</a><br />
-	<a href="topic_00000000000000BD.html">Fluxnote.Backend.Dtos.Documents Namespace</a><br />
+			<a href="topic_00000000000000F2.html">DocumentDto Class</a><br />
+	<a href="topic_00000000000000CA.html">Fluxnote.Backend.Dtos.Documents Namespace</a><br />
 
 
 			

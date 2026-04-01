@@ -1,1 +1,1 @@
-search_result['1034']=["topic_00000000000001FB.html","RefreshToken.TokenHash Property","Hash SHA256 do token em Base64 (índice único)."];
+search_result['1034']=["topic_0000000000000181_overloads--.html","AddYDocSnapshot.BuildTargetModel Method","Implemented to build the TargetModel."];

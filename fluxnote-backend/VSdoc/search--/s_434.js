@@ -1,1 +1,1 @@
-search_result['434']=["topic_00000000000000CD.html","CreateDocumentRequest.TeamName Property","Nome para nova equipa a criar (usado se TeamId não for especificado)."];
+search_result['434']=["topic_00000000000000A6_props--.html","UserProfile Properties",""];

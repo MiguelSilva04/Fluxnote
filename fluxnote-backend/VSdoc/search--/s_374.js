@@ -1,1 +1,1 @@
-search_result['374']=["topic_00000000000000AF.html","CreateDocumentInviteRequest.ExpirationDays Property","Dias até o convite expirar. Após esse período, o convite não poderá mais ser aceito.\r\nPor padrão, o convite expira em 7 dias. O valor deve ser um inteiro positivo."];
+search_result['374']=["topic_0000000000000091.html","Fluxnote.Backend.Contracts.Auth Namespace",""];

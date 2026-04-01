@@ -1,1 +1,1 @@
-search_result['1173']=["topic_0000000000000259.html","TextExtractionService.IsSupported Method","Verifica se o contentType é suportado para extração de texto."];
+search_result['1173']=["topic_00000000000001AB.html","DocumentContext.BuildTargetModel Method","Implemented to build the TargetModel."];

@@ -1,1 +1,1 @@
-search_result['356']=["topic_00000000000000A7.html","AcceptDocumentInviteResponseDto.TeamId Property","Identificador do documento para o qual o convite foi aceito.\r\nEste campo é necessário para que o frontend saiba qual documento abrir após o utilizador aceitar o convite."];
+search_result['356']=["topic_000000000000008A_props--.html","ForgotPasswordRequest Properties",""];

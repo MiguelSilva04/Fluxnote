@@ -1,1 +1,1 @@
-search_result['519']=["topic_00000000000000EE_events--.html","IEmailSender Events",""];
+search_result['519']=["topic_00000000000000C8.html","DocumentInviteDto.IsUsed Property","Indica se o convite já foi utilizado. Um convite é considerado utilizado\r\nse já tiver sido aceito por um utilizador."];

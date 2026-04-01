@@ -1,1 +1,1 @@
-search_result['947']=["topic_00000000000001C0.html","DocumentContext Class","Representa um ficheiro de contexto associado a um documento para uso pela IA.\r\nO texto extraído é armazenado na BD para ser usado futuramente em prompts de geração de conteúdo."];
+search_result['947']=["topic_0000000000000161.html","TeamInviteDto.InviteUrl Property","Url do convite que pode ser partilhada com o utilizador convidado.\r\nEste é o link que o utilizador deve aceder para aceitar o convite."];

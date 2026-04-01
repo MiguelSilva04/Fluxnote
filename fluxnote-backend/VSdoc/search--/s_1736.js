@@ -1,0 +1,1 @@
+search_result['1736']=["topic_00000000000002AE.html","TokenService Constructor","Construtor com injeção de configuração."];

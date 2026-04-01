@@ -1,1 +1,1 @@
-search_result['307']=["topic_000000000000008F.html","SetPasswordRequest Class","DTO para definir uma password local numa conta autenticada externamente."];
+search_result['307']=["topic_000000000000007D_methods--.html","ChangePasswordRequest Methods",""];

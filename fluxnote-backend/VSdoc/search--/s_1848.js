@@ -1,0 +1,1 @@
+search_result['1848']=["topic_00000000000002EC.html","NotificationService.SendAsync Method","Envia uma notificação (in-app e/ou email) ao utilizador, respeitando as suas preferências."];

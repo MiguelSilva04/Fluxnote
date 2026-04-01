@@ -1,1 +1,1 @@
-search_result['436']=["topic_00000000000000CD_events--.html","AuthProviderExtensions Events",""];
+search_result['436']=["topic_00000000000000A7.html","UserProfile.Id Property","Identificador único do utilizador (GUID)."];

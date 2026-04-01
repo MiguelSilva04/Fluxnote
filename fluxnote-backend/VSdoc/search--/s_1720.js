@@ -1,0 +1,1 @@
+search_result['1720']=["topic_00000000000002A8.html","ITextExtractionService.IsSupported Method","Verifica se o contentType é suportado para extração de texto."];

@@ -1,1 +1,1 @@
-search_result['566']=["topic_0000000000000101_vars--.html","DocumentPermissionDto Fields",""];
+search_result['566']=["topic_00000000000000D9.html","CreateDocumentRequest.TeamId Property","ID da equipa onde o documento será criado."];

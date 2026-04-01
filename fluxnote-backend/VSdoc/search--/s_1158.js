@@ -1,1 +1,1 @@
-search_result['1158']=["topic_0000000000000254.html","IAIService.GenerateContentAsync Method","Gera conteúdo novo com base num prompt do utilizador, tendo em conta o documento e ficheiros de contexto."];
+search_result['1158']=["topic_00000000000001A5_overloads--.html","AddYDocSnapshot.Up Method","Builds the operations that will migrate the database \u0027up\u0027."];

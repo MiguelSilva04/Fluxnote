@@ -5,7 +5,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta name="GENERATOR" content="VSdocman - documentation generator; https://www.helixoft.com" />
 	<link rel="icon" href="favicon.ico">
-	<title>DocumentPermissionSummaryDto Class</title>
+	<title>TeamInviteDto Class</title>
 
 	<link rel="stylesheet" type="text/css" href="msdn2019/toc.css" />
 	<script src="msdn2019/toc.js"></script>
@@ -75,11 +75,11 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
   </div>
 
 <div id="mainBody">
-		<h1 class="title">DocumentPermissionSummaryDto Class</h1>
+		<h1 class="title">TeamInviteDto Class</h1>
         
 		<div class="metadata">
         Namespace:
-<a href="topic_000000000000013C.html">Fluxnote.Backend.Dtos.Teams</a>
+<a href="topic_0000000000000151.html">Fluxnote.Backend.Dtos.TeamInvites</a>
 
 
 
@@ -90,7 +90,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 
        
        
-        <summary-info>DTO resumido de permissão de documento em contexto de equipa.</summary-info>
+        <summary-info>DTO de resposta para exibição de um convite de equipa.</summary-info>
 
 
 
@@ -140,7 +140,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 				</div>
 				
 				<div class="codeSnippetCode codeVB">
-					<pre xml:space="preserve" class="brush: vb">Public Class DocumentPermissionSummaryDto</pre>			
+					<pre xml:space="preserve" class="brush: vb">Public Class TeamInviteDto</pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -179,7 +179,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 				</div>
 				
 				<div class="codeSnippetCode codeCsharp">
-					<pre xml:space="preserve" class="brush: csharp">public class DocumentPermissionSummaryDto</pre>			
+					<pre xml:space="preserve" class="brush: csharp">public class TeamInviteDto</pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -219,7 +219,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 				</div>
 				
 				<div class="codeSnippetCode codeCpp">
-					<pre xml:space="preserve" class="brush: cpp">public ref class DocumentPermissionSummaryDto </pre>			
+					<pre xml:space="preserve" class="brush: cpp">public ref class TeamInviteDto </pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -258,7 +258,7 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 				</div>
 				
 				<div class="codeSnippetCode codeJScript">
-					<pre xml:space="preserve" class="brush: js">public class DocumentPermissionSummaryDto</pre>			
+					<pre xml:space="preserve" class="brush: js">public class TeamInviteDto</pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -320,12 +320,39 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
     
 	</td>
 	<td>
-	<a href="topic_000000000000015D.html">DocumentRole</a>
+	<a href="topic_000000000000015D.html">CreatedByName</a>
 
 	</td>
 	<td>
 
-Role no documento (0=Viewer, 1=Editor).
+Nome do utilizador que criou o convite. Este campo é incluído para facilitar a exibição de
+informações sobre o convite, sem a necessidade de uma consulta adicional para obter o nome do utilizador.
+Ele é preenchido no momento da criação do DTO com base na relação entre o convite e o membro da equipa que o criou.
+
+	</td>
+</tr>
+	
+
+
+	
+		<tr class="
+
+
+">
+	<td>
+<img alt="Public property" title="Public property" src="msdn2019/pubproperty.png"></img>
+
+
+    
+	</td>
+	<td>
+	<a href="topic_000000000000015E.html">ExpiresAt</a>
+
+	</td>
+	<td>
+
+Data e hora em que o convite foi criado. Este campo é útil
+para exibir informações sobre quando o convite foi gerado e para fins de auditoria.
 
 	</td>
 </tr>
@@ -349,7 +376,8 @@ Role no documento (0=Viewer, 1=Editor).
 	</td>
 	<td>
 
-Identificador único da permissão.
+Identificador único do convite.
+Este é o ID do convite na base de dados e é usado para referência interna.
 
 	</td>
 </tr>
@@ -368,36 +396,13 @@ Identificador único da permissão.
     
 	</td>
 	<td>
-	<a href="topic_000000000000015B.html">MemberName</a>
+	<a href="topic_0000000000000161.html">InviteUrl</a>
 
 	</td>
 	<td>
 
-Nome do membro da equipa.
-
-	</td>
-</tr>
-	
-
-
-	
-		<tr class="
-
-
-">
-	<td>
-<img alt="Public property" title="Public property" src="msdn2019/pubproperty.png"></img>
-
-
-    
-	</td>
-	<td>
-	<a href="topic_000000000000015C.html">MemberRole</a>
-
-	</td>
-	<td>
-
-Role do membro na equipa (0=Member, 1=TeamAdmin, 2=Owner).
+Url do convite que pode ser partilhada com o utilizador convidado.
+Este é o link que o utilizador deve aceder para aceitar o convite.
 
 	</td>
 </tr>
@@ -416,12 +421,114 @@ Role do membro na equipa (0=Member, 1=TeamAdmin, 2=Owner).
     
 	</td>
 	<td>
-	<a href="topic_000000000000015A.html">TeamMemberId</a>
+	<a href="topic_000000000000015F.html">IsRevoked</a>
 
 	</td>
 	<td>
 
-ID do membro da equipa associado à permissão.
+Indica se o convite foi revogado.
+Um convite revogado não pode ser aceito, mesmo que ainda não tenha expirado.
+
+	</td>
+</tr>
+	
+
+
+	
+		<tr class="
+
+
+">
+	<td>
+<img alt="Public property" title="Public property" src="msdn2019/pubproperty.png"></img>
+
+
+    
+	</td>
+	<td>
+	<a href="topic_0000000000000160.html">IsUsed</a>
+
+	</td>
+	<td>
+
+Indica se o convite já foi utilizado. Um convite é considerado utilizado
+se já tiver sido aceito por um utilizador.
+
+	</td>
+</tr>
+	
+
+
+	
+		<tr class="
+
+
+">
+	<td>
+<img alt="Public property" title="Public property" src="msdn2019/pubproperty.png"></img>
+
+
+    
+	</td>
+	<td>
+	<a href="topic_000000000000015B.html">TeamId</a>
+
+	</td>
+	<td>
+
+TeamId é o identificador da equipa para o qual o convite foi criado.
+
+	</td>
+</tr>
+	
+
+
+	
+		<tr class="
+
+
+">
+	<td>
+<img alt="Public property" title="Public property" src="msdn2019/pubproperty.png"></img>
+
+
+    
+	</td>
+	<td>
+	<a href="topic_000000000000015C.html">TeamName</a>
+
+	</td>
+	<td>
+
+Título da equipa para o qual o convite foi criado. Este campo é incluído para
+facilitar a exibição de informações sobre o convite, sem a necessidade de uma
+consulta adicional para obter o título da equipa.
+Ele é preenchido no momento da criação do DTO com base na relação entre o convite
+e a equipa correspondente.
+
+	</td>
+</tr>
+	
+
+
+	
+		<tr class="
+
+
+">
+	<td>
+<img alt="Public property" title="Public property" src="msdn2019/pubproperty.png"></img>
+
+
+    
+	</td>
+	<td>
+	<a href="topic_000000000000015A.html">Token</a>
+
+	</td>
+	<td>
+
+Token único para o link do convite.
 
 	</td>
 </tr>
@@ -764,7 +871,7 @@ Returns a string that represents the current object.
 
 
 
-<div style="padding-left:1em;">Fluxnote.Backend.Dtos.Teams.DocumentPermissionSummaryDto</div>
+<div style="padding-left:1em;">Fluxnote.Backend.Dtos.TeamInvites.TeamInviteDto</div>
 
 				
 </div>
@@ -832,7 +939,7 @@ Returns a string that represents the current object.
 
 	<div id="seeAlsoSection" class="section">	
 		<div>
-	<a href="topic_000000000000013C.html">Fluxnote.Backend.Dtos.Teams Namespace</a><br />
+	<a href="topic_0000000000000151.html">Fluxnote.Backend.Dtos.TeamInvites Namespace</a><br />
 
 
 	

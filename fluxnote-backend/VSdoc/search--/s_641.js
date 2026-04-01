@@ -1,1 +1,1 @@
-search_result['641']=["topic_0000000000000124.html","FolderDto.UpdatedAt Property","Data da última atualização da pasta (UTC)."];
+search_result['641']=["topic_00000000000000F2.html","DocumentDto Class","DTO leve para listagem de documentos (sem conteúdo).\r\nUsado na resposta do endpoint GET /api/documents."];

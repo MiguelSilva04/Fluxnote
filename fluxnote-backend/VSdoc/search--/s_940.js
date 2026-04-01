@@ -1,1 +1,1 @@
-search_result['940']=["topic_00000000000001B9.html","DocumentComment.CreatedByColor Property","Cor associada ao utilizador que criou o comentário. Isto pode ser usado para destacar visualmente os comentários de diferentes utilizadores no frontend."];
+search_result['940']=["topic_000000000000015F.html","TeamInviteDto.IsRevoked Property","Indica se o convite foi revogado.\r\nUm convite revogado não pode ser aceito, mesmo que ainda não tenha expirado."];

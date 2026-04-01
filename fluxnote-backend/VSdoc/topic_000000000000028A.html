@@ -5,7 +5,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta name="GENERATOR" content="VSdocman - documentation generator; https://www.helixoft.com" />
 	<link rel="icon" href="favicon.ico">
-	<title>BlobStorageService.UploadContextFileAsync Method</title>
+	<title>User.UsernameChangesThisMonth Property</title>
 
 	<link rel="stylesheet" type="text/css" href="msdn2019/toc.css" />
 	<script src="msdn2019/toc.js"></script>
@@ -75,11 +75,11 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
   </div>
 
 <div id="mainBody">
-		<h1 class="title">BlobStorageService.UploadContextFileAsync Method</h1>
+		<h1 class="title">User.UsernameChangesThisMonth Property</h1>
         
 		<div class="metadata">
         Namespace:
-<a href="topic_0000000000000281.html">Fluxnote.Backend.Services.Storage</a>
+<a href="topic_00000000000001C8.html">Fluxnote.Backend.Models</a>
 
 
 
@@ -90,9 +90,8 @@ document.write(getCssCustomProperty('--headerTopCustomLineHtml'));
 
        
        
-        <summary-info>Faz upload de um ficheiro de contexto e retorna uma referência de armazenamento.
-Em dev: &quot;local://context/{uniqueName}&quot;. Em produção: &quot;blob://context/{blobName}&quot;.
-O ficheiro não é servido via HTTP — é apenas usado server-side pela IA.</summary-info>
+        <summary-info>Contador de alterações de username no mês atual.
+Limite máximo: 3 alterações por mês.</summary-info>
 
 
 
@@ -142,7 +141,7 @@ O ficheiro não é servido via HTTP — é apenas usado server-side pela IA.</su
 				</div>
 				
 				<div class="codeSnippetCode codeVB">
-					<pre xml:space="preserve" class="brush: vb">Public Function UploadContextFileAsync( _&nbsp;<br />   ByVal <i>stream</i> As <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.io.stream">Stream</a>, _&nbsp;<br />   ByVal <i>fileName</i> As <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.string">String</a>, _&nbsp;<br />   ByVal <i>contentType</i> As <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.string">String</a> _&nbsp;<br />) As <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1">Task</a>(Of <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.string">String</a>) Implements  _&nbsp;<br />   <a target="_top" href="topic_000000000000028F.html" onclick="this.target='';return true;">IStorageService.UploadContextFileAsync</a></pre>			
+					<pre xml:space="preserve" class="brush: vb">Public Property UsernameChangesThisMonth() As <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.int32">Integer</a></pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -181,7 +180,7 @@ O ficheiro não é servido via HTTP — é apenas usado server-side pela IA.</su
 				</div>
 				
 				<div class="codeSnippetCode codeCsharp">
-					<pre xml:space="preserve" class="brush: csharp">public <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.string">string</a>&gt; UploadContextFileAsync(&nbsp;<br />   <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.io.stream">Stream</a> <i>stream</i>,&nbsp;<br />   <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.string">string</a> <i>fileName</i>,&nbsp;<br />   <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.string">string</a> <i>contentType</i>&nbsp;<br />)</pre>			
+					<pre xml:space="preserve" class="brush: csharp">public <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.int32">int</a> UsernameChangesThisMonth {get; set;}</pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -221,7 +220,7 @@ O ficheiro não é servido via HTTP — é apenas usado server-side pela IA.</su
 				</div>
 				
 				<div class="codeSnippetCode codeCpp">
-					<pre xml:space="preserve" class="brush: cpp">public: &nbsp;<br /><a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.string">String</a>^&gt;^ UploadContextFileAsync(&nbsp;<br />   <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.io.stream">Stream</a>^ <i>stream</i>,&nbsp;<br />   <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.string">String</a>^ <i>fileName</i>,&nbsp;<br />   <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.string">String</a>^ <i>contentType</i>&nbsp;<br />) </pre>			
+					<pre xml:space="preserve" class="brush: cpp">public: &nbsp;<br />property <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.int32">int</a> UsernameChangesThisMonth {&nbsp;<br /> <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.int32">int</a> get( );&nbsp;<br /> void set(&nbsp;<br />   <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.int32">int</a> value&nbsp;<br /> );&nbsp;<br />}</pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -260,7 +259,7 @@ O ficheiro não é servido via HTTP — é apenas usado server-side pela IA.</su
 				</div>
 				
 				<div class="codeSnippetCode codeJScript">
-					<pre xml:space="preserve" class="brush: js">JScript does not support generic types and methods.</pre>			
+					<pre xml:space="preserve" class="brush: js">public function get UsernameChangesThisMonth() : <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.int32">int</a>;&nbsp;<br />public function set UsernameChangesThisMonth(value : <a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.int32">int</a>);</pre>			
 				</div>
 				<div class="codeSnippetCode codeNA">
 					<pre xml:space="preserve">This language is not supported or no code example is available.</pre>			
@@ -271,57 +270,11 @@ O ficheiro não é servido via HTTP — é apenas usado server-side pela IA.</su
 	</div>
 
 
-<h4 class="subHeading">
-	Parameters</h4><dl paramName="stream" class="parameterList">
-	<dt>
-		<span class="parameter">
-			stream
-		</span>
-	</dt>
-	<dd>
-		<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.io.stream">Stream</a> 
-	</dd>
-</dl>
-<p>
-	 
-</p>
-<dl paramName="fileName" class="parameterList">
-	<dt>
-		<span class="parameter">
-			fileName
-		</span>
-	</dt>
-	<dd>
-		<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.string">string</a> 
-	</dd>
-</dl>
-<p>
-	 
-</p>
-<dl paramName="contentType" class="parameterList">
-	<dt>
-		<span class="parameter">
-			contentType
-		</span>
-	</dt>
-	<dd>
-		<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.string">string</a> 
-	</dd>
-</dl>
-<p>
-	 
-</p>
-
-<p />
 
 	<h4 class="subHeading">
-		Return Value</h4>
-	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.string">string</a>&gt; 
+		Property Value</h4>
+	<a target="_top" href="https://docs.microsoft.com/en-us/dotnet/api/system.int32">int</a> 
 	
-
-	<h4 class="subHeading">
-		Implements</h4><a href="topic_000000000000028F.html">IStorageService.UploadContextFileAsync</a>
-<br />
 
 
 
@@ -343,6 +296,16 @@ O ficheiro não é servido via HTTP — é apenas usado server-side pela IA.</su
 
 
 
+<div class="section_container">
+	<div class="section_heading">
+		<span><a href="javascript:void(0)" title="Collapse" onclick="toggleSection(this);">Remarks</a></span>
+		<div>&nbsp;</div>
+	</div>
+
+	<div id="remarksSection" class="section">	
+			Resetado automaticamente no início de cada mês.
+	</div>					
+</div>
 
 
 
@@ -409,11 +372,11 @@ O ficheiro não é servido via HTTP — é apenas usado server-side pela IA.</su
 
 	<div id="seeAlsoSection" class="section">	
 		<div>
-			<a href="topic_0000000000000286.html">BlobStorageService Class</a><br />
+			<a href="topic_000000000000027F.html">User Class</a><br />
 
 
 
-<a href="topic_0000000000000281.html">Fluxnote.Backend.Services.Storage Namespace</a><br />
+<a href="topic_00000000000001C8.html">Fluxnote.Backend.Models Namespace</a><br />
 
 
 			

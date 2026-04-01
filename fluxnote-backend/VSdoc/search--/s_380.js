@@ -1,1 +1,1 @@
-search_result['380']=["topic_00000000000000B0_vars--.html","DocumentInviteDto Fields",""];
+search_result['380']=["topic_0000000000000092.html","RegisterRequest Class","DTO para pedido de registo de novo utilizador.\r\nUsado no endpoint POST /api/auth/register."];
