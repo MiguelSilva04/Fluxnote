@@ -1,0 +1,1 @@
+search_result['99']=["topic_0000000000000032.html","DocumentsController.GetTrash Method","Lista documentos na lixeira do utilizador (apenas documentos criados pelo próprio)."];

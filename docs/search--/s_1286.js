@@ -1,0 +1,1 @@
+search_result['1286']=["topic_00000000000001D4.html","Document.YDocSnapshot Property","Snapshot binário do Y.Doc para colaboração em tempo real (Yjs)."];

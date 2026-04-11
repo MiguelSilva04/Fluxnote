@@ -1,0 +1,1 @@
+search_result['697']=["topic_000000000000010C.html","DocumentDetailDto.IsOwner Property","Indica se o utilizador autenticado é o Owner da equipa deste documento.\r\nApenas o Owner pode restaurar versões. O Owner e o TeamAdmin podem resolver comentários."];

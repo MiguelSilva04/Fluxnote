@@ -1,0 +1,1 @@
+search_result['781']=["topic_0000000000000124.html","GenerateContentRequest.Prompt Property","Prompt do utilizador — instrução sobre o conteúdo a gerar."];

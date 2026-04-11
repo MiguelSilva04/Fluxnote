@@ -1,0 +1,1 @@
+search_result['1157']=["topic_00000000000001A5.html","AddYDocSnapshot.Up Method","Builds the operations that will migrate the database \u0027up\u0027."];

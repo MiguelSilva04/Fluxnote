@@ -1,0 +1,1 @@
+search_result['688']=["topic_0000000000000108.html","DocumentDetailDto.IsDeleted Property","Indica se está na lixeira."];

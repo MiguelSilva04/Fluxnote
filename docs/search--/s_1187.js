@@ -1,0 +1,1 @@
+search_result['1187']=["topic_00000000000001B0.html","documentComments Class","A base class inherited by each EF Core migration."];

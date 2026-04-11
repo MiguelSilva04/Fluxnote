@@ -1,0 +1,1 @@
+search_result['14']=["topic_0000000000000007.html","AuthController.GetExternalLogins Method","Obtém os providers externos ligados à conta autenticada."];

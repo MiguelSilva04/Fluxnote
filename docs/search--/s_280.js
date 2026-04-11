@@ -1,0 +1,1 @@
+search_result['280']=["topic_0000000000000074.html","FluxnoteServerContext.DocumentContext Property","DbSet para ficheiros de contexto de documentos (uso pela IA)."];

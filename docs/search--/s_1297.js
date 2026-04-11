@@ -1,0 +1,1 @@
+search_result['1297']=["topic_00000000000001DA.html","Document.DeletedAt Property","Data e hora em que o documento foi movido para a lixeira."];

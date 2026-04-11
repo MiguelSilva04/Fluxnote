@@ -1,0 +1,1 @@
+search_result['1671']=["topic_0000000000000295.html","LocalStorageService.UploadContextFileAsync Method","Faz upload de um ficheiro de contexto e retorna uma referência de armazenamento.\r\nEm dev: \"local://context/{uniqueName}\". Em produção: \"blob://context/{blobName}\".\r\nO ficheiro não é servido via HTTP —..."];

@@ -1,0 +1,1 @@
+search_result['768']=["topic_0000000000000121.html","DocumentVersionDetailDto Class","DTO completo para visualização de uma versão específica.\r\nInclui o conteúdo HTML para exibição em modo leitura.\r\nUsado no endpoint GET /api/documents/{id}/versions/{versionId}."];

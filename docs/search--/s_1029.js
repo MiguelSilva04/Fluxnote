@@ -1,0 +1,1 @@
+search_result['1029']=["topic_000000000000017F.html","DocumentPermissionSummaryDto.Id Property","Identificador único da permissão."];

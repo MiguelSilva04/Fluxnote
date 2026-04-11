@@ -1,0 +1,1 @@
+search_result['515']=["topic_00000000000000C4.html","DocumentInviteDto.CreatedByName Property","Nome do utilizador que criou o convite. Este campo é incluído para facilitar a exibição de\r\ninformações sobre o convite, sem a necessidade de uma consulta adicional para obter o nome do utilizador.\r\nE..."];

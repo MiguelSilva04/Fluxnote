@@ -1,0 +1,1 @@
+search_result['1827']=["topic_00000000000002DC.html","NotificationRequest.UserId Property","ID do utilizador que recebe a notificação."];

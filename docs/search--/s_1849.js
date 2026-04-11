@@ -1,0 +1,1 @@
+search_result['1849']=["topic_00000000000002ED.html","NotificationService.SendSecurityEmailAsync Method","Envia uma notificação de segurança por email que ignora as preferências do utilizador.\r\nUsado para eventos sensíveis como alteração de password."];

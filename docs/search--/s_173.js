@@ -1,0 +1,1 @@
+search_result['173']=["topic_000000000000004F.html","NotificationsController.DeleteAllNotifications Method","Elimina todas as notificações do utilizador."];

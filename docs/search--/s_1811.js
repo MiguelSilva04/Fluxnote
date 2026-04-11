@@ -1,0 +1,1 @@
+search_result['1811']=["topic_00000000000002D6.html","INotificationService Interface","Serviço central de notificações. Gere a criação de notificações in-app\r\ne o envio de emails com base nas preferências do utilizador."];

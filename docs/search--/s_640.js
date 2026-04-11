@@ -1,0 +1,1 @@
+search_result['640']=["topic_00000000000000F1.html","DocumentContextDto.HasExtractedText Property","Indicador de se o ficheiro tem texto extraído. True significa que o texto foi extraído com sucesso e está disponível para análise pela IA.\r\nFalse pode indicar um PDF sem texto selecionável ou um fiche..."];

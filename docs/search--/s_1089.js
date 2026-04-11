@@ -1,0 +1,1 @@
+search_result['1089']=["topic_0000000000000190.html","DocumentHub Class","Hub SignalR para colaboração em tempo real nos documentos.\r\nCada documento tem o seu próprio grupo: \"doc-{documentId}\".\r\n\r\nFluxo:\r\n  1. Cliente chama JoinDocument(documentId)\r\n  2. Hub valida permissã..."];

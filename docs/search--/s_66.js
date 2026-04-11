@@ -1,0 +1,1 @@
+search_result['66']=["topic_0000000000000025.html","DocumentPermissionsController.UpdatePermission Method","Atualiza a DocumentRole de uma permissão existente.\r\nRequer Owner ou TeamAdmin. Não pode alterar permissão de Owner/TeamAdmin."];

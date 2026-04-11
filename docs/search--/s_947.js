@@ -1,0 +1,1 @@
+search_result['947']=["topic_0000000000000161.html","TeamInviteDto.InviteUrl Property","Url do convite que pode ser partilhada com o utilizador convidado.\r\nEste é o link que o utilizador deve aceder para aceitar o convite."];

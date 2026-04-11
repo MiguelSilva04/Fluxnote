@@ -1,0 +1,1 @@
+search_result['1260']=["topic_00000000000001C9.html","CommentMention Class","Representa uma menção (@user) feita dentro de um comentário.\r\nLiga um comentário a um utilizador mencionado."];

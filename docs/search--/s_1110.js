@@ -1,0 +1,1 @@
+search_result['1110']=["topic_0000000000000196.html","DocumentHub.SendComment Method","Notifica outros utilizadores no documento que um comentário foi criado.\r\nO payload é o JSON do comentário completo (DocumentCommentDto)."];

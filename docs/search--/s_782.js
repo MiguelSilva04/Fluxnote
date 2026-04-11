@@ -1,0 +1,1 @@
+search_result['782']=["topic_0000000000000125.html","ImproveTextRequest Class","Request para sugerir melhorias num excerto de texto selecionado pelo utilizador."];

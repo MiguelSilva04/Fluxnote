@@ -1,0 +1,1 @@
+search_result['331']=["topic_0000000000000084.html","ExternalUserInfo Class","Informação do utilizador devolvida por provider externo."];

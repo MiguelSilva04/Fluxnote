@@ -1,0 +1,1 @@
+search_result['3']=["topic_0000000000000001.html","AuthController Class","Controlador responsável pela autenticação e gestão de utilizadores.\r\nImplementa registo, login, refresh de tokens, gestão de perfil e sessões."];

@@ -1,0 +1,1 @@
+search_result['28']=["topic_0000000000000010.html","AuthController.Refresh Method","Renova o access token usando o refresh token do cookie."];

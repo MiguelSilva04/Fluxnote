@@ -1,0 +1,1 @@
+search_result['1647']=["topic_000000000000028C.html","AuthProvider Enumeration","Define os métodos de autenticação suportados pelo sistema."];

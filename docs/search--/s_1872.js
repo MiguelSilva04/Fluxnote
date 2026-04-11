@@ -1,0 +1,1 @@
+search_result['1872']=["topic_00000000000002FA.html","BlobStorageService.DeleteContextFileAsync Method","Elimina um ficheiro de contexto previamente armazenado."];

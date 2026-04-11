@@ -1,0 +1,1 @@
+search_result['231']=["topic_0000000000000061.html","TeamsController.GetTeam Method","Obtém os detalhes de uma equipa específica."];

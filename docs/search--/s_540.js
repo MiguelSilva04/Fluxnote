@@ -1,0 +1,1 @@
+search_result['540']=["topic_00000000000000CE.html","CreateDocumentCommentDto Class","DTO para criar um comentário num documento. Pode ser um comentário raiz ou uma resposta a outro comentário."];

@@ -1,0 +1,1 @@
+search_result['1760']=["topic_00000000000002BC.html","ConsoleEmailSender.SendPasswordResetAsync Method","Simula o envio de um email de recuperação de password."];

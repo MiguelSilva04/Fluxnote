@@ -1,0 +1,1 @@
+search_result['126']=["topic_000000000000003E.html","DocumentsController.GetVersionDetail Method","Obtém o detalhe de uma versão específica, incluindo conteúdo HTML para visualização.\r\nAcessível a Owner, TeamAdmin e Editores do documento."];

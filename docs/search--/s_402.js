@@ -1,0 +1,1 @@
+search_result['402']=["topic_0000000000000099.html","ResetPasswordRequest.Token Property","Token de reset codificado em Base64Url."];

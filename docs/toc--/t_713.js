@@ -1,0 +1,1 @@
+c['713']=[['714',"ExtractTextAsync Method","topic_00000000000002A7.html",0],['715',"IsSupported Method","topic_00000000000002A8.html",0]];

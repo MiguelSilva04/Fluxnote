@@ -1,0 +1,1 @@
+search_result['1506']=["topic_000000000000024F.html","RefreshToken.SessionId Property","Identificador único da sessão (GUID)."];

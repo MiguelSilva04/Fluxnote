@@ -1,0 +1,1 @@
+search_result['67']=["topic_0000000000000026.html","DocumentPermissionsController.DeletePermission Method","Remove uma permissão de documento (retira acesso ao membro).\r\nRequer Owner ou TeamAdmin. Não pode remover Owner/TeamAdmin."];

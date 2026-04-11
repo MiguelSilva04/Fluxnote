@@ -1,0 +1,1 @@
+search_result['35']=["topic_0000000000000017.html","AuthController.ResetPassword Method","Redefine a password do utilizador usando um token válido."];

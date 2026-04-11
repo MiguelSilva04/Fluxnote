@@ -1,0 +1,1 @@
+search_result['1426']=["topic_0000000000000224.html","Folder.TeamId Property","ID da equipa proprietária da pasta."];

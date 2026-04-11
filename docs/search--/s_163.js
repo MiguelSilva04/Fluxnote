@@ -1,0 +1,1 @@
+search_result['163']=["topic_000000000000004A.html","NotificationsController.GetNotifications Method","Lista as notificações do utilizador autenticado (ordenadas por data, mais recentes primeiro).\r\nSuporte para paginação mas o frontend ainda não utiliza"];

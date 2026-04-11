@@ -1,0 +1,1 @@
+search_result['1454']=["topic_0000000000000236.html","Notification.ReferenceId Property","ID do recurso relacionado (documento, equipa, comentário, etc.).\r\nPermite navegação direta ao clicar na notificação."];

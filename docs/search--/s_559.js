@@ -1,0 +1,1 @@
+search_result['559']=["topic_00000000000000D7.html","CreateDocumentRequest Class","DTO para pedido de criação de novo documento.\r\nUsado no endpoint POST /api/documents."];

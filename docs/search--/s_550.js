@@ -1,0 +1,1 @@
+search_result['550']=["topic_00000000000000D3.html","CreateDocumentCommentDto.RangeLength Property","Comprimento do texto selecionado no editor Quill. Se for um comentário de seleção, isto indica quantos caracteres estão a ser comentados.\r\nSe for um comentário de posição (sem seleção), este campo pod..."];

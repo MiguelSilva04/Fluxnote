@@ -1,0 +1,1 @@
+c['787']=[['788',"BlobStorageOptions Class","topic_00000000000002F1.html",1],['793',"BlobStorageService Class","topic_00000000000002F5.html",1],['800',"LocalStorageService Class","topic_0000000000000300.html",1],['807',"IStorageService Interface","topic_00000000000002FB.html",1]];

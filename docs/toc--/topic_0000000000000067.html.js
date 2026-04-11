@@ -1,0 +1,1 @@
+var breadcrumbs=[['-1',"",""],['2',"fluxnote-backend Reference","topic_000000000000030A.html"],['21',"Fluxnote.Backend.Controllers Namespace","topic_0000000000000000.html"],['132',"UploadsController Class","topic_0000000000000066.html"],['133',"UploadsController Constructor","topic_0000000000000067.html"]];

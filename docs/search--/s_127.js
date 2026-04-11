@@ -1,0 +1,1 @@
+search_result['127']=["topic_000000000000003F.html","DocumentsController.RestoreVersion Method","Restaura o conteúdo do documento para uma versão anterior.\r\nApenas o Owner da equipa pode executar esta operação.\r\nCria uma nova entrada de versão com o conteúdo restaurado e notifica os clientes via ..."];

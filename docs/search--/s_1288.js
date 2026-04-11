@@ -1,0 +1,1 @@
+search_result['1288']=["topic_00000000000001D6.html","Document.CreatedAt Property","Data e hora de criação do documento (UTC)."];

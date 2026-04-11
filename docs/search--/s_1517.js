@@ -1,0 +1,1 @@
+search_result['1517']=["topic_0000000000000255.html","RefreshToken.RevokedAt Property","Momento em que o token foi revogado (UTC)."];

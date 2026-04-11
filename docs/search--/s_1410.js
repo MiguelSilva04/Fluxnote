@@ -1,0 +1,1 @@
+search_result['1410']=["topic_000000000000021E.html","DocumentVersion.ContentHtml Property","Conteúdo HTML do documento no momento da versão (UTF-8 bytes).\r\nExtraído de Document.Content para exibição em modo leitura."];

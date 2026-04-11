@@ -1,0 +1,1 @@
+search_result['1738']=["topic_00000000000002B0.html","TokenService.GenerateRefreshTokenPlain Method","Gera um refresh token aleatório em texto plano."];

@@ -1,0 +1,1 @@
+search_result['703']=["topic_000000000000010D.html","DocumentDetailDto.IsTeamAdmin Property","Indica se o utilizador autenticado é um Team Admin da equipa deste documento.\r\nO Owner e o TeamAdmin podem resolver comentários."];

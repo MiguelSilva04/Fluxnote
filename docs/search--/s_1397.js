@@ -1,0 +1,1 @@
+search_result['1397']=["topic_0000000000000216.html","DocumentVersion Class","Representa uma versão imutável de um documento, criada quando um utilizador\r\nfecha a sessão de edição (desconexão do hub SignalR)."];

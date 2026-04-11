@@ -1,0 +1,1 @@
+search_result['202']=["topic_0000000000000058.html","TeamInvitesController.InviteByEmail Method","Convida um utilizador para uma equipa por email.\r\nSe o utilizador existir e tiver notificações ativas, envia notificação in-app e/ou email.\r\nSe não tiver nenhum canal ativo, retorna aviso para usar co..."];

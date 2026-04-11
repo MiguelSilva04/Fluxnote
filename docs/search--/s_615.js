@@ -1,0 +1,1 @@
+search_result['615']=["topic_00000000000000E7.html","DocumentCommentDto.Replies Property","Lista de respostas (replies) a este comentário. Cada resposta é também um DocumentCommentDto, permitindo uma estrutura hierárquica de comentários e respostas. Se não houver respostas, essa lista pode ..."];

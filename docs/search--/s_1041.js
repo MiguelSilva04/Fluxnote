@@ -1,0 +1,1 @@
+search_result['1041']=["topic_0000000000000183.html","DocumentPermissionSummaryDto.DocumentRole Property","Role no documento (0=Viewer, 1=Editor)."];

@@ -1,0 +1,1 @@
+c['58']=[['59',"CreatePermission Method","topic_0000000000000024.html",0],['60',"DeletePermission Method","topic_0000000000000026.html",0],['61',"GetByDocument Method","topic_0000000000000023.html",0],['62',"UpdatePermission Method","topic_0000000000000025.html",0]];

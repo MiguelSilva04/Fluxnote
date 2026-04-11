@@ -1,0 +1,1 @@
+search_result['1111']=["topic_0000000000000197.html","DocumentHub.SendCommentResolved Method","Notifica outros utilizadores que um comentário foi resolvido/unreresolvido."];

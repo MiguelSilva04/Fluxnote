@@ -1,0 +1,1 @@
+search_result['1662']=["topic_0000000000000291.html","AuthProviderExtensions.ToDisplayString Method","Converte o valor do enum para string legível."];

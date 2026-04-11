@@ -1,0 +1,1 @@
+search_result['1347']=["topic_00000000000001F8.html","DocumentContext.ExtractedText Property","Texto extraído do ficheiro, pronto para ser incluído em prompts de IA.\r\nNull se a extração falhou ou o ficheiro estava vazio.\r\nNão é exposto ao frontend."];

@@ -1,0 +1,1 @@
+search_result['1117']=["topic_0000000000000198.html","DocumentHub.SendCommentDeleted Method","Notifica outros utilizadores que um comentário foi eliminado."];

@@ -1,0 +1,1 @@
+search_result['704']=["topic_000000000000010E.html","DocumentPermissionDto Class","DTO de resposta para uma permissão explícita de documento."];

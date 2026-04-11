@@ -1,0 +1,1 @@
+search_result['1019']=["topic_000000000000017C.html","TeamDocumentDto.FolderId Property","ID da pasta onde o documento está (null se solto)."];

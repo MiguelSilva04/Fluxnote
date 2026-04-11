@@ -1,0 +1,1 @@
+search_result['165']=["topic_000000000000004C.html","NotificationsController.MarkAllAsRead Method","Marca todas as notificações do utilizador como lidas."];

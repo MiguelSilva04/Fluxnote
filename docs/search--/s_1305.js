@@ -1,0 +1,1 @@
+search_result['1305']=["topic_00000000000001E2.html","DocumentComment Class","Representa um comentário feito num documento. Os comentários podem ser hierárquicos, permitindo respostas a outros comentários. Cada comentário está associado a um documento e a um utilizador (autor)...."];

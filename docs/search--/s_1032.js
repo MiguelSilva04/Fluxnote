@@ -1,0 +1,1 @@
+search_result['1032']=["topic_0000000000000180_overloads--.html","AddYDocSnapshot.Down Method","Builds the operations that will migrate the database \u0027down\u0027."];

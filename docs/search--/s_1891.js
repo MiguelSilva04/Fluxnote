@@ -1,0 +1,1 @@
+search_result['1891']=["topic_0000000000000303.html","LocalStorageService.GetImageAsync Method","Devolve o stream de uma imagem previamente carregada, ou null se não existir.\r\nUsado pelo UploadsController para servir imagens sem depender de acesso anónimo ao blob."];

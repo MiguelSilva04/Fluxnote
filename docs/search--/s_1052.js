@@ -1,0 +1,1 @@
+search_result['1052']=["topic_0000000000000186.html","CreateTeamMemberRequest Class","DTO de pedido para criação de um novo membro de equipa."];

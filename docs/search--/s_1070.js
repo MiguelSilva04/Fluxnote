@@ -1,0 +1,1 @@
+search_result['1070']=["topic_000000000000018B.html","CreateTeamMemberRequest.Email Property","Email do utilizador a adicionar (quando aplicável)."];

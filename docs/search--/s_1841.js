@@ -1,0 +1,1 @@
+search_result['1841']=["topic_00000000000002EA.html","NotificationService Class","Implementação do serviço de notificações.\r\nCoordena a criação de notificações in-app e o envio de emails,\r\nrespeitando a língua preferida do utilizador."];

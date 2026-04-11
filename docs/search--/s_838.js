@@ -1,0 +1,1 @@
+search_result['838']=["topic_0000000000000135.html","CreateFolderRequest.TeamId Property","ID da equipa onde a pasta será criada."];

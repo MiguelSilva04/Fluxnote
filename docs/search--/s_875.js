@@ -1,0 +1,1 @@
+search_result['875']=["topic_0000000000000146.html","NotificationDto.ReferenceToken Property","Token do convite associado, para navegação à página de aceitação.\r\nPreenchido apenas em notificações de DocumentInvite e TeamInvite."];

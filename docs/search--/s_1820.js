@@ -1,0 +1,1 @@
+search_result['1820']=["topic_00000000000002DA.html","INotificationService.GetOrCreatePreferencesAsync Method","Obtém ou cria as preferências de notificação de um utilizador."];

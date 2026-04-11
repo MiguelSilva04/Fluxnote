@@ -1,0 +1,1 @@
+search_result['1819']=["topic_00000000000002D9.html","INotificationService.HasAnyChannelEnabledAsync Method","Verifica se o utilizador tem pelo menos um canal de notificação ativo.\r\nÚtil para avisar o invocador que deve usar convite por link."];

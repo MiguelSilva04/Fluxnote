@@ -1,0 +1,1 @@
+search_result['474']=["topic_00000000000000B4.html","AcceptDocumentInviteResponseDto.TeamId Property","Identificador do documento para o qual o convite foi aceito.\r\nEste campo é necessário para que o frontend saiba qual documento abrir após o utilizador aceitar o convite."];

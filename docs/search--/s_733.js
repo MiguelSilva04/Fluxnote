@@ -1,0 +1,1 @@
+search_result['733']=["topic_0000000000000117.html","CreateDocumentPermissionRequest.TeamMemberId Property","ID do membro da equipa que receberá a permissão."];

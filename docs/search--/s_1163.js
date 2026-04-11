@@ -1,0 +1,1 @@
+search_result['1163']=["topic_00000000000001A8.html","DocumentContext Class","A base class inherited by each EF Core migration."];

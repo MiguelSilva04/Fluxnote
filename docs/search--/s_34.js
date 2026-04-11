@@ -1,0 +1,1 @@
+search_result['34']=["topic_0000000000000016.html","AuthController.ForgotPassword Method","Inicia o fluxo de recuperação de password.\r\nGera um token de reset e envia email com link (prod) ou guarda em memória (dev)."];

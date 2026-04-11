@@ -1,0 +1,1 @@
+search_result['1750']=["topic_00000000000002B7.html","TeamAutorizationService.GetTeamMemberAsync Method","Obtém o registo de associação de um utilizador a uma equipa."];

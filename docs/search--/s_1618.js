@@ -1,0 +1,1 @@
+search_result['1618']=["topic_000000000000027E.html","SmtpEmailSender Constructor","Construtor com injeção de opções."];

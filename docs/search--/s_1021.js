@@ -1,0 +1,1 @@
+search_result['1021']=["topic_000000000000017D.html","TeamDocumentDto.Permissions Property","Lista de permissões do documento (apenas para Owner/TeamAdmin)."];

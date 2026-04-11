@@ -1,0 +1,1 @@
+search_result['1346']=["topic_00000000000001F7.html","DocumentContext.StoredPath Property","Caminho ou referência ao ficheiro armazenado, devolvido pelo IStorageService.\r\nEm dev: \"local://context/{uniqueName}\". Em produção: \"blob://context/{blobName}\".\r\nUsado para eliminar o ficheiro do stor..."];

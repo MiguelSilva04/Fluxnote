@@ -1,0 +1,1 @@
+search_result['933']=["topic_000000000000015D.html","TeamInviteDto.CreatedByName Property","Nome do utilizador que criou o convite. Este campo é incluído para facilitar a exibição de\r\ninformações sobre o convite, sem a necessidade de uma consulta adicional para obter o nome do utilizador.\r\nE..."];

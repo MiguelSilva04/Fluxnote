@@ -1,0 +1,1 @@
+search_result['278']=["topic_0000000000000072.html","FluxnoteServerContext.DocumentInvite Property","DbSet para convites de documentos (permite gerir convites pendentes e aceites)."];

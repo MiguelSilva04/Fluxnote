@@ -1,0 +1,1 @@
+search_result['517']=["topic_00000000000000C6.html","DocumentInviteDto.ExpiresAt Property","Data e hora em que o convite foi criado. Este campo é útil\r\npara exibir informações sobre quando o convite foi gerado e para fins de auditoria."];

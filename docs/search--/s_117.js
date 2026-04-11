@@ -1,0 +1,1 @@
+search_result['117']=["topic_000000000000003A.html","DocumentsController.CreateComment Method","Cria um novo comentário para o documento. Pode ser um comentário raiz ou uma resposta\r\n a outro comentário (se ParentCommentId for fornecido). O campo RangeIndex e RangeLength\r\n permitem associar o co..."];

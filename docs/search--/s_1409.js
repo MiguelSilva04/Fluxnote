@@ -1,0 +1,1 @@
+search_result['1409']=["topic_000000000000021D.html","DocumentVersion.YDocSnapshot Property","Snapshot binário do Y.Doc no momento da versão.\r\nSerializado via Y.encodeStateAsUpdate() no frontend."];

@@ -1,0 +1,1 @@
+search_result['430']=["topic_00000000000000A6.html","UserProfile Class","DTO de resposta com o perfil completo do utilizador.\r\nUsado na resposta dos endpoints GET/PUT /api/auth/users/me."];

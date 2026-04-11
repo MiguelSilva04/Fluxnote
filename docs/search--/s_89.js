@@ -1,0 +1,1 @@
+search_result['89']=["topic_000000000000002D.html","DocumentsController.ImproveText Method","Sugere melhorias para o texto selecionado usando IA (Google Gemini).\r\nUtiliza o contexto do documento e ficheiros de contexto para maior precisão."];

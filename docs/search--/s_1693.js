@@ -1,0 +1,1 @@
+search_result['1693']=["topic_000000000000029C.html","GeminiAIService.GenerateSummaryAsync Method","Gera um resumo a partir do texto fornecido."];

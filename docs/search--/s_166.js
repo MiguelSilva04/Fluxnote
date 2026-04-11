@@ -1,0 +1,1 @@
+search_result['166']=["topic_000000000000004D.html","NotificationsController.GetPreferences Method","Obtém as preferências de notificação do utilizador."];

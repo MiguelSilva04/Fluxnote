@@ -1,0 +1,104 @@
+Summary
+  Generated on: 11/04/2026 - 16:00:29
+  Coverage date: 11/04/2026 - 15:51:55
+  Parser: Cobertura
+  Assemblies: 1
+  Classes: 82
+  Files: 67
+  Line coverage: 67.1%
+  Covered lines: 3661
+  Uncovered lines: 1788
+  Coverable lines: 5449
+  Total lines: 11365
+  Branch coverage: 49.9% (751 of 1505)
+  Covered branches: 751
+  Total branches: 1505
+  Method coverage: 85.8% (490 of 571)
+  Full method coverage: 74.6% (426 of 571)
+  Covered methods: 490
+  Fully covered methods: 426
+  Total methods: 571
+
+fluxnote-backend                                                          67.1%
+  Fluxnote.Backend.Contracts.Auth.RegisterRequest                          100%
+  Fluxnote.Backend.Controllers.AuthController                             53.1%
+  Fluxnote.Backend.Controllers.DocumentInvitesController                  60.4%
+  Fluxnote.Backend.Controllers.DocumentPermissionsController              83.1%
+  Fluxnote.Backend.Controllers.DocumentsController                        70.2%
+  Fluxnote.Backend.Controllers.FoldersController                          73.8%
+  Fluxnote.Backend.Controllers.NotificationsController                     100%
+  Fluxnote.Backend.Controllers.TeamInvitesController                      60.6%
+  Fluxnote.Backend.Controllers.TeamMembersController                      84.8%
+  Fluxnote.Backend.Controllers.TeamsController                            56.2%
+  Fluxnote.Backend.Controllers.UploadsController                             0%
+  Fluxnote.Backend.Data.FluxnoteServerContext                             95.1%
+  Fluxnote.Backend.Dtos.Auth.ChangePasswordRequest                         100%
+  Fluxnote.Backend.Dtos.Auth.ExternalAuthErrorResponse                       0%
+  Fluxnote.Backend.Dtos.Auth.ExternalUserInfo                                0%
+  Fluxnote.Backend.Dtos.Auth.ForgotPasswordRequest                         100%
+  Fluxnote.Backend.Dtos.Auth.LoginRequest                                  100%
+  Fluxnote.Backend.Dtos.Auth.LoginResponse                                 100%
+  Fluxnote.Backend.Dtos.Auth.ResetPasswordRequest                          100%
+  Fluxnote.Backend.Dtos.Auth.SetPasswordRequest                            100%
+  Fluxnote.Backend.Dtos.Auth.TokenResponse                                 100%
+  Fluxnote.Backend.Dtos.Auth.UpdateProfileRequest                          100%
+  Fluxnote.Backend.Dtos.Auth.UserProfile                                   100%
+  Fluxnote.Backend.Dtos.DocumentInvites.AcceptDocumentInviteResponseDto    100%
+  Fluxnote.Backend.Dtos.DocumentInvites.CreateDocumentInviteRequest        100%
+  Fluxnote.Backend.Dtos.DocumentInvites.DocumentInviteDto                  100%
+  Fluxnote.Backend.Dtos.Documents.CommentMentionDto                          0%
+  Fluxnote.Backend.Dtos.Documents.CreateDocumentCommentDto                 100%
+  Fluxnote.Backend.Dtos.Documents.CreateDocumentPermissionRequest          100%
+  Fluxnote.Backend.Dtos.Documents.CreateDocumentRequest                    100%
+  Fluxnote.Backend.Dtos.Documents.DocumentCommentDto                       100%
+  Fluxnote.Backend.Dtos.Documents.DocumentContextDto                       100%
+  Fluxnote.Backend.Dtos.Documents.DocumentDetailDto                        100%
+  Fluxnote.Backend.Dtos.Documents.DocumentDto                              100%
+  Fluxnote.Backend.Dtos.Documents.DocumentPermissionDto                    100%
+  Fluxnote.Backend.Dtos.Documents.GenerateContentRequest                     0%
+  Fluxnote.Backend.Dtos.Documents.ImproveTextRequest                         0%
+  Fluxnote.Backend.Dtos.Documents.UpdateDocumentPermissionRequest          100%
+  Fluxnote.Backend.Dtos.Documents.UpdateDocumentRequest                    100%
+  Fluxnote.Backend.Dtos.Folders.CreateFolderRequest                        100%
+  Fluxnote.Backend.Dtos.Folders.FolderDto                                  100%
+  Fluxnote.Backend.Dtos.Folders.UpdateFolderRequest                        100%
+  Fluxnote.Backend.Dtos.Notifications.EmailInviteRequest                   100%
+  Fluxnote.Backend.Dtos.Notifications.NotificationDto                      100%
+  Fluxnote.Backend.Dtos.Notifications.NotificationPreferenceDto            100%
+  Fluxnote.Backend.Dtos.Notifications.UpdateNotificationPreferenceDto      100%
+  Fluxnote.Backend.Dtos.TeamInvites.AcceptTeamInviteResponseDto            100%
+  Fluxnote.Backend.Dtos.TeamInvites.CreateTeamInviteRequest                100%
+  Fluxnote.Backend.Dtos.TeamInvites.TeamInviteDto                          100%
+  Fluxnote.Backend.Dtos.Teams.CreateTeamMemberRequest                      100%
+  Fluxnote.Backend.Dtos.Teams.CreateTeamRequest                            100%
+  Fluxnote.Backend.Dtos.Teams.DocumentPermissionSummaryDto                   0%
+  Fluxnote.Backend.Dtos.Teams.TeamDocumentDto                                0%
+  Fluxnote.Backend.Dtos.Teams.TeamDto                                      100%
+  Fluxnote.Backend.Dtos.Teams.TeamMemberDto                                100%
+  Fluxnote.Backend.Dtos.Teams.UpdateTeamMemberRoleRequest                  100%
+  Fluxnote.Backend.Dtos.Teams.UpdateTeamRequest                            100%
+  Fluxnote.Backend.Hubs.DocumentHub                                       31.2%
+  Fluxnote.Backend.Models.AccountStatusExtensions                            0%
+  Fluxnote.Backend.Models.AuthProviderExtensions                             0%
+  Fluxnote.Backend.Models.CommentMention                                     0%
+  Fluxnote.Backend.Models.Document                                        94.4%
+  Fluxnote.Backend.Models.DocumentComment                                  100%
+  Fluxnote.Backend.Models.DocumentContext                                  100%
+  Fluxnote.Backend.Models.DocumentInvite                                   100%
+  Fluxnote.Backend.Models.DocumentPermission                               100%
+  Fluxnote.Backend.Models.DocumentVersion                                  100%
+  Fluxnote.Backend.Models.Folder                                           100%
+  Fluxnote.Backend.Models.Notification                                    93.3%
+  Fluxnote.Backend.Models.NotificationPreference                          83.3%
+  Fluxnote.Backend.Models.RefreshToken                                    76.4%
+  Fluxnote.Backend.Models.Team                                             100%
+  Fluxnote.Backend.Models.TeamInvite                                       100%
+  Fluxnote.Backend.Models.TeamMember                                       100%
+  Fluxnote.Backend.Models.User                                             100%
+  Fluxnote.Backend.Services.AI.TextExtractionService                      27.5%
+  Fluxnote.Backend.Services.Auth.TokenService                              100%
+  Fluxnote.Backend.Services.Authorization.TeamAutorizationService          100%
+  Fluxnote.Backend.Services.Notifications.NotificationRequest              100%
+  Fluxnote.Backend.Services.Notifications.NotificationService             93.7%
+  Fluxnote.Backend.Validators.RegisterRequestValidator                     100%
+  Program                                                                 63.4%

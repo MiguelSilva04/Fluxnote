@@ -1,0 +1,1 @@
+search_result['108']=["topic_0000000000000036.html","DocumentsController.GetContextFiles Method","Lista os ficheiros de contexto associados ao documento.\r\nApenas Editors e Owners podem listar (Viewers não têm acesso ao painel de IA)."];

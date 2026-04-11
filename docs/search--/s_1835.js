@@ -1,0 +1,1 @@
+search_result['1835']=["topic_00000000000002E4.html","NotificationRequest.ActorId Property","ID do utilizador que gerou a ação (quem convidou, comentou, etc.)."];

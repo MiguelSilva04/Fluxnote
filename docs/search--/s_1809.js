@@ -1,0 +1,1 @@
+search_result['1809']=["topic_00000000000002D4.html","SmtpEmailSender.SendNotificationEmailAsync Method","Envia um email de notificação genérico via SMTP."];

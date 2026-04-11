@@ -1,0 +1,1 @@
+search_result['940']=["topic_000000000000015F.html","TeamInviteDto.IsRevoked Property","Indica se o convite foi revogado.\r\nUm convite revogado não pode ser aceito, mesmo que ainda não tenha expirado."];

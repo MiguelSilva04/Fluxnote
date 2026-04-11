@@ -1,0 +1,1 @@
+search_result['922']=["topic_0000000000000157.html","CreateTeamInviteRequest.ExpirationDays Property","Dias até o convite expirar. Após esse período, o convite não poderá mais ser aceito.\r\nPor padrão, o convite expira em 7 dias. O valor deve ser um inteiro positivo."];

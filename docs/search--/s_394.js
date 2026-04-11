@@ -1,0 +1,1 @@
+search_result['394']=["topic_0000000000000096.html","RegisterRequest.Lang Property","Idioma preferido do utilizador para emails (\"en\" ou \"pt\")."];

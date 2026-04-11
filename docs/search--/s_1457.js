@@ -1,0 +1,1 @@
+search_result['1457']=["topic_0000000000000239.html","Notification.ActorId Property","ID do utilizador que causou a notificação (quem convidou, comentou, etc.).\r\nNullable para notificações de sistema."];

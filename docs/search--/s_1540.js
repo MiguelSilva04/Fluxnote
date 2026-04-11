@@ -1,0 +1,1 @@
+search_result['1540']=["topic_000000000000025D.html","Team.Id Property","Identificador único da equipa (chave primária)."];

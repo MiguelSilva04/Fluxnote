@@ -1,0 +1,1 @@
+search_result['1797']=["topic_00000000000002CD.html","IEmailSender.SendEmailConfirmationAsync Method","Envia um email de confirmação de conta para um utilizador."];

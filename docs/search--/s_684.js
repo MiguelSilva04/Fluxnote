@@ -1,0 +1,1 @@
+search_result['684']=["topic_0000000000000104.html","DocumentDetailDto.CreatedById Property","ID do utilizador criador."];

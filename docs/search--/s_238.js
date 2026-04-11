@@ -1,0 +1,1 @@
+search_result['238']=["topic_0000000000000063.html","TeamsController.PatchTeamName Method","Atualiza o nome de uma equipa. Apenas o Owner pode executar esta operação."];

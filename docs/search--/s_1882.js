@@ -1,0 +1,1 @@
+search_result['1882']=["topic_00000000000002FF.html","IStorageService.DeleteContextFileAsync Method","Elimina um ficheiro de contexto previamente armazenado."];

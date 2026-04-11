@@ -1,0 +1,1 @@
+search_result['65']=["topic_0000000000000024.html","DocumentPermissionsController.CreatePermission Method","Adiciona uma permissão de documento a um membro.\r\nRequer Owner ou TeamAdmin. Não pode adicionar Owner/TeamAdmin (já têm acesso implícito)."];

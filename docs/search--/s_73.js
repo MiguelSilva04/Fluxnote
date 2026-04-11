@@ -1,0 +1,1 @@
+search_result['73']=["topic_0000000000000027.html","DocumentsController Class","Controlador responsável pela gestão de documentos colaborativos.\r\nSuporta CRUD completo, pesquisa, lixeira e recuperação de documentos."];

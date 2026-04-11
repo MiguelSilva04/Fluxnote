@@ -1,0 +1,1 @@
+search_result['1247']=["topic_00000000000001C4.html","AddBilingualFieldsToNotification Class","A base class inherited by each EF Core migration."];

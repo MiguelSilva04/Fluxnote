@@ -1,0 +1,1 @@
+search_result['1694']=["topic_000000000000029D.html","GeminiAIService.ImproveTextAsync Method","Sugere melhorias para o texto selecionado, tendo em conta o contexto do documento."];
