@@ -1637,8 +1637,8 @@ export class DocumentEditorComponent implements OnInit {
         this.documentTitle = doc.title;
         this.originalTitle = doc.title;
         this.initialContent = doc.content || '';
-        this.lastEdited.set(new Date(doc.updatedAt));
-        this.lastEditedText.set(this.formatLastEdited(new Date(doc.updatedAt)));
+        this.lastEdited.set(new Date(doc.updatedAt.endsWith('Z') ? doc.updatedAt : doc.updatedAt + 'Z'));
+        this.lastEditedText.set(this.formatLastEdited(new Date(doc.updatedAt.endsWith('Z') ? doc.updatedAt : doc.updatedAt + 'Z')));
         this.documentRole.set(doc.role || 'Viewer');
         this.isOwner.set(doc.isOwner ?? false);
         this.isTeamAdmin.set(doc.isTeamAdmin ?? false);
@@ -2931,7 +2931,7 @@ export class DocumentEditorComponent implements OnInit {
   }
 
   formatCommentDate(dateString: string): string {
-    const date = new Date(dateString);
+    const date = new Date(dateString.endsWith('Z') ? dateString : dateString + 'Z');
     const now = new Date();
     const diffMs = now.getTime() - date.getTime();
     const diffMins = Math.floor(diffMs / 60000);
