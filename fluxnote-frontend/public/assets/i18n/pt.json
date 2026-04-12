@@ -157,6 +157,28 @@
       "ALL_RIGHTS": "© 2026 Fluxnote. Todos os direitos reservados.",
       "COMING_SOON": "Em breve"
     },
+    "DEMO": {
+      "HERO_TITLE": "Veja o Fluxnote em ação",
+      "HERO_SUBTITLE": "Assista a uma demonstração interativa da criação de documentos com assistência de IA e colaboração em tempo real.",
+      "CTA_CREATE": "Crie uma conta e experimente",
+      "STEPS_TITLE": "Como funciona em 4 passos simples",
+      "STEPS_SUBTITLE": "Veja como é fácil criar documentos profissionais com a ajuda da IA.",
+      "STEP_1_TITLE": "Criar um novo documento",
+      "STEP_1_DESC": "Comece um novo documento em segundos com modelos inteligentes ou uma página em branco.",
+      "STEP_2_TITLE": "Convidar colegas",
+      "STEP_2_DESC": "Adicione colegas com um clique e defina permissões de edição personalizadas.",
+      "STEP_3_TITLE": "Obter sugestões da IA",
+      "STEP_3_DESC": "A IA fornece melhorias de texto, correções e sugestões de conteúdo em tempo real.",
+      "STEP_4_TITLE": "Restaurar versões anteriores",
+      "STEP_4_DESC": "Aceda ao histórico completo de alterações e restaure qualquer versão anterior com facilidade.",
+      "TESTIMONIAL_QUOTE": "\"A demonstração convenceu toda a minha equipa — agora usamos o Fluxnote todos os dias!\"",
+      "TESTIMONIAL_NAME": "Sofia Mendes",
+      "TESTIMONIAL_ROLE": "Gestora de Projetos, TechFlow",
+      "FINAL_TITLE": "Pronto para experimentar o Fluxnote?",
+      "FINAL_SUBTITLE": "Sem cartão de crédito. Comece em menos de um minuto.",
+      "FINAL_CTA": "Criar conta gratuita",
+      "FINAL_NOTE": "Junte-se a milhares de profissionais que confiam no Fluxnote"
+    },
     "BLOG": {
       "COMING_SOON_BADGE": "Em breve",
       "TITLE": "Blog Fluxnote",
@@ -285,6 +307,7 @@
     }
   },
   "AUTH": {
+    "BACK_TO_LANDING": "Voltar à página inicial",
     "LOGIN": {
       "TITLE": "FluxNote",
       "SUBTITLE": "Aceda aos seus documentos colaborativos",
@@ -759,6 +782,7 @@
   },
   "SUBSCRIPTIONS": {
     "TITLE": "Subscrição",
+    "WIP_WARNING": "⚠️ Esta funcionalidade ainda está em desenvolvimento. Os valores apresentados são estáticos e meramente ilustrativos.",
     "TAB_PLANS": "Planos de Subscrição",
     "CHOOSE_PLAN": "Escolha o Seu Plano",
     "CURRENT_PLAN_BADGE": "O SEU PLANO ATUAL",

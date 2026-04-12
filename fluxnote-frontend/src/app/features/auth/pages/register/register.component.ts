@@ -28,7 +28,11 @@ import { ToastService } from '../../../../shared/services/toast.service';
     CardContentComponent,
   ],
   template: `
-    <div class="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col items-center justify-center p-4">
+    <div class="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col items-center justify-center p-4 relative">
+      <a routerLink="/" class="absolute top-6 left-6 inline-flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 hover:text-[#155347] dark:hover:text-emerald-400 transition-colors">
+        <lucide-icon name="arrow-left" class="h-4 w-4"></lucide-icon>
+        {{ 'AUTH.BACK_TO_LANDING' | translate }}
+      </a>
       <div class="mb-8 text-center">
         <div
           class="inline-flex items-center justify-center p-3 bg-[#155347] rounded-xl mb-4 shadow-lg shadow-[#155347]/20"

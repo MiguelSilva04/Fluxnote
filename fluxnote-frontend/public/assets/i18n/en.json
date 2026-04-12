@@ -157,6 +157,28 @@
       "ALL_RIGHTS": "© 2026 Fluxnote. All rights reserved.",
       "COMING_SOON": "Coming soon"
     },
+    "DEMO": {
+      "HERO_TITLE": "See how Fluxnote works in practice",
+      "HERO_SUBTITLE": "Watch an interactive demo of document creation with AI assistance and real-time collaboration.",
+      "CTA_CREATE": "Create an account and try it",
+      "STEPS_TITLE": "How it works in 4 simple steps",
+      "STEPS_SUBTITLE": "See how easy it is to create professional documents with AI assistance.",
+      "STEP_1_TITLE": "Create a new document",
+      "STEP_1_DESC": "Start a new document in seconds with smart templates or a blank page.",
+      "STEP_2_TITLE": "Invite teammates",
+      "STEP_2_DESC": "Add teammates with one click and set custom editing permissions.",
+      "STEP_3_TITLE": "Get AI suggestions",
+      "STEP_3_DESC": "AI provides text improvements, corrections, and content suggestions in real time.",
+      "STEP_4_TITLE": "Restore earlier versions",
+      "STEP_4_DESC": "Access the full change history and restore any previous version with ease.",
+      "TESTIMONIAL_QUOTE": "\"The demo convinced my whole team—now we use Fluxnote every day!\"",
+      "TESTIMONIAL_NAME": "Sofia Mendes",
+      "TESTIMONIAL_ROLE": "Project Manager, TechFlow",
+      "FINAL_TITLE": "Ready to try Fluxnote?",
+      "FINAL_SUBTITLE": "No credit card required. Get started in under a minute.",
+      "FINAL_CTA": "Create a free account",
+      "FINAL_NOTE": "Join thousands of professionals who trust Fluxnote"
+    },
     "BLOG": {
       "COMING_SOON_BADGE": "Coming soon",
       "TITLE": "Fluxnote Blog",
@@ -285,6 +307,7 @@
     }
   },
   "AUTH": {
+    "BACK_TO_LANDING": "Back to home",
     "LOGIN": {
       "TITLE": "FluxNote",
       "SUBTITLE": "Access your collaborative documents",
@@ -759,6 +782,7 @@
   },
   "SUBSCRIPTIONS": {
     "TITLE": "Subscription",
+    "WIP_WARNING": "⚠️ This feature is still under development. The values shown are static and for illustration only.",
     "TAB_PLANS": "Subscription Plans",
     "CHOOSE_PLAN": "Choose Your Plan",
     "CURRENT_PLAN_BADGE": "YOUR CURRENT PLAN",

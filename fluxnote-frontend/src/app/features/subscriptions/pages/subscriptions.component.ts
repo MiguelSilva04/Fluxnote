@@ -22,7 +22,12 @@ import { ButtonComponent, CardComponent, CardContentComponent, BadgeComponent, W
   template: `
     <app-dashboard-layout>
       <div class="max-w-7xl mx-auto">
-        <h1 class="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-8">{{ 'SUBSCRIPTIONS.TITLE' | translate }}</h1>
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-4">{{ 'SUBSCRIPTIONS.TITLE' | translate }}</h1>
+
+        <!-- Work In Progress Warning -->
+        <div class="mb-8 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-300 dark:border-amber-700 rounded-lg">
+          <p class="text-sm text-amber-900 dark:text-amber-200">{{ 'SUBSCRIPTIONS.WIP_WARNING' | translate }}</p>
+        </div>
 
         <!-- Tabs -->
         <div class="flex gap-1 mb-8 border-b border-gray-200 dark:border-gray-700">
@@ -108,94 +113,6 @@ import { ButtonComponent, CardComponent, CardContentComponent, BadgeComponent, W
             </div>
           </div>
 
-          <!-- Current Usage -->
-          <app-card customClass="mb-8">
-            <app-card-content customClass="p-8">
-              <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6">{{ 'SUBSCRIPTIONS.CURRENT_USAGE' | translate }}</h2>
-
-              <div class="space-y-6">
-                <!-- Documents Created -->
-                <div>
-                  <div class="flex items-center justify-between mb-3">
-                    <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ 'SUBSCRIPTIONS.DOCS_LABEL' | translate }}</span>
-                    <span class="text-sm font-bold text-gray-900 dark:text-gray-100">{{ 'SUBSCRIPTIONS.DOCS_VALUE' | translate }}</span>
-                  </div>
-                  <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 overflow-hidden">
-                    <div class="bg-[#155347] h-full rounded-full transition-all duration-500" style="width: 60%"></div>
-                  </div>
-                  <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">{{ 'SUBSCRIPTIONS.DOCS_REMAINING' | translate }}</p>
-                </div>
-
-                <!-- AI Requests -->
-                <div>
-                  <div class="flex items-center justify-between mb-3">
-                    <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ 'SUBSCRIPTIONS.AI_LABEL' | translate }}</span>
-                    <span class="text-sm font-bold text-gray-900 dark:text-gray-100">{{ 'SUBSCRIPTIONS.AI_VALUE' | translate }}</span>
-                  </div>
-                  <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 overflow-hidden">
-                    <div class="bg-[#155347] h-full rounded-full transition-all duration-500" style="width: 75%"></div>
-                  </div>
-                  <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">{{ 'SUBSCRIPTIONS.AI_REMAINING' | translate }}</p>
-                </div>
-
-                <!-- Teams Created -->
-                <div>
-                  <div class="flex items-center justify-between mb-3">
-                    <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ 'SUBSCRIPTIONS.TEAMS_LABEL' | translate }}</span>
-                    <span class="text-sm font-bold text-gray-900 dark:text-gray-100">{{ 'SUBSCRIPTIONS.TEAMS_VALUE' | translate }}</span>
-                  </div>
-                  <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 overflow-hidden">
-                    <div class="bg-[#155347] h-full rounded-full transition-all duration-500" style="width: 60%"></div>
-                  </div>
-                  <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">{{ 'SUBSCRIPTIONS.TEAMS_REMAINING' | translate }}</p>
-                </div>
-              </div>
-            </app-card-content>
-          </app-card>
-
-          <!-- Payment Information -->
-          <app-card>
-            <app-card-content customClass="p-8">
-              <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6">{{ 'SUBSCRIPTIONS.PAYMENT_INFO' | translate }}</h2>
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{{ 'SUBSCRIPTIONS.CARD_NUMBER' | translate }}</label>
-                  <input
-                    type="text"
-                    [placeholder]="'SUBSCRIPTIONS.CARD_NUMBER' | translate"
-                    class="w-full h-10 px-4 rounded-lg border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-[#155347] text-sm"
-                  />
-                </div>
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{{ 'SUBSCRIPTIONS.EXPIRY' | translate }}</label>
-                  <input
-                    type="text"
-                    placeholder="MM/YY"
-                    class="w-full h-10 px-4 rounded-lg border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-[#155347] text-sm"
-                  />
-                </div>
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{{ 'SUBSCRIPTIONS.CVC' | translate }}</label>
-                  <input
-                    type="text"
-                    placeholder="CVC"
-                    class="w-full h-10 px-4 rounded-lg border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-[#155347] text-sm"
-                  />
-                </div>
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{{ 'SUBSCRIPTIONS.BILLING_ZIP' | translate }}</label>
-                  <input
-                    type="text"
-                    [placeholder]="'SUBSCRIPTIONS.BILLING_ZIP' | translate"
-                    class="w-full h-10 px-4 rounded-lg border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-[#155347] text-sm"
-                  />
-                </div>
-              </div>
-              <div class="mt-6">
-                <app-button customClass="bg-[#155347] hover:bg-[#0d3d31]" (click)="showWipModal.set(true)">{{ 'SUBSCRIPTIONS.UPDATE_PAYMENT' | translate }}</app-button>
-              </div>
-            </app-card-content>
-          </app-card>
         }
       </div>
 

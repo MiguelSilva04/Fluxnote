@@ -36,12 +36,6 @@ import { ThemeService } from '../../../core/services/theme.service';
               {{ 'LANDING.HEADER.FEATURES' | translate }}
             </button>
             <button
-              (click)="scrollTo('precos')"
-              class="text-gray-700 dark:text-gray-300 hover:text-[#155347] dark:hover:text-emerald-400 transition-colors cursor-pointer"
-            >
-              {{ 'LANDING.HEADER.PRICING' | translate }}
-            </button>
-            <button
               (click)="scrollTo('faq')"
               class="text-gray-700 dark:text-gray-300 hover:text-[#155347] dark:hover:text-emerald-400 transition-colors cursor-pointer"
             >
@@ -154,12 +148,6 @@ import { ThemeService } from '../../../core/services/theme.service';
                 class="text-gray-700 dark:text-gray-300 hover:text-[#155347] dark:hover:text-emerald-400 transition-colors text-left cursor-pointer"
               >
                 {{ 'LANDING.HEADER.FEATURES' | translate }}
-              </button>
-              <button
-                (click)="scrollTo('precos'); closeMenu()"
-                class="text-gray-700 dark:text-gray-300 hover:text-[#155347] dark:hover:text-emerald-400 transition-colors text-left cursor-pointer"
-              >
-                {{ 'LANDING.HEADER.PRICING' | translate }}
               </button>
               <button
                 (click)="scrollTo('faq'); closeMenu()"

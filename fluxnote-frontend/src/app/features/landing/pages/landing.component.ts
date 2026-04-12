@@ -5,7 +5,6 @@ import {
   LandingFooterComponent,
   HeroSectionComponent,
   FeaturesSectionComponent,
-  PricingSectionComponent,
   FaqSectionComponent
 } from '../components';
 
@@ -18,7 +17,6 @@ import {
     LandingFooterComponent,
     HeroSectionComponent,
     FeaturesSectionComponent,
-    PricingSectionComponent,
     FaqSectionComponent
   ],
   template: `
@@ -26,7 +24,6 @@ import {
       <app-landing-header></app-landing-header>
       <app-hero-section></app-hero-section>
       <app-features-section></app-features-section>
-      <app-pricing-section></app-pricing-section>
       <app-faq-section></app-faq-section>
       <app-landing-footer></app-landing-footer>
     </div>

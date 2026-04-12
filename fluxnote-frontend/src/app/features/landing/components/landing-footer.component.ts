@@ -24,14 +24,6 @@ import { TranslateModule } from '@ngx-translate/core';
               </li>
               <li>
                 <button
-                  (click)="scrollTo('precos')"
-                  class="text-gray-300 hover:text-white transition-colors text-left cursor-pointer"
-                >
-                  {{ 'LANDING.HEADER.PRICING' | translate }}
-                </button>
-              </li>
-              <li>
-                <button
                   (click)="scrollTo('faq')"
                   class="text-gray-300 hover:text-white transition-colors text-left cursor-pointer"
                 >
